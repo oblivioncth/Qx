@@ -71,9 +71,9 @@ public:
     //-Class Members----------------------------------------------------------------------------------------------------
     public:
         static const inline QStringList TARGET_TYPES  = {"file", "directory"};
-        static const inline QString SUCCESS_TEMPLATE = "Succesfully %1  ""%3""";
-        static const inline QString ERROR_TEMPLATE = "Error while %1 ""%3""";
-        static const inline QStringList SUCCESS_VERBS = {"read", "wrote", "enumerated", "inspecting"};
+        static const inline QString SUCCESS_TEMPLATE = R"(Succesfully %1 %2 "%3")";
+        static const inline QString ERROR_TEMPLATE = R"(Error while %1 %2 "%3")";
+        static const inline QStringList SUCCESS_VERBS = {"read", "wrote", "enumerated", "inspected"};
         static const inline QStringList ERROR_VERBS = {"reading", "writing", "enumerating", "inspecting"};
         static const inline QStringList ERROR_INFO = {"An unknown error has occured.", "Access denied.", "Target is not a file.", "Target is not a directory.", "Out of resources.",
                                                       "General read error.", "General write error.", "A fatal error has occured.", "Could not open file.", "The opperation was aborted.",
