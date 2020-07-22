@@ -309,4 +309,32 @@ QString String::fromByteArrayHex(QByteArray data, QChar separator, Endian::Endia
 
 QString String::stripToHexOnly(QString string) { return string.replace(RegEx::nonHexOnly, ""); }
 
+//===============================================================================================================
+// FreeIndexTracker {defined in .h}
+//===============================================================================================================
+
+//-Constructor---------------------------------------------------------------------------------------------------
+//Public:
+//template <typename T, std::enable_if_t<std::is_arithmetic_v<T>, int>>
+//FreeIndexTracker(T minIndex, T maxIndex, QSet<T> reservedIndicies) { defined in .h }
+
+//-Instance Functions----------------------------------------------------------------------------------------------
+//Private:
+//int reserveInternal(int index) { defined in .h }
+//int releaseInternal(int index) { defined in .h }
+
+//Public:
+//bool isReserved(T index) { defined in .h }
+//T minimum() { defined in .h }
+//T maximum() { defined in .h }
+//T firstReserved() { defined in .h }
+//T lastReserved() { defined in .h }
+//T firstFree() { defined in .h }
+//T lastFree() { defined in .h }
+//bool reserve(int index) { defined in .h }
+//T reserveFirstFree() { defined in .h }
+//T reserveLastFree() { defined in .h }
+//bool release(int index) { defined in .h }
+
+
 }

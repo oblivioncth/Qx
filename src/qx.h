@@ -9,6 +9,9 @@
 #include <QRegularExpression>
 #include <QtEndian>
 #include <QWidget>
+#include <QSet>
+#include <QSet>
+#include "assert.h"
 
 namespace Qx
 {
@@ -29,7 +32,7 @@ struct is_specialization<Template<Args...>, Template> : std::true_type {};
 template <typename T>
 struct typeIdentifier {typedef T type; }; // Forces compiler to deduce the type of T from only one argument so that implicit conversions can be used for the others
 
-template<typename T> //FIXME: Template is not type limited!
+template<typename T, std::enable_if_t<std::is_integral_v<T>, int> = 0>
 T rangeToLength(T start, T end)
 {
     // Returns the length from start to end including start, primarily for support of NII (Negative Is Infinity)
@@ -43,23 +46,6 @@ static bool isOdd(T num) { return num % 2; }
 
 template<typename T, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
 static bool isEven(T num) { return !isOdd(num); }
-
-//int testFunction()
-//{
-//    NII<long> temp(5);
-//    NII<long> temptwo(4);
-
-//    std::vector<int> var;
-
-//    bool check = is_specialization<std::vector<int>, std::vector>::value;
-//   NII<long> test = rangeToLength(temp,temptwo);
-
-//   //return rangeToLength(3,4);
-
-
-
-//    return 10;
-//}
 
 //-Classes------------------------------------------------------------------------------------------------------
 class Endian
@@ -268,6 +254,144 @@ public:
     static bool isHexNumber(QChar hexNum);
 };
 
+template <typename T, std::enable_if_t<std::is_integral_v<T>, int> = 0>
+class FreeIndexTracker
+{
+//-Class Members-------------------------------------------------------------------------------------------------
+public:
+    static const int ABSOLUTE_MIN = 0;
+    static const int TYPE_MAX = -1;
+
+//-Instance Members----------------------------------------------------------------------------------------------
+private:
+    T mMinIndex;
+    T mMaxIndex;
+    QSet<T> mReservedIndicies;
+
+//-Constructor---------------------------------------------------------------------------------------------------
+public:
+    FreeIndexTracker() : mMinIndex(0), mMaxIndex(0), mReservedIndicies(QSet<T>()) {}
+    FreeIndexTracker(T minIndex, T maxIndex, QSet<T> reservedIndicies) : mMinIndex(minIndex), mMaxIndex(maxIndex), mReservedIndicies(reservedIndicies)
+    {
+        // Determine programatic limit if "type max" (-1) is specified
+        if(maxIndex < 0)
+            maxIndex = std::numeric_limits<T>::max();
+
+        // Insure initial values are valid
+        assert(minIndex >= 0 && minIndex <= maxIndex &&
+               (*std::min_element(reservedIndicies.begin(), reservedIndicies.end())) >= mMinIndex &&
+               (*std::max_element(reservedIndicies.begin(), reservedIndicies.end())) <= mMaxIndex);
+    }
+
+//-Instance Functions----------------------------------------------------------------------------------------------
+private:
+    int reserveInternal(int index)
+    {
+        // Check for valid index
+        assert(index == -1 || (index >= mMinIndex && index <= mMaxIndex));
+
+        int indexAffected = -1;
+
+        // Check if index is free and reserve if so
+        if(index != -1 && !mReservedIndicies.contains(index))
+        {
+            mReservedIndicies.insert(index);
+            indexAffected = index;
+        }
+
+        return indexAffected;
+    }
+
+    int releaseInternal(int index)
+    {
+        // Check for valid index
+        assert(index == -1 || (index >= mMinIndex && index <= mMaxIndex));
+
+        int indexAffected = -1;
+
+        // Check if index is reserved and free if so
+        if(index != -1 && mReservedIndicies.contains(index))
+        {
+            mReservedIndicies.remove(index);
+            indexAffected = index;
+        }
+
+        return indexAffected;
+    }
+
+public:
+    bool isReserved(T index) { return mReservedIndicies.contains(index); }
+    T minimum() { return mMinIndex; }
+    T maximum() { return mMaxIndex; }
+
+    T firstReserved()
+    {
+        if(!mReservedIndicies.isEmpty())
+            return (*std::min_element(mReservedIndicies.begin(), mReservedIndicies.end()));
+        else
+            return -1;
+    }
+
+    T lastReserved()
+    {
+        if(!mReservedIndicies.isEmpty())
+            return (*std::max_element(mReservedIndicies.begin(), mReservedIndicies.end()));
+        else
+            return -1;
+    }
+
+    T firstFree()
+    {
+        // Quick check for all reserved
+        if(mReservedIndicies.count() == rangeToLength(mMinIndex, mMaxIndex))
+            return -1;
+
+        // Full check for first available
+        for(int i = mMinIndex; i <= mMaxIndex; i++)
+            if(!mReservedIndicies.contains(i))
+                return i;
+
+        // Should never be reached, used to prevent warning (all control paths)
+        return -1;
+    }
+
+    T lastFree()
+    {
+        // Quick check for all reserved
+        if(mReservedIndicies.count() == rangeToLength(mMinIndex, mMaxIndex))
+            return -1;
+
+        // Full check for first available (backwards)
+        for(int i = mMaxIndex; i >= mMinIndex ; i--)
+            if(!mReservedIndicies.contains(i))
+                return i;
+
+        // Should never be reached, used to prevent warning (all control paths)
+        return -1;
+    }
+
+    bool reserve(int index)
+    {
+        // Check for valid index
+        assert(index >= mMinIndex && index <= mMaxIndex);
+
+        return reserveInternal(index) == index;
+    }
+
+    T reserveFirstFree() { return reserveInternal(firstFree()); }
+
+    T reserveLastFree() { return reserveInternal(lastFree()); }
+
+    bool release(int index)
+    {
+        // Check for valid index
+        assert(index >= mMinIndex && index <= mMaxIndex);
+
+        return releaseInternal(index) == index;
+    }
+
+};
+
 class Integrity
 {
 //-Class Functions---------------------------------------------------------------------------------------------
@@ -276,7 +400,6 @@ public:
 };
 
 template <typename T, std::enable_if_t<std::is_arithmetic_v<T>, int>>
-//template <typename T>
 class NII // Negative Is Infinity - Wrapper class (0 is minimum)
 {
 //-Class Members-------------------------------------------------------------------------------------------------
