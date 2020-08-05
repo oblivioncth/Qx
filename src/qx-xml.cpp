@@ -19,7 +19,7 @@ namespace Qx
 
 //-Class Functions-----------------------------------------------------------------------------------------------
 //Private:
-    static QString textFromStandardError(QXmlStreamReader::Error standardError)
+    QString XmlStreamReaderError::textFromStandardError(QXmlStreamReader::Error standardError)
     {
         switch (standardError)
         {

@@ -103,28 +103,28 @@ static inline QString ENDL = "\r\n"; //NOTE: Currently this is windows only
 //-Functions-------------------------------------------------------------------------------------------------------------
 
 // General:
-    static bool fileIsEmpty(QFile& file);
-    static bool fileIsEmpty(QFile& file, IOOpReport& reportBuffer);
+    bool fileIsEmpty(QFile& file);
+    bool fileIsEmpty(QFile& file, IOOpReport& reportBuffer);
 // Text Based:
-    static IOOpReport getLineCountOfFile(long long& returnBuffer, QFile& textFile);
-    static IOOpReport findStringInFile(TextPos& returnBuffer, QFile& textFile, const QString& query, int hitsToSkip = 0, Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive);
-    static IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos textPos, int characters = -1);
-    static IOOpReport readTextRangeFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos, TextPos endPos = TextPos::END);
-    static IOOpReport readTextFromFileByLine(QStringList& returnBuffer, QFile &textFile, int startLine = 0, int endLine = -1);
-    static IOOpReport readAllTextFromFile(QString& returnBuffer, QFile& textFile);
-    static IOOpReport writeStringAsFile(QFile &textFile, const QString& text, bool overwriteIfExist = false, bool createDirs = true);
-    static IOOpReport writeStringToEndOfFile(QFile &textFile, const QString& text, bool ensureNewLine = false, bool createIfDNE = false, bool createDirs = true); // Consider making function just writeStringToFile and use TextPos with bool for overwrite vs insert
-    static IOOpReport deleteTextRangeFromFile(QFile &textFile, TextPos startPos, TextPos endPos);
+    IOOpReport getLineCountOfFile(long long& returnBuffer, QFile& textFile);
+    IOOpReport findStringInFile(TextPos& returnBuffer, QFile& textFile, const QString& query, int hitsToSkip = 0, Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive);
+    IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos textPos, int characters = -1);
+    IOOpReport readTextRangeFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos, TextPos endPos = TextPos::END);
+    IOOpReport readTextFromFileByLine(QStringList& returnBuffer, QFile &textFile, int startLine = 0, int endLine = -1);
+    IOOpReport readAllTextFromFile(QString& returnBuffer, QFile& textFile);
+    IOOpReport writeStringAsFile(QFile &textFile, const QString& text, bool overwriteIfExist = false, bool createDirs = true);
+    IOOpReport writeStringToEndOfFile(QFile &textFile, const QString& text, bool ensureNewLine = false, bool createIfDNE = false, bool createDirs = true); // Consider making function just writeStringToFile and use TextPos with bool for overwrite vs insert
+    IOOpReport deleteTextRangeFromFile(QFile &textFile, TextPos startPos, TextPos endPos);
 // Directory Based:
-    static IOOpReport getDirFileList(QStringList& returnBuffer, QDir directory, bool includeSubdirectories = false, QStringList extFilter = QStringList());
-    static bool dirContainsFiles(QDir directory, bool includeSubdirectories = false);
-    static bool dirContainsFiles(QDir directory, IOOpReport& reportBuffer, bool includeSubdirectories = false);
+    IOOpReport getDirFileList(QStringList& returnBuffer, QDir directory, bool includeSubdirectories = false, QStringList extFilter = QStringList());
+    bool dirContainsFiles(QDir directory, bool includeSubdirectories = false);
+    bool dirContainsFiles(QDir directory, IOOpReport& reportBuffer, bool includeSubdirectories = false);
 // Integrity Based
-    static IOOpReport calculateFileChecksum(QByteArray& returnBuffer, QFile& file, QCryptographicHash::Algorithm hashAlgorithm);
+    IOOpReport calculateFileChecksum(QByteArray& returnBuffer, QFile& file, QCryptographicHash::Algorithm hashAlgorithm);
 // Raw Based
-    static IOOpReport readAllBytesFromFile(QByteArray& returnBuffer, QFile &file);
-    static IOOpReport readBytesFromFile(QByteArray& returnBuffer, QFile &file, long long start, long long end = -1);
-    static IOOpReport writeBytesAsFile(QFile &file, const QByteArray &byteArray, bool overwriteIfExist = false, bool createDirs = true);
+    IOOpReport readAllBytesFromFile(QByteArray& returnBuffer, QFile &file);
+    IOOpReport readBytesFromFile(QByteArray& returnBuffer, QFile &file, long long start, long long end = -1);
+    IOOpReport writeBytesAsFile(QFile &file, const QByteArray &byteArray, bool overwriteIfExist = false, bool createDirs = true);
 }
 
 #endif // IO_H
