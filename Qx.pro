@@ -5,7 +5,7 @@ LIB_SHORT_NAME = Qx
 LIB_VER_MJR = 0
 LIB_VER_MNR = 0
 LIB_VER_REV = 1
-LIB_VER_BLD = 5
+LIB_VER_BLD = 6
 
 contains(QT_ARCH, i386) {
     ARCH_STR = 32
@@ -40,11 +40,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     src/qx-io.cpp \
+    src/qx-xml.cpp \
     src/qx.cpp
 
 HEADERS += \
     src/Windows_c++17_compat.h \
     src/qx-io.h \
+    src/qx-xml.h \
     src/qx.h
 
 # Default rules for deployment.

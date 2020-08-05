@@ -6,106 +6,109 @@
 
 namespace Qx
 {
-//===============================================================================================================
-// IO
-//===============================================================================================================
 
 //-Functions-----------------------------------------------------------------------------------------------------
 //Private:
-IO::IOOpResultType IO::parsedOpen(QFile &file, QIODevice::OpenMode openMode)
+namespace  // Anonymous namespace for effectively private (to this cpp) functions
 {
-    if(file.open(openMode))
-        return IO_SUCCESS;
-    else
-        return translateQFileDeviceError(file.error());
-}
 
-IO::IOOpResultType IO::translateQFileDeviceError(QFileDevice::FileError fileError)
-{
-    switch(fileError)
+    IOOpResultType translateQFileDeviceError(QFileDevice::FileError fileError)
     {
-        case QFileDevice::NoError:
-            return IO_SUCCESS;
-        case QFileDevice::ReadError:
-            return IO_ERR_READ;
-        case QFileDevice::WriteError:
-            return IO_ERR_WRITE;
-        case QFileDevice::FatalError:
-            return IO_ERR_FATAL;
-        case QFileDevice::ResourceError:
-            return IO_ERR_OUT_OF_RES;
-        case QFileDevice::OpenError:
-            return IO_ERR_OPEN;
-        case QFileDevice::AbortError:
-            return IO_ERR_ABORT;
-        case QFileDevice::TimeOutError:
-            return IO_ERR_TIMEOUT;
-        case QFileDevice::UnspecifiedError:
-            return IO_ERR_UNKNOWN;
-        case QFileDevice::RemoveError:
-            return IO_ERR_REMOVE;
-        case QFileDevice::RenameError:
-            return IO_ERR_RENAME;
-        case QFileDevice::PositionError:
-            return IO_ERR_REPOSITION;
-        case QFileDevice::ResizeError:
-            return IO_ERR_RESIZE;
-        case  QFileDevice::PermissionsError:
-            return IO_ERR_ACCESS_DENIED;
-        case QFileDevice::CopyError:
-            return IO_ERR_COPY;
+        switch(fileError)
+        {
+            case QFileDevice::NoError:
+                return IO_SUCCESS;
+            case QFileDevice::ReadError:
+                return IO_ERR_READ;
+            case QFileDevice::WriteError:
+                return IO_ERR_WRITE;
+            case QFileDevice::FatalError:
+                return IO_ERR_FATAL;
+            case QFileDevice::ResourceError:
+                return IO_ERR_OUT_OF_RES;
+            case QFileDevice::OpenError:
+                return IO_ERR_OPEN;
+            case QFileDevice::AbortError:
+                return IO_ERR_ABORT;
+            case QFileDevice::TimeOutError:
+                return IO_ERR_TIMEOUT;
+            case QFileDevice::UnspecifiedError:
+                return IO_ERR_UNKNOWN;
+            case QFileDevice::RemoveError:
+                return IO_ERR_REMOVE;
+            case QFileDevice::RenameError:
+                return IO_ERR_RENAME;
+            case QFileDevice::PositionError:
+                return IO_ERR_REPOSITION;
+            case QFileDevice::ResizeError:
+                return IO_ERR_RESIZE;
+            case  QFileDevice::PermissionsError:
+                return IO_ERR_ACCESS_DENIED;
+            case QFileDevice::CopyError:
+                return IO_ERR_COPY;
+        }
+
+        return IO_ERR_UNKNOWN; // Should never be reached, used to avoid "not all control paths return a value" warning
     }
 
-    return IO_ERR_UNKNOWN; // Should never be reached, used to avoid "not all control paths return a value" warning
-}
-
-IO::IOOpResultType IO::translateQTextStreamStatus(QTextStream::Status fileStatus)
-{
-    switch(fileStatus)
+    IOOpResultType parsedOpen(QFile &file, QIODevice::OpenMode openMode)
     {
-        case QTextStream::Ok:
-            return IO::IO_SUCCESS;
-        case QTextStream::ReadPastEnd:
-            return IO::IO_ERR_CURSOR_OOB;
-        case QTextStream::ReadCorruptData:
-            return IO::IO_ERR_READ;
-        case QTextStream::WriteFailed:
-            return IO::IO_ERR_WRITE;
-    }
-
-    return IO_ERR_UNKNOWN; // Should never be reached, used to avoid "not all control paths return a value" warning
-}
-
-IO::IOOpResultType IO::fileCheck(QFile &file)
-{
-    if(file.exists())
-    {
-        if(QFileInfo(file).isFile())
+        if(file.open(openMode))
             return IO_SUCCESS;
         else
-            return IO_ERR_NOT_A_FILE;
+            return translateQFileDeviceError(file.error());
     }
-    else
-        return IO_ERR_FILE_DNE;
-}
 
-IO::IOOpResultType IO::directoryCheck(QDir &dir)
-{
-    if(dir.exists())
+
+
+    IOOpResultType translateQTextStreamStatus(QTextStream::Status fileStatus)
     {
-        if(QFileInfo(dir.absolutePath()).isDir())
-            return IO_SUCCESS;
-        else
-            return IO_ERR_NOT_A_DIR;
+        switch(fileStatus)
+        {
+            case QTextStream::Ok:
+                return IO_SUCCESS;
+            case QTextStream::ReadPastEnd:
+                return IO_ERR_CURSOR_OOB;
+            case QTextStream::ReadCorruptData:
+                return IO_ERR_READ;
+            case QTextStream::WriteFailed:
+                return IO_ERR_WRITE;
+        }
+
+        return IO_ERR_UNKNOWN; // Should never be reached, used to avoid "not all control paths return a value" warning
     }
-    else
-        return IO_ERR_DIR_DNE;
+
+    IOOpResultType fileCheck(QFile &file)
+    {
+        if(file.exists())
+        {
+            if(QFileInfo(file).isFile())
+                return IO_SUCCESS;
+            else
+                return IO_ERR_NOT_A_FILE;
+        }
+        else
+            return IO_ERR_FILE_DNE;
+    }
+
+    IOOpResultType directoryCheck(QDir &dir)
+    {
+        if(dir.exists())
+        {
+            if(QFileInfo(dir.absolutePath()).isDir())
+                return IO_SUCCESS;
+            else
+                return IO_ERR_NOT_A_DIR;
+        }
+        else
+            return IO_ERR_DIR_DNE;
+    }
 }
 
 //Public:
-bool IO::fileIsEmpty(QFile& file) { return file.size() == 0; }
+bool fileIsEmpty(QFile& file) { return file.size() == 0; }
 
-bool IO::fileIsEmpty(QFile &file, IOOpReport& reportBuffer)
+bool fileIsEmpty(QFile &file, IOOpReport& reportBuffer)
 {
     // Empty buffer
     reportBuffer = IOOpReport();
@@ -124,7 +127,7 @@ bool IO::fileIsEmpty(QFile &file, IOOpReport& reportBuffer)
     }
 }
 
-IO::IOOpReport IO::getLineCountOfFile(long long& returnBuffer, QFile &textFile)
+IOOpReport getLineCountOfFile(long long& returnBuffer, QFile &textFile)
 {
     // Check file
     IOOpResultType fileCheckResult = fileCheck(textFile);
@@ -157,7 +160,7 @@ IO::IOOpReport IO::getLineCountOfFile(long long& returnBuffer, QFile &textFile)
     return IOOpReport(IO_OP_INSPECT, IO_SUCCESS, textFile);
 }
 
-IO::IOOpReport IO::findStringInFile(TextPos& returnBuffer, QFile& textFile, const QString& query, int hitsToSkip, Qt::CaseSensitivity caseSensitivty)
+IOOpReport findStringInFile(TextPos& returnBuffer, QFile& textFile, const QString& query, int hitsToSkip, Qt::CaseSensitivity caseSensitivty)
 {
     // Returns the found match after skipping the requested hits if it exists, otherwise returns a null position
     // hitsToSkip = -1 returns the last match if any
@@ -175,7 +178,7 @@ IO::IOOpReport IO::findStringInFile(TextPos& returnBuffer, QFile& textFile, cons
     if(openResult != IO_SUCCESS)
         return IOOpReport(IO_OP_READ, openResult, textFile);
 
-    IO::TextPos lastHit = TextPos(); // Null position in the event no match is found
+    TextPos lastHit = TextPos(); // Null position in the event no match is found
     int skipCount = 0;
     int currentLine = 0;
     int currentChar = 0;
@@ -215,7 +218,7 @@ IO::IOOpReport IO::findStringInFile(TextPos& returnBuffer, QFile& textFile, cons
     return IOOpReport(IO_OP_READ, IO_SUCCESS, textFile);
 }
 
-IO::IOOpReport IO::readTextFromFile(QString& returnBuffer, QFile& textFile, IO::TextPos textPos, int characters)
+IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos textPos, int characters)
 {
     // Empty buffer
     returnBuffer = QString();
@@ -274,13 +277,13 @@ IO::IOOpReport IO::readTextFromFile(QString& returnBuffer, QFile& textFile, IO::
     return IOOpReport(IO_OP_READ, IO_SUCCESS, textFile);
 }
 
-IO::IOOpReport IO::readTextRangeFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos, TextPos endPos)
+IOOpReport readTextRangeFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos, TextPos endPos)
 {
     // Returns a string of a portion of the passed file [startPos, endPos] (inclusive for both)
 
     // Ensure positions are valid
      if(startPos > endPos)
-         throw std::runtime_error("Error: endPos must be greater than or equal to startPos for Qx::IO::getTextRangeFromFile()");
+         throw std::runtime_error("Error: endPos must be greater than or equal to startPos for Qx::getTextRangeFromFile()");
          //TODO: create excpetion class that prints error and stashes the expection properly
 
      // Empty buffer
@@ -365,11 +368,11 @@ IO::IOOpReport IO::readTextRangeFromFile(QString& returnBuffer, QFile& textFile,
     return IOOpReport(IO_OP_READ, IO_SUCCESS, textFile);
 }
 
-IO::IOOpReport IO::readTextFromFileByLine(QStringList& returnBuffer, QFile& textFile, int startLine, int endLine)
+IOOpReport readTextFromFileByLine(QStringList& returnBuffer, QFile& textFile, int startLine, int endLine)
 {
      // Ensure positions are valid
      if(NII(startLine) > NII(endLine))
-         throw std::runtime_error("Error: endLine must be greater than or equal to startLine for Qx::IO::getLineListFromFile()");
+         throw std::runtime_error("Error: endLine must be greater than or equal to startLine for Qx::getLineListFromFile()");
 
      // Empty buffer
      returnBuffer = QStringList();
@@ -421,7 +424,7 @@ IO::IOOpReport IO::readTextFromFileByLine(QStringList& returnBuffer, QFile& text
      return IOOpReport(IO_OP_READ, IO_SUCCESS, textFile);
 }
 
-IO::IOOpReport IO::readAllTextFromFile(QString& returnBuffer, QFile& textFile)
+IOOpReport readAllTextFromFile(QString& returnBuffer, QFile& textFile)
 {
     // Empty buffer
     returnBuffer = QString();
@@ -443,7 +446,7 @@ IO::IOOpReport IO::readAllTextFromFile(QString& returnBuffer, QFile& textFile)
     return IOOpReport(IO_OP_READ, IO_SUCCESS, textFile);
 }
 
-IO::IOOpReport IO::writeStringAsFile(QFile& textFile, const QString& text, bool overwriteIfExist, bool createDirs)
+IOOpReport writeStringAsFile(QFile& textFile, const QString& text, bool overwriteIfExist, bool createDirs)
 {
     // Prints the entire string as a text file. If the file already exists and overwriteIfExist is true, the file is replaced.
 
@@ -493,7 +496,7 @@ IO::IOOpReport IO::writeStringAsFile(QFile& textFile, const QString& text, bool 
     return IOOpReport(IO_OP_WRITE, translateQTextStreamStatus(fileStream.status()), textFile);
 }
 
-IO::IOOpReport IO::writeStringToEndOfFile(QFile &textFile, const QString &text, bool ensureNewLine, bool createIfDNE, bool createDirs)
+IOOpReport writeStringToEndOfFile(QFile &textFile, const QString &text, bool ensureNewLine, bool createIfDNE, bool createDirs)
 {
     // Appends the given string to the given file, makes sure the appended string starts in a new line if ensureNewLine is true
 
@@ -556,13 +559,13 @@ IO::IOOpReport IO::writeStringToEndOfFile(QFile &textFile, const QString &text, 
 
 }
 
-IO::IOOpReport IO::deleteTextRangeFromFile(QFile &textFile, TextPos startPos, TextPos endPos)
+IOOpReport deleteTextRangeFromFile(QFile &textFile, TextPos startPos, TextPos endPos)
 {
     // Removes a string of a portion of the passed file [startPos, endPos] (inclusive for both)
 
     // Ensure positions are valid
      if(startPos > endPos)
-         throw std::runtime_error("Error: endPos must be greater than or equal to startPos for Qx::IO::getTextRangeFromFile()");
+         throw std::runtime_error("Error: endPos must be greater than or equal to startPos for Qx::getTextRangeFromFile()");
          //TODO: create excpetion class that prints error and stashes the expection properly
 
      // Check file
@@ -617,7 +620,7 @@ IO::IOOpReport IO::deleteTextRangeFromFile(QFile &textFile, TextPos startPos, Te
     return writeStringAsFile(textFile, truncatedText, true);
 }
 
-IO::IOOpReport IO::getDirFileList(QStringList& returnBuffer, QDir directory, bool includeSubdirectories, QStringList extFilter)
+IOOpReport getDirFileList(QStringList& returnBuffer, QDir directory, bool includeSubdirectories, QStringList extFilter)
 {
     // Empty buffer
     returnBuffer = QStringList();
@@ -649,7 +652,7 @@ IO::IOOpReport IO::getDirFileList(QStringList& returnBuffer, QDir directory, boo
     return IOOpReport(IO_OP_ENUMERATE, IO_SUCCESS, directory);
 }
 
-bool IO::dirContainsFiles(QDir directory, bool includeSubdirectories)
+bool dirContainsFiles(QDir directory, bool includeSubdirectories)
 {
     // Setup flags
     QDirIterator::IteratorFlags itFlags;
@@ -665,7 +668,7 @@ bool IO::dirContainsFiles(QDir directory, bool includeSubdirectories)
     return listIterator.hasNext();
 }
 
-bool IO::dirContainsFiles(QDir directory, IOOpReport &reportBuffer, bool includeSubdirectories)
+bool dirContainsFiles(QDir directory, IOOpReport &reportBuffer, bool includeSubdirectories)
 {
     // Empty buffer
     reportBuffer = IOOpReport();
@@ -685,7 +688,7 @@ bool IO::dirContainsFiles(QDir directory, IOOpReport &reportBuffer, bool include
 }
 
 
-IO::IOOpReport IO::calculateFileChecksum(QByteArray& returnBuffer, QFile& file, QCryptographicHash::Algorithm hashAlgorithm)
+IOOpReport calculateFileChecksum(QByteArray& returnBuffer, QFile& file, QCryptographicHash::Algorithm hashAlgorithm)
 {
     // Empty buffer
     returnBuffer = QByteArray();
@@ -714,7 +717,7 @@ IO::IOOpReport IO::calculateFileChecksum(QByteArray& returnBuffer, QFile& file, 
     }
 }
 
-IO::IOOpReport IO::readAllBytesFromFile(QByteArray& returnBuffer, QFile& file)
+IOOpReport readAllBytesFromFile(QByteArray& returnBuffer, QFile& file)
 {
     // Empty buffer
     returnBuffer = QByteArray();
@@ -736,11 +739,11 @@ IO::IOOpReport IO::readAllBytesFromFile(QByteArray& returnBuffer, QFile& file)
     return IOOpReport(IO_OP_READ, IO_SUCCESS, file);
 }
 
-IO::IOOpReport IO::readBytesFromFile(QByteArray& returnBuffer, QFile& file, long long startByte, long long endByte)
+IOOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, long long startByte, long long endByte)
 {
     // Ensure positions are valid
      if(NII(startByte) > NII(endByte))
-         throw std::runtime_error("Error: endPos must be greater than or euqal to startPos for Qx::IO::readBytesFromFile()");
+         throw std::runtime_error("Error: endPos must be greater than or euqal to startPos for Qx::readBytesFromFile()");
 
     // Empty buffer
     returnBuffer = QByteArray();
@@ -769,7 +772,7 @@ IO::IOOpReport IO::readBytesFromFile(QByteArray& returnBuffer, QFile& file, long
     return IOOpReport(IO_OP_READ, IO_SUCCESS, file);
 }
 
-IO::IOOpReport IO::writeBytesAsFile(QFile &file, const QByteArray &byteArray, bool overwriteIfExist, bool createDirs)
+IOOpReport writeBytesAsFile(QFile &file, const QByteArray &byteArray, bool overwriteIfExist, bool createDirs)
 {
     // Write the entire byte array to file. If the file already exists and overwriteIfExist is true, the file is replaced.
 
@@ -833,25 +836,25 @@ IO::IOOpReport IO::writeBytesAsFile(QFile &file, const QByteArray &byteArray, bo
 
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
-IO::IOOpReport::IOOpReport() {}
-IO::IOOpReport::IOOpReport(IOOpType op, IOOpResultType res, QFile& tar)
+IOOpReport::IOOpReport() {}
+IOOpReport::IOOpReport(IOOpType op, IOOpResultType res, QFile& tar)
     : mOperation(op), mResult(res), mTargetType(IO_FILE), mTarget(tar.fileName()) { parseOutcome(); }
-IO::IOOpReport::IOOpReport(IOOpType op, IOOpResultType res, QDir& tar)
+IOOpReport::IOOpReport(IOOpType op, IOOpResultType res, QDir& tar)
     : mOperation(op), mResult(res), mTargetType(IO_DIR), mTarget(tar.absolutePath()) { parseOutcome(); }
 
 
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:
-IO::IOOpType IO::IOOpReport::getOperation() const { return mOperation; }
-IO::IOOpResultType IO::IOOpReport::getResult() const { return mResult; }
-IO::IOOpTargetType IO::IOOpReport::getTargetType() const { return mTargetType; }
-QString IO::IOOpReport::getTarget() const { return mTarget; }
-QString IO::IOOpReport::getOutcome() const { return mOutcome; }
-QString IO::IOOpReport::getOutcomeInfo() const { return mOutcomeInfo; }
-bool IO::IOOpReport::wasSuccessful() const { return mResult == IO_SUCCESS; }
+IOOpType IOOpReport::getOperation() const { return mOperation; }
+IOOpResultType IOOpReport::getResult() const { return mResult; }
+IOOpTargetType IOOpReport::getTargetType() const { return mTargetType; }
+QString IOOpReport::getTarget() const { return mTarget; }
+QString IOOpReport::getOutcome() const { return mOutcome; }
+QString IOOpReport::getOutcomeInfo() const { return mOutcomeInfo; }
+bool IOOpReport::wasSuccessful() const { return mResult == IO_SUCCESS; }
 
 //Private:
-void IO::IOOpReport::parseOutcome()
+void IOOpReport::parseOutcome()
 {
     if(mResult == IO_SUCCESS)
         mOutcome = SUCCESS_TEMPLATE.arg(SUCCESS_VERBS.value(static_cast<int>(mOperation)), TARGET_TYPES.value(static_cast<int>(mTargetType)), QDir::toNativeSeparators(mTarget));
@@ -868,14 +871,14 @@ void IO::IOOpReport::parseOutcome()
 
 //-Class Variables-----------------------------------------------------------------------------------------------
 //Public:
-const IO::TextPos IO::TextPos::START = TextPos(0,0); // Intialization of constant reference TextPos
-const IO::TextPos IO::TextPos::END = TextPos(-1,-1); // Intialization of constant reference TextPos
+const TextPos TextPos::START = TextPos(0,0); // Intialization of constant reference TextPos
+const TextPos TextPos::END = TextPos(-1,-1); // Intialization of constant reference TextPos
 
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
-IO::TextPos::TextPos() { mLineNum = -2; mCharNum = -2; }
+TextPos::TextPos() { mLineNum = -2; mCharNum = -2; }
 
-IO::TextPos::TextPos(int lineNum, int charNum)
+TextPos::TextPos(int lineNum, int charNum)
  : mLineNum(lineNum), mCharNum(charNum)
 {
     if(mLineNum < -1)
@@ -886,23 +889,23 @@ IO::TextPos::TextPos(int lineNum, int charNum)
 
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:
-bool IO::TextPos::operator==(const TextPos &otherTextPos) { return mLineNum == otherTextPos.mLineNum && mCharNum == otherTextPos.mCharNum; }
-bool IO::TextPos::operator!= (const TextPos &otherTextPos) { return !(*this == otherTextPos); }
-bool IO::TextPos::operator> (const TextPos &otherTextPos)
+bool TextPos::operator==(const TextPos &otherTextPos) { return mLineNum == otherTextPos.mLineNum && mCharNum == otherTextPos.mCharNum; }
+bool TextPos::operator!= (const TextPos &otherTextPos) { return !(*this == otherTextPos); }
+bool TextPos::operator> (const TextPos &otherTextPos)
 {
     if(mLineNum == otherTextPos.mLineNum)
         return NII<int>(mCharNum) > NII<int>(otherTextPos.mCharNum);
     else
         return NII<int>(mLineNum) > NII<int>(otherTextPos.mLineNum);
 }
-bool IO::TextPos::operator>= (const TextPos &otherTextPos) { return *this == otherTextPos || *this > otherTextPos; }
-bool IO::TextPos::operator< (const TextPos &otherTextPos) { return !(*this >= otherTextPos); }
-bool IO::TextPos::operator<= (const TextPos &otherTextPos) { return !(*this > otherTextPos); }
+bool TextPos::operator>= (const TextPos &otherTextPos) { return *this == otherTextPos || *this > otherTextPos; }
+bool TextPos::operator< (const TextPos &otherTextPos) { return !(*this >= otherTextPos); }
+bool TextPos::operator<= (const TextPos &otherTextPos) { return !(*this > otherTextPos); }
 
-int IO::TextPos::getLineNum() { return mLineNum; }
-int IO::TextPos::getCharNum() { return mCharNum; }
+int TextPos::getLineNum() { return mLineNum; }
+int TextPos::getCharNum() { return mCharNum; }
 
-void IO::TextPos::setLineNum(int lineNum)
+void TextPos::setLineNum(int lineNum)
 {
     if(lineNum < -1)
         mLineNum = -1;
@@ -910,7 +913,7 @@ void IO::TextPos::setLineNum(int lineNum)
         mLineNum = lineNum;
 }
 
-void IO::TextPos::setCharNum(int charNum)
+void TextPos::setCharNum(int charNum)
 {
     if(charNum < -1)
         mCharNum = -1;
@@ -918,7 +921,7 @@ void IO::TextPos::setCharNum(int charNum)
         mCharNum = charNum;
 }
 
-void IO::TextPos::setNull() { mLineNum = -2; mCharNum = -2; }
-bool IO::TextPos::isNull() { return mLineNum == -2 && mCharNum == -2; }
+void TextPos::setNull() { mLineNum = -2; mCharNum = -2; }
+bool TextPos::isNull() { return mLineNum == -2 && mCharNum == -2; }
 
 }
