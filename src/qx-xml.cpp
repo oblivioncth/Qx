@@ -9,6 +9,8 @@ namespace Qx
 
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
+    XmlStreamReaderError::XmlStreamReaderError()
+        : mErrorType(QXmlStreamReader::NoError), mErrorText(textFromStandardError(QXmlStreamReader::NoError)) {}
     XmlStreamReaderError::XmlStreamReaderError(QXmlStreamReader::Error standardError)
         : mErrorType(standardError), mErrorText(textFromStandardError(standardError)) {}
 

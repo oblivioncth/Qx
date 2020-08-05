@@ -15,6 +15,7 @@ private:
 
 //-Constructor---------------------------------------------------------------------------------------------------
 public:
+    XmlStreamReaderError();
     XmlStreamReaderError(QXmlStreamReader::Error standardError);
     XmlStreamReaderError(QString customError);
 
