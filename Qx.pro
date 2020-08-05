@@ -1,11 +1,11 @@
-QT += widgets
+QT += widgets xml
 
 LIB_NAME = Qxtended
 LIB_SHORT_NAME = Qx
 LIB_VER_MJR = 0
 LIB_VER_MNR = 0
 LIB_VER_REV = 1
-LIB_VER_BLD = 4
+LIB_VER_BLD = 5
 
 contains(QT_ARCH, i386) {
     ARCH_STR = 32

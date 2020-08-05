@@ -11,6 +11,7 @@
 #include <QWidget>
 #include <QSet>
 #include <QSet>
+#include <QtXml>
 #include "assert.h"
 
 namespace Qx
@@ -593,6 +594,29 @@ public:
     static QString fromByteArrayHex(QByteArray data);
     static QString fromByteArrayHex(QByteArray data, QChar separator, Endian::Endianness endianness);
     static QString stripToHexOnly(QString string);
+};
+
+class XmlStreamReaderError
+{
+//-Instance Members----------------------------------------------------------------------------------------------
+private:
+    QXmlStreamReader::Error mErrorType;
+    QString mErrorText;
+
+//-Constructor---------------------------------------------------------------------------------------------------
+public:
+    XmlStreamReaderError(QXmlStreamReader::Error standardError);
+    XmlStreamReaderError(QString customError);
+
+//-Class Functions-----------------------------------------------------------------------------------------------
+private:
+    static QString textFromStandardError(QXmlStreamReader::Error standardError);
+
+//-Instance Functions--------------------------------------------------------------------------------------------
+public:
+    bool isValid();
+    QXmlStreamReader::Error getType();
+    QString getText();
 };
 
 }
