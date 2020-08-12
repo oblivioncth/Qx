@@ -8,7 +8,7 @@ namespace Qx
 DWORD getProcessIDByName(QString processName)
 {
     // Find process ID by name
-    DWORD processID = -1;
+    DWORD processID = 0;
     PROCESSENTRY32 entry;
     entry.dwSize = sizeof(PROCESSENTRY32);
 
@@ -28,7 +28,7 @@ DWORD getProcessIDByName(QString processName)
 
     CloseHandle(snapshot);
 
-    // Return if found or not (-1 if not)
+    // Return if found or not (0 if not)
     return processID;
 }
 
@@ -59,7 +59,7 @@ QString getProcessNameByID(DWORD processID)
     return processName;
 }
 
-bool processIsRunning(QString processName) { return getProcessIDByName(processName) == DWORD(-1); }
+bool processIsRunning(QString processName) { return getProcessIDByName(processName); }
 bool processIsRunning(DWORD processID) { return getProcessNameByID(processID).isNull(); }
 
 }
