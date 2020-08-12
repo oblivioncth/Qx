@@ -96,7 +96,7 @@ public:
     bool operator<= (const TextPos &otherTextPos);
 };
 
-//-Variables-------------------------------------------------------------------------------------------------
+//-Variables------------------------------------------------------------------------------------------------------------
 
 static inline QString ENDL = "\r\n"; //NOTE: Currently this is windows only
 
