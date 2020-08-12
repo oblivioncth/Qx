@@ -269,17 +269,27 @@ private:
 
 //-Constructor---------------------------------------------------------------------------------------------------
 public:
-    FreeIndexTracker() : mMinIndex(0), mMaxIndex(0), mReservedIndicies(QSet<T>()) {}
-    FreeIndexTracker(T minIndex, T maxIndex, QSet<T> reservedIndicies) : mMinIndex(minIndex), mMaxIndex(maxIndex), mReservedIndicies(reservedIndicies)
+    FreeIndexTracker(T minIndex = 0, T maxIndex = 0, QSet<T> reservedIndicies = QSet<T>()) : mMinIndex(minIndex), mMaxIndex(maxIndex), mReservedIndicies(reservedIndicies)
     {
         // Determine programatic limit if "type max" (-1) is specified
         if(maxIndex < 0)
             maxIndex = std::numeric_limits<T>::max();
 
         // Insure initial values are valid
-        assert(minIndex >= 0 && minIndex <= maxIndex &&
-               (*std::min_element(reservedIndicies.begin(), reservedIndicies.end())) >= mMinIndex &&
-               (*std::max_element(reservedIndicies.begin(), reservedIndicies.end())) <= mMaxIndex);
+        assert(minIndex >= 0 && minIndex <= maxIndex && (reservedIndicies.isEmpty() ||
+               (*std::min_element(reservedIndicies.begin(), reservedIndicies.end())) >= 0));
+
+        // Change bounds to match initial reserve list if they are mismatched
+        if(!reservedIndicies.isEmpty())
+        {
+            T minElement = *std::min_element(reservedIndicies.begin(), reservedIndicies.end());
+            if(minElement < minIndex)
+                mMinIndex = minElement;
+
+            T maxElement = *std::max_element(reservedIndicies.begin(), reservedIndicies.end());
+            if(maxElement > mMaxIndex)
+                mMaxIndex = maxElement;
+        }
     }
 
 //-Instance Functions----------------------------------------------------------------------------------------------
