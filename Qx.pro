@@ -44,7 +44,6 @@ SOURCES += \
     src/qx.cpp
 
 HEADERS += \
-    src/Windows_c++17_compat.h \
     src/qx-io.h \
     src/qx-xml.h \
     src/qx.h
