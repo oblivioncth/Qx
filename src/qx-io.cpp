@@ -1,7 +1,6 @@
 #include "qx-io.h"
 #include "qx.h"
 #include <stdexcept>
-#include <QDirIterator>
 #include <QDataStream>
 
 namespace Qx
@@ -125,6 +124,26 @@ bool fileIsEmpty(QFile &file, IOOpReport& reportBuffer)
         reportBuffer = IOOpReport(IO_OP_INSPECT, IO_SUCCESS, file);
         return fileIsEmpty(file); // Use reportless function
     }
+}
+
+QString kosherizeFileName(QString fileName)
+{
+    // Handle illegal characters
+    fileName.replace('<','{');
+    fileName.replace('>','}');
+    fileName.replace(':','-');
+    fileName.replace('"','`');
+    fileName.replace('/','_');
+    fileName.replace('\\','_');
+    fileName.replace('|',';');
+    fileName.remove('?');
+    fileName.replace('*','#');
+
+    // Prevent name from ending with .
+    while(fileName.back() == '.')
+        fileName.chop(1);
+
+    return fileName;
 }
 
 IOOpReport getLineCountOfFile(long long& returnBuffer, QFile &textFile)
@@ -620,7 +639,7 @@ IOOpReport deleteTextRangeFromFile(QFile &textFile, TextPos startPos, TextPos en
     return writeStringAsFile(textFile, truncatedText, true);
 }
 
-IOOpReport getDirFileList(QStringList& returnBuffer, QDir directory, bool includeSubdirectories, QStringList extFilter)
+IOOpReport getDirFileList(QStringList& returnBuffer, QDir directory, QDirIterator::IteratorFlag traversalFlags, QStringList extFilter, bool leadingDotSensitive, Qt::CaseSensitivity caseSensitivity)
 {
     // Empty buffer
     returnBuffer = QStringList();
@@ -630,22 +649,15 @@ IOOpReport getDirFileList(QStringList& returnBuffer, QDir directory, bool includ
     if(dirCheckResult != IO_SUCCESS)
         return IOOpReport(IO_OP_ENUMERATE, dirCheckResult, directory);
 
-    // Setup flags
-    QDirIterator::IteratorFlags itFlags;
-
-    if(includeSubdirectories)
-        itFlags = QDirIterator::Subdirectories;
-    else
-        itFlags = QDirIterator::NoIteratorFlags;
-
     // Construct directory iterator
-    QDirIterator listIterator(directory.path(), QDir::Files | QDir::NoDotAndDotDot, itFlags);
+    QDirIterator listIterator(directory.path(), QDir::Files | QDir::NoDotAndDotDot, traversalFlags);
 
     while(listIterator.hasNext())
     {
         QString filePath = listIterator.next();
         QFileInfo fileInfo(filePath);
-        if(extFilter.isEmpty() || extFilter.contains(fileInfo.suffix() ,Qt::CaseInsensitive))
+        if(extFilter.isEmpty() || extFilter.contains(fileInfo.suffix(), caseSensitivity) ||
+           (!leadingDotSensitive && extFilter.contains("." + fileInfo.suffix())))
             returnBuffer.append(filePath);
     }
 

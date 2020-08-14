@@ -4,8 +4,8 @@ LIB_NAME = Qxtended
 LIB_SHORT_NAME = Qx
 LIB_VER_MJR = 0
 LIB_VER_MNR = 0
-LIB_VER_REV = 1
-LIB_VER_BLD = 9
+LIB_VER_REV = 2
+LIB_VER_BLD = 1
 
 contains(QT_ARCH, i386) {
     ARCH_STR = 32
