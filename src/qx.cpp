@@ -97,6 +97,24 @@ QByteArray ByteArray::RAWFromStringHex(QString str) { return QByteArray::fromHex
 // ENDIAN
 //===============================================================================================================
 
+// Types/Constants only
+
+//===============================================================================================================
+// Generic Error
+//===============================================================================================================
+
+//-Constructor----------------------------------------------------------------------------------------------
+//Public:
+    GenericError::GenericError(QString primaryInfo, QString secondaryInfo, QString detailedInfo)
+        : mPrimaryInfo(primaryInfo), mSecondaryInfo(secondaryInfo), mDetailedInfo(detailedInfo) {}
+
+//-Instance Functions----------------------------------------------------------------------------------------------
+//Public:
+    bool GenericError::isValid() { return !mPrimaryInfo.isEmpty() || !mSecondaryInfo.isEmpty() || !mDetailedInfo.isEmpty(); }
+    QString GenericError::getPrimaryInfo() { return mPrimaryInfo; }
+    QString GenericError::getSecondaryInfo() { return mSecondaryInfo; }
+    QString GenericError::getDetailedInfo() { return mDetailedInfo; }
+
 //===============================================================================================================
 // INTEGRITY
 //===============================================================================================================
