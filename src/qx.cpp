@@ -105,12 +105,13 @@ QByteArray ByteArray::RAWFromStringHex(QString str) { return QByteArray::fromHex
 
 //-Constructor----------------------------------------------------------------------------------------------
 //Public:
-    GenericError::GenericError(QString primaryInfo, QString secondaryInfo, QString detailedInfo)
-        : mPrimaryInfo(primaryInfo), mSecondaryInfo(secondaryInfo), mDetailedInfo(detailedInfo) {}
+    GenericError::GenericError(QString caption, QString primaryInfo, QString secondaryInfo, QString detailedInfo)
+        : mCaption(caption), mPrimaryInfo(primaryInfo), mSecondaryInfo(secondaryInfo), mDetailedInfo(detailedInfo) {}
 
 //-Instance Functions----------------------------------------------------------------------------------------------
 //Public:
     bool GenericError::isValid() { return !mPrimaryInfo.isEmpty() || !mSecondaryInfo.isEmpty() || !mDetailedInfo.isEmpty(); }
+    QString GenericError::getCaption() { return mCaption; }
     QString GenericError::getPrimaryInfo() { return mPrimaryInfo; }
     QString GenericError::getSecondaryInfo() { return mSecondaryInfo; }
     QString GenericError::getDetailedInfo() { return mDetailedInfo; }
