@@ -685,4 +685,8 @@ public:
 };
 
 }
+
+//-Metatype declarations-------------------------------------------------------------------------------------------
+Q_DECLARE_METATYPE(Qx::GenericError);
+
 #endif // QX_H
