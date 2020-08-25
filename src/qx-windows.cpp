@@ -4,18 +4,25 @@
 
 namespace Qx
 {
-//-Classes---------------------------------------------------------------------------------------------------------------
+//-Classes------------------------------------------------------------------------------------------------------------
 
 //===============================================================================================================
 // FILE DETAILS
 //===============================================================================================================
 
+//-Constructor-------------------------------------------------------------------------------------------------------
+//Public:
+FileDetails::FileDetails() {}
+
+//-Instance Functions------------------------------------------------------------------------------------------------
+//Public:
 void FileDetails::addStringTable(StringTable stringTable)
 {
     mStringTables.append(stringTable);
     mLangCodePageMap[qMakePair(stringTable.metaLanguageID, stringTable.metaCodePageID)] = mStringTables.count() - 1;
 }
 
+//Private:
 bool FileDetails::isNull() { return mFileVersion.isNull() && mProductVersion.isNull() && mStringTables.isEmpty(); }
 int FileDetails::stringTableCount() { return mStringTables.count(); }
 QList<QPair<QString, QString>> FileDetails::availableLangCodePages() { return mLangCodePageMap.keys(); }
@@ -45,7 +52,6 @@ const FileDetails::StringTable FileDetails::getStringTable(QString language, QSt
     else
         return StringTable();
 }
-
 
 //-Functions-------------------------------------------------------------------------------------------------------------
 FileDetails getFileDetails(QString filePath)

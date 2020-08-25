@@ -197,6 +197,8 @@ public:
 };
 
 //-Functions-------------------------------------------------------------------------------------------------------------
+FileDetails getFileDetails(QString filePath);
+
 DWORD getProcessIDByName(QString processName);
 QString getProcessNameByID(DWORD processID);
 bool processIsRunning(QString processName);

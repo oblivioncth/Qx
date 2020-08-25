@@ -2,6 +2,8 @@
 #define QX_H
 
 #define ENABLE_IF(...) std::enable_if_t<__VA_ARGS__, int> = 0 // enable_if Macro; allows ENABLE_IF(std::is_arithmetic_v<T>) for example
+#define ENABLE_IF2(...) std::enable_if_t<__VA_ARGS__, int> // enable_if Macro with no default argument, use if template was already forward declared
+
 
 #include <QHash>
 #include <QCryptographicHash>
@@ -442,7 +444,7 @@ public:
     static QByteArray generateChecksum(QByteArray &data, QCryptographicHash::Algorithm hashAlgorithm);
 };
 
-template <typename T, ENABLE_IF(std::is_arithmetic_v<T>)>
+template <typename T, ENABLE_IF2(std::is_arithmetic_v<T>)>
 class NII // Negative Is Infinity - Wrapper class (0 is minimum)
 {
 //-Class Members-------------------------------------------------------------------------------------------------
