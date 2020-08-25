@@ -1,8 +1,7 @@
 #ifndef QX_H
 #define QX_H
 
-//#define REQUIRES(...) std::enable_if_t<__VA_ARGS__> // enable_if Macro; allows REQUIRES(std::is_arithmetic_v<T>) for example
-//TODO: Possibly remove this
+#define ENABLE_IF(...) std::enable_if_t<__VA_ARGS__, int> = 0 // enable_if Macro; allows ENABLE_IF(std::is_arithmetic_v<T>) for example
 
 #include <QHash>
 #include <QCryptographicHash>
@@ -10,15 +9,14 @@
 #include <QtEndian>
 #include <QWidget>
 #include <QSet>
+#include <QDateTime>
 #include "assert.h"
 
 namespace Qx
 {
 //-Class Forward Declarations---------------------------------------------------------------------------------------------
-template <typename T, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
+template <typename T, ENABLE_IF(std::is_arithmetic_v<T>)>
 class NII;
-
-class Endian;
 
 //-Traits-------------------------------------------------------------------------------------------------------
 template <class T, template <class...> class Template>
@@ -31,7 +29,7 @@ struct is_specialization<Template<Args...>, Template> : std::true_type {};
 template <typename T>
 struct typeIdentifier {typedef T type; }; // Forces compiler to deduce the type of T from only one argument so that implicit conversions can be used for the others
 
-template<typename T, std::enable_if_t<std::is_integral_v<T>, int> = 0>
+template<typename T, ENABLE_IF(std::is_integral_v<T>)>
 T rangeToLength(T start, T end)
 {
     // Returns the length from start to end including start, primarily for support of NII (Negative Is Infinity)
@@ -40,14 +38,14 @@ T rangeToLength(T start, T end)
     return length;
 }
 
-template<typename T, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
+template<typename T, ENABLE_IF(std::is_arithmetic_v<T>)>
 static bool isOdd(T num) { return num % 2; }
 
-template<typename T, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
+template<typename T, ENABLE_IF(std::is_arithmetic_v<T>)>
 static bool isEven(T num) { return !isOdd(num); }
 
 //-Classes------------------------------------------------------------------------------------------------------
-class Endian
+class Endian // Must be before its use, hence why this is out of alphabetical order
 {
 //-Class Types----------------------------------------------------------------------------------------------
 public:
@@ -126,7 +124,7 @@ class ByteArray
 {
 //-Class Functions----------------------------------------------------------------------------------------------
 public:
-    template<typename T, std::enable_if_t<std::is_integral_v<T>, int> = 0>
+    template<typename T, ENABLE_IF(std::is_integral_v<T>)>
     static QByteArray RAWFromPrimitive(T primitive, Endian::Endianness endianness = Endian::LE)
     {
         QByteArray rawBytes;
@@ -150,7 +148,7 @@ public:
         return rawBytes;
     }
 
-    template<typename T, std::enable_if_t<std::is_floating_point_v<T>, int> = 0>
+    template<typename T, ENABLE_IF(std::is_floating_point_v<T>)>
     static QByteArray RAWFromPrimitive(T primitive, Endian::Endianness endianness = Endian::LE)
     {
         QByteArray rawBytes;
@@ -186,7 +184,7 @@ public:
         return rawBytes;
     }
 
-    template<typename T, std::enable_if_t<std::is_fundamental_v<T>, int> = 0>
+    template<typename T, ENABLE_IF(std::is_fundamental_v<T>)>
     static T RAWToPrimitive(QByteArray ba, Endian::Endianness endianness = Endian::LE)
     {
         static_assert(std::numeric_limits<float>::is_iec559, "Only supports IEC 559 (IEEE 754) float"); // For floats
@@ -253,7 +251,20 @@ public:
     static bool isHexNumber(QChar hexNum);
 };
 
-template <typename T, std::enable_if_t<std::is_integral_v<T>, int> = 0>
+class DateTime
+{
+//-Class Variables----------------------------------------------------------------------------------------------
+private:
+    static const qint64 FILETIME_EPOCH_OFFSET_MS = 11644473600000; // Milliseconds between FILETIME 0 and Unix Epoch 0
+    static const qint64 EPOCH_MIN_MS = static_cast<qint64>(QDateTime::YearRange::First) * 31556952000; // Years to MS
+    static const qint64 EPOCH_MAX_MS = std::numeric_limits<qint64>::max(); // The true max QDateTime can represent is above signed 64bit limit in ms
+
+//-Class Functions----------------------------------------------------------------------------------------------
+public:
+    static QDateTime fromMSFileTime(qint64 fileTime);
+};
+
+template <typename T, ENABLE_IF(std::is_integral_v<T>)>
 class FreeIndexTracker
 {
 //-Class Members-------------------------------------------------------------------------------------------------
@@ -431,7 +442,7 @@ public:
     static QByteArray generateChecksum(QByteArray &data, QCryptographicHash::Algorithm hashAlgorithm);
 };
 
-template <typename T, std::enable_if_t<std::is_arithmetic_v<T>, int>>
+template <typename T, ENABLE_IF(std::is_arithmetic_v<T>)>
 class NII // Negative Is Infinity - Wrapper class (0 is minimum)
 {
 //-Class Members-------------------------------------------------------------------------------------------------
@@ -600,6 +611,50 @@ private:
 //-Class Functions---------------------------------------------------------------------------------------------
 public:
     static MMRB fromString(QString string);
+};
+
+class Number
+{
+//-Class Functions---------------------------------------------------------------------------------------------
+public:
+    template <typename T>
+    static T typeLimitedAdd(T a, T b)
+    {
+        if(((b > 0) && (a > (std::numeric_limits<T>::max() - b))) ||
+           ((b < 0) && (a < (std::numeric_limits<T>::min() - b))))
+            return std::numeric_limits<T>::max();
+        else
+            return a + b;
+    }
+
+    template <typename T>
+    static T typeLimitedSub(T a, T b)
+    {
+        if((b > 0 && a < std::numeric_limits<T>::min() + b) ||
+           (b < 0 && a > std::numeric_limits<T>::max() + b))
+            return std::numeric_limits<T>::min();
+        else
+            return a - b;
+    }
+
+    template <typename T, ENABLE_IF(std::is_integral_v<T>)>
+    static T roundToNearestMultiple(T num, T mult)
+    {
+        // Ignore negative multiples
+        mult = std::abs(mult);
+
+        if(mult == 0)
+            return 0;
+
+        if(mult == 1)
+            return num;
+
+        T towardsZero = (num / mult) * mult;
+        T awayFromZero = num < 0 ? typeLimitedSub(towardsZero, mult) : typeLimitedAdd(towardsZero, mult);
+
+        // Return of closest the two directions
+        return (abs(num) - abs(towardsZero) >= abs(awayFromZero) - abs(num))? awayFromZero : towardsZero;
+    }
 };
 
 class RegEx

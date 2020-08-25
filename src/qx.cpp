@@ -43,11 +43,6 @@ namespace Qx
 //static T mostFrequent(T(&array) [N]) { defined in .h }
 
 //===============================================================================================================
-// CHAR
-//===============================================================================================================
-bool Char::isHexNumber(QChar hexNum) { return RegEx::hexOnly.match(hexNum).hasMatch(); }
-
-//===============================================================================================================
 // BYTEARRAY
 //===============================================================================================================
 
@@ -65,6 +60,33 @@ bool Char::isHexNumber(QChar hexNum) { return RegEx::hexOnly.match(hexNum).hasMa
 
 QByteArray ByteArray::RAWFromString(QString str) { return str.toLatin1(); }
 QByteArray ByteArray::RAWFromStringHex(QString str) { return QByteArray::fromHex(str.toUtf8()); }
+
+//===============================================================================================================
+// CHAR
+//===============================================================================================================
+bool Char::isHexNumber(QChar hexNum) { return RegEx::hexOnly.match(hexNum).hasMatch(); }
+
+//===============================================================================================================
+// DATETIME
+//===============================================================================================================
+QDateTime DateTime::fromMSFileTime(qint64 fileTime)
+{
+    // Round to nearest 10,000-s place first to better account for precision loss than simply truncating
+    fileTime = Number::roundToNearestMultiple(fileTime, qint64(10000));
+
+    // Convert FILETIME 100ns count to ms (incurs tolerable precision loss)
+    qint64 msFileTime = fileTime/10000;
+
+    // Offset to unix epoch time, if underflow would occur use min
+    qint64 msEpochTime = Number::typeLimitedSub(msFileTime, FILETIME_EPOCH_OFFSET_MS);
+
+    // Check QDateTime bounds (the bounds can be slightly further than this as the min/max month/day/time within the
+    // min/max years are not accounted for, but this should be more than sufficient for most cases
+    if(msEpochTime >= EPOCH_MIN_MS && msEpochTime <= EPOCH_MAX_MS)
+        return QDateTime::fromMSecsSinceEpoch(msEpochTime);
+    else
+        return QDateTime();
+}
 
 //===============================================================================================================
 // FreeIndexTracker {defined in .h}
@@ -216,6 +238,9 @@ MMRB MMRB::fromString(QString string)
 //-Class Functions----------------------------------------------------------------------------------------------
 //Private:
 //T forceBounds(bool boundAtZero) { defined in .h }
+
+//-Instance Functions----------------------------------------------------------------------------------------------
+//Public::
 //bool operator==(const NII& otherNII) { defined in .h }
 //bool operator!=(const NII& otherNII) { defined in .h }
 //bool operator<(const NII& otherNII) { defined in .h }
@@ -231,6 +256,16 @@ MMRB MMRB::fromString(QString string)
 //void setNull() { defined in .h }
 //bool isInf() const { defined in .h }
 //T value() const { defined in .h }
+
+//===============================================================================================================
+// NUMBER
+//===============================================================================================================
+
+//-Class Functions----------------------------------------------------------------------------------------------
+//Public:
+//T typeLimitedAdd(T a, T b) { defined in .h }
+//T typeLimitedSub(T a, T b) { defined in .h }
+//T roundToNearestMultiple(T num, T mult) { defined in .h }
 
 //===============================================================================================================
 // STRING
