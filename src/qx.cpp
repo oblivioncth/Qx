@@ -206,7 +206,21 @@ bool MMRB::operator>= (const MMRB &otherMMRB) { return *this == otherMMRB || *th
 bool MMRB::operator< (const MMRB &otherMMRB) { return !(*this >= otherMMRB); }
 bool MMRB::operator<= (const MMRB &otherMMRB) { return !(*this > otherMMRB); }
 
-QString MMRB::toString() { return QString("%1.%2.%3.%4").arg(mMajor).arg(mMinor).arg(mRevision).arg(mBuild); }
+QString MMRB::toString(MMRB::StringFormat format)
+{
+    QString workingString = QString::number(mMajor);
+
+    if(mMinor != 0 || mRevision != 0 || mBuild != 0 || format != StringFormat::NoTrailZero)
+        workingString += "." + QString::number(mMinor);
+
+    if(mRevision != 0 || mBuild != 0 || format == StringFormat::Full)
+        workingString += "." + QString::number(mRevision);
+
+    if(mBuild != 0 || format == StringFormat::Full)
+        workingString += "." + QString::number(mBuild);
+
+    return workingString;
+}
 int MMRB::getMajorVer() { return mMajor; }
 int MMRB::getMinorVer() { return mMinor; }
 int MMRB::getRevisionVer() { return mRevision; }

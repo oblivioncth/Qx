@@ -4,7 +4,6 @@
 #define ENABLE_IF(...) std::enable_if_t<__VA_ARGS__, int> = 0 // enable_if Macro; allows ENABLE_IF(std::is_arithmetic_v<T>) for example
 #define ENABLE_IF2(...) std::enable_if_t<__VA_ARGS__, int> // enable_if Macro with no default argument, use if template was already forward declared
 
-
 #include <QHash>
 #include <QCryptographicHash>
 #include <QRegularExpression>
@@ -578,8 +577,9 @@ public:
 class MMRB
 {
 //-Class Variables---------------------------------------------------------------------------------------------
-private:
-    //static inline const QString MMRB_FORMAT = "%1.%2.%3.%4";
+public:
+    enum class StringFormat { Full, NoTrailZero, NoTrailRBZero };
+
 
 //-Member Variables--------------------------------------------------------------------------------------------
 private:
@@ -602,7 +602,7 @@ public:
     bool operator< (const MMRB &otherMMRB);
     bool operator<= (const MMRB &otherMMRB);
 
-    QString toString();
+    QString toString(StringFormat format = StringFormat::Full);
     int getMajorVer();
     int getMinorVer();
     int getRevisionVer();
