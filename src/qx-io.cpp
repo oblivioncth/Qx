@@ -126,7 +126,7 @@ bool fileIsEmpty(QFile &file, IOOpReport& reportBuffer)
     }
 }
 
-QString kosherizeFileName(QString fileName)
+QString kosherizeFileName(QString fileName) // Can return empty name if all characters are invalid
 {
     // Handle illegal characters
     fileName.replace('<','{');
@@ -140,7 +140,7 @@ QString kosherizeFileName(QString fileName)
     fileName.replace('*','#');
 
     // Prevent name from ending with .
-    while(fileName.back() == '.')
+    while(!fileName.isEmpty() && fileName.back() == '.') // Check size to prevent out of bounds ref
         fileName.chop(1);
 
     return fileName;
