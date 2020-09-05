@@ -1,5 +1,7 @@
 #include "qx.h"
 #include <QRegularExpression>
+#include <QJsonArray>
+#include <QJsonObject>
 
 namespace Qx
 {
@@ -149,6 +151,100 @@ QByteArray Integrity::generateChecksum(QByteArray &data, QCryptographicHash::Alg
     QCryptographicHash checksumHash(hashAlgorithm);
     checksumHash.addData(data);
     return checksumHash.result();
+}
+
+//===============================================================================================================
+// JSON
+//===============================================================================================================
+
+Qx::GenericError Json::checkedKeyRetrieval(bool& valueBuffer, QJsonObject jObject, QString key)
+{
+    // Reset buffer
+    valueBuffer = false;
+
+    QJsonValue potentialBool;
+
+    if((potentialBool = jObject.value(key)).isUndefined())
+        return Qx::GenericError(QString(), ERR_RETRIEVING_VALUE.arg(JSON_TYPE_BOOL, key), ERR_KEY_DOESNT_EXIST.arg(key));
+
+    if(!potentialBool.isBool())
+        return Qx::GenericError(QString(), ERR_RETRIEVING_VALUE.arg(JSON_TYPE_BOOL, key), ERR_KEY_TYPE_MISMATCH.arg(key, JSON_TYPE_BOOL));
+    else
+        valueBuffer = potentialBool.toBool();
+
+    return Qx::GenericError();
+}
+
+Qx::GenericError Json::checkedKeyRetrieval(double& valueBuffer, QJsonObject jObject, QString key)
+{
+    // Reset buffer
+    valueBuffer = 0.0;
+
+    QJsonValue potentialDouble;
+
+    if((potentialDouble = jObject.value(key)).isUndefined())
+        return Qx::GenericError(QString(), ERR_RETRIEVING_VALUE.arg(JSON_TYPE_DOUBLE, key), ERR_KEY_DOESNT_EXIST.arg(key));
+
+    if(!potentialDouble.isDouble())
+        return Qx::GenericError(QString(), ERR_RETRIEVING_VALUE.arg(JSON_TYPE_DOUBLE, key), ERR_KEY_TYPE_MISMATCH.arg(key, JSON_TYPE_DOUBLE));
+    else
+        valueBuffer = potentialDouble.toDouble();
+
+    return Qx::GenericError();
+}
+
+Qx::GenericError Json::checkedKeyRetrieval(QString& valueBuffer, QJsonObject jObject, QString key)
+{
+    // Reset buffer
+    valueBuffer = QString();
+
+    QJsonValue potentialString;
+
+    if((potentialString = jObject.value(key)).isUndefined())
+        return Qx::GenericError(QString(), ERR_RETRIEVING_VALUE.arg(JSON_TYPE_STRING, key), ERR_KEY_DOESNT_EXIST.arg(key));
+
+    if(!potentialString.isString())
+        return Qx::GenericError(QString(), ERR_RETRIEVING_VALUE.arg(JSON_TYPE_STRING, key), ERR_KEY_TYPE_MISMATCH.arg(key, JSON_TYPE_STRING));
+    else
+        valueBuffer = potentialString.toString();
+
+    return Qx::GenericError();
+}
+
+Qx::GenericError Json::checkedKeyRetrieval(QJsonArray& valueBuffer, QJsonObject jObject, QString key)
+{
+    // Reset buffer
+    valueBuffer = QJsonArray();
+
+    QJsonValue potentialArray;
+
+    if((potentialArray = jObject.value(key)).isUndefined())
+        return Qx::GenericError(QString(), ERR_RETRIEVING_VALUE.arg(JSON_TYPE_ARRAY, key), ERR_KEY_DOESNT_EXIST.arg(key));
+
+    if(!potentialArray.isArray())
+        return Qx::GenericError(QString(), ERR_RETRIEVING_VALUE.arg(JSON_TYPE_ARRAY, key), ERR_KEY_TYPE_MISMATCH.arg(key, JSON_TYPE_ARRAY));
+    else
+        valueBuffer = potentialArray.toArray();
+
+    return Qx::GenericError();
+}
+
+Qx::GenericError Json::checkedKeyRetrieval(QJsonObject& valueBuffer, QJsonObject jObject, QString key)
+{
+    // Reset buffer
+    valueBuffer = QJsonObject();
+
+    QJsonValue potentialObject;
+
+    if((potentialObject = jObject.value(key)).isUndefined())
+        return Qx::GenericError(QString(), ERR_RETRIEVING_VALUE.arg(JSON_TYPE_OBJECT, key), ERR_KEY_DOESNT_EXIST.arg(key));
+
+    if(!potentialObject.isObject())
+        return Qx::GenericError(QString(), ERR_RETRIEVING_VALUE.arg(JSON_TYPE_OBJECT, key), ERR_KEY_TYPE_MISMATCH.arg(key, JSON_TYPE_OBJECT));
+    else
+        valueBuffer = potentialObject.toObject();
+
+    return Qx::GenericError();
 }
 
 //===============================================================================================================
