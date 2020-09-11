@@ -1,6 +1,8 @@
 #include "qx-windows.h"
+#include "qx-io.h"
 #include <tlhelp32.h>
 #include <QFileInfo>
+#include <QCoreApplication>
 
 namespace Qx
 {
@@ -242,5 +244,31 @@ QString getProcessNameByID(DWORD processID)
 
 bool processIsRunning(QString processName) { return getProcessIDByName(processName); }
 bool processIsRunning(DWORD processID) { return getProcessNameByID(processID).isNull(); }
+
+bool enforceSingleInstance()
+{
+    // Presistant handle instance
+    static HANDLE uniqueAppMutex = NULL;
+
+    // Get self hash
+    QFile selfEXE(QCoreApplication::applicationFilePath());
+    QByteArray selfHash;
+
+    if(!calculateFileChecksum(selfHash, selfEXE, QCryptographicHash::Sha256).wasSuccessful())
+        return false;
+
+    QString selfHashHex = String::fromByteArrayHex(selfHash);
+
+    // Attempt to create unique mutex
+    uniqueAppMutex = CreateMutex(NULL, FALSE, selfHashHex.toStdWString().c_str());
+    if(GetLastError() == ERROR_ALREADY_EXISTS)
+    {
+        CloseHandle(uniqueAppMutex);
+        return false;
+    }
+
+    // Instance is only one
+    return true;
+}
 
 }
