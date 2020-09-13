@@ -110,6 +110,7 @@ static inline QString ENDL = "\r\n"; //NOTE: Currently this is windows only
 // Text Based:
     IOOpReport getLineCountOfFile(long long& returnBuffer, QFile& textFile);
     IOOpReport findStringInFile(TextPos& returnBuffer, QFile& textFile, const QString& query, int hitsToSkip = 0, Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive);
+    IOOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const QString& query, int hitLimit = -1, Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive);
     IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos textPos, int characters = -1);
     IOOpReport readTextRangeFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos, TextPos endPos = TextPos::END);
     IOOpReport readTextFromFileByLine(QStringList& returnBuffer, QFile &textFile, int startLine = 0, int endLine = -1);

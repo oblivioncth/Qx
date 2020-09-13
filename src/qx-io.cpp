@@ -179,7 +179,7 @@ IOOpReport getLineCountOfFile(long long& returnBuffer, QFile &textFile)
     return IOOpReport(IO_OP_INSPECT, IO_SUCCESS, textFile);
 }
 
-IOOpReport findStringInFile(TextPos& returnBuffer, QFile& textFile, const QString& query, int hitsToSkip, Qt::CaseSensitivity caseSensitivty)
+IOOpReport findStringInFile(TextPos& returnBuffer, QFile& textFile, const QString& query, int hitsToSkip, Qt::CaseSensitivity caseSensitivity)
 {
     // Returns the found match after skipping the requested hits if it exists, otherwise returns a null position
     // hitsToSkip = -1 returns the last match if any
@@ -205,7 +205,7 @@ IOOpReport findStringInFile(TextPos& returnBuffer, QFile& textFile, const QStrin
 
     while(!fileTextStream.atEnd())
     {
-        currentChar = fileTextStream.readLine().indexOf(query, 0, caseSensitivty);
+        currentChar = fileTextStream.readLine().indexOf(query, 0, caseSensitivity);
 
         if(currentChar == -1)
             currentLine++;
@@ -233,6 +233,51 @@ IOOpReport findStringInFile(TextPos& returnBuffer, QFile& textFile, const QStrin
     // Return last hit if that was requested, otherwise existing position, null or not
     if(hitsToSkip == -1)
         returnBuffer = lastHit;
+
+    return IOOpReport(IO_OP_READ, IO_SUCCESS, textFile);
+}
+
+IOOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const QString& query, int hitLimit, Qt::CaseSensitivity caseSensitivity)
+{
+    // Returns every occurs of the given query found in the given file up to the hitLimit, all if hitLimit == -1
+
+    // Empty buffer
+    returnBuffer.clear();
+
+    // Check file
+    IOOpResultType fileCheckResult = fileCheck(textFile);
+    if(fileCheckResult != IO_SUCCESS)
+        return IOOpReport(IO_OP_READ, fileCheckResult, textFile);
+
+    // Attempt to open file
+    IOOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly);
+    if(openResult != IO_SUCCESS)
+        return IOOpReport(IO_OP_READ, openResult, textFile);
+
+    int currentLine = 0;
+    int currentChar = 0;
+    QTextStream fileTextStream(&textFile);
+
+    while(!fileTextStream.atEnd())
+    {
+        currentChar = fileTextStream.readLine().indexOf(query, 0, caseSensitivity);
+
+        if(currentChar != -1)
+        {
+            // Add hit location to list
+            returnBuffer.append(TextPos(currentLine, currentChar));
+
+            // Check if hit limit has been reached
+            if(returnBuffer.size() == hitLimit)
+                break;
+        }
+
+        // Increase line count
+        currentLine++;
+    }
+
+    // Make sure to close file before return
+    textFile.close();
 
     return IOOpReport(IO_OP_READ, IO_SUCCESS, textFile);
 }
