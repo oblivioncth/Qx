@@ -959,8 +959,8 @@ bool TextPos::operator>= (const TextPos &otherTextPos) { return *this == otherTe
 bool TextPos::operator< (const TextPos &otherTextPos) { return !(*this >= otherTextPos); }
 bool TextPos::operator<= (const TextPos &otherTextPos) { return !(*this > otherTextPos); }
 
-int TextPos::getLineNum() { return mLineNum; }
-int TextPos::getCharNum() { return mCharNum; }
+int TextPos::getLineNum() const { return mLineNum; }
+int TextPos::getCharNum() const { return mCharNum; }
 
 void TextPos::setLineNum(int lineNum)
 {
@@ -979,6 +979,6 @@ void TextPos::setCharNum(int charNum)
 }
 
 void TextPos::setNull() { mLineNum = -2; mCharNum = -2; }
-bool TextPos::isNull() { return mLineNum == -2 && mCharNum == -2; }
+bool TextPos::isNull() const { return mLineNum == -2 && mCharNum == -2; }
 
 }

@@ -82,12 +82,12 @@ public:
 
 //-Instance Functions------------------------------------------------------------------------------------------------
 public:
-    int getLineNum();
-    int getCharNum();
+    int getLineNum() const;
+    int getCharNum() const;
     void setLineNum(int lineNum);
     void setCharNum(int charNum);
     void setNull();
-    bool isNull();
+    bool isNull() const;
 
     bool operator== (const TextPos &otherTextPos);
     bool operator!= (const TextPos &otherTextPos);
