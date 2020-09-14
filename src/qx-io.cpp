@@ -77,7 +77,7 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
         return IO_ERR_UNKNOWN; // Should never be reached, used to avoid "not all control paths return a value" warning
     }
 
-    IOOpResultType fileCheck(QFile &file)
+    IOOpResultType fileCheck(const QFile &file)
     {
         if(file.exists())
         {
@@ -105,9 +105,9 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
 }
 
 //Public:
-bool fileIsEmpty(QFile& file) { return file.size() == 0; }
+bool fileIsEmpty(const QFile& file) { return file.size() == 0; }
 
-bool fileIsEmpty(QFile &file, IOOpReport& reportBuffer)
+bool fileIsEmpty(const QFile &file, IOOpReport& reportBuffer)
 {
     // Empty buffer
     reportBuffer = IOOpReport();
@@ -894,9 +894,9 @@ IOOpReport writeBytesAsFile(QFile &file, const QByteArray &byteArray, bool overw
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
 IOOpReport::IOOpReport() {}
-IOOpReport::IOOpReport(IOOpType op, IOOpResultType res, QFile& tar)
+IOOpReport::IOOpReport(IOOpType op, IOOpResultType res, const QFile& tar)
     : mOperation(op), mResult(res), mTargetType(IO_FILE), mTarget(tar.fileName()) { parseOutcome(); }
-IOOpReport::IOOpReport(IOOpType op, IOOpResultType res, QDir& tar)
+IOOpReport::IOOpReport(IOOpType op, IOOpResultType res, const QDir& tar)
     : mOperation(op), mResult(res), mTargetType(IO_DIR), mTarget(tar.absolutePath()) { parseOutcome(); }
 
 

@@ -49,8 +49,8 @@ private:
 //-Constructor-------------------------------------------------------------------------------------------------------
 public:
     IOOpReport();
-    IOOpReport(IOOpType op, IOOpResultType res, QFile& tar);
-    IOOpReport(IOOpType op, IOOpResultType res, QDir& tar);
+    IOOpReport(IOOpType op, IOOpResultType res, const QFile& tar);
+    IOOpReport(IOOpType op, IOOpResultType res, const QDir& tar);
 
 //-Instance Functions----------------------------------------------------------------------------------------------
 public:
@@ -104,8 +104,8 @@ static inline QString ENDL = "\r\n"; //NOTE: Currently this is windows only
 //-Functions-------------------------------------------------------------------------------------------------------------
 
 // General:
-    bool fileIsEmpty(QFile& file);
-    bool fileIsEmpty(QFile& file, IOOpReport& reportBuffer);
+    bool fileIsEmpty(const QFile& file);
+    bool fileIsEmpty(const QFile& file, IOOpReport& reportBuffer);
     QString kosherizeFileName(QString fileName);
 // Text Based:
     IOOpReport getLineCountOfFile(long long& returnBuffer, QFile& textFile);
