@@ -178,7 +178,7 @@ IOOpReport getLineCountOfFile(long long& returnBuffer, QFile &textFile)
     return IOOpReport(IO_OP_INSPECT, IO_SUCCESS, textFile);
 }
 
-IOOpReport findStringInFile(TextPos& returnBuffer, QFile& textFile, const QString& query, int hitsToSkip, Qt::CaseSensitivity caseSensitivity)
+IOOpReport findStringInFile(TextPos& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity caseSensitivity, int hitsToSkip)
 {
     // Returns the found match after skipping the requested hits if it exists, otherwise returns a null position
     // hitsToSkip = -1 returns the last match if any
@@ -236,7 +236,7 @@ IOOpReport findStringInFile(TextPos& returnBuffer, QFile& textFile, const QStrin
     return IOOpReport(IO_OP_READ, IO_SUCCESS, textFile);
 }
 
-IOOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const QString& query, int hitLimit, Qt::CaseSensitivity caseSensitivity)
+IOOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity caseSensitivity, int hitLimit)
 {
     // Returns every occurs of the given query found in the given file up to the hitLimit, all if hitLimit == -1
 
@@ -279,6 +279,15 @@ IOOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const
     textFile.close();
 
     return IOOpReport(IO_OP_READ, IO_SUCCESS, textFile);
+}
+
+IOOpReport fileContainsString(bool& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity caseSensitivity)
+{
+    TextPos queryLocation;
+    IOOpReport searchReport = findStringInFile(queryLocation, textFile, query, caseSensitivity);
+    returnBuffer = !queryLocation.isNull();
+
+    return searchReport;
 }
 
 IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos textPos, int characters)
