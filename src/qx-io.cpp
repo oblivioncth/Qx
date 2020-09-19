@@ -10,7 +10,6 @@ namespace Qx
 //Private:
 namespace  // Anonymous namespace for effectively private (to this cpp) functions
 {
-
     IOOpResultType translateQFileDeviceError(QFileDevice::FileError fileError)
     {
         switch(fileError)
@@ -324,7 +323,7 @@ IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos text
             for (currentLine = 0; currentLine != textPos.getLineNum() && !fileTextStream.atEnd(); currentLine++)
                 fileTextStream.readLine(); // Burn lines until desired line or last line is reached
 
-            if(currentLine == textPos.getLineNum()) // Desired line index is within file bounds
+            if(currentLine == textPos.getLineNum() && !fileTextStream.atEnd()) // Desired line index is within file bounds
             {
                 if(textPos.getCharNum() == -1) // Last char is desired
                     returnBuffer = fileTextStream.readLine().right(1);
@@ -370,7 +369,7 @@ IOOpReport readTextRangeFromFile(QString& returnBuffer, QFile& textFile, TextPos
 
          // Last line tracker and text stream
          QString lastLine;
-        QTextStream fileTextStream(&textFile);
+         QTextStream fileTextStream(&textFile);
 
          // Cover each possible range type
          if(startPos.getLineNum() == -1) // Last line is desired
@@ -404,22 +403,26 @@ IOOpReport readTextRangeFromFile(QString& returnBuffer, QFile& textFile, TextPos
                  {
                      // Process first line
                      if(startPos.getCharNum() == -1) // Last char is desired
-                         returnBuffer = fileTextStream.readLine().right(1) + ENDL;
+                         returnBuffer = fileTextStream.readLine().right(1);
                      else // Some range of first line is desired
-                         returnBuffer = fileTextStream.readLine().mid(startPos.getCharNum()) + ENDL;
+                         returnBuffer = fileTextStream.readLine().mid(startPos.getCharNum());
 
                      // Update current line position
                      currentLine++;
 
                      // Process middle lines
                      for(; currentLine != endPos.getLineNum() && !fileTextStream.atEnd(); currentLine++)
-                         returnBuffer += fileTextStream.readLine() + ENDL;
+                         returnBuffer += ENDL + fileTextStream.readLine();
 
-                     // Process last line if it is within range
-                     if(currentLine == endPos.getLineNum() || endPos.getLineNum() == -1)
+                     // Process last line if it is within range, or truncate previous line to desired char if
+                     // endPos is the last line, but not the last character
+                     if(!fileTextStream.atEnd())
                          returnBuffer += fileTextStream.readLine().left(endPos.getCharNum());
-                     else // Remove the last appended new line characters if the desired last line is not in range so that the last middle line becomes the actual last line
-                         returnBuffer = returnBuffer.left(returnBuffer.length() - ENDL.length());
+                     else if(endPos.getLineNum() == -1 && endPos.getCharNum() != -1)
+                     {
+                         int lastLineStart = returnBuffer.lastIndexOf(ENDL) + ENDL.size();
+                         returnBuffer.chop(returnBuffer.size() - (lastLineStart + endPos.getCharNum()) - 1);
+                     }
                  }
              }
              else // Start line index is outside file founds
@@ -517,7 +520,7 @@ IOOpReport writeStringAsFile(QFile& textFile, const QString& text, bool overwrit
     // Check file
     IOOpResultType fileCheckResult = fileCheck(textFile);
 
-    if(fileCheckResult != IO_ERR_NOT_A_FILE)
+    if(fileCheckResult == IO_ERR_NOT_A_FILE)
         return IOOpReport(IO_OP_WRITE, fileCheckResult, textFile);
     else if(fileCheckResult == IO_SUCCESS && !overwriteIfExist)
         return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_EXISTS, textFile);
@@ -628,58 +631,58 @@ IOOpReport deleteTextRangeFromFile(QFile &textFile, TextPos startPos, TextPos en
     // Removes a string of a portion of the passed file [startPos, endPos] (inclusive for both)
 
     // Ensure positions are valid
-     if(startPos > endPos)
-         throw std::runtime_error("Error: endPos must be greater than or equal to startPos for Qx::getTextRangeFromFile()");
-         //TODO: create excpetion class that prints error and stashes the expection properly
+    if(startPos > endPos)
+        throw std::runtime_error("Error: endPos must be greater than or equal to startPos for Qx::getTextRangeFromFile()");
+        //TODO: create excpetion class that prints error and stashes the expection properly
 
-     // Check file
-     IOOpResultType fileCheckResult = fileCheck(textFile);
-     if(fileCheckResult != IO_SUCCESS)
-         return IOOpReport(IO_OP_READ, fileCheckResult, textFile);
+    // Check file
+    IOOpResultType fileCheckResult = fileCheck(textFile);
+    if(fileCheckResult != IO_SUCCESS)
+        return IOOpReport(IO_OP_READ, fileCheckResult, textFile);
 
-     // Text to keep
-     QString beforeDeletion;
-     QString afterDeletion;
+    // Text to keep
+    QString beforeDeletion;
+    QString afterDeletion;
 
-     // Transient Ops Report
-     IOOpReport transientReport;
+    // Transient Ops Report
+    IOOpReport transientReport;
 
-     // Determine beforeDeletion
-     if(startPos == TextPos::START) // (0,0)
-         beforeDeletion = "";
-     else if(startPos.getCharNum() == -1)
-     {
-         transientReport = readTextRangeFromFile(beforeDeletion, textFile, TextPos::START, TextPos(startPos.getLineNum(), -1));
-         beforeDeletion = beforeDeletion.chopped(1);
-     }
-     else
-         transientReport = readTextRangeFromFile(beforeDeletion, textFile, TextPos::START, TextPos(startPos.getLineNum(), startPos.getCharNum() - 1));
+    // Determine beforeDeletion
+    if(startPos == TextPos::START) // (0,0)
+        beforeDeletion = "";
+    else if(startPos.getCharNum() == -1)
+    {
+        transientReport = readTextRangeFromFile(beforeDeletion, textFile, TextPos::START, TextPos(startPos.getLineNum(), -1));
+        beforeDeletion = beforeDeletion.chopped(1);
+    }
+    else
+        transientReport = readTextRangeFromFile(beforeDeletion, textFile, TextPos::START, TextPos(startPos.getLineNum(), startPos.getCharNum() - 1));
 
-     // Check for transient errors
-     if(transientReport.getResult() != IO_SUCCESS)
-         return IOOpReport(IO_OP_WRITE, transientReport.getResult(), textFile);
+    // Check for transient errors
+    if(!transientReport.isNull() && transientReport.getResult() != IO_SUCCESS)
+        return IOOpReport(IO_OP_WRITE, transientReport.getResult(), textFile);
 
-     // Determine afterDeletion
-     if(endPos == TextPos::END)
-         afterDeletion = "";
-     else if(endPos.getCharNum() == -1)
-         transientReport = readTextRangeFromFile(afterDeletion, textFile, TextPos(endPos.getLineNum() + 1, 0), TextPos::END);
-     else
-         transientReport = readTextRangeFromFile(afterDeletion, textFile, TextPos(endPos.getLineNum(), endPos.getCharNum() + 1), TextPos::END);
+    // Determine afterDeletion
+    if(endPos == TextPos::END)
+        afterDeletion = "";
+    else if(endPos.getCharNum() == -1)
+        transientReport = readTextRangeFromFile(afterDeletion, textFile, TextPos(endPos.getLineNum() + 1, 0), TextPos::END);
+    else
+        transientReport = readTextRangeFromFile(afterDeletion, textFile, TextPos(endPos.getLineNum(), endPos.getCharNum() + 1), TextPos::END);
 
-     // Check for transient errors
-     if(transientReport.getResult() != IO_SUCCESS)
-         return IOOpReport(IO_OP_WRITE, transientReport.getResult(), textFile);
+    // Check for transient errors
+    if(transientReport.getResult() != IO_SUCCESS)
+        return IOOpReport(IO_OP_WRITE, transientReport.getResult(), textFile);
 
-     // Combine strings
-        QString truncatedText;
+    // Combine strings
+    QString truncatedText;
 
-        if(beforeDeletion.isEmpty())
-            truncatedText = afterDeletion;
-        else if(afterDeletion.isEmpty())
-            truncatedText = beforeDeletion;
-        else
-            truncatedText = beforeDeletion +  ENDL + afterDeletion;
+    if(beforeDeletion.isEmpty())
+        truncatedText = afterDeletion;
+    else if(afterDeletion.isEmpty())
+        truncatedText = beforeDeletion;
+    else
+        truncatedText = beforeDeletion + ENDL + afterDeletion;
 
     return writeStringAsFile(textFile, truncatedText, true);
 }
@@ -893,11 +896,11 @@ IOOpReport writeBytesAsFile(QFile &file, const QByteArray &byteArray, bool overw
 
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
-IOOpReport::IOOpReport() {}
+IOOpReport::IOOpReport() : mNull(true) {}
 IOOpReport::IOOpReport(IOOpType op, IOOpResultType res, const QFile& tar)
-    : mOperation(op), mResult(res), mTargetType(IO_FILE), mTarget(tar.fileName()) { parseOutcome(); }
+    : mNull(false), mOperation(op), mResult(res), mTargetType(IO_FILE), mTarget(tar.fileName()) { parseOutcome(); }
 IOOpReport::IOOpReport(IOOpType op, IOOpResultType res, const QDir& tar)
-    : mOperation(op), mResult(res), mTargetType(IO_DIR), mTarget(tar.absolutePath()) { parseOutcome(); }
+    : mNull(false), mOperation(op), mResult(res), mTargetType(IO_DIR), mTarget(tar.absolutePath()) { parseOutcome(); }
 
 
 //-Instance Functions--------------------------------------------------------------------------------------------
@@ -909,6 +912,7 @@ QString IOOpReport::getTarget() const { return mTarget; }
 QString IOOpReport::getOutcome() const { return mOutcome; }
 QString IOOpReport::getOutcomeInfo() const { return mOutcomeInfo; }
 bool IOOpReport::wasSuccessful() const { return mResult == IO_SUCCESS; }
+bool IOOpReport::isNull() const { return mNull; }
 
 //Private:
 void IOOpReport::parseOutcome()
