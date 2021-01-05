@@ -5,7 +5,7 @@ LIB_SHORT_NAME = Qx
 LIB_VER_MJR = 0
 LIB_VER_MNR = 0
 LIB_VER_REV = 2
-LIB_VER_BLD = 9
+LIB_VER_BLD = 10
 
 contains(QT_ARCH, i386) {
     ARCH_STR = 32
@@ -21,6 +21,8 @@ CONFIG(release, debug|release) {
 CONFIG(debug, debug|release) {
   TARGET = $${LIB_SHORT_NAME}_static$${ARCH_STR}_$${LIB_VER_MJR}-$${LIB_VER_MNR}-$${LIB_VER_REV}-$${LIB_VER_BLD}_Qt_$${QT_MAJOR_VERSION}-$${QT_MINOR_VERSION}-$${QT_PATCH_VERSION}d
 }
+
+LIBS += Version.lib
 
 TEMPLATE = lib
 CONFIG += staticlib
