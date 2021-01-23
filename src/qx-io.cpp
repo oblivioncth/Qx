@@ -696,7 +696,7 @@ IOOpReport deleteTextRangeFromFile(QFile &textFile, TextPos startPos, TextPos en
     return writeStringAsFile(textFile, truncatedText, true);
 }
 
-IOOpReport getDirFileList(QStringList& returnBuffer, QDir directory, QDirIterator::IteratorFlag traversalFlags, QStringList extFilter, bool leadingDotSensitive, Qt::CaseSensitivity caseSensitivity)
+IOOpReport getDirFileList(QStringList& returnBuffer, QDir directory, QStringList extFilter, QDirIterator::IteratorFlag traversalFlags, Qt::CaseSensitivity caseSensitivity)
 {
     // Empty buffer
     returnBuffer = QStringList();
@@ -706,6 +706,11 @@ IOOpReport getDirFileList(QStringList& returnBuffer, QDir directory, QDirIterato
     if(dirCheckResult != IO_SUCCESS)
         return IOOpReport(IO_OP_ENUMERATE, dirCheckResult, directory);
 
+    // Normalize leading dot for extensions
+    for(QString& ext : extFilter)
+        while(ext.front() == '.')
+            ext.remove(0,1);
+
     // Construct directory iterator
     QDirIterator listIterator(directory.path(), QDir::Files | QDir::NoDotAndDotDot, traversalFlags);
 
@@ -713,8 +718,7 @@ IOOpReport getDirFileList(QStringList& returnBuffer, QDir directory, QDirIterato
     {
         QString filePath = listIterator.next();
         QFileInfo fileInfo(filePath);
-        if(extFilter.isEmpty() || extFilter.contains(fileInfo.suffix(), caseSensitivity) ||
-           (!leadingDotSensitive && extFilter.contains("." + fileInfo.suffix())))
+        if(extFilter.isEmpty() || extFilter.contains(fileInfo.suffix(), caseSensitivity))
             returnBuffer.append(filePath);
     }
 
