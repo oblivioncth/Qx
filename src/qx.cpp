@@ -16,10 +16,10 @@ namespace Qx
 //template<typename T>
 //T rangeToLength(T start, T end) { defined in .h }
 
-//template<typename T, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
+//template<typename T, std::enable_if_t<std::is_arithmetic<T>, int> = 0>
 //static bool isOdd(T num) { defined in .h }
 
-//template<typename T, std::enable_if_t<std::is_arithmetic_v<T>, int> = 0>
+//template<typename T, std::enable_if_t<std::is_arithmetic<T>, int> = 0>
 //static bool isEven(T num) { defined in .h }
 
 //-Classes-----------------------------------------------------------------------------------------------------
@@ -96,7 +96,7 @@ QDateTime DateTime::fromMSFileTime(qint64 fileTime)
 
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
-//template <typename T, std::enable_if_t<std::is_arithmetic_v<T>, int>>
+//template <typename T, std::enable_if_t<std::is_arithmetic<T>, int>>
 //FreeIndexTracker(T minIndex, T maxIndex, QSet<T> reservedIndicies) { defined in .h }
 
 //-Instance Functions----------------------------------------------------------------------------------------------
