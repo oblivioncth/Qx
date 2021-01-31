@@ -544,5 +544,6 @@ QString String::fromByteArrayHex(QByteArray data, QChar separator, Endian::Endia
 }
 
 QString String::stripToHexOnly(QString string) { return string.replace(RegEx::nonHexOnly, ""); }
+//QString join(QList<T> list, QString separator, F&& toStringFunc) { defined in .h }
 
 }

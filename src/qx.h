@@ -300,10 +300,10 @@ public:
     {
         // Determine programatic limit if "type max" (-1) is specified
         if(maxIndex < 0)
-            maxIndex = std::numeric_limits<T>::max();
+            mMaxIndex = std::numeric_limits<T>::max();
 
         // Insure initial values are valid
-        assert(minIndex >= 0 && minIndex <= maxIndex && (reservedIndicies.isEmpty() ||
+        assert(mMinIndex >= 0 && mMinIndex <= mMaxIndex && (reservedIndicies.isEmpty() ||
                (*std::min_element(reservedIndicies.begin(), reservedIndicies.end())) >= 0));
 
         // Change bounds to match initial reserve list if they are mismatched
@@ -735,6 +735,21 @@ public:
     static QString fromByteArrayHex(QByteArray data);
     static QString fromByteArrayHex(QByteArray data, QChar separator, Endian::Endianness endianness);
     static QString stripToHexOnly(QString string);
+
+    template<typename T, typename F>
+    static QString join(QList<T> list, QString separator, F&& toStringFunc)
+    {
+        QString conjuction;
+
+        for(int i = 0; i < list.length(); i++)
+        {
+            conjuction += toStringFunc(list.at(i));
+            if(i < list.length() - 1)
+                conjuction += separator;
+        }
+
+        return conjuction;
+    }
 };
 
 }
