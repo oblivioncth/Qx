@@ -489,11 +489,16 @@ private:
 
 //-Class Functions-----------------------------------------------------------------------------------------------
 public:
-    static Qx::GenericError checkedKeyRetrieval(bool& valueBuffer, QJsonObject jObject, QString key);
-    static Qx::GenericError checkedKeyRetrieval(double& valueBuffer, QJsonObject jObject, QString key);
-    static Qx::GenericError checkedKeyRetrieval(QString& valueBuffer, QJsonObject jObject, QString key);
-    static Qx::GenericError checkedKeyRetrieval(QJsonArray& valueBuffer, QJsonObject jObject, QString key);
-    static Qx::GenericError checkedKeyRetrieval(QJsonObject& valueBuffer, QJsonObject jObject, QString key);
+    static Qx::GenericError checkedKeyRetrieval(bool& valueBuffer, QJsonObject jObject, QString key,
+                                                Qx::GenericError::ErrorLevel errLvlOnFail = Qx::GenericError::Undefined);
+    static Qx::GenericError checkedKeyRetrieval(double& valueBuffer, QJsonObject jObject, QString key,
+                                                Qx::GenericError::ErrorLevel errLvlOnFail = Qx::GenericError::Undefined);
+    static Qx::GenericError checkedKeyRetrieval(QString& valueBuffer, QJsonObject jObject, QString key,
+                                                Qx::GenericError::ErrorLevel errLvlOnFail = Qx::GenericError::Undefined);
+    static Qx::GenericError checkedKeyRetrieval(QJsonArray& valueBuffer, QJsonObject jObject, QString key,
+                                                Qx::GenericError::ErrorLevel errLvlOnFail = Qx::GenericError::Undefined);
+    static Qx::GenericError checkedKeyRetrieval(QJsonObject& valueBuffer, QJsonObject jObject, QString key,
+                                                Qx::GenericError::ErrorLevel errLvlOnFail = Qx::GenericError::Undefined);
 };
 
 template <typename T, ENABLE_IF2(std::is_arithmetic<T>)>
