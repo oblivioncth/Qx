@@ -13,7 +13,6 @@ namespace Qx
 {
 
 //-Types------------------------------------------------------------------------------------------------------
-
 enum IOOpType { IO_OP_READ, IO_OP_WRITE, IO_OP_ENUMERATE, IO_OP_INSPECT };
 enum IOOpResultType { IO_SUCCESS, IO_ERR_UNKNOWN, IO_ERR_ACCESS_DENIED, IO_ERR_NOT_A_FILE, IO_ERR_NOT_A_DIR, IO_ERR_OUT_OF_RES,
                       IO_ERR_READ, IO_ERR_WRITE, IO_ERR_FATAL, IO_ERR_OPEN, IO_ERR_ABORT,
@@ -47,6 +46,7 @@ private:
     QString mTarget = QString();
     QString mOutcome = QString();
     QString mOutcomeInfo = QString();
+
 //-Constructor-------------------------------------------------------------------------------------------------------
 public:
     IOOpReport();

@@ -17,13 +17,6 @@ namespace Qx
 FileDetails::FileDetails() {}
 
 //-Instance Functions------------------------------------------------------------------------------------------------
-//Public:
-void FileDetails::addStringTable(StringTable stringTable)
-{
-    mStringTables.append(stringTable);
-    mLangCodePageMap[qMakePair(stringTable.metaLanguageID, stringTable.metaCodePageID)] = mStringTables.count() - 1;
-}
-
 //Private:
 bool FileDetails::isNull() { return mFileVersion.isNull() && mProductVersion.isNull() && mStringTables.isEmpty(); }
 int FileDetails::stringTableCount() { return mStringTables.count(); }
@@ -53,6 +46,13 @@ const FileDetails::StringTable FileDetails::getStringTable(QString language, QSt
         return mStringTables.at(mLangCodePageMap.value(qMakePair(language.toUpper(), codePage.toUpper())));
     else
         return StringTable();
+}
+
+//Public:
+void FileDetails::addStringTable(StringTable stringTable)
+{
+    mStringTables.append(stringTable);
+    mLangCodePageMap[qMakePair(stringTable.metaLanguageID, stringTable.metaCodePageID)] = mStringTables.count() - 1;
 }
 
 //-Functions-------------------------------------------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-QT += widgets xml
+QT += widgets xml network
 
 LIB_NAME = Qxtended
 LIB_SHORT_NAME = Qx
@@ -42,12 +42,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     src/qx-io.cpp \
+    src/qx-net.cpp \
     src/qx-windows.cpp \
     src/qx-xml.cpp \
     src/qx.cpp
 
 HEADERS += \
     src/qx-io.h \
+    src/qx-net.h \
     src/qx-windows.h \
     src/qx-xml.h \
     src/qx.h
