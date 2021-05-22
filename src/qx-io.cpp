@@ -103,6 +103,167 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
     }
 }
 
+//-Classes-------------------------------------------------------------------------------------------------------
+
+//===============================================================================================================
+// IO OP REPORT
+//===============================================================================================================
+
+//-Constructor---------------------------------------------------------------------------------------------------
+//Public:
+IOOpReport::IOOpReport()
+    : mNull(true), mOperation(IO_OP_ENUMERATE), mResult(IO_SUCCESS), mTargetType(IO_FILE), mTarget(QString()) {}
+IOOpReport::IOOpReport(IOOpType op, IOOpResultType res, const QFile& tar)
+    : mNull(false), mOperation(op), mResult(res), mTargetType(IO_FILE), mTarget(tar.fileName()) { parseOutcome(); }
+IOOpReport::IOOpReport(IOOpType op, IOOpResultType res, const QDir& tar)
+    : mNull(false), mOperation(op), mResult(res), mTargetType(IO_DIR), mTarget(tar.absolutePath()) { parseOutcome(); }
+
+
+//-Instance Functions--------------------------------------------------------------------------------------------
+//Public:
+IOOpType IOOpReport::getOperation() const { return mOperation; }
+IOOpResultType IOOpReport::getResult() const { return mResult; }
+IOOpTargetType IOOpReport::getTargetType() const { return mTargetType; }
+QString IOOpReport::getTarget() const { return mTarget; }
+QString IOOpReport::getOutcome() const { return mOutcome; }
+QString IOOpReport::getOutcomeInfo() const { return mOutcomeInfo; }
+bool IOOpReport::wasSuccessful() const { return mResult == IO_SUCCESS; }
+bool IOOpReport::isNull() const { return mNull; }
+
+//Private:
+void IOOpReport::parseOutcome()
+{
+    if(mResult == IO_SUCCESS)
+        mOutcome = SUCCESS_TEMPLATE.arg(SUCCESS_VERBS.value(static_cast<int>(mOperation)), TARGET_TYPES.value(static_cast<int>(mTargetType)), QDir::toNativeSeparators(mTarget));
+    else
+    {
+        mOutcome = ERROR_TEMPLATE.arg(ERROR_VERBS.value(static_cast<int>(mOperation)), TARGET_TYPES.value(static_cast<int>(mTargetType)), QDir::fromNativeSeparators(mTarget));
+        mOutcomeInfo = ERROR_INFO.value(static_cast<int>(mResult) - 1);
+    }
+
+}
+//===============================================================================================================
+// TEXT POS
+//===============================================================================================================
+
+//-Class Variables-----------------------------------------------------------------------------------------------
+//Public:
+const TextPos TextPos::START = TextPos(0,0); // Intialization of constant reference TextPos
+const TextPos TextPos::END = TextPos(-1,-1); // Intialization of constant reference TextPos
+
+//-Constructor---------------------------------------------------------------------------------------------------
+//Public:
+TextPos::TextPos() { mLineNum = -2; mCharNum = -2; }
+
+TextPos::TextPos(int lineNum, int charNum)
+ : mLineNum(lineNum), mCharNum(charNum)
+{
+    if(mLineNum < -1)
+        mLineNum = -1;
+    if(this->mCharNum < -1)
+        this->mCharNum = -1;
+}
+
+//-Instance Functions--------------------------------------------------------------------------------------------
+//Public:
+bool TextPos::operator==(const TextPos &otherTextPos) { return mLineNum == otherTextPos.mLineNum && mCharNum == otherTextPos.mCharNum; }
+bool TextPos::operator!= (const TextPos &otherTextPos) { return !(*this == otherTextPos); }
+bool TextPos::operator> (const TextPos &otherTextPos)
+{
+    if(mLineNum == otherTextPos.mLineNum)
+        return NII<int>(mCharNum) > NII<int>(otherTextPos.mCharNum);
+    else
+        return NII<int>(mLineNum) > NII<int>(otherTextPos.mLineNum);
+}
+bool TextPos::operator>= (const TextPos &otherTextPos) { return *this == otherTextPos || *this > otherTextPos; }
+bool TextPos::operator< (const TextPos &otherTextPos) { return !(*this >= otherTextPos); }
+bool TextPos::operator<= (const TextPos &otherTextPos) { return !(*this > otherTextPos); }
+
+int TextPos::getLineNum() const { return mLineNum; }
+int TextPos::getCharNum() const { return mCharNum; }
+
+void TextPos::setLineNum(int lineNum)
+{
+    if(lineNum < -1)
+        mLineNum = -1;
+    else
+        mLineNum = lineNum;
+}
+
+void TextPos::setCharNum(int charNum)
+{
+    if(charNum < -1)
+        mCharNum = -1;
+    else
+        mCharNum = charNum;
+}
+
+void TextPos::setNull() { mLineNum = -2; mCharNum = -2; }
+bool TextPos::isNull() const { return mLineNum == -2 && mCharNum == -2; }
+
+//===============================================================================================================
+// FILE STREAM WRITTER
+//===============================================================================================================
+
+//-Constructor---------------------------------------------------------------------------------------------------
+//Public:
+FileStreamWriter::FileStreamWriter(QFile& file, bool overwriteIfExist, bool createDirs) :
+    mTargetFile(file), mOverwrite(overwriteIfExist), mCreateDirs(createDirs) {}
+
+//-Instance Functions--------------------------------------------------------------------------------------------
+//Public:
+IOOpReport FileStreamWriter::openFile()
+{
+    // Write the entire byte array to file. If the file already exists and overwriteIfExist is true, the file is replaced.
+
+    // Check file
+    IOOpResultType fileCheckResult = fileCheck(mTargetFile);
+
+    if(fileCheckResult == IO_ERR_NOT_A_FILE)
+        return IOOpReport(IO_OP_WRITE, fileCheckResult, mTargetFile);
+    else if(fileCheckResult == IO_SUCCESS && !mOverwrite)
+        return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_EXISTS, mTargetFile);
+
+    // Delete file if it exists since overwrite is desired
+    if(fileCheckResult == IO_SUCCESS)
+        mTargetFile.resize(0); // Clear file contents
+
+    // Make folders if wanted and necessary
+    QDir filePath(QFileInfo(mTargetFile).absolutePath());
+    IOOpResultType dirCheckResult = directoryCheck(filePath);
+
+    if(dirCheckResult == IO_ERR_NOT_A_DIR || (dirCheckResult == IO_ERR_DIR_DNE && !mCreateDirs))
+        return IOOpReport(IO_OP_WRITE, dirCheckResult, mTargetFile);
+    else if(dirCheckResult == IO_ERR_DIR_DNE)
+    {
+        if(!QDir().mkpath(filePath.absolutePath()))
+            return IOOpReport(IO_OP_WRITE, IO_ERR_CANT_MAKE_DIR, mTargetFile);
+    }
+
+    // Attempt to open file
+    IOOpResultType openResult = parsedOpen(mTargetFile, QFile::WriteOnly);
+    if(openResult != IO_SUCCESS)
+        return IOOpReport(IO_OP_WRITE, openResult, mTargetFile);
+
+    // Set data stream IO device
+    mStreamWriter.setDevice(&mTargetFile);
+
+    // Return no error
+    return IOOpReport(IO_OP_WRITE, IO_SUCCESS, mTargetFile);
+}
+
+IOOpReport FileStreamWriter::writeData(QByteArray data)
+{
+    // Write data to file
+    if(mStreamWriter.writeRawData(data, data.size()) == data.size())
+        return IOOpReport(IO_OP_WRITE, IO_SUCCESS, mTargetFile);
+    else
+        return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_SIZE_MISMATCH, mTargetFile);
+}
+
+void FileStreamWriter::closeFile() { mTargetFile.close(); }
+
+//-Functions (Cont.)----------------------------------------------------------------------------------------------
 //Public:
 bool fileIsEmpty(const QFile& file) { return file.size() == 0; }
 
@@ -543,17 +704,11 @@ IOOpReport writeStringAsFile(QFile& textFile, const QString& text, bool overwrit
     IOOpResultType dirCheckResult = directoryCheck(filePath);
 
     if(dirCheckResult == IO_ERR_NOT_A_DIR || (dirCheckResult == IO_ERR_DIR_DNE && !createDirs))
-    {
-        textFile.close();
         return IOOpReport(IO_OP_WRITE, dirCheckResult, textFile);
-    }
     else if(dirCheckResult == IO_ERR_DIR_DNE)
     {
         if(!QDir().mkpath(filePath.absolutePath()))
-        {
-            textFile.close();
             return IOOpReport(IO_OP_WRITE, IO_ERR_CANT_MAKE_DIR, textFile);
-        }
     }
 
     // Attempt to open file
@@ -603,17 +758,11 @@ IOOpReport writeStringToEndOfFile(QFile &textFile, const QString &text, bool ens
     IOOpResultType dirCheckResult = directoryCheck(filePath);
 
     if(dirCheckResult == IO_ERR_NOT_A_DIR || (dirCheckResult == IO_ERR_DIR_DNE && !createDirs))
-    {
-        textFile.close();
         return IOOpReport(IO_OP_WRITE, dirCheckResult, textFile);
-    }
     else if(dirCheckResult == IO_ERR_DIR_DNE)
     {
         if(!QDir().mkpath(filePath.absolutePath()))
-        {
-            textFile.close();
             return IOOpReport(IO_OP_WRITE, IO_ERR_CANT_MAKE_DIR, textFile);
-        }
     }
 
     // Attempt to open file
@@ -866,17 +1015,11 @@ IOOpReport writeBytesAsFile(QFile &file, const QByteArray &byteArray, bool overw
     IOOpResultType dirCheckResult = directoryCheck(filePath);
 
     if(dirCheckResult == IO_ERR_NOT_A_DIR || (dirCheckResult == IO_ERR_DIR_DNE && !createDirs))
-    {
-        file.close();
         return IOOpReport(IO_OP_WRITE, dirCheckResult, file);
-    }
     else if(dirCheckResult == IO_ERR_DIR_DNE)
     {
         if(!QDir().mkpath(filePath.absolutePath()))
-        {
-            file.close();
             return IOOpReport(IO_OP_WRITE, IO_ERR_CANT_MAKE_DIR, file);
-        }
     }
 
     // Attempt to open file
@@ -887,7 +1030,7 @@ IOOpReport writeBytesAsFile(QFile &file, const QByteArray &byteArray, bool overw
     // Construct DataStream
     QDataStream fileStream(&file);
 
-    // Write string to file
+    // Write data to file
     if(fileStream.writeRawData(byteArray, byteArray.size()) == byteArray.size())
     {
         file.close();
@@ -899,103 +1042,5 @@ IOOpReport writeBytesAsFile(QFile &file, const QByteArray &byteArray, bool overw
         return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_SIZE_MISMATCH, file);
     }
 }
-
-
-//-Inner Classes-------------------------------------------------------------------------------------------------
-
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// IOOpReport
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-//-Constructor---------------------------------------------------------------------------------------------------
-//Public:
-IOOpReport::IOOpReport() : mNull(true) {}
-IOOpReport::IOOpReport(IOOpType op, IOOpResultType res, const QFile& tar)
-    : mNull(false), mOperation(op), mResult(res), mTargetType(IO_FILE), mTarget(tar.fileName()) { parseOutcome(); }
-IOOpReport::IOOpReport(IOOpType op, IOOpResultType res, const QDir& tar)
-    : mNull(false), mOperation(op), mResult(res), mTargetType(IO_DIR), mTarget(tar.absolutePath()) { parseOutcome(); }
-
-
-//-Instance Functions--------------------------------------------------------------------------------------------
-//Public:
-IOOpType IOOpReport::getOperation() const { return mOperation; }
-IOOpResultType IOOpReport::getResult() const { return mResult; }
-IOOpTargetType IOOpReport::getTargetType() const { return mTargetType; }
-QString IOOpReport::getTarget() const { return mTarget; }
-QString IOOpReport::getOutcome() const { return mOutcome; }
-QString IOOpReport::getOutcomeInfo() const { return mOutcomeInfo; }
-bool IOOpReport::wasSuccessful() const { return mResult == IO_SUCCESS; }
-bool IOOpReport::isNull() const { return mNull; }
-
-//Private:
-void IOOpReport::parseOutcome()
-{
-    if(mResult == IO_SUCCESS)
-        mOutcome = SUCCESS_TEMPLATE.arg(SUCCESS_VERBS.value(static_cast<int>(mOperation)), TARGET_TYPES.value(static_cast<int>(mTargetType)), QDir::toNativeSeparators(mTarget));
-    else
-    {
-        mOutcome = ERROR_TEMPLATE.arg(ERROR_VERBS.value(static_cast<int>(mOperation)), TARGET_TYPES.value(static_cast<int>(mTargetType)), QDir::fromNativeSeparators(mTarget));
-        mOutcomeInfo = ERROR_INFO.value(static_cast<int>(mResult) - 1);
-    }
-
-}
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// TextPos
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-//-Class Variables-----------------------------------------------------------------------------------------------
-//Public:
-const TextPos TextPos::START = TextPos(0,0); // Intialization of constant reference TextPos
-const TextPos TextPos::END = TextPos(-1,-1); // Intialization of constant reference TextPos
-
-//-Constructor---------------------------------------------------------------------------------------------------
-//Public:
-TextPos::TextPos() { mLineNum = -2; mCharNum = -2; }
-
-TextPos::TextPos(int lineNum, int charNum)
- : mLineNum(lineNum), mCharNum(charNum)
-{
-    if(mLineNum < -1)
-        mLineNum = -1;
-    if(this->mCharNum < -1)
-        this->mCharNum = -1;
-}
-
-//-Instance Functions--------------------------------------------------------------------------------------------
-//Public:
-bool TextPos::operator==(const TextPos &otherTextPos) { return mLineNum == otherTextPos.mLineNum && mCharNum == otherTextPos.mCharNum; }
-bool TextPos::operator!= (const TextPos &otherTextPos) { return !(*this == otherTextPos); }
-bool TextPos::operator> (const TextPos &otherTextPos)
-{
-    if(mLineNum == otherTextPos.mLineNum)
-        return NII<int>(mCharNum) > NII<int>(otherTextPos.mCharNum);
-    else
-        return NII<int>(mLineNum) > NII<int>(otherTextPos.mLineNum);
-}
-bool TextPos::operator>= (const TextPos &otherTextPos) { return *this == otherTextPos || *this > otherTextPos; }
-bool TextPos::operator< (const TextPos &otherTextPos) { return !(*this >= otherTextPos); }
-bool TextPos::operator<= (const TextPos &otherTextPos) { return !(*this > otherTextPos); }
-
-int TextPos::getLineNum() const { return mLineNum; }
-int TextPos::getCharNum() const { return mCharNum; }
-
-void TextPos::setLineNum(int lineNum)
-{
-    if(lineNum < -1)
-        mLineNum = -1;
-    else
-        mLineNum = lineNum;
-}
-
-void TextPos::setCharNum(int charNum)
-{
-    if(charNum < -1)
-        mCharNum = -1;
-    else
-        mCharNum = charNum;
-}
-
-void TextPos::setNull() { mLineNum = -2; mCharNum = -2; }
-bool TextPos::isNull() const { return mLineNum == -2 && mCharNum == -2; }
 
 }
