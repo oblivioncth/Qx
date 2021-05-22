@@ -104,7 +104,7 @@ IOOpReport SyncDownloadManager::startDownload(DownloadTask task)
     //mDownloadAccessMan.get(downloadReq);
 
     // Create stream writer
-    std::shared_ptr<FileStreamWriter> fileWriter = std::make_shared<FileStreamWriter>(*task.dest, true, true);
+    std::shared_ptr<FileStreamWriter> fileWriter = std::make_shared<FileStreamWriter>(*task.dest, mOverwrite, true);
 
     // Open file
     IOOpReport streamOpen = fileWriter->openFile();

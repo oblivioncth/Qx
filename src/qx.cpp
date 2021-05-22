@@ -129,7 +129,7 @@ QDateTime DateTime::fromMSFileTime(qint64 fileTime)
 
 //-Constructor----------------------------------------------------------------------------------------------
 //Public:
-GenericError::GenericError() {}
+GenericError::GenericError() : mErrorLevel(Undefined) {}
 GenericError::GenericError(ErrorLevel errorLevel, QString primaryInfo, QString secondaryInfo, QString detailedInfo, QString caption)
     : mErrorLevel(errorLevel), mCaption(caption), mPrimaryInfo(primaryInfo), mSecondaryInfo(secondaryInfo), mDetailedInfo(detailedInfo) {}
 
