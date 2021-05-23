@@ -82,7 +82,7 @@ public:
 //-Instance Functions----------------------------------------------------------------------------------------------
 private:
     NetworkReplyError enumerateTotalSize();
-    NetworkReplyError getFileSize(quint64 returnBuffer, QUrl target);
+    NetworkReplyError getFileSize(quint64& returnBuffer, QUrl target);
     IOOpReport startDownload(DownloadTask task);
     void cancelAll();
 
@@ -102,7 +102,8 @@ public slots:
     void abort();
 
 signals:
-    void downloadProgress(qint64 bytesCurrent, qint64 bytesTotal);
+    void downloadProgress(qint64 bytesCurrent);
+    void downloadTotalChanged(quint64 bytesTotal);
 };
 
 }

@@ -60,11 +60,14 @@ NetworkReplyError SyncDownloadManager::enumerateTotalSize()
         mTotalBytes += singleFileSize;
     }
 
+    // Emit calculated total
+    emit downloadTotalChanged(mTotalBytes);
+
     // Return no error
     return NetworkReplyError();
 }
 
-NetworkReplyError SyncDownloadManager::getFileSize(quint64 returnBuffer, QUrl target)
+NetworkReplyError SyncDownloadManager::getFileSize(quint64& returnBuffer, QUrl target)
 {
     // Ensure return buffer is reset
     returnBuffer = 0;
@@ -215,7 +218,7 @@ void SyncDownloadManager::downloadProgressHandler(qint64 bytesCurrent, qint64 by
     mInvididualBytes[senderNetworkReply] = bytesCurrent;
 
     // Emit progress
-    emit downloadProgress(mCurrentBytes, mTotalBytes);
+    emit downloadProgress(mCurrentBytes);
 }
 
 void SyncDownloadManager::downloadFinished(QNetworkReply *reply)
