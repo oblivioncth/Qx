@@ -153,6 +153,7 @@ public:
 
 // Integrity Based
     IOOpReport calculateFileChecksum(QString& returnBuffer, QFile& file, QCryptographicHash::Algorithm hashAlgorithm);
+    IOOpReport fileMatchesChecksum(bool& returnBuffer, QFile& file, QString checksum, QCryptographicHash::Algorithm hashAlgorithm);
 
 // Raw Based
     IOOpReport readAllBytesFromFile(QByteArray& returnBuffer, QFile &file);

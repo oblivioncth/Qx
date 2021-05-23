@@ -939,6 +939,26 @@ IOOpReport calculateFileChecksum(QString& returnBuffer, QFile& file, QCryptograp
     }
 }
 
+IOOpReport fileMatchesChecksum(bool& returnBuffer, QFile& file, QString checksum, QCryptographicHash::Algorithm hashAlgorithm)
+{
+    // Reset return buffer
+    returnBuffer = false;
+
+    // Get checksum
+    QString fileChecksum;
+    IOOpReport checksumReport = calculateFileChecksum(fileChecksum, file, hashAlgorithm);
+
+    if(!checksumReport.wasSuccessful())
+        return checksumReport;
+
+    // Compare
+    if(checksum == fileChecksum)
+        returnBuffer = true;
+
+    // Return success
+    return IOOpReport(IOOpType::IO_OP_INSPECT, IO_SUCCESS, file);
+}
+
 IOOpReport readAllBytesFromFile(QByteArray& returnBuffer, QFile& file)
 {
     // Empty buffer
