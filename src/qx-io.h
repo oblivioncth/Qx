@@ -152,7 +152,7 @@ public:
     bool dirContainsFiles(QDir directory, IOOpReport& reportBuffer, bool includeSubdirectories = false);
 
 // Integrity Based
-    IOOpReport calculateFileChecksum(QByteArray& returnBuffer, QFile& file, QCryptographicHash::Algorithm hashAlgorithm);
+    IOOpReport calculateFileChecksum(QString& returnBuffer, QFile& file, QCryptographicHash::Algorithm hashAlgorithm);
 
 // Raw Based
     IOOpReport readAllBytesFromFile(QByteArray& returnBuffer, QFile &file);

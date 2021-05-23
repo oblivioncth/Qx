@@ -910,10 +910,10 @@ bool dirContainsFiles(QDir directory, IOOpReport &reportBuffer, bool includeSubd
 }
 
 
-IOOpReport calculateFileChecksum(QByteArray& returnBuffer, QFile& file, QCryptographicHash::Algorithm hashAlgorithm)
+IOOpReport calculateFileChecksum(QString& returnBuffer, QFile& file, QCryptographicHash::Algorithm hashAlgorithm)
 {
     // Empty buffer
-    returnBuffer = QByteArray();
+    returnBuffer = QString();
 
     // Check file
     IOOpResultType fileCheckResult = fileCheck(file);
@@ -928,7 +928,7 @@ IOOpReport calculateFileChecksum(QByteArray& returnBuffer, QFile& file, QCryptog
     QCryptographicHash checksumHash(hashAlgorithm);
     if(checksumHash.addData(&file))
     {
-        returnBuffer = checksumHash.result();
+        returnBuffer = String::fromByteArrayHex(checksumHash.result());
         file.close();
         return IOOpReport(IO_OP_READ, IO_SUCCESS, file);
     }

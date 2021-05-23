@@ -252,15 +252,13 @@ bool enforceSingleInstance()
 
     // Get self hash
     QFile selfEXE(QCoreApplication::applicationFilePath());
-    QByteArray selfHash;
+    QString selfHash;
 
     if(!calculateFileChecksum(selfHash, selfEXE, QCryptographicHash::Sha256).wasSuccessful())
         return false;
 
-    QString selfHashHex = String::fromByteArrayHex(selfHash);
-
     // Attempt to create unique mutex
-    uniqueAppMutex = CreateMutex(NULL, FALSE, selfHashHex.toStdWString().c_str());
+    uniqueAppMutex = CreateMutex(NULL, FALSE, selfHash.toStdWString().c_str());
     if(GetLastError() == ERROR_ALREADY_EXISTS)
     {
         CloseHandle(uniqueAppMutex);
