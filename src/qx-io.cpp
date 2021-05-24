@@ -952,7 +952,7 @@ IOOpReport fileMatchesChecksum(bool& returnBuffer, QFile& file, QString checksum
         return checksumReport;
 
     // Compare
-    if(checksum == fileChecksum)
+    if(checksum.compare(fileChecksum, Qt::CaseInsensitive) == 0)
         returnBuffer = true;
 
     // Return success
