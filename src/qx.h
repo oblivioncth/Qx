@@ -741,10 +741,26 @@ public:
     {
         QString conjuction;
 
-        for(int i = 0; i < list.length(); i++)
+        for(int i = 0; i < list.length(); ++i)
         {
             conjuction += toStringFunc(list.at(i));
             if(i < list.length() - 1)
+                conjuction += separator;
+        }
+
+        return conjuction;
+    }
+
+    template<typename T, typename F>
+    static QString join(QSet<T> set, QString separator, F&& toStringFunc)
+    {
+        QString conjuction;
+
+        QSet<T>::const_iterator i = set.constBegin();
+        while(i != set.constEnd())
+        {
+            conjuction += toStringFunc(*i);
+            if(++i != set.constEnd())
                 conjuction += separator;
         }
 
