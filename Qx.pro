@@ -4,7 +4,7 @@ LIB_NAME = Qxtended
 LIB_SHORT_NAME = Qx
 LIB_VER_MJR = 0
 LIB_VER_MNR = 0
-LIB_VER_REV = 3
+LIB_VER_REV = 4
 LIB_VER_BLD = 0
 
 contains(QT_ARCH, i386) {
@@ -43,6 +43,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     src/qx-io.cpp \
     src/qx-net.cpp \
+    src/qx-widgets.cpp \
     src/qx-windows.cpp \
     src/qx-xml.cpp \
     src/qx.cpp
@@ -50,6 +51,7 @@ SOURCES += \
 HEADERS += \
     src/qx-io.h \
     src/qx-net.h \
+    src/qx-widgets.h \
     src/qx-windows.h \
     src/qx-xml.h \
     src/qx.h
