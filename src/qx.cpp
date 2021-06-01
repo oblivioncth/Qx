@@ -144,7 +144,7 @@ QString GenericError::detailedInfo() { return mDetailedInfo; }
 
 GenericError& GenericError::setErrorLevel(ErrorLevel errorLevel) { mErrorLevel = errorLevel; return *this; }
 
-int GenericError::exec(QMessageBox::StandardButtons choices)
+int GenericError::exec(QMessageBox::StandardButtons choices, QMessageBox::StandardButton defChoice)
 {
     // Determine icon
     QMessageBox::Icon icon;
@@ -172,6 +172,7 @@ int GenericError::exec(QMessageBox::StandardButtons choices)
     QMessageBox genericErrorMessage;
     genericErrorMessage.setText(mPrimaryInfo);
     genericErrorMessage.setStandardButtons(choices);
+    genericErrorMessage.setDefaultButton(defChoice);
     genericErrorMessage.setIcon(icon);
 
     if(!mCaption.isEmpty())

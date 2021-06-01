@@ -33,12 +33,19 @@ SyncDownloadManager::SyncDownloadManager()
 {
     // Configure access managers
     mDownloadAccessMan.setAutoDeleteReplies(true);
-    mDownloadAccessMan.setAutoDeleteReplies(true);
-    mQueryAccessMan.setRedirectPolicy(mRedirectPolicy);
+    mQueryAccessMan.setAutoDeleteReplies(true);
+    mDownloadAccessMan.setRedirectPolicy(mRedirectPolicy);
     mQueryAccessMan.setRedirectPolicy(mRedirectPolicy);
 
-    // Conected slots
+    // Conect slots
     connect(&mDownloadAccessMan, &QNetworkAccessManager::finished, this, &SyncDownloadManager::downloadFinished);
+    connect(&mDownloadAccessMan, &QNetworkAccessManager::sslErrors, this, &SyncDownloadManager::sslErrorHandler);
+    connect(&mDownloadAccessMan, &QNetworkAccessManager::authenticationRequired, this, &SyncDownloadManager::authHandler);
+    connect(&mDownloadAccessMan, &QNetworkAccessManager::proxyAuthenticationRequired, this, &SyncDownloadManager::proxyAuthHandler);
+
+    connect(&mQueryAccessMan, &QNetworkAccessManager::sslErrors, this, &SyncDownloadManager::sslErrorHandler);
+    connect(&mQueryAccessMan, &QNetworkAccessManager::authenticationRequired, this, &SyncDownloadManager::authHandler);
+    connect(&mQueryAccessMan, &QNetworkAccessManager::proxyAuthenticationRequired, this, &SyncDownloadManager::proxyAuthHandler);
 }
 
 //-Instance Functions------------------------------------------------------------------------------------------------
@@ -132,15 +139,15 @@ IOOpReport SyncDownloadManager::startDownload(DownloadTask task)
 
 void SyncDownloadManager::cancelAll()
 {
+    // Remove pending downloads
+    mPendingDownloads.clear();
+
     // Abort all remaining downloads
     QHash<QNetworkReply*, std::shared_ptr<FileStreamWriter>>::const_iterator i;
     for(i = mActiveDownloads.constBegin(); i != mActiveDownloads.constEnd(); i++)
         i.key()->abort();
 
     mActiveDownloads.clear();
-
-    // Remove pending downloads
-    mPendingDownloads.clear();
 }
 
 //Public:
@@ -154,11 +161,12 @@ void SyncDownloadManager::setRedirectPolicy(QNetworkRequest::RedirectPolicy redi
 }
 
 void SyncDownloadManager::setOverwrite(bool overwrite) { mOverwrite = overwrite; }
+void SyncDownloadManager::setAutoAbort(bool autoAbort) { mAutoAbort = autoAbort; }
 
 GenericError SyncDownloadManager::processQueue()
 {
     // Ensure error state is cleared
-    mFinalErrorStatus = GenericError();
+    mErrorList.clear();
 
     // Get total task size
     NetworkReplyError enumError = enumerateTotalSize();
@@ -172,12 +180,35 @@ GenericError SyncDownloadManager::processQueue()
     // Wait for downloads to finish
     mDownloadWait.exec();
 
-    // Reset progress
+    // Create final error message
+    GenericError fe;
+
+    switch(mFinishStatus)
+    {
+        case FinishStatus::SUCCESS:
+            fe = GenericError();
+            break;
+
+        case FinishStatus::USER_ABORT:
+            fe = GenericError(GenericError::Error, ERR_QUEUE_INCOMPL, ERR_OUTCOME_USER_ABORT);
+            break;
+
+        case FinishStatus::AUTO_ABORT:
+            fe = GenericError(GenericError::Error, ERR_QUEUE_INCOMPL, ERR_OUTCOME_AUTO_ABORT, "- " + mErrorList.join("\n- "));
+            break;
+
+        case FinishStatus::OTHER:
+            fe = GenericError(GenericError::Error, ERR_QUEUE_INCOMPL, ERR_OUTCOME_FAIL, "- " + mErrorList.join("\n- "));
+            break;
+    }
+
+    // Reset state
     mCurrentBytes = 0;
     mTotalBytes = 0;
+    mFinishStatus = FinishStatus::SUCCESS;
 
     // Return final error status
-    return mFinalErrorStatus;
+    return fe;
 }
 
 //Private Slots:
@@ -195,8 +226,18 @@ void SyncDownloadManager::readyRead()
 
     if(!writeReport.wasSuccessful())
     {
-        mFinalErrorStatus = GenericError(GenericError::Undefined, writeReport.getOutcome(), writeReport.getOutcomeInfo());
-        cancelAll();
+        mErrorList.append(ERR_GEN_FAIL.arg(senderNetworkReply->url().toString(), writeReport.getOutcome() + ": " + writeReport.getOutcomeInfo()));
+
+        if(mAutoAbort)
+        {
+            mFinishStatus = FinishStatus::AUTO_ABORT;
+            cancelAll();
+        }
+        else
+        {
+            mFinishStatus = FinishStatus::OTHER;
+            senderNetworkReply->abort();
+        }
     }
 }
 
@@ -232,12 +273,19 @@ void SyncDownloadManager::downloadFinished(QNetworkReply *reply)
     // Check for non-abort error
     if(reply->error() != QNetworkReply::NoError && reply->error() != QNetworkReply::OperationCanceledError)
     {
-        mFinalErrorStatus = GenericError(GenericError::Undefined, ERR_DOWNLOAD.arg(reply->url().toString()), reply->errorString());
-        cancelAll();
+        mErrorList.append(ERR_GEN_FAIL.arg(reply->url().toString(), reply->errorString()));
+
+        if(mAutoAbort)
+        {
+            mFinishStatus = FinishStatus::AUTO_ABORT;
+            cancelAll();
+        }
+        else
+            mFinishStatus = FinishStatus::OTHER;
     }
 
-    // Add next pending download if present on successful download finish
-    if(!reply->error() && !mPendingDownloads.isEmpty())
+    // Add next pending download if not aborting
+    if(mFinishStatus != FinishStatus::AUTO_ABORT && mFinishStatus != FinishStatus::USER_ABORT && !mPendingDownloads.isEmpty())
         startDownload(mPendingDownloads.takeFirst());
     else if(mPendingDownloads.isEmpty()) // Release wait loop if all downloads are finished
         mDownloadWait.quit();
@@ -246,8 +294,75 @@ void SyncDownloadManager::downloadFinished(QNetworkReply *reply)
 //Public Slots:
 void SyncDownloadManager::abort()
 {
-    mFinalErrorStatus = GenericError(GenericError::Undefined, ERR_DOWNLOAD.arg(" files"), ERR_SEC_ABORT);
+    mFinishStatus = FinishStatus::USER_ABORT;
     cancelAll();
+}
+
+void SyncDownloadManager::sslErrorHandler(QNetworkReply* reply, const QList<QSslError>& errors)
+{
+    // Create error message
+    GenericError errMsg(GenericError::Warning, SSL_ERR.arg(reply->url().toString()), CONTINUE_QUES,
+                        String::join(errors, [](const QSslError& err){ return err.errorString(); }, ENDL, LIST_ITM_PRFX));
+
+    // Signal result
+    bool abortDownload = true;
+
+    // Emit signal for answer
+    emit sslErrors(errMsg, &abortDownload);
+
+    // Abort if desired
+    if(abortDownload)
+    {
+        reply->abort();
+        mErrorList.append(ERR_SINGLE_ABORT.arg(reply->url().toString()));
+        mFinishStatus = FinishStatus::OTHER;
+    }
+    else
+        reply->ignoreSslErrors();
+}
+
+void SyncDownloadManager::authHandler(QNetworkReply* reply, QAuthenticator* authenticator)
+{
+    // Signal result
+    bool abortDownload = true;
+    QString username = QString();
+    QString password = QString();
+
+    // Emit signal for answer
+    emit authenticationRequired(PROMPT_AUTH.arg(reply->url().host()), &username, &password, &abortDownload);
+
+    // Abort if desired
+    if(abortDownload)
+    {
+        reply->abort();
+        mErrorList.append(ERR_SINGLE_ABORT.arg(reply->url().toString()));
+        mFinishStatus = FinishStatus::OTHER;
+    }
+    else
+    {
+        authenticator->setUser(username);
+        authenticator->setPassword(password);
+    }
+}
+
+void SyncDownloadManager::proxyAuthHandler(const QNetworkProxy& proxy, QAuthenticator* authenticator)
+{
+    // Signal result
+    bool abortDownload = true;
+    QString username = QString();
+    QString password = QString();
+
+    // Emit signal for answer
+    emit authenticationRequired(PROMPT_AUTH.arg(proxy.hostName()), &username, &password, &abortDownload);
+
+    // Abort if desired
+    if(abortDownload)
+        abort();
+    else
+    {
+        authenticator->setUser(username);
+        authenticator->setPassword(password);
+    }
 }
 
 }
