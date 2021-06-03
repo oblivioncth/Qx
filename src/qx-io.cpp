@@ -205,8 +205,8 @@ bool TextPos::isNull() const { return mLineNum == -2 && mCharNum == -2; }
 
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
-FileStreamWriter::FileStreamWriter(QFile& file, WriteMode writeMode, bool createDirs) :
-    mTargetFile(file), mWriteMode(writeMode), mCreateDirs(createDirs) {}
+FileStreamWriter::FileStreamWriter(QFile& file, WriteMode writeMode, bool createDirs, bool buffered) :
+    mTargetFile(file), mWriteMode(writeMode), mCreateDirs(createDirs), mBuffered(buffered) {}
 
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:
@@ -233,7 +233,11 @@ IOOpReport FileStreamWriter::openFile()
     }
 
     // Attempt to open file
-    IOOpResultType openResult = parsedOpen(mTargetFile, QFile::WriteOnly | WRITE_OPEN_FLAGS_MAP[mWriteMode]);
+    QIODevice::OpenMode om = QFile::WriteOnly | WRITE_OPEN_FLAGS_MAP[mWriteMode];
+    if(!mBuffered)
+        om |= QIODevice::Unbuffered;
+
+    IOOpResultType openResult = parsedOpen(mTargetFile, om);
     if(openResult != IO_SUCCESS)
         return IOOpReport(IO_OP_WRITE, openResult, mTargetFile);
 
@@ -266,8 +270,8 @@ void FileStreamWriter::closeFile() { mTargetFile.close(); }
 
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
-TextStreamWriter::TextStreamWriter(QFile& file, WriteMode writeMode, bool createDirs) :
-    mTargetFile(file), mWriteMode(writeMode), mCreateDirs(createDirs) {}
+TextStreamWriter::TextStreamWriter(QFile& file, WriteMode writeMode, bool createDirs, bool buffered) :
+    mTargetFile(file), mWriteMode(writeMode), mCreateDirs(createDirs), mBuffered(buffered) {}
 
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:
@@ -294,7 +298,11 @@ IOOpReport TextStreamWriter::openFile()
     }
 
     // Attempt to open file
-    IOOpResultType openResult = parsedOpen(mTargetFile, QFile::WriteOnly | QFile::Text | WRITE_OPEN_FLAGS_MAP[mWriteMode]);
+    QIODevice::OpenMode om = QFile::WriteOnly | QFile::Text | WRITE_OPEN_FLAGS_MAP[mWriteMode];
+    if(!mBuffered)
+        om |= QIODevice::Unbuffered;
+
+    IOOpResultType openResult = parsedOpen(mTargetFile, om);
     if(openResult != IO_SUCCESS)
         return IOOpReport(IO_OP_WRITE, openResult, mTargetFile);
 
@@ -670,7 +678,7 @@ IOOpReport readTextRangeFromFile(QString& returnBuffer, QFile& textFile, TextPos
                      // Process last line if it is within range, or truncate previous line to desired char if
                      // endPos is the last line, but not the last character
                      if(!fileTextStream.atEnd())
-                         returnBuffer += fileTextStream.readLine().left(endPos.getCharNum());
+                         returnBuffer += fileTextStream.readLine().leftRef(endPos.getCharNum());
                      else if(endPos.getLineNum() == -1 && endPos.getCharNum() != -1)
                      {
                          int lastLineStart = returnBuffer.lastIndexOf(ENDL) + ENDL.size();
