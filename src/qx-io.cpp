@@ -246,11 +246,16 @@ IOOpReport FileStreamWriter::openFile()
 
 IOOpReport FileStreamWriter::writeData(QByteArray data)
 {
-    // Write data to file
-    if(mStreamWriter.writeRawData(data, data.size()) == data.size())
-        return IOOpReport(IO_OP_WRITE, IO_SUCCESS, mTargetFile);
+    if(mTargetFile.isOpen())
+    {
+        // Write data to file
+        if(mStreamWriter.writeRawData(data, data.size()) == data.size())
+            return IOOpReport(IO_OP_WRITE, IO_SUCCESS, mTargetFile);
+        else
+            return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_SIZE_MISMATCH, mTargetFile);
+    }
     else
-        return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_SIZE_MISMATCH, mTargetFile);
+        return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_NOT_OPEN, mTargetFile);
 }
 
 void FileStreamWriter::closeFile() { mTargetFile.close(); }
@@ -302,30 +307,40 @@ IOOpReport TextStreamWriter::openFile()
 
 IOOpReport TextStreamWriter::writeLine(QString line, bool ensureLineStart)
 {
-    // Mark that text will end at line start
-    mAtLineStart = true;
+    if(mTargetFile.isOpen())
+    {
+        // Mark that text will end at line start
+        mAtLineStart = true;
 
-    // Ensure line start if requested
-    if(ensureLineStart && !mAtLineStart)
-        mStreamWriter << ENDL;
+        // Ensure line start if requested
+        if(ensureLineStart && !mAtLineStart)
+            mStreamWriter << ENDL;
 
-    // Write line to file
-    mStreamWriter << line << ENDL;
+        // Write line to file
+        mStreamWriter << line << ENDL;
 
-    // Return stream status
-    return IOOpReport(IO_OP_WRITE, translateQTextStreamStatus(mStreamWriter.status()), mTargetFile);
+        // Return stream status
+        return IOOpReport(IO_OP_WRITE, translateQTextStreamStatus(mStreamWriter.status()), mTargetFile);
+    }
+    else
+        return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_NOT_OPEN, mTargetFile);
 }
 
 IOOpReport TextStreamWriter::writeText(QString text)
 {
-    // Check if data will end at line start
-    mAtLineStart = text.back() == ENDL;
+    if(mTargetFile.isOpen())
+    {
+        // Check if data will end at line start
+        mAtLineStart = text.back() == ENDL;
 
-    // Write text to file
-    mStreamWriter << text;
+        // Write text to file
+        mStreamWriter << text;
 
-    // Return stream status
-    return IOOpReport(IO_OP_WRITE, translateQTextStreamStatus(mStreamWriter.status()), mTargetFile);
+        // Return stream status
+        return IOOpReport(IO_OP_WRITE, translateQTextStreamStatus(mStreamWriter.status()), mTargetFile);
+    }
+    else
+        return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_NOT_OPEN, mTargetFile);
 }
 
 void TextStreamWriter::closeFile() { mTargetFile.close(); }
