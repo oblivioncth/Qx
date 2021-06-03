@@ -205,8 +205,8 @@ bool TextPos::isNull() const { return mLineNum == -2 && mCharNum == -2; }
 
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
-FileStreamWriter::FileStreamWriter(QFile& file, WriteMode writeMode, bool createDirs, bool buffered) :
-    mTargetFile(file), mWriteMode(writeMode), mCreateDirs(createDirs), mBuffered(buffered) {}
+FileStreamWriter::FileStreamWriter(QFile& file, WriteMode writeMode, bool createDirs) :
+    mTargetFile(file), mWriteMode(writeMode), mCreateDirs(createDirs) {}
 
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:
@@ -233,11 +233,7 @@ IOOpReport FileStreamWriter::openFile()
     }
 
     // Attempt to open file
-    QIODevice::OpenMode om = QFile::WriteOnly | WRITE_OPEN_FLAGS_MAP[mWriteMode];
-    if(!mBuffered)
-        om |= QIODevice::Unbuffered;
-
-    IOOpResultType openResult = parsedOpen(mTargetFile, om);
+    IOOpResultType openResult = parsedOpen(mTargetFile, QFile::WriteOnly | WRITE_OPEN_FLAGS_MAP[mWriteMode]);
     if(openResult != IO_SUCCESS)
         return IOOpReport(IO_OP_WRITE, openResult, mTargetFile);
 
@@ -326,6 +322,8 @@ IOOpReport TextStreamWriter::writeLine(QString line, bool ensureLineStart)
 
         // Write line to file
         mStreamWriter << line << ENDL;
+        if(!mBuffered)
+            mStreamWriter.flush();
 
         // Return stream status
         return IOOpReport(IO_OP_WRITE, translateQTextStreamStatus(mStreamWriter.status()), mTargetFile);
@@ -343,6 +341,8 @@ IOOpReport TextStreamWriter::writeText(QString text)
 
         // Write text to file
         mStreamWriter << text;
+        if(!mBuffered)
+            mStreamWriter.flush();
 
         // Return stream status
         return IOOpReport(IO_OP_WRITE, translateQTextStreamStatus(mStreamWriter.status()), mTargetFile);

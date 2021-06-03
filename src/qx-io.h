@@ -114,11 +114,10 @@ private:
     QFile& mTargetFile;
     WriteMode mWriteMode;
     bool mCreateDirs;
-    bool mBuffered;
 
 //-Constructor-------------------------------------------------------------------------------------------------------
 public:
-    FileStreamWriter(QFile& file, WriteMode writeMode = Append, bool createDirs = true, bool buffered = true);
+    FileStreamWriter(QFile& file, WriteMode writeMode = Append, bool createDirs = true);
 
 //-Instance Functions------------------------------------------------------------------------------------------------
 public:
