@@ -267,6 +267,13 @@ public:
     static bool isHexNumber(QChar hexNum);
 };
 
+class Color
+{
+//-Class Functions----------------------------------------------------------------------------------------------
+public:
+    static QColor textColorFromBackgroundColor(QColor bgColor);
+};
+
 class DateTime
 {
 //-Class Variables----------------------------------------------------------------------------------------------
