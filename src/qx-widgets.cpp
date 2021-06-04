@@ -36,6 +36,10 @@ TreeInputDialog::TreeInputDialog(QWidget* parent) : QDialog(parent)
     setLayout(mainLayout);
 }
 
+//-Instance Functions--------------------------------------------------------------------------------------------
+//Public:
+void TreeInputDialog::setModel(QAbstractItemModel* model) { mTreeView->setModel(model); }
+
 //===============================================================================================================
 // LOGIN DIALOG
 //===============================================================================================================
