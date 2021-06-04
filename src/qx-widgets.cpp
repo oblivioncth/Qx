@@ -18,6 +18,7 @@ TreeInputDialog::TreeInputDialog(QWidget* parent) : QDialog(parent)
 {
     // Setup TreeView
     mTreeView = new QTreeView();
+    mTreeView->setHeaderHidden(true);
 
     // Setup ButtonBox
     mButtonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
