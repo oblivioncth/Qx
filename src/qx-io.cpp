@@ -6,72 +6,41 @@
 namespace Qx
 {
 
-//-Functions-----------------------------------------------------------------------------------------------------
-//Private:
 namespace  // Anonymous namespace for effectively private (to this cpp) functions
 {
-    IOOpResultType translateQFileDeviceError(QFileDevice::FileError fileError) // TODO: Change to hash
-    {
-        switch(fileError)
-        {
-            case QFileDevice::NoError:
-                return IO_SUCCESS;
-            case QFileDevice::ReadError:
-                return IO_ERR_READ;
-            case QFileDevice::WriteError:
-                return IO_ERR_WRITE;
-            case QFileDevice::FatalError:
-                return IO_ERR_FATAL;
-            case QFileDevice::ResourceError:
-                return IO_ERR_OUT_OF_RES;
-            case QFileDevice::OpenError:
-                return IO_ERR_OPEN;
-            case QFileDevice::AbortError:
-                return IO_ERR_ABORT;
-            case QFileDevice::TimeOutError:
-                return IO_ERR_TIMEOUT;
-            case QFileDevice::UnspecifiedError:
-                return IO_ERR_UNKNOWN;
-            case QFileDevice::RemoveError:
-                return IO_ERR_REMOVE;
-            case QFileDevice::RenameError:
-                return IO_ERR_RENAME;
-            case QFileDevice::PositionError:
-                return IO_ERR_REPOSITION;
-            case QFileDevice::ResizeError:
-                return IO_ERR_RESIZE;
-            case  QFileDevice::PermissionsError:
-                return IO_ERR_ACCESS_DENIED;
-            case QFileDevice::CopyError:
-                return IO_ERR_COPY;
-        }
+    //-Unit Variables-----------------------------------------------------------------------------------------------------
+    const QHash<QFileDevice::FileError, IOOpResultType> FILE_DEV_ERR_MAP = {
+        {QFileDevice::NoError, IO_SUCCESS},
+        {QFileDevice::ReadError, IO_ERR_READ},
+        {QFileDevice::WriteError, IO_ERR_WRITE},
+        {QFileDevice::FatalError, IO_ERR_FATAL},
+        {QFileDevice::ResourceError, IO_ERR_OUT_OF_RES},
+        {QFileDevice::OpenError, IO_ERR_OPEN},
+        {QFileDevice::AbortError, IO_ERR_ABORT},
+        {QFileDevice::TimeOutError, IO_ERR_TIMEOUT},
+        {QFileDevice::UnspecifiedError, IO_ERR_UNKNOWN},
+        {QFileDevice::RemoveError, IO_ERR_REMOVE},
+        {QFileDevice::RenameError, IO_ERR_RENAME},
+        {QFileDevice::PositionError, IO_ERR_REPOSITION},
+        {QFileDevice::ResizeError, IO_ERR_RESIZE},
+        {QFileDevice::PermissionsError, IO_ERR_ACCESS_DENIED},
+        {QFileDevice::CopyError, IO_ERR_COPY}
+    };
 
-        return IO_ERR_UNKNOWN; // Should never be reached, used to avoid "not all control paths return a value" warning
-    }
+    const QHash<QTextStream::Status, IOOpResultType> TXT_STRM_STAT_MAP = {
+        {QTextStream::Ok, IO_SUCCESS},
+        {QTextStream::ReadPastEnd, IO_ERR_CURSOR_OOB},
+        {QTextStream::ReadCorruptData, IO_ERR_READ},
+        {QTextStream::WriteFailed, IO_ERR_WRITE}
+    };
 
-    IOOpResultType parsedOpen(QFile &file, QIODevice::OpenMode openMode)
+    //-Unit Functions-----------------------------------------------------------------------------------------------------
+        IOOpResultType parsedOpen(QFile &file, QIODevice::OpenMode openMode)
     {
         if(file.open(openMode))
             return IO_SUCCESS;
         else
-            return translateQFileDeviceError(file.error());
-    }
-
-    IOOpResultType translateQTextStreamStatus(QTextStream::Status fileStatus) // TODO: Change to hash
-    {
-        switch(fileStatus)
-        {
-            case QTextStream::Ok:
-                return IO_SUCCESS;
-            case QTextStream::ReadPastEnd:
-                return IO_ERR_CURSOR_OOB;
-            case QTextStream::ReadCorruptData:
-                return IO_ERR_READ;
-            case QTextStream::WriteFailed:
-                return IO_ERR_WRITE;
-        }
-
-        return IO_ERR_UNKNOWN; // Should never be reached, used to avoid "not all control paths return a value" warning
+            return FILE_DEV_ERR_MAP.value(file.error());
     }
 
     IOOpResultType fileCheck(const QFile &file)
@@ -132,11 +101,11 @@ bool IOOpReport::isNull() const { return mNull; }
 void IOOpReport::parseOutcome()
 {
     if(mResult == IO_SUCCESS)
-        mOutcome = SUCCESS_TEMPLATE.arg(SUCCESS_VERBS.value(static_cast<int>(mOperation)), TARGET_TYPES.value(static_cast<int>(mTargetType)), QDir::toNativeSeparators(mTarget));
+        mOutcome = SUCCESS_TEMPLATE.arg(SUCCESS_VERBS.value(mOperation), TARGET_TYPES.value(mTargetType), QDir::toNativeSeparators(mTarget));
     else
     {
-        mOutcome = ERROR_TEMPLATE.arg(ERROR_VERBS.value(static_cast<int>(mOperation)), TARGET_TYPES.value(static_cast<int>(mTargetType)), QDir::fromNativeSeparators(mTarget));
-        mOutcomeInfo = ERROR_INFO.value(static_cast<int>(mResult) - 1);
+        mOutcome = ERROR_TEMPLATE.arg(ERROR_VERBS.value(mOperation), TARGET_TYPES.value(mTargetType), QDir::fromNativeSeparators(mTarget));
+        mOutcomeInfo = ERROR_INFO.value(mResult);
     }
 
 }
@@ -326,7 +295,7 @@ IOOpReport TextStreamWriter::writeLine(QString line, bool ensureLineStart)
             mStreamWriter.flush();
 
         // Return stream status
-        return IOOpReport(IO_OP_WRITE, translateQTextStreamStatus(mStreamWriter.status()), mTargetFile);
+        return IOOpReport(IO_OP_WRITE, TXT_STRM_STAT_MAP.value(mStreamWriter.status()), mTargetFile);
     }
     else
         return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_NOT_OPEN, mTargetFile);
@@ -345,7 +314,7 @@ IOOpReport TextStreamWriter::writeText(QString text)
             mStreamWriter.flush();
 
         // Return stream status
-        return IOOpReport(IO_OP_WRITE, translateQTextStreamStatus(mStreamWriter.status()), mTargetFile);
+        return IOOpReport(IO_OP_WRITE, TXT_STRM_STAT_MAP.value(mStreamWriter.status()), mTargetFile);
     }
     else
         return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_NOT_OPEN, mTargetFile);
@@ -815,7 +784,7 @@ IOOpReport writeStringAsFile(QFile& textFile, const QString& text, bool overwrit
 
     // Close file and return stream status
     textFile.close();
-    return IOOpReport(IO_OP_WRITE, translateQTextStreamStatus(fileStream.status()), textFile);
+    return IOOpReport(IO_OP_WRITE, TXT_STRM_STAT_MAP.value(fileStream.status()), textFile);
 }
 
 IOOpReport writeStringToEndOfFile(QFile &textFile, const QString &text, bool ensureNewLine, bool createIfDNE, bool createDirs)
@@ -871,7 +840,7 @@ IOOpReport writeStringToEndOfFile(QFile &textFile, const QString &text, bool ens
 
     // Close file and return stream status
     textFile.close();
-    return IOOpReport(IO_OP_WRITE, translateQTextStreamStatus(fileStream.status()), textFile);
+    return IOOpReport(IO_OP_WRITE, TXT_STRM_STAT_MAP.value(fileStream.status()), textFile);
 
 }
 
