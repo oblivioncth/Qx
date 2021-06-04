@@ -466,7 +466,7 @@ class Integrity
 {
 //-Class Functions---------------------------------------------------------------------------------------------
 public:
-    static QByteArray generateChecksum(QByteArray &data, QCryptographicHash::Algorithm hashAlgorithm);
+    static QString generateChecksum(QByteArray &data, QCryptographicHash::Algorithm hashAlgorithm);
 };
 
 class Json

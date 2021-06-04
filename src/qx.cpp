@@ -192,11 +192,11 @@ int GenericError::exec(QMessageBox::StandardButtons choices, QMessageBox::Standa
 
 //-Class Functions---------------------------------------------------------------------------------------------
 //Public:
-QByteArray Integrity::generateChecksum(QByteArray &data, QCryptographicHash::Algorithm hashAlgorithm)
+QString Integrity::generateChecksum(QByteArray &data, QCryptographicHash::Algorithm hashAlgorithm)
 {
     QCryptographicHash checksumHash(hashAlgorithm);
     checksumHash.addData(data);
-    return checksumHash.result();
+    return Qx::String::fromByteArrayHex(checksumHash.result());
 }
 
 //===============================================================================================================
