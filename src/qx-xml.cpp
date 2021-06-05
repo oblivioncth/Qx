@@ -6,7 +6,7 @@ namespace Qx
 namespace  // Anonymous namespace for effectively private (to this cpp) functions
 {
     //-Unit Variables-----------------------------------------------------------------------------------------------------
-    const QRegularExpression illegalXmlChar("[\x01-\x08\x0B\x0C\x0E-\x1F\x7F]"); // Missing unicode characters
+    const QRegularExpression illegalXmlChar(QStringLiteral(u"[\u0001-\u0008\u000B\u000C\u000E-\u001F\u007f-\u0084\u0086-\u009f\uFDD0-\uFDFF\uFFFF\uC008]"));
 }
 
 //-Classes------------------------------------------------------------------------------------------------------------
