@@ -2,6 +2,13 @@
 
 namespace Qx
 {
+
+namespace  // Anonymous namespace for effectively private (to this cpp) functions
+{
+    //-Unit Variables-----------------------------------------------------------------------------------------------------
+    const QRegularExpression illegalXmlChar("[\x01-\x08\x0B\x0C\x0E-\x1F\x7F]"); // Missing unicode characters
+}
+
 //-Classes------------------------------------------------------------------------------------------------------------
 
 //===============================================================================================================
@@ -23,5 +30,8 @@ XmlStreamReaderError::XmlStreamReaderError(QString customError)
 bool XmlStreamReaderError::isValid() { return mErrorType != QXmlStreamReader::Error::NoError; }
 QXmlStreamReader::Error XmlStreamReaderError::getType() { return mErrorType; }
 QString XmlStreamReaderError::getText() { return mErrorText; }
+
+//-Functions------------------------------------------------------------------------------------------------------------
+QString xmlSanitized(QString string) { return string.replace(illegalXmlChar, ""); }
 
 }
