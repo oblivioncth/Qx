@@ -576,6 +576,19 @@ QString String::fromByteArrayHex(QByteArray data, QChar separator, Endian::Endia
 }
 
 QString String::stripToHexOnly(QString string) { return string.replace(RegEx::nonHexOnly, ""); }
-//QString join(QList<T> list, QString separator, F&& toStringFunc) { defined in .h }
+
+//QString String::join(QList<T> list, QString separator, F&& toStringFunc) { defined in .h }
+
+QString String::join(QList<String> set, QString separator, QString prefix) // Specialization for T = QString
+{
+    return join(set, [](const QString& str){ return str; }, separator, prefix);
+}
+
+//QString String::join(QSet<T> set, F&& toStringFunc, QString separator = "", QString prefix = "") { defined in .h }
+
+QString String::join(QSet<String> set, QString separator, QString prefix) // Specialization for T = QString
+{
+    return join(set, [](const QString& str){ return str; }, separator, prefix);
+}
 
 }
