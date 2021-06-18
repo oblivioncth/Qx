@@ -759,14 +759,14 @@ public:
         return conjuction;
     }
 
-    static QString join(QList<String> set, QString separator = "", QString prefix = ""); // Specialization for T = QString
+    static QString join(QList<QString> set, QString separator = "", QString prefix = ""); // Overload for T = QString
 
     template<typename T, typename F>
     static QString join(QSet<T> set, F&& toStringFunc, QString separator = "", QString prefix = "")
     {
         QString conjuction;
 
-        QSet<T>::const_iterator i = set.constBegin();
+        QSet<T>::const_iterator i = set.constBegin(); // With some compilers this shows as a syntax error, but will still compile
         while(i != set.constEnd())
         {
             conjuction += prefix;
@@ -778,7 +778,7 @@ public:
         return conjuction;
     }
 
-    static QString join(QSet<String> set, QString separator = "", QString prefix = ""); // Specialization for T = QString
+    static QString join(QSet<QString> set, QString separator = "", QString prefix = ""); // Overload for T = QString
 };
 
 }
