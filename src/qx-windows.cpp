@@ -1,11 +1,46 @@
 #include "qx-windows.h"
+
 #include "qx-io.h"
-#include <tlhelp32.h>
+
 #include <QFileInfo>
 #include <QCoreApplication>
 
+#include <tlhelp32.h>
+#include "comdef.h"
+#include "winnls.h"
+#include "shobjidl.h"
+#include "objbase.h"
+#include "objidl.h"
+#include "shlguid.h"
+#include "atlbase.h"
+
 namespace Qx
 {
+
+namespace  // Anonymous namespace for effectively private (to this cpp) functions
+{
+    // Alternate function to internal RtlNtStatusToDosError (which requires address linkage),
+    // Thanks to https://gist.github.com/ian-abbott/732c5b88182a1941a603
+    DWORD ConvertNtStatusToWin32Error(NTSTATUS ntstatus)
+    {
+            DWORD oldError;
+            DWORD result;
+            DWORD br;
+            OVERLAPPED o;
+
+            o.Internal = ntstatus;
+            o.InternalHigh = 0;
+            o.Offset = 0;
+            o.OffsetHigh = 0;
+            o.hEvent = 0;
+            oldError = GetLastError();
+            GetOverlappedResult(NULL, &o, &br, FALSE);
+            result = GetLastError();
+            SetLastError(oldError);
+            return result;
+    }
+}
+
 //-Classes------------------------------------------------------------------------------------------------------------
 
 //===============================================================================================================
@@ -267,6 +302,130 @@ bool enforceSingleInstance()
 
     // Instance is only one
     return true;
+}
+
+Qx::GenericError translateHresult(HRESULT res)
+{
+    Qx::BitArrayX resBits = Qx::BitArrayX::fromInteger(res, Endian::BE);
+
+    // Check if result is actually an ntstatus code
+    if(resBits.testBit(28))
+        return translateNtstatus(res);
+
+    // Check for success
+    if(!resBits.testBit(31))
+        return Qx::GenericError();
+
+    // Create com error instance from result
+    _com_error comError(res);
+
+    // Return translated error
+    return Qx::GenericError(GenericError::Error, QString::fromWCharArray(comError.ErrorMessage()));
+}
+
+Qx::GenericError translateNtstatus(NTSTATUS stat)
+{
+    Qx::BitArrayX statBits = Qx::BitArrayX::fromInteger(stat, Endian::BE);
+
+    // Get severity
+    quint8 severity = statBits.toInteger<quint8>(Endian::BE, 30);
+
+    // Check for success
+    if(severity == 0x00)
+        return Qx::GenericError();
+
+    // Get handle to ntdll.dll.
+    HMODULE hNtDll = LoadLibrary(L"NTDLL.DLL");
+
+    // Return unknown error if library fails to load
+    if (hNtDll == NULL)
+        return GenericError::UNKNOWN_ERROR;
+
+    // Use format message to create error string
+    TCHAR* formatedBuffer = nullptr;
+    DWORD formatResult = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_FROM_HMODULE,
+                                       hNtDll, ConvertNtStatusToWin32Error(stat), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                                       (LPTSTR)&formatedBuffer, 0, NULL);
+
+    // Free loaded dll
+    FreeLibrary(hNtDll);
+
+    // Return unknown error if message fails to format
+    if(!formatResult)
+        return GenericError::UNKNOWN_ERROR;
+
+    // Return translated error
+    return Qx::GenericError(severity == 0x03 ? GenericError::Error : GenericError::Warning, QString::fromWCharArray(formatedBuffer));
+}
+
+Qx::GenericError createShortcut(QString shortcutPath, ShortcutProperties sp)
+{
+    // Check for basic argument validity
+    if(sp.target.isEmpty() || shortcutPath.isEmpty() || sp.iconIndex < 0)
+        return translateHresult(E_INVALIDARG);
+
+    // Working vars
+    HRESULT hRes;
+    CComPtr<IShellLink> ipShellLink;
+
+    // Get full path of target
+    QFileInfo targetInfo(sp.target);
+    QString fullTargetPath = targetInfo.absoluteFilePath();
+
+    // Get a pointer to the IShellLink interface
+    hRes = CoCreateInstance(CLSID_ShellLink,
+                            NULL,
+                            CLSCTX_INPROC_SERVER,
+                            IID_IShellLink,
+                            (void**)&ipShellLink);
+
+    if (SUCCEEDED(hRes))
+    {
+        // Get a pointer to the IPersistFile interface
+        CComQIPtr<IPersistFile> ipPersistFile(ipShellLink);
+
+        // Set shortcut properties
+        hRes = ipShellLink->SetPath(fullTargetPath.toStdWString().c_str());
+        if (FAILED(hRes))
+            return translateHresult(hRes);
+
+        if(!sp.targetArgs.isEmpty())
+        {
+            hRes = ipShellLink->SetArguments(sp.targetArgs.toStdWString().c_str());
+            if (FAILED(hRes))
+                return translateHresult(hRes);
+        }
+
+        if(!sp.startIn.isEmpty())
+        {
+            hRes = ipShellLink->SetWorkingDirectory(sp.startIn.toStdWString().c_str());
+            if (FAILED(hRes))
+                return translateHresult(hRes);
+        }
+
+        if(!sp.comment.isEmpty())
+        {
+            hRes = ipShellLink->SetDescription(sp.comment.toStdWString().c_str());
+            if (FAILED(hRes))
+                return translateHresult(hRes);
+        }
+
+        if(!sp.iconFilePath.isEmpty())
+        {
+            hRes = ipShellLink->SetIconLocation(sp.iconFilePath.toStdWString().c_str(), sp.iconIndex);
+            if (FAILED(hRes))
+                return translateHresult(hRes);
+        }
+
+        hRes = ipShellLink->SetShowCmd(sp.showMode);
+        if (FAILED(hRes))
+            return translateHresult(hRes);
+
+        // Write the shortcut to disk
+        hRes = ipPersistFile->Save(shortcutPath.toStdWString().c_str(), TRUE);
+    }
+
+    return translateHresult(hRes);
 }
 
 }

@@ -45,20 +45,33 @@ namespace Qx
 //static T mostFrequent(T(&array) [N]) { defined in .h }
 
 //===============================================================================================================
+// BITARRAY
+//===============================================================================================================
+
+//-Constructor--------------------------------------------------------------------------------------------------
+//Public:
+BitArrayX::BitArrayX() : QBitArray() {}
+BitArrayX::BitArrayX(int size, bool value) : QBitArray(size, value) {}
+
+//-Class Functions-----------------------------------------------------------------------------------------------
+//Public:
+
+
+//-Instance Functions--------------------------------------------------------------------------------------------
+//Public:
+
+
+//===============================================================================================================
 // BYTEARRAY
 //===============================================================================================================
 
 //-Class Functions-----------------------------------------------------------------------------------------------
 //Public:
+//template<typename T, ENABLE_IF(std::is_integral<T>)>
+//static QByteArray RAWFromPrimitive(T primitive, Endian::Endianness endianness = Endian::LE) { defined in .h }
 
-//template<typename T, REQUIRES(std::is_fundamental<T>())>
-//static QByteArray QByteArrayFromRawPrimitive(T primitive, BasicUtilities::Endian::Endianness endianness) defined in .h
-
-//template<typename T, REQUIRES(std::is_integral<T>())>
-//static QByteArray RAWFromPrimitive(T primitive, BasicUtilities::Endian::Endianness endianness = BasicUtilities::Endian::LEties::Endian::LE) defined in .h
-
-//template<typename T, REQUIRES(std::is_fundamental<T>())>
-//static T RAWToPrimitive(QByteArray ba, BasicUtilities::Endian::Endianness endianness = BasicUtilities::Endian::LEties::Endian::LE) defined in .h
+//template<typename T, ENABLE_IF(std::is_floating_point<T>)>
+//static QByteArray RAWFromPrimitive(T primitive, Endian::Endianness endianness = Endian::LE) { defined in .h }
 
 QByteArray ByteArray::RAWFromString(QString str) { return str.toLatin1(); }
 QByteArray ByteArray::RAWFromStringHex(QString str) { return QByteArray::fromHex(str.toUtf8()); }
@@ -157,6 +170,10 @@ QDateTime DateTime::fromMSFileTime(qint64 fileTime)
 //===============================================================================================================
 // Generic Error
 //===============================================================================================================
+
+//-Class Variables-----------------------------------------------------------------------------------------------
+//Public:
+const GenericError GenericError::UNKNOWN_ERROR = Qx::GenericError(GenericError::Error, "An unknown error occured."); // Intialization of static error
 
 //-Constructor----------------------------------------------------------------------------------------------
 //Public:
