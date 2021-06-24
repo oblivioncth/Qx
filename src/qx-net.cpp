@@ -53,7 +53,7 @@ SyncDownloadManager::SyncDownloadManager()
 NetworkReplyError SyncDownloadManager::enumerateTotalSize()
 {
     // Check size of each file
-    for(const DownloadTask& task : mPendingDownloads)
+    for(const DownloadTask& task : qAsConst(mPendingDownloads))
     {
         // Get download size
         quint64 singleFileSize = 0;
