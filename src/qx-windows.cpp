@@ -98,13 +98,13 @@ FileDetails getFileDetails(QString filePath)
 
     if(QFileInfo::exists(filePath) && QFileInfo(filePath).isFile())
     {
-        DWORD verInfoHandle, verInfoSize = GetFileVersionInfoSize(filePath.toStdWString().c_str(), &verInfoHandle);
+        DWORD verInfoHandle, verInfoSize = GetFileVersionInfoSize((const wchar_t *)filePath.utf16(), &verInfoHandle);
 
         if (verInfoSize != NULL)
         {
             LPSTR verInfo = new char[verInfoSize];
 
-            if (GetFileVersionInfo(filePath.toStdWString().c_str(), verInfoHandle, verInfoSize, verInfo))
+            if (GetFileVersionInfo((const wchar_t *)filePath.utf16(), verInfoHandle, verInfoSize, verInfo))
             {
                 LPBYTE viQueryResultBuffer = NULL;
                 UINT viQuerryResultSizeBuffer = 0;
@@ -174,7 +174,7 @@ FileDetails getFileDetails(QString filePath)
                     LPVOID lpPointer;
                     UINT bufferSize;
 
-                    if(VerQueryValue(verInfo, query.toStdWString().c_str(), &lpPointer, &bufferSize) && bufferSize)
+                    if(VerQueryValue(verInfo, (const wchar_t *)query.utf16(), &lpPointer, &bufferSize) && bufferSize)
                         return QString::fromStdWString((const TCHAR*)lpPointer);
                     else
                         return QString();
@@ -182,7 +182,7 @@ FileDetails getFileDetails(QString filePath)
                 };
 
                 // Read the list of languages and code pages.
-                VerQueryValue(verInfo, FileDetails::LANG_CODE_PAGE_QUERY.toStdWString().c_str(), (LPVOID*)&langCodePage, &viQuerryResultSizeBuffer);
+                VerQueryValue(verInfo, (const wchar_t *)FileDetails::LANG_CODE_PAGE_QUERY.utf16(), (LPVOID*)&langCodePage, &viQuerryResultSizeBuffer);
 
                 // Read the file details for each language and code page.
                 for (ULONGLONG i = 0; i < (viQuerryResultSizeBuffer / sizeof(struct LANGANDCODEPAGE)); i++)
@@ -293,7 +293,7 @@ bool enforceSingleInstance()
         return false;
 
     // Attempt to create unique mutex
-    uniqueAppMutex = CreateMutex(NULL, FALSE, selfHash.toStdWString().c_str());
+    uniqueAppMutex = CreateMutex(NULL, FALSE, (const wchar_t *)selfHash.utf16());
     if(GetLastError() == ERROR_ALREADY_EXISTS)
     {
         CloseHandle(uniqueAppMutex);
@@ -385,34 +385,34 @@ Qx::GenericError createShortcut(QString shortcutPath, ShortcutProperties sp)
         CComQIPtr<IPersistFile> ipPersistFile(ipShellLink);
 
         // Set shortcut properties
-        hRes = ipShellLink->SetPath(fullTargetPath.toStdWString().c_str());
+        hRes = ipShellLink->SetPath((const wchar_t *)fullTargetPath.utf16());
         if (FAILED(hRes))
             return translateHresult(hRes);
 
         if(!sp.targetArgs.isEmpty())
         {
-            hRes = ipShellLink->SetArguments(sp.targetArgs.toStdWString().c_str());
+            hRes = ipShellLink->SetArguments((const wchar_t *)sp.targetArgs.utf16());
             if (FAILED(hRes))
                 return translateHresult(hRes);
         }
 
         if(!sp.startIn.isEmpty())
         {
-            hRes = ipShellLink->SetWorkingDirectory(sp.startIn.toStdWString().c_str());
+            hRes = ipShellLink->SetWorkingDirectory((const wchar_t *)sp.startIn.utf16());
             if (FAILED(hRes))
                 return translateHresult(hRes);
         }
 
         if(!sp.comment.isEmpty())
         {
-            hRes = ipShellLink->SetDescription(sp.comment.toStdWString().c_str());
+            hRes = ipShellLink->SetDescription((const wchar_t *)sp.comment.utf16());
             if (FAILED(hRes))
                 return translateHresult(hRes);
         }
 
         if(!sp.iconFilePath.isEmpty())
         {
-            hRes = ipShellLink->SetIconLocation(sp.iconFilePath.toStdWString().c_str(), sp.iconIndex);
+            hRes = ipShellLink->SetIconLocation((const wchar_t *)sp.iconFilePath.utf16(), sp.iconIndex);
             if (FAILED(hRes))
                 return translateHresult(hRes);
         }
@@ -422,7 +422,7 @@ Qx::GenericError createShortcut(QString shortcutPath, ShortcutProperties sp)
             return translateHresult(hRes);
 
         // Write the shortcut to disk
-        hRes = ipPersistFile->Save(shortcutPath.toStdWString().c_str(), TRUE);
+        hRes = ipPersistFile->Save((const wchar_t *)shortcutPath.utf16(), TRUE);
     }
 
     return translateHresult(hRes);
