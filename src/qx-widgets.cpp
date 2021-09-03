@@ -1,3 +1,4 @@
+#ifdef QT_WIDGETS_LIB // Only enabled for Widget applications
 #include "qx-widgets.h"
 #include <QVBoxLayout>
 #include <QPushButton>
@@ -198,3 +199,4 @@ void StandardItemModelX::selectNone() { forEachItem([](QStandardItem* item){ ite
 
 }
 
+#endif

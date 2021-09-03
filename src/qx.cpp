@@ -84,6 +84,7 @@ QByteArray ByteArray::RAWFromStringHex(QString str) { return QByteArray::fromHex
 //Public:
 bool Char::isHexNumber(QChar hexNum) { return RegEx::hexOnly.match(hexNum).hasMatch(); }
 
+#ifdef QT_GUI_LIB // Only enabled for GUI applications
 //===============================================================================================================
 // COLOR
 //===============================================================================================================
@@ -111,6 +112,7 @@ QColor Color::textColorFromBackgroundColor(QColor bgColor)
     // Return black or white text
     return L > contrastThreshold ? QColorConstants::Black : QColorConstants::White;
 }
+#endif
 
 //===============================================================================================================
 // DATETIME
@@ -192,6 +194,7 @@ QString GenericError::detailedInfo() { return mDetailedInfo; }
 
 GenericError& GenericError::setErrorLevel(ErrorLevel errorLevel) { mErrorLevel = errorLevel; return *this; }
 
+#ifdef QT_WIDGETS_LIB // Only enabled for Widget applications
 int GenericError::exec(QMessageBox::StandardButtons choices, QMessageBox::StandardButton defChoice)
 {
     // Determine icon
@@ -233,6 +236,7 @@ int GenericError::exec(QMessageBox::StandardButtons choices, QMessageBox::Standa
     // Show dialog and return user response
     return genericErrorMessage.exec();
 }
+#endif
 
 //===============================================================================================================
 // INTEGRITY
@@ -350,6 +354,7 @@ GenericError Json::checkedKeyRetrieval(QJsonObject& valueBuffer, QJsonObject jOb
 
 //template<typename T> static QList<T> subtractAB(QList<T> &listA, QList<T> &listB) defined in .h
 
+#ifdef QT_WIDGETS_LIB // Only enabled for Widget applications
 QWidgetList List::objectListToWidgetList(QObjectList list)
 {
     QWidgetList widgetList;
@@ -358,6 +363,7 @@ QWidgetList List::objectListToWidgetList(QObjectList list)
 
     return widgetList;
 }
+#endif
 
 //===============================================================================================================
 // MMRB

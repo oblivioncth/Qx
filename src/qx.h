@@ -4,14 +4,20 @@
 #define ENABLE_IF(...) std::enable_if_t<__VA_ARGS__::value, int> = 0 // enable_if Macro; allows ENABLE_IF(std::is_arithmetic<T>) for example
 #define ENABLE_IF2(...) std::enable_if_t<__VA_ARGS__::value, int> // enable_if Macro with no default argument, use if template was already forward declared
 
+// Only enabled for Widget applications
+#ifdef QT_WIDGETS_LIB // Only enabled for Widget applications
+    #include <QWidget>
+    #include <QMessageBox>
+#endif
+
 #include <QHash>
 #include <QCryptographicHash>
 #include <QRegularExpression>
 #include <QtEndian>
-#include <QWidget>
+
 #include <QSet>
 #include <QDateTime>
-#include <QMessageBox>
+
 #include <QBitArray>
 #include "assert.h"
 
@@ -314,12 +320,14 @@ public:
     static bool isHexNumber(QChar hexNum);
 };
 
+#ifdef QT_GUI_LIB // Only enabled for GUI applications
 class Color
 {
 //-Class Functions----------------------------------------------------------------------------------------------
 public:
     static QColor textColorFromBackgroundColor(QColor bgColor);
 };
+#endif
 
 class DateTime
 {
@@ -517,7 +525,9 @@ public:
 
     Qx::GenericError& setErrorLevel(ErrorLevel errorLevel);
 
+#ifdef QT_WIDGETS_LIB // Only enabled for Widget applications
     int exec(QMessageBox::StandardButtons choices, QMessageBox::StandardButton defChoice = QMessageBox::NoButton);
+#endif
 };
 
 class Integrity
@@ -681,8 +691,9 @@ public:
         return differenceList;
     }
 
+#ifdef QT_WIDGETS_LIB // Only enabled for Widget applications
     static QWidgetList objectListToWidgetList(QObjectList list);
-
+#endif
 };
 
 class MMRB
