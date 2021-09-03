@@ -2,6 +2,7 @@
 #include <QRegularExpression>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QColor>
 
 namespace Qx
 {
