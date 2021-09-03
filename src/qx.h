@@ -832,6 +832,28 @@ public:
     static QString join(QSet<QString> set, QString separator = "", QString prefix = ""); // Overload for T = QString
 };
 
+class StringTraverser
+{
+//-Instance Members----------------------------------------------------------------------------------------------------
+private:
+    int mIndex;
+    QString::const_iterator mIterator;
+    QString::const_iterator mEnd;
+
+//-Constructor-------------------------------------------------------------------------------------------------------
+public:
+    StringTraverser(const QString& string);
+
+//-Instance Functions--------------------------------------------------------------------------------------------------
+public:
+    void advance(int count = 1);
+
+    QChar currentChar();
+    QChar currentIndex();
+    QChar lookAhead(int posOffset = 1);
+    bool atEnd();
+};
+
 }
 
 //-Metatype declarations-------------------------------------------------------------------------------------------
