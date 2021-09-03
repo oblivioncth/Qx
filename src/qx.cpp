@@ -1,8 +1,12 @@
 #include "qx.h"
+
+#ifdef QT_GUI_LIB // Only enabled for GUI applications
+ #include <QColor>
+#endif
+
 #include <QRegularExpression>
 #include <QJsonArray>
 #include <QJsonObject>
-#include <QColor>
 
 namespace Qx
 {

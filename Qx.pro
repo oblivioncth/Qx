@@ -1,11 +1,19 @@
-QT += widgets xml network
+QT += xml network
+contains(DEFINES, EDITION_WIDGETS) {
+    QT += widgets
+} else {
+    QT -= gui
+    CONFIG += console
+}
+
+BUILDS
 
 LIB_NAME = Qxtended
 LIB_SHORT_NAME = Qx
 LIB_VER_MJR = 0
 LIB_VER_MNR = 0
 LIB_VER_REV = 6
-LIB_VER_BLD = 0
+LIB_VER_BLD = 1
 
 contains(QT_ARCH, i386) {
     ARCH_STR = 32
@@ -15,12 +23,17 @@ contains(QT_ARCH, i386) {
 
 VERSION = $${LIB_VER_MJR}.$${LIB_VER_MNR}.$${LIB_VER_REV}.$${LIB_VER_BLD}
 
-CONFIG(release, debug|release) {
-  TARGET = $${LIB_SHORT_NAME}_static$${ARCH_STR}_$${LIB_VER_MJR}-$${LIB_VER_MNR}-$${LIB_VER_REV}-$${LIB_VER_BLD}_Qt_$${QT_MAJOR_VERSION}-$${QT_MINOR_VERSION}-$${QT_PATCH_VERSION}
+contains(DEFINES, EDITION_WIDGETS) {
+    CONFIG_STR = W
+} else {
+    CONFIG_STR = C
 }
+
 CONFIG(debug, debug|release) {
-  TARGET = $${LIB_SHORT_NAME}_static$${ARCH_STR}_$${LIB_VER_MJR}-$${LIB_VER_MNR}-$${LIB_VER_REV}-$${LIB_VER_BLD}_Qt_$${QT_MAJOR_VERSION}-$${QT_MINOR_VERSION}-$${QT_PATCH_VERSION}d
+  SUFFIX = d
 }
+
+TARGET = $${LIB_SHORT_NAME}$${CONFIG_STR}_static$${ARCH_STR}_$${LIB_VER_MJR}-$${LIB_VER_MNR}-$${LIB_VER_REV}-$${LIB_VER_BLD}_Qt_$${QT_MAJOR_VERSION}-$${QT_MINOR_VERSION}-$${QT_PATCH_VERSION}$${SUFFIX}
 
 LIBS += Version.lib
 
