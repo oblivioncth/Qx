@@ -407,6 +407,8 @@ bool MMRB::operator>= (const MMRB &otherMMRB) { return *this == otherMMRB || *th
 bool MMRB::operator< (const MMRB &otherMMRB) { return !(*this >= otherMMRB); }
 bool MMRB::operator<= (const MMRB &otherMMRB) { return !(*this > otherMMRB); }
 
+bool MMRB::isNull() { return mMajor == -1 && mMinor == -1 && mRevision == -1 && mBuild == -1; }
+
 QString MMRB::toString(MMRB::StringFormat format)
 {
     QString workingString = QString::number(mMajor);
@@ -422,11 +424,21 @@ QString MMRB::toString(MMRB::StringFormat format)
 
     return workingString;
 }
+
 int MMRB::getMajorVer() { return mMajor; }
 int MMRB::getMinorVer() { return mMinor; }
 int MMRB::getRevisionVer() { return mRevision; }
 int MMRB::getBuildVer() { return mBuild; }
-bool MMRB::isNull() { return mMajor == -1 && mMinor == -1 && mRevision == -1 && mBuild == -1; }
+
+void MMRB::setMajorVer(int major) { mMajor = major; }
+void MMRB::setMinorVer(int minor) { mMinor = minor; }
+void MMRB::setRevisionVer(int revision) { mRevision = revision; }
+void MMRB::setBuildVer(int build) { mBuild = build; }
+
+void MMRB::incrementMajorVer() { mMajor++; }
+void MMRB::incrementMinorVer() { mMinor++; }
+void MMRB::incrementRevisionVer() { mRevision++; }
+void MMRB::incrementBuildVer() { mBuild++; }
 
 //-Class Functions---------------------------------------------------------------------------------------------
 //Public:

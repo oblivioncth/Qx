@@ -701,7 +701,6 @@ class MMRB
 public:
     enum class StringFormat { Full, NoTrailZero, NoTrailRBZero };
 
-
 //-Member Variables--------------------------------------------------------------------------------------------
 private:
     int mMajor;
@@ -723,12 +722,24 @@ public:
     bool operator< (const MMRB &otherMMRB);
     bool operator<= (const MMRB &otherMMRB);
 
+    bool isNull();
     QString toString(StringFormat format = StringFormat::Full);
+
     int getMajorVer();
     int getMinorVer();
     int getRevisionVer();
     int getBuildVer();
-    bool isNull();
+
+    void setMajorVer(int major);
+    void setMinorVer(int minor);
+    void setRevisionVer(int revision);
+    void setBuildVer(int build);
+
+    void incrementMajorVer();
+    void incrementMinorVer();
+    void incrementRevisionVer();
+    void incrementBuildVer();
+
 private:
 
 //-Class Functions---------------------------------------------------------------------------------------------
