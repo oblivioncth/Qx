@@ -450,7 +450,7 @@ MMRB MMRB::fromString(QString string)
 
     int versions[] = {0, 0, 0, 0}; // Above check prevents going OOB with this
 
-    QStringList segments = string.split(string);
+    QStringList segments = string.split('.');
 
     for(int i = 0; i < segments.size(); i++)
         versions[i] = segments.at(i).toInt();
@@ -511,7 +511,7 @@ bool String::isValidMMRB(QString version)
 {
     // MMRB: Major.Minor.Revision.Build
 
-    QStringList segments = version.split(".");
+    QStringList segments = version.split('.');
 
     if(segments.size() > 4)
         return false;
