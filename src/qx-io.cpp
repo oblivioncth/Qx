@@ -402,7 +402,9 @@ IOOpReport getLineCountOfFile(long long& returnBuffer, QFile &textFile)
 IOOpReport findStringInFile(TextPos& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity caseSensitivity, int hitsToSkip)
 {
     // Returns the found match after skipping the requested hits if it exists, otherwise returns a null position
-    // hitsToSkip = -1 returns the last match if any
+    // hitsToSkip = -1 returns the last match if any.
+
+    // TODO: The current implementation does not allow searching for line breaks
 
     // Empty buffer
     returnBuffer = TextPos();
