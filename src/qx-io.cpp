@@ -712,7 +712,7 @@ IOOpReport readTextFromFileByLine(QStringList& returnBuffer, QFile& textFile, in
              if(currentLine == startLine) // Start line index is within file bounds (if not, do nothing)
              {
                  // Process start line to end line or end of file
-                 for(; currentLine != endLine + 1 && !fileTextStream.atEnd(); currentLine++)
+                 for(; (endLine == -1 || currentLine != endLine + 1) && !fileTextStream.atEnd(); currentLine++)
                      returnBuffer.append(fileTextStream.readLine());
              }
          }
