@@ -448,9 +448,14 @@ MMRB MMRB::fromString(QString string)
     if(!String::isValidMMRB(string))
         return MMRB();
 
+    int versions[] = {0, 0, 0, 0}; // Above check prevents going OOB with this
+
     QStringList segments = string.split(string);
 
-    return MMRB(segments.at(0).toInt(), segments.at(1).toInt(), segments.at(2).toInt(), segments.at(3).toInt());
+    for(int i = 0; i < segments.size(); i++)
+        versions[i] = segments.at(i).toInt();
+
+    return MMRB(versions[0], versions[1], versions[2], versions[3]);
 }
 
 //===============================================================================================================
@@ -508,19 +513,14 @@ bool String::isValidMMRB(QString version)
 
     QStringList segments = version.split(".");
 
-    if(segments.size() == 4)
-    {
-        for(int i = 0; i < 5; i++)
-        {
-            if(i == 5)
-                return true;
+    if(segments.size() > 4)
+        return false;
 
-            if(!isOnlyNumbers(segments.at(i)))
-                break;
-        }
-    }
+    for(const QString& segment : qAsConst(segments))
+        if(!isOnlyNumbers(segment))
+            return false;
 
-    return false;
+    return true;
 }
 
 bool String::isHexNumber(QString hexNum) { return RegEx::hexOnly.match(hexNum).hasMatch() && !hexNum.isEmpty(); }
