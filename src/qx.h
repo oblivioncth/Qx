@@ -18,6 +18,7 @@
 #include <QDateTime>
 
 #include <QBitArray>
+#include <stdexcept>
 #include "assert.h"
 
 //-Non-namspace Functions-------------------------------------------------------------------------------------------------
@@ -788,6 +789,46 @@ public:
 
         // Return of closest the two directions
         return (abs(num) - abs(towardsZero) >= abs(awayFromZero) - abs(num))? awayFromZero : towardsZero;
+    }
+
+    template <typename T, ENABLE_IF(std::is_integral<T>)>
+    T ceilPowOfTwo(T num)
+    {
+        // Return if num already is power of 2
+        if (num && !(num & (num - 1)))
+            return num;
+
+        T powOfTwo = 1;
+
+        while(powOfTwo < num)
+            powOfTwo <<= 1;
+
+        return powOfTwo;
+    }
+
+    template <typename T, ENABLE_IF(std::is_integral<T>)>
+    T floorPowOfTwo(T num)
+    {
+        // Return if num already is power of 2
+        if (num && !(num & (num - 1)))
+            return num;
+
+        // Start with largest possible power of T type can hold
+        T powOfTwo = (std::numeric_limits<T>::max() >> 1) + 1;
+
+        while(powOfTwo > num)
+            powOfTwo >>= 1;
+
+        return powOfTwo;
+    }
+
+    template <typename T, ENABLE_IF(std::is_integral<T>)>
+    T roundPowOfTwo(T num)
+    {
+       T above = ceilPowOfTwo(num);
+       T below = floorPowOfTwo(num);
+
+       return above - num <= num - below ? above : below;
     }
 };
 
