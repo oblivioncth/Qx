@@ -792,7 +792,7 @@ public:
     }
 
     template <typename T, ENABLE_IF(std::is_integral<T>)>
-    T ceilPowOfTwo(T num)
+    static T ceilPowOfTwo(T num)
     {
         // Return if num already is power of 2
         if (num && !(num & (num - 1)))
@@ -807,7 +807,7 @@ public:
     }
 
     template <typename T, ENABLE_IF(std::is_integral<T>)>
-    T floorPowOfTwo(T num)
+    static T floorPowOfTwo(T num)
     {
         // Return if num already is power of 2
         if (num && !(num & (num - 1)))
@@ -823,7 +823,7 @@ public:
     }
 
     template <typename T, ENABLE_IF(std::is_integral<T>)>
-    T roundPowOfTwo(T num)
+    static T roundPowOfTwo(T num)
     {
        T above = ceilPowOfTwo(num);
        T below = floorPowOfTwo(num);

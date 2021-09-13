@@ -497,7 +497,9 @@ MMRB MMRB::fromString(QString string)
 //Public:
 //T typeLimitedAdd(T a, T b) { defined in .h }
 //T typeLimitedSub(T a, T b) { defined in .h }
-//T roundToNearestMultiple(T num, T mult) { defined in .h }
+//T ceilPowOfTwo(T num) { defined in .h }
+//T floorPowOfTwo(T num) { defined in .h }
+//T roundPowOfTwo(T num) { defined in .h }
 
 //===============================================================================================================
 // STRING
