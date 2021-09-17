@@ -1,4 +1,4 @@
-QT += xml network
+QT += network
 contains(DEFINES, EDITION_WIDGETS) {
     QT += widgets
 } else {
