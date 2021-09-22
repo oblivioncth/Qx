@@ -260,103 +260,16 @@ QString Integrity::generateChecksum(QByteArray &data, QCryptographicHash::Algori
 // JSON
 //===============================================================================================================
 
-GenericError Json::checkedKeyRetrieval(bool& valueBuffer, QJsonObject jObject, QString key)
-{
-    // Reset buffer
-    valueBuffer = false;
+//-Class Functions---------------------------------------------------------------------------------------------
+//Public:
 
-    QJsonValue potentialBool;
-
-    if((potentialBool = jObject.value(key)).isUndefined())
-        return GenericError(GenericError::Undefined, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_BOOL, key), ERR_KEY_DOESNT_EXIST.arg(key));
-
-    if(!potentialBool.isBool())
-        return GenericError(GenericError::Undefined, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_BOOL, key), ERR_KEY_TYPE_MISMATCH.arg(key, JSON_TYPE_BOOL));
-    else
-        valueBuffer = potentialBool.toBool();
-
-    return GenericError();
-}
-
-GenericError Json::checkedKeyRetrieval(double& valueBuffer, QJsonObject jObject, QString key)
-{
-    // Reset buffer
-    valueBuffer = 0.0;
-
-    QJsonValue potentialDouble;
-
-    if((potentialDouble = jObject.value(key)).isUndefined())
-        return GenericError(GenericError::Undefined, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_DOUBLE, key), ERR_KEY_DOESNT_EXIST.arg(key));
-
-    if(!potentialDouble.isDouble())
-        return GenericError(GenericError::Undefined, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_DOUBLE, key), ERR_KEY_TYPE_MISMATCH.arg(key, JSON_TYPE_DOUBLE));
-    else
-        valueBuffer = potentialDouble.toDouble();
-
-    return GenericError();
-}
-
-GenericError Json::checkedKeyRetrieval(QString& valueBuffer, QJsonObject jObject, QString key)
-{
-    // Reset buffer
-    valueBuffer = QString();
-
-    QJsonValue potentialString;
-
-    if((potentialString = jObject.value(key)).isUndefined())
-        return GenericError(GenericError::Undefined, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_STRING, key), ERR_KEY_DOESNT_EXIST.arg(key));
-
-    if(!potentialString.isString())
-        return GenericError(GenericError::Undefined, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_STRING, key), ERR_KEY_TYPE_MISMATCH.arg(key, JSON_TYPE_STRING));
-    else
-        valueBuffer = potentialString.toString();
-
-    return GenericError();
-}
-
-GenericError Json:: checkedKeyRetrieval(QJsonArray& valueBuffer, QJsonObject jObject, QString key)
-{
-    // Reset buffer
-    valueBuffer = QJsonArray();
-
-    QJsonValue potentialArray;
-
-    if((potentialArray = jObject.value(key)).isUndefined())
-        return GenericError(GenericError::Undefined, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_ARRAY, key), ERR_KEY_DOESNT_EXIST.arg(key));
-
-    if(!potentialArray.isArray())
-        return GenericError(GenericError::Undefined, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_ARRAY, key), ERR_KEY_TYPE_MISMATCH.arg(key, JSON_TYPE_ARRAY));
-    else
-        valueBuffer = potentialArray.toArray();
-
-    return GenericError();
-}
-
-GenericError Json::checkedKeyRetrieval(QJsonObject& valueBuffer, QJsonObject jObject, QString key)
-{
-    // Reset buffer
-    valueBuffer = QJsonObject();
-
-    QJsonValue potentialObject;
-
-    if((potentialObject = jObject.value(key)).isUndefined())
-        return GenericError(GenericError::Undefined, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_OBJECT, key), ERR_KEY_DOESNT_EXIST.arg(key));
-
-    if(!potentialObject.isObject())
-        return GenericError(GenericError::Undefined, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_OBJECT, key), ERR_KEY_TYPE_MISMATCH.arg(key, JSON_TYPE_OBJECT));
-    else
-        valueBuffer = potentialObject.toObject();
-
-    return GenericError();
-}
+//template <typename T)> static Qx::GenericError checkedKeyRetrieval(T& valueBuffer, QJsonObject jObject, QString key) { defined in .h }
 
 //===============================================================================================================
 // LIST
 //===============================================================================================================
 
-//template<typename T>
-//static QList<T>* getListThatContains(T element, QList<QList<T>*> listOfLists) defined in .h
-
+//template<typename T> static QList<T>* getListThatContains(T element, QList<QList<T>*> listOfLists) defined in .h
 //template<typename T> static QList<T> subtractAB(QList<T> &listA, QList<T> &listB) defined in .h
 
 #ifdef QT_WIDGETS_LIB // Only enabled for Widget applications

@@ -1,5 +1,4 @@
 #include "qx-io.h"
-#include "qx.h"
 #include <stdexcept>
 #include <QDataStream>
 
@@ -34,8 +33,15 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
         {QTextStream::WriteFailed, IO_ERR_WRITE}
     };
 
+    const QHash<QDataStream::Status, IOOpResultType> DATA_STRM_STAT_MAP = {
+        {QDataStream::Ok, IO_SUCCESS},
+        {QDataStream::ReadPastEnd, IO_ERR_CURSOR_OOB},
+        {QDataStream::ReadCorruptData, IO_ERR_READ},
+        {QDataStream::WriteFailed, IO_ERR_WRITE}
+    };
+
     //-Unit Functions-----------------------------------------------------------------------------------------------------
-        IOOpResultType parsedOpen(QFile &file, QIODevice::OpenMode openMode)
+    IOOpResultType parsedOpen(QFile &file, QIODevice::OpenMode openMode)
     {
         if(file.open(openMode))
             return IO_SUCCESS;
@@ -179,6 +185,27 @@ FileStreamWriter::FileStreamWriter(QFile& file, WriteMode writeMode, bool create
 
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:
+QDataStream::ByteOrder FileStreamWriter::byteOrder() const { return mStreamWriter.byteOrder(); }
+QDataStream::FloatingPointPrecision FileStreamWriter::floatingPointPrecision() const { return mStreamWriter.floatingPointPrecision(); }
+void FileStreamWriter::resetStatus() { mStreamWriter.resetStatus(); }
+void FileStreamWriter::setByteOrder(QDataStream::ByteOrder bo) { mStreamWriter.setByteOrder(bo); }
+void FileStreamWriter::setFloatingPointPrecision(QDataStream::FloatingPointPrecision precision) { mStreamWriter.setFloatingPointPrecision(precision); }
+
+IOOpReport FileStreamWriter::status()
+{
+    return IOOpReport(IOOpType::IO_OP_WRITE, DATA_STRM_STAT_MAP.value(mStreamWriter.status()), mTargetFile);
+}
+
+FileStreamWriter& FileStreamWriter::writeRawData(const QByteArray& data)
+{
+    if(mStreamWriter.writeRawData(data, data.size()) != data.size())
+        mStreamWriter.setStatus(QDataStream::Status::WriteFailed);
+
+    return *this;
+}
+
+//template<typename T> FileStreamWriter& operator<<(T d) { defined in .h }
+
 IOOpReport FileStreamWriter::openFile()
 {
     // Check file
@@ -213,21 +240,63 @@ IOOpReport FileStreamWriter::openFile()
     return IOOpReport(IO_OP_WRITE, IO_SUCCESS, mTargetFile);
 }
 
-IOOpReport FileStreamWriter::writeData(QByteArray data)
+void FileStreamWriter::closeFile() { mTargetFile.close(); }
+
+//===============================================================================================================
+// FILE STREAM READER
+//===============================================================================================================
+
+//-Constructor---------------------------------------------------------------------------------------------------
+//Public:
+FileStreamReader::FileStreamReader(QFile& file) : mSourceFile(file) {}
+
+//-Instance Functions--------------------------------------------------------------------------------------------
+//Public:
+bool FileStreamReader::atEnd() const { return mStreamReader.atEnd(); }
+QDataStream::ByteOrder FileStreamReader::byteOrder() const { return mStreamReader.byteOrder(); }
+QDataStream::FloatingPointPrecision FileStreamReader::floatingPointPrecision() const { return mStreamReader.floatingPointPrecision(); }
+
+FileStreamReader& FileStreamReader::readRawData(QByteArray& data, int len)
 {
-    if(mTargetFile.isOpen())
-    {
-        // Write data to file
-        if(mStreamWriter.writeRawData(data, data.size()) == data.size())
-            return IOOpReport(IO_OP_WRITE, IO_SUCCESS, mTargetFile);
-        else
-            return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_SIZE_MISMATCH, mTargetFile);
-    }
-    else
-        return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_NOT_OPEN, mTargetFile);
+    if(mStreamReader.readRawData(data.data(), len) != len)
+        mStreamReader.setStatus(QDataStream::Status::ReadPastEnd);
+
+    return *this;
 }
 
-void FileStreamWriter::closeFile() { mTargetFile.close(); }
+void FileStreamReader::resetStatus() { mStreamReader.resetStatus(); }
+void FileStreamReader::setByteOrder(QDataStream::ByteOrder bo) { mStreamReader.setByteOrder(bo); }
+void FileStreamReader::setFloatingPointPrecision(QDataStream::FloatingPointPrecision precision) { mStreamReader.setFloatingPointPrecision(precision); }
+void FileStreamReader::skipRawData(int len) { mStreamReader.skipRawData(len); }
+
+IOOpReport FileStreamReader::status()
+{
+    return IOOpReport(IOOpType::IO_OP_READ, DATA_STRM_STAT_MAP.value(mStreamReader.status()), mSourceFile);
+}
+
+//template<typename T> FileStreamWriter& operator>>(T d) { defined in .h }
+
+IOOpReport FileStreamReader::openFile()
+{
+    // Check file
+    IOOpResultType fileCheckResult = fileCheck(mSourceFile);
+
+    if(fileCheckResult == IO_ERR_NOT_A_FILE)
+        return IOOpReport(IO_OP_WRITE, fileCheckResult, mSourceFile);
+
+    // Attempt to open file
+    IOOpResultType openResult = parsedOpen(mSourceFile, QFile::ReadOnly);
+    if(openResult != IO_SUCCESS)
+        return IOOpReport(IO_OP_WRITE, openResult, mSourceFile);
+
+    // Set data stream IO device
+    mStreamReader.setDevice(&mSourceFile);
+
+    // Return no error
+    return IOOpReport(IO_OP_WRITE, IO_SUCCESS, mSourceFile);
+}
+
+void FileStreamReader::closeFile() { mSourceFile.close(); }
 
 //===============================================================================================================
 // TEXT STREAM WRITTER
@@ -1092,7 +1161,7 @@ IOOpReport writeBytesAsFile(QFile &file, const QByteArray &byteArray, bool overw
     if(fileCheckResult == IO_SUCCESS)
         file.resize(0); // Clear file contents
 
-    // Make folders if wanted and necessary
+    // Make folders if wanted and necessary TODO: Turn this mostly copy and pasted segment used in many functions into its own function
     QDir filePath(QFileInfo(file).absolutePath());
     IOOpResultType dirCheckResult = directoryCheck(filePath);
 

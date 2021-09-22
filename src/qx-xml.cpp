@@ -1,4 +1,5 @@
 #include "qx-xml.h"
+#include <QRegularExpression>
 
 namespace Qx
 {

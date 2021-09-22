@@ -222,11 +222,12 @@ void SyncDownloadManager::readyRead()
         throw std::runtime_error("Pointer conversion to network reply failed");
 
     // Write available data
-    IOOpReport writeReport = mActiveDownloads[senderNetworkReply]->writeData(senderNetworkReply->readAll());
+    std::shared_ptr<FileStreamWriter> writer = mActiveDownloads[senderNetworkReply];
+    writer->writeRawData(senderNetworkReply->readAll());
 
-    if(!writeReport.wasSuccessful())
+    if(!writer->status().wasSuccessful())
     {
-        mErrorList.append(ERR_GEN_FAIL.arg(senderNetworkReply->url().toString(), writeReport.getOutcome() + ": " + writeReport.getOutcomeInfo()));
+        mErrorList.append(ERR_GEN_FAIL.arg(senderNetworkReply->url().toString(), writer->status().getOutcome() + ": " + writer->status().getOutcomeInfo()));
 
         if(mAutoAbort)
         {
