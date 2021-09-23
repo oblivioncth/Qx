@@ -55,15 +55,90 @@ namespace Qx
 
 //-Constructor--------------------------------------------------------------------------------------------------
 //Public:
-BitArrayX::BitArrayX() : QBitArray() {}
-BitArrayX::BitArrayX(int size, bool value) : QBitArray(size, value) {}
+BitArray::BitArray() : QBitArray() {}
+BitArray::BitArray(int size, bool value) : QBitArray(size, value) {}
 
 //-Class Functions-----------------------------------------------------------------------------------------------
 //Public:
-
+//template<typename T> static BitArray fromInteger(const T& integer, Endian::Endianness endianness) { defined in .h }
 
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:
+void BitArray::replace(const BitArray& bits, int start, int length)
+{
+    if(start < 0 || start >= count())
+        throw std::out_of_range("Least significant bit index was outside BitArray contents");
+
+    // Stop when end of bits array, this array, or length is reached
+    for(int i = start, j = 0; i < count() && j < bits.count() && j != length - 1; i++, j++)
+        setBit(i, bits.at(j));
+}
+
+//template<typename T> void replace(T integer, Endian::Endianness endianness, int start, int length) { defined in .h }
+
+BitArray BitArray::extract(int start, int length)
+{
+    if(start < 0 || start >= count())
+        throw std::out_of_range("Least significant bit index was outside BitArray contents");
+
+    // Constrain length to bounds
+    int maxLength = count() - start;
+    length = (length == -1) ? maxLength : std::min(length, maxLength);
+
+    BitArray extracted(length);
+
+    for(int i = 0; i < length; i++)
+        extracted.setBit(i, at(start + i));
+
+    return extracted;
+}
+
+BitArray BitArray::operator<<(int n)
+{
+    BitArray shifted(count());
+
+    for(int i = count() - 1; i > n - 1; i--)
+        shifted.setBit(i, at(i - n));
+
+    return shifted;
+}
+void BitArray::operator<<=(int n)
+{
+    for(int i = count() - 1; i > n - 1; i--)
+        setBit(i, at(i - n));
+
+    fill(false, 0, n);
+}
+
+BitArray BitArray::operator>>(int n)
+{
+    BitArray shifted(count());
+
+    for(int i = 0; i < count() - n; i++)
+        shifted.setBit(i, at(i + n));
+
+    return shifted;
+}
+
+void BitArray::operator>>=(int n)
+{
+    for(int i = 0; i < count() - n; i++)
+        setBit(i, at(i + n));
+
+    fill(false, count() - n, count());
+}
+
+BitArray BitArray::operator+(BitArray rhs)
+{
+    BitArray sum(count() + rhs.count());
+    rhs.resize(sum.count());
+    rhs << count();
+    sum |= rhs;
+
+    return sum;
+}
+
+void BitArray::operator+=(const BitArray& rhs) { (*this) = (*this) + rhs; }
 
 
 //===============================================================================================================

@@ -306,7 +306,7 @@ bool enforceSingleInstance()
 
 Qx::GenericError translateHresult(HRESULT res)
 {
-    Qx::BitArrayX resBits = Qx::BitArrayX::fromInteger(res, Endian::BE);
+    BitArray resBits = BitArray::fromInteger(res, Endian::BE);
 
     // Check if result is actually an ntstatus code
     if(resBits.testBit(28))
@@ -325,10 +325,11 @@ Qx::GenericError translateHresult(HRESULT res)
 
 Qx::GenericError translateNtstatus(NTSTATUS stat)
 {
-    Qx::BitArrayX statBits = Qx::BitArrayX::fromInteger(stat, Endian::BE);
+    BitArray statBits = BitArray::fromInteger(stat, Endian::BE);
 
     // Get severity
-    quint8 severity = statBits.toInteger<quint8>(Endian::BE, 30);
+    BitArray severityBits = statBits.extract(30, 2);
+    quint8 severity = severityBits.toInteger<quint8>();
 
     // Check for success
     if(severity == 0x00)
