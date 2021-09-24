@@ -1059,7 +1059,7 @@ IOOpReport calculateFileChecksum(QString& returnBuffer, QFile& file, QCryptograp
     QCryptographicHash checksumHash(hashAlgorithm);
     if(checksumHash.addData(&file))
     {
-        returnBuffer = String::fromByteArrayHex(checksumHash.result());
+        returnBuffer = checksumHash.result().toHex();
         file.close();
         return IOOpReport(IO_OP_READ, IO_SUCCESS, file);
     }

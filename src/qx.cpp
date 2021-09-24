@@ -325,7 +325,7 @@ QString Integrity::generateChecksum(QByteArray &data, QCryptographicHash::Algori
 {
     QCryptographicHash checksumHash(hashAlgorithm);
     checksumHash.addData(data);
-    return Qx::String::fromByteArrayHex(checksumHash.result());
+    return checksumHash.result().toHex();
 }
 
 //===============================================================================================================
@@ -561,9 +561,7 @@ QString String::fromByteArrayDirectly(QByteArray data)
     return directCopyConversion;
 }
 
-QString String::fromByteArrayHex(QByteArray data) { return data.toHex(); }
-
-QString String::fromByteArrayHex(QByteArray data, QChar separator, Endian::Endianness endianness)
+QString String::formattedHex(QByteArray data, QChar separator, Endian::Endianness endianness)
 {
     QString unseparated = data.toHex();
     QString separated;
