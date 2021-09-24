@@ -315,9 +315,6 @@ public:
             return(*out);
         }
     }
-
-    static QByteArray RAWFromString(QString str);
-    static QByteArray RAWFromStringHex(QString str);
 };
 
 class BitArray : public QBitArray

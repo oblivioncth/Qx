@@ -153,9 +153,6 @@ void BitArray::operator+=(const BitArray& rhs) { (*this) = (*this) + rhs; }
 //template<typename T, ENABLE_IF(std::is_floating_point<T>)>
 //static QByteArray RAWFromPrimitive(T primitive, Endian::Endianness endianness = Endian::LE) { defined in .h }
 
-QByteArray ByteArray::RAWFromString(QString str) { return str.toLatin1(); }
-QByteArray ByteArray::RAWFromStringHex(QString str) { return QByteArray::fromHex(str.toUtf8()); }
-
 //===============================================================================================================
 // CHAR
 //===============================================================================================================
