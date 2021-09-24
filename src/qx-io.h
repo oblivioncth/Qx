@@ -193,8 +193,8 @@ public:
     void skipRawData(int len);
     IOOpReport status();
 
-    template<typename T, ENABLE_IF(defines_right_shift<QDataStream, T>)>
-    FileStreamReader& operator>>(T d) { mStreamReader >> d; return *this; }
+    template<typename T, ENABLE_IF(defines_right_shift<QDataStream, T&>)>
+    FileStreamReader& operator>>(T& d) { mStreamReader >> d; return *this; }
 
     // New functions
     IOOpReport openFile();
