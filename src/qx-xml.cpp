@@ -13,6 +13,23 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
 //-Classes------------------------------------------------------------------------------------------------------------
 
 //===============================================================================================================
+// XML STREAM WRITER ERROR
+//===============================================================================================================
+
+//-Constructor---------------------------------------------------------------------------------------------------
+//Public:
+XmlStreamWriterError::XmlStreamWriterError()
+    : mErrorText() {}
+
+XmlStreamWriterError::XmlStreamWriterError(QString errorText)
+    : mErrorText(errorText) {}
+
+//-Instance Functions--------------------------------------------------------------------------------------------
+//Public:
+bool XmlStreamWriterError::isValid() { return !mErrorText.isNull(); }
+QString XmlStreamWriterError::getText() { return mErrorText; }
+
+//===============================================================================================================
 // XML STREAM READER ERROR
 //===============================================================================================================
 
@@ -20,6 +37,7 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
 //Public:
 XmlStreamReaderError::XmlStreamReaderError()
     : mErrorType(QXmlStreamReader::NoError), mErrorText(STD_ERR_TXT.value(QXmlStreamReader::NoError)) {}
+
 XmlStreamReaderError::XmlStreamReaderError(QXmlStreamReader::Error standardError)
     : mErrorType(standardError), mErrorText(STD_ERR_TXT.value(standardError)) {}
 
