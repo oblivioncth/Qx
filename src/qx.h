@@ -559,10 +559,12 @@ public:
 
 //-Class Members---------------------------------------------------------------------------------------------
 private:
-    static inline const QString ERR_LVL_UNDEF = "Undefined Severity";
-    static inline const QString ERR_LVL_WARN = "Warning";
-    static inline const QString ERR_LVL_ERR = "Error";
-    static inline const QString ERR_LVL_CRIT = "Critical";
+    static inline const QHash<ErrorLevel, QString> ERR_LVL_STRING_MAP = {
+        {ErrorLevel::Undefined, "Undefined Severity"},
+        {ErrorLevel::Warning, "Warning"},
+        {ErrorLevel::Error, "Error"},
+        {ErrorLevel::Critical, "Critical"},
+    };
 
 public:
     static const GenericError UNKNOWN_ERROR;

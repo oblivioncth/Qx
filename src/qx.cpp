@@ -267,19 +267,8 @@ GenericError::ErrorLevel GenericError::errorLevel() const { return mErrorLevel; 
 
 QString GenericError::errorLevelString(bool caps) const
 {
-    switch (mErrorLevel)
-    {
-        case ErrorLevel::Critical:
-            return caps ? ERR_LVL_CRIT.toUpper() : ERR_LVL_CRIT;
-        case ErrorLevel::Error:
-            return caps ? ERR_LVL_ERR.toUpper() : ERR_LVL_ERR;
-        case ErrorLevel::Warning:
-            return caps ? ERR_LVL_WARN.toUpper() : ERR_LVL_WARN;
-        case ErrorLevel::Undefined:
-            return caps ? ERR_LVL_UNDEF.toUpper() : ERR_LVL_UNDEF;
-        default:
-            return QString(); // Supress control paths warning
-    }
+    QString str = ERR_LVL_STRING_MAP.value(mErrorLevel);
+    return caps? str.toUpper() : str;
 }
 
 QString GenericError::caption() const { return mCaption; }
