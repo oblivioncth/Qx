@@ -262,17 +262,35 @@ GenericError::GenericError(ErrorLevel errorLevel, QString primaryInfo, QString s
 
 //-Instance Functions----------------------------------------------------------------------------------------------
 //Public:
-bool GenericError::isValid() { return !mPrimaryInfo.isEmpty(); }
-GenericError::ErrorLevel GenericError::errorLevel() { return mErrorLevel; }
-QString GenericError::caption() { return mCaption; }
-QString GenericError::primaryInfo() { return mPrimaryInfo; }
-QString GenericError::secondaryInfo() { return mSecondaryInfo; }
-QString GenericError::detailedInfo() { return mDetailedInfo; }
+bool GenericError::isValid() const { return !mPrimaryInfo.isEmpty(); }
+GenericError::ErrorLevel GenericError::errorLevel() const { return mErrorLevel; }
+
+QString GenericError::errorLevelString(bool caps) const
+{
+    switch (mErrorLevel)
+    {
+        case ErrorLevel::Critical:
+            return caps ? ERR_LVL_CRIT.toUpper() : ERR_LVL_CRIT;
+        case ErrorLevel::Error:
+            return caps ? ERR_LVL_ERR.toUpper() : ERR_LVL_ERR;
+        case ErrorLevel::Warning:
+            return caps ? ERR_LVL_WARN.toUpper() : ERR_LVL_WARN;
+        case ErrorLevel::Undefined:
+            return caps ? ERR_LVL_UNDEF.toUpper() : ERR_LVL_UNDEF;
+        default:
+            return QString(); // Supress control paths warning
+    }
+}
+
+QString GenericError::caption() const { return mCaption; }
+QString GenericError::primaryInfo() const { return mPrimaryInfo; }
+QString GenericError::secondaryInfo() const { return mSecondaryInfo; }
+QString GenericError::detailedInfo() const { return mDetailedInfo; }
 
 GenericError& GenericError::setErrorLevel(ErrorLevel errorLevel) { mErrorLevel = errorLevel; return *this; }
 
 #ifdef QT_WIDGETS_LIB // Only enabled for Widget applications
-int GenericError::exec(QMessageBox::StandardButtons choices, QMessageBox::StandardButton defChoice)
+int GenericError::exec(QMessageBox::StandardButtons choices, QMessageBox::StandardButton defChoice) const
 {
     // Determine icon
     QMessageBox::Icon icon;
