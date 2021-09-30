@@ -161,6 +161,7 @@ void BitArray::operator>>=(int n)
 BitArray BitArray::operator+(BitArray rhs)
 {
     BitArray sum(count() + rhs.count());
+    sum |= *this;
     rhs.resize(sum.count());
     rhs <<= count();
     sum |= rhs;
