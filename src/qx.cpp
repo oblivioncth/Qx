@@ -162,7 +162,7 @@ BitArray BitArray::operator+(BitArray rhs)
 {
     BitArray sum(count() + rhs.count());
     rhs.resize(sum.count());
-    rhs << count();
+    rhs <<= count();
     sum |= rhs;
 
     return sum;
