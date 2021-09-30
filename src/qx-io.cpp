@@ -258,6 +258,7 @@ QDataStream::FloatingPointPrecision FileStreamReader::floatingPointPrecision() c
 
 FileStreamReader& FileStreamReader::readRawData(QByteArray& data, int len)
 {
+    data.resize(len);
     if(mStreamReader.readRawData(data.data(), len) != len)
         mStreamReader.setStatus(QDataStream::Status::ReadPastEnd);
 
