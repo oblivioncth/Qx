@@ -24,6 +24,25 @@ QUrl NetworkReplyError::getUrl() { return mUrl; }
 QString NetworkReplyError::getText() { return mErrorText; }
 
 //===============================================================================================================
+// SYNC DOWNLOAD MANAGER::REPORT
+//===============================================================================================================
+
+//-Constructor-------------------------------------------------------------------------------------------------------
+//Public:
+SyncDownloadManager::Report::Report() : mFinishStatus(FinishStatus::Success) {}
+SyncDownloadManager::Report::Report(FinishStatus finishStatus, GenericError errorInfo) :
+    mFinishStatus(finishStatus),
+    mErrorInfo(errorInfo)
+{}
+
+
+//-Instance Functions------------------------------------------------------------------------------------------------
+//Public:
+SyncDownloadManager::FinishStatus SyncDownloadManager::Report::finishStatus() const { return mFinishStatus; }
+GenericError SyncDownloadManager::Report::errorInfo() const { return mErrorInfo; }
+bool SyncDownloadManager::Report::wasSuccessful() const { return mFinishStatus == FinishStatus::Success; }
+
+//===============================================================================================================
 // SYNC DOWNLOAD MANAGER
 //===============================================================================================================
 
@@ -163,7 +182,7 @@ void SyncDownloadManager::setRedirectPolicy(QNetworkRequest::RedirectPolicy redi
 void SyncDownloadManager::setOverwrite(bool overwrite) { mOverwrite = overwrite; }
 void SyncDownloadManager::setAutoAbort(bool autoAbort) { mAutoAbort = autoAbort; }
 
-GenericError SyncDownloadManager::processQueue()
+SyncDownloadManager::Report SyncDownloadManager::processQueue()
 {
     // Ensure error state is cleared
     mErrorList.clear();
@@ -171,7 +190,7 @@ GenericError SyncDownloadManager::processQueue()
     // Get total task size
     NetworkReplyError enumError = enumerateTotalSize();
     if(enumError.isValid())
-        return GenericError(GenericError::Undefined, ERR_ENUM_TOTAL_SIZE.arg(enumError.getUrl().toString()), enumError.getText());
+        return Report(FinishStatus::Error, GenericError(GenericError::Undefined, ERR_ENUM_TOTAL_SIZE.arg(enumError.getUrl().toString()), enumError.getText()));
 
     // Add initial downloads
     for(int j = 0; j < mMaxSimultaneous && !mPendingDownloads.isEmpty(); j++)
@@ -185,30 +204,33 @@ GenericError SyncDownloadManager::processQueue()
 
     switch(mFinishStatus)
     {
-        case FinishStatus::SUCCESS:
+        case FinishStatus::Success:
             fe = GenericError();
             break;
 
-        case FinishStatus::USER_ABORT:
+        case FinishStatus::UserAbort:
             fe = GenericError(GenericError::Error, ERR_QUEUE_INCOMPL, ERR_OUTCOME_USER_ABORT);
             break;
 
-        case FinishStatus::AUTO_ABORT:
+        case FinishStatus::AutoAbort:
             fe = GenericError(GenericError::Error, ERR_QUEUE_INCOMPL, ERR_OUTCOME_AUTO_ABORT, "- " + mErrorList.join("\n- "));
             break;
 
-        case FinishStatus::OTHER:
+        case FinishStatus::Error:
             fe = GenericError(GenericError::Error, ERR_QUEUE_INCOMPL, ERR_OUTCOME_FAIL, "- " + mErrorList.join("\n- "));
             break;
     }
 
+    // Create report
+    Report report(mFinishStatus, fe);
+
     // Reset state
     mCurrentBytes = 0;
     mTotalBytes = 0;
-    mFinishStatus = FinishStatus::SUCCESS;
+    mFinishStatus = FinishStatus::Success;
 
-    // Return final error status
-    return fe;
+    // Return final report
+    return report;
 }
 
 //Private Slots:
@@ -231,12 +253,12 @@ void SyncDownloadManager::readyRead()
 
         if(mAutoAbort)
         {
-            mFinishStatus = FinishStatus::AUTO_ABORT;
+            mFinishStatus = FinishStatus::AutoAbort;
             cancelAll();
         }
         else
         {
-            mFinishStatus = FinishStatus::OTHER;
+            mFinishStatus = FinishStatus::Error;
             senderNetworkReply->abort();
         }
     }
@@ -278,15 +300,15 @@ void SyncDownloadManager::downloadFinished(QNetworkReply *reply)
 
         if(mAutoAbort)
         {
-            mFinishStatus = FinishStatus::AUTO_ABORT;
+            mFinishStatus = FinishStatus::AutoAbort;
             cancelAll();
         }
         else
-            mFinishStatus = FinishStatus::OTHER;
+            mFinishStatus = FinishStatus::Error;
     }
 
     // Add next pending download if not aborting
-    if(mFinishStatus != FinishStatus::AUTO_ABORT && mFinishStatus != FinishStatus::USER_ABORT && !mPendingDownloads.isEmpty())
+    if(mFinishStatus != FinishStatus::AutoAbort && mFinishStatus != FinishStatus::UserAbort && !mPendingDownloads.isEmpty())
         startDownload(mPendingDownloads.takeFirst());
     else if(mPendingDownloads.isEmpty()) // Release wait loop if all downloads are finished
         mDownloadWait.quit();
@@ -295,8 +317,11 @@ void SyncDownloadManager::downloadFinished(QNetworkReply *reply)
 //Public Slots:
 void SyncDownloadManager::abort()
 {
-    mFinishStatus = FinishStatus::USER_ABORT;
-    cancelAll();
+    if(!mActiveDownloads.isEmpty() || !mPendingDownloads.isEmpty())
+    {
+        mFinishStatus = FinishStatus::UserAbort;
+        cancelAll();
+    }
 }
 
 void SyncDownloadManager::sslErrorHandler(QNetworkReply* reply, const QList<QSslError>& errors)
@@ -316,7 +341,7 @@ void SyncDownloadManager::sslErrorHandler(QNetworkReply* reply, const QList<QSsl
     {
         reply->abort();
         mErrorList.append(ERR_SINGLE_ABORT.arg(reply->url().toString()));
-        mFinishStatus = FinishStatus::OTHER;
+        mFinishStatus = FinishStatus::Error;
     }
     else
         reply->ignoreSslErrors();
@@ -337,7 +362,7 @@ void SyncDownloadManager::authHandler(QNetworkReply* reply, QAuthenticator* auth
     {
         reply->abort();
         mErrorList.append(ERR_SINGLE_ABORT.arg(reply->url().toString()));
-        mFinishStatus = FinishStatus::OTHER;
+        mFinishStatus = FinishStatus::Error;
     }
     else
     {
