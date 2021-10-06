@@ -1,9 +1,32 @@
 #include "qx-net.h"
+#include <QScopedValueRollback>
 
 namespace Qx
 {
+//-Structs-------------------------------------------------------------------------------------------------------
 
-//-Classes------------------------------------------------------------------------------------------------------------
+//===============================================================================================================
+// DOWNLOAD TASK
+//===============================================================================================================
+
+//-Opperators----------------------------------------------------------------------------------------------------
+//Public:
+bool operator== (const DownloadTask& lhs, const DownloadTask& rhs) noexcept
+{
+    return lhs.target == rhs.target && lhs.dest == rhs.dest;
+}
+
+//-Hashing------------------------------------------------------------------------------------------------------
+uint qHash(const DownloadTask& key, uint seed) noexcept
+{
+    QtPrivate::QHashCombine hash;
+    seed = hash(seed, key.target);
+    seed = hash(seed, key.dest);
+
+    return seed;
+}
+
+//-Classes-------------------------------------------------------------------------------------------------------
 
 //===============================================================================================================
 // NETWORK REPLY ERROR
@@ -83,11 +106,11 @@ NetworkReplyError SyncDownloadManager::enumerateTotalSize()
             return errorStatus;
 
         // Add to total size
-        mTotalBytes += singleFileSize;
+        mTotalBytes.setValue(task, singleFileSize);
     }
 
     // Emit calculated total
-    emit downloadTotalChanged(mTotalBytes);
+    emit downloadTotalChanged(mTotalBytes.total());
 
     // Return no error
     return NetworkReplyError();
@@ -148,6 +171,9 @@ IOOpReport SyncDownloadManager::startDownload(DownloadTask task)
     // Add to active list
     mActiveDownloads[reply] = fileWriter;
 
+    // Add reply to task map
+    mReplyTaskMap[reply] = task;
+
     // Return success
     return IOOpReport();
 }
@@ -165,8 +191,25 @@ void SyncDownloadManager::cancelAll()
     mActiveDownloads.clear();
 }
 
+void SyncDownloadManager::reset()
+{
+    // Reset state
+    mPendingDownloads.clear();
+    mActiveDownloads.clear();
+    mReplyTaskMap.clear();
+    mCurrentBytes.clear();
+    mTotalBytes.clear();
+    mFinishStatus = FinishStatus::Success;
+}
+
 //Public:
-void SyncDownloadManager::appendTask(DownloadTask task) { mPendingDownloads.append(task); }
+void SyncDownloadManager::appendTask(DownloadTask task)
+{
+    // Don't let the same task be added twice
+    if(!mDownloading && !mPendingDownloads.contains(task))
+        mPendingDownloads.append(task);
+}
+
 void SyncDownloadManager::setMaxSimultaneous(int maxSimultaneous) { mMaxSimultaneous = maxSimultaneous; }
 void SyncDownloadManager::setRedirectPolicy(QNetworkRequest::RedirectPolicy redirectPolicy)
 {
@@ -182,6 +225,12 @@ SyncDownloadManager::Report SyncDownloadManager::processQueue()
 {
     // Ensure error state is cleared
     mErrorList.clear();
+
+    // Ensure instance will reset when complete
+    QScopeGuard resetGuard([this](){ reset(); }); // Need lambda since function is private
+
+    // Set flag
+    QScopedValueRollback guard(mDownloading, true);
 
     // Get total task size
     NetworkReplyError enumError = enumerateTotalSize();
@@ -220,11 +269,6 @@ SyncDownloadManager::Report SyncDownloadManager::processQueue()
     // Create report
     Report report(mFinishStatus, fe);
 
-    // Reset state
-    mCurrentBytes = 0;
-    mTotalBytes = 0;
-    mFinishStatus = FinishStatus::Success;
-
     // Return final report
     return report;
 }
@@ -262,14 +306,6 @@ void SyncDownloadManager::readyRead()
 
 void SyncDownloadManager::downloadProgressHandler(qint64 bytesCurrent, qint64 bytesTotal)
 {
-    /*
-     TODO: Keep track of each downloads size independently (maybe throw some helper class that
-     keeps the running total but has the functionality to replace the value of components and update
-     the total) and change this so that bytesTotal is used to update the size of the given download
-     and therefore the total size of all downloads if here it differs from what was precalcualted
-    */
-    Q_UNUSED(bytesTotal);
-
     // Get the object that called this slot
     QNetworkReply* senderNetworkReply = qobject_cast<QNetworkReply*>(sender());
 
@@ -277,14 +313,22 @@ void SyncDownloadManager::downloadProgressHandler(qint64 bytesCurrent, qint64 by
     if(senderNetworkReply == nullptr)
         throw std::runtime_error("Pointer conversion to network reply failed");
 
-    // Update cumulative progress
-    mCurrentBytes += bytesCurrent - mInvididualBytes.value(senderNetworkReply);
+    // Update total size if needed
+    if(bytesTotal != 0)
+    {
+        DownloadTask taskOfReply = mReplyTaskMap.value(senderNetworkReply);
+        if(mTotalBytes.value(taskOfReply) != bytesTotal)
+        {
+            mTotalBytes.setValue(taskOfReply, bytesTotal);
+            emit downloadTotalChanged(mTotalBytes.total());
+        }
+    }
 
-    // Update individual progress
-    mInvididualBytes[senderNetworkReply] = bytesCurrent;
+    // Update cumulative progress
+    mCurrentBytes.setValue(senderNetworkReply, bytesCurrent);
 
     // Emit progress
-    emit downloadProgress(mCurrentBytes);
+    emit downloadProgress(mCurrentBytes.total());
 }
 
 void SyncDownloadManager::downloadFinished(QNetworkReply *reply)
