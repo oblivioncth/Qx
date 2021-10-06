@@ -126,7 +126,7 @@ private:
 
 //-Constructor-------------------------------------------------------------------------------------------------------
 public:
-    SyncDownloadManager();
+    SyncDownloadManager(QObject* parent = nullptr);
 
 //-Instance Functions----------------------------------------------------------------------------------------------
 private:

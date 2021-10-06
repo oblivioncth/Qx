@@ -48,7 +48,7 @@ bool SyncDownloadManager::Report::wasSuccessful() const { return mFinishStatus =
 
 //-Constructor-------------------------------------------------------------------------------------------------------
 //Public:
-SyncDownloadManager::SyncDownloadManager()
+SyncDownloadManager::SyncDownloadManager(QObject* parent) : QObject(parent)
 {
     // Configure access managers
     mDownloadAccessMan.setAutoDeleteReplies(true);
@@ -128,10 +128,6 @@ NetworkReplyError SyncDownloadManager::getFileSize(quint64& returnBuffer, QUrl t
 
 IOOpReport SyncDownloadManager::startDownload(DownloadTask task)
 {
-    //QNetworkRequest downloadReq(i.key());
-    //downloadReq.setAttribute(QNetworkRequest::RedirectPolicyAttribute, mRedirectPolicy);
-    //mDownloadAccessMan.get(downloadReq);
-
     // Create stream writer
     std::shared_ptr<FileStreamWriter> fileWriter = std::make_shared<FileStreamWriter>(*task.dest, mOverwrite ? WriteMode:: Overwrite : WriteMode::NewOnly, true);
 
@@ -266,6 +262,12 @@ void SyncDownloadManager::readyRead()
 
 void SyncDownloadManager::downloadProgressHandler(qint64 bytesCurrent, qint64 bytesTotal)
 {
+    /*
+     TODO: Keep track of each downloads size independently (maybe throw some helper class that
+     keeps the running total but has the functionality to replace the value of components and update
+     the total) and change this so that bytesTotal is used to update the size of the given download
+     and therefore the total size of all downloads if here it differs from what was precalcualted
+    */
     Q_UNUSED(bytesTotal);
 
     // Get the object that called this slot
