@@ -1018,7 +1018,7 @@ public:
     void advance(int count = 1);
 
     QChar currentChar();
-    QChar currentIndex();
+    int currentIndex();
     QChar lookAhead(int posOffset = 1);
     bool atEnd();
 };

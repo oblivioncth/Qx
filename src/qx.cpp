@@ -764,7 +764,7 @@ void StringTraverser::advance(int count)
 }
 
 QChar StringTraverser::currentChar() { return *mIterator; }
-QChar StringTraverser::currentIndex() { return mIndex; }
+int StringTraverser::currentIndex() { return mIndex; }
 QChar StringTraverser::lookAhead(int posOffset) { return *(mIterator + posOffset); }
 bool StringTraverser::atEnd() { return mIterator == mEnd; }
 
