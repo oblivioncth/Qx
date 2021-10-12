@@ -35,12 +35,14 @@ CONFIG(debug, debug|release) {
 
 TARGET = $${LIB_SHORT_NAME}$${CONFIG_STR}_static$${ARCH_STR}_$${LIB_VER_MJR}-$${LIB_VER_MNR}-$${LIB_VER_REV}-$${LIB_VER_BLD}_Qt_$${QT_MAJOR_VERSION}-$${QT_MINOR_VERSION}-$${QT_PATCH_VERSION}$${SUFFIX}
 
-LIBS += Version.lib
-
 TEMPLATE = lib
 CONFIG += staticlib
 
 CONFIG += c++17
+
+win32 {
+    LIBS += Version.lib
+}
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
@@ -57,20 +59,26 @@ SOURCES += \
     src/qx-io.cpp \
     src/qx-net.cpp \
     src/qx-widgets.cpp \
-    src/qx-windows.cpp \
     src/qx-xml.cpp \
     src/qx.cpp
+
+win32 {
+    LIBS += src/qx-windows.cpp
+}
 
 HEADERS += \
     src/qx-io.h \
     src/qx-net.h \
     src/qx-widgets.h \
-    src/qx-windows.h \
     src/qx-xml.h \
     src/qx.h
 
-# Default rules for deployment.
-unix {
-    target.path = $$[QT_INSTALL_PLUGINS]/generic
+win32 {
+    LIBS += src/qx-windows.h
 }
-!isEmpty(target.path): INSTALLS += target
+
+# Default rules for deployment.
+#unix {
+#    target.path = $$[QT_INSTALL_PLUGINS]/generic
+#}
+#!isEmpty(target.path): INSTALLS += target
