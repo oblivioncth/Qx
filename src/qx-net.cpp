@@ -98,7 +98,7 @@ NetworkReplyError SyncDownloadManager::enumerateTotalSize()
     for(const DownloadTask& task : qAsConst(mPendingDownloads))
     {
         // Get download size
-        quint64 singleFileSize = 0;
+        qint64 singleFileSize = 0;
         NetworkReplyError errorStatus = getFileSize(singleFileSize, task.target);
 
         // Check for network error
@@ -116,7 +116,7 @@ NetworkReplyError SyncDownloadManager::enumerateTotalSize()
     return NetworkReplyError();
 }
 
-NetworkReplyError SyncDownloadManager::getFileSize(quint64& returnBuffer, QUrl target)
+NetworkReplyError SyncDownloadManager::getFileSize(qint64& returnBuffer, QUrl target)
 {
     // Ensure return buffer is reset
     returnBuffer = 0;
@@ -136,7 +136,7 @@ NetworkReplyError SyncDownloadManager::getFileSize(quint64& returnBuffer, QUrl t
 
         // Set size return buffer
         if(sizeReply->error() == QNetworkReply::NoError) // clazy:exclude=lambda-in-connect
-            returnBuffer = sizeReply->header(QNetworkRequest::ContentLengthHeader).toULongLong();
+            returnBuffer = sizeReply->header(QNetworkRequest::ContentLengthHeader).toLongLong();
 
         // End wait loop
         sizeCheckWait.quit(); // clazy:exclude=lambda-in-connect

@@ -120,8 +120,8 @@ private:
 
     // Progress
     bool mDownloading = false;
-    Cumulation<DownloadTask, quint64> mTotalBytes;
-    Cumulation<QNetworkReply*, quint64> mCurrentBytes;
+    Cumulation<DownloadTask, qint64> mTotalBytes;
+    Cumulation<QNetworkReply*, qint64> mCurrentBytes;
 
     // Synchronus elements
     QEventLoop mDownloadWait;
@@ -137,7 +137,7 @@ public:
 //-Instance Functions----------------------------------------------------------------------------------------------
 private:
     NetworkReplyError enumerateTotalSize();
-    NetworkReplyError getFileSize(quint64& returnBuffer, QUrl target);
+    NetworkReplyError getFileSize(qint64& returnBuffer, QUrl target);
     IOOpReport startDownload(DownloadTask task);
     void cancelAll();
     void reset();
