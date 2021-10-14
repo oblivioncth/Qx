@@ -1,3 +1,5 @@
+################# Common #################
+
 QT += network
 contains(DEFINES, EDITION_WIDGETS) {
     QT += widgets
@@ -40,20 +42,7 @@ CONFIG += staticlib
 
 CONFIG += c++17
 
-win32 {
-    LIBS += Version.lib
-}
-
-# The following define makes your compiler emit warnings if you use
-# any Qt feature that has been marked deprecated (the exact warnings
-# depend on your compiler). Please consult the documentation of the
-# deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
-
-# You can also make your code fail to compile if it uses deprecated APIs.
-# In order to do so, uncomment the following line.
-# You can also select to disable deprecated APIs only up to a certain version of Qt.
-#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
     src/qx-io.cpp \
@@ -62,10 +51,6 @@ SOURCES += \
     src/qx-xml.cpp \
     src/qx.cpp
 
-win32 {
-    LIBS += src/qx-windows.cpp
-}
-
 HEADERS += \
     src/qx-io.h \
     src/qx-net.h \
@@ -73,8 +58,17 @@ HEADERS += \
     src/qx-xml.h \
     src/qx.h
 
+################# Windows Build #################
 win32 {
-    LIBS += src/qx-windows.h
+    LIBS += Version.lib
+    SOURCES += src/qx-windows.cpp
+    HEADERS += src/qx-windows.h
+}
+
+################# Linux Build #################
+unix:!macx {
+    CONFIG += no_plugin_name_prefix # Don't prefix with lib
+    CONFIG += plugin # Don't enable symlink and versioning for lib
 }
 
 # Default rules for deployment.
