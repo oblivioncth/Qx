@@ -67,8 +67,7 @@ win32 {
 
 ################# Linux Build #################
 unix:!macx {
-    CONFIG += no_plugin_name_prefix # Don't prefix with lib
-    CONFIG += plugin # Don't enable symlink and versioning for lib
+
 }
 
 # Default rules for deployment.
