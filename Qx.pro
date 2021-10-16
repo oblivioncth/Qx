@@ -1,4 +1,4 @@
-################# Common #################
+################# Common Build #################
 
 QT += network
 contains(DEFINES, EDITION_WIDGETS) {
@@ -44,19 +44,32 @@ CONFIG += c++17
 
 DEFINES += QT_DEPRECATED_WARNINGS
 
+#--------- Edition Common -----------------------
 SOURCES += \
     src/qx-io.cpp \
     src/qx-net.cpp \
-    src/qx-widgets.cpp \
     src/qx-xml.cpp \
     src/qx.cpp
 
 HEADERS += \
     src/qx-io.h \
     src/qx-net.h \
-    src/qx-widgets.h \
     src/qx-xml.h \
     src/qx.h
+
+#--------- Edition Console -----------------------
+!contains(DEFINES, EDITION_WIDGETS) {
+
+}
+
+#--------- Edition Widgets -----------------------
+contains(DEFINES, EDITION_WIDGETS) {
+    SOURCES += \
+        src/qx-widgets.cpp \
+
+    HEADERS += \
+        src/qx-widgets.h \
+}
 
 ################# Windows Build #################
 win32 {

@@ -1,6 +1,5 @@
 #ifndef QXWIDGETS_H
 #define QXWIDGETS_H
-#ifdef QT_WIDGETS_LIB // Only enabled for Widget applications
 
 #include <QDialog>
 #include <QLabel>
@@ -99,5 +98,4 @@ public:
 };
 
 }
-#endif
 #endif // S_H
