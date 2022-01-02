@@ -433,6 +433,10 @@ QString kosherizeFileName(QString fileName) // Can return empty name if all char
     while(!fileName.isEmpty() && fileName.back() == '.') // Check size to prevent out of bounds ref
         fileName.chop(1);
 
+    // Prevent name from starting or ending with space (this isn't disallowed by various filesystem,
+    // but is generaly enforced by the OS
+    fileName = fileName.trimmed();
+
     return fileName;
 }
 

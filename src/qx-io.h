@@ -257,7 +257,7 @@ public:
 
 // Directory Based:
     IOOpReport getDirFileList(QStringList& returnBuffer, QDir directory, QStringList extFilter = QStringList(), QDirIterator::IteratorFlag traversalFlags = QDirIterator::NoIteratorFlags,
-                              Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive);
+                              Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive); // Likely disolve in favor of QFileInfoList and QDir::entryInfoList()
     bool dirContainsFiles(QDir directory, bool includeSubdirectories = false);
     bool dirContainsFiles(QDir directory, IOOpReport& reportBuffer, bool includeSubdirectories = false);
 
