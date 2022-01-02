@@ -1,9 +1,32 @@
 #include "qx-net.h"
+#include <QScopedValueRollback>
 
 namespace Qx
 {
+//-Structs-------------------------------------------------------------------------------------------------------
 
-//-Classes------------------------------------------------------------------------------------------------------------
+//===============================================================================================================
+// DOWNLOAD TASK
+//===============================================================================================================
+
+//-Opperators----------------------------------------------------------------------------------------------------
+//Public:
+bool operator== (const DownloadTask& lhs, const DownloadTask& rhs) noexcept
+{
+    return lhs.target == rhs.target && lhs.dest == rhs.dest;
+}
+
+//-Hashing------------------------------------------------------------------------------------------------------
+uint qHash(const DownloadTask& key, uint seed) noexcept
+{
+    QtPrivate::QHashCombine hash;
+    seed = hash(seed, key.target);
+    seed = hash(seed, key.dest);
+
+    return seed;
+}
+
+//-Classes-------------------------------------------------------------------------------------------------------
 
 //===============================================================================================================
 // NETWORK REPLY ERROR
@@ -24,12 +47,31 @@ QUrl NetworkReplyError::getUrl() { return mUrl; }
 QString NetworkReplyError::getText() { return mErrorText; }
 
 //===============================================================================================================
+// SYNC DOWNLOAD MANAGER::REPORT
+//===============================================================================================================
+
+//-Constructor-------------------------------------------------------------------------------------------------------
+//Public:
+SyncDownloadManager::Report::Report() : mFinishStatus(FinishStatus::Success) {}
+SyncDownloadManager::Report::Report(FinishStatus finishStatus, GenericError errorInfo) :
+    mFinishStatus(finishStatus),
+    mErrorInfo(errorInfo)
+{}
+
+
+//-Instance Functions------------------------------------------------------------------------------------------------
+//Public:
+SyncDownloadManager::FinishStatus SyncDownloadManager::Report::finishStatus() const { return mFinishStatus; }
+GenericError SyncDownloadManager::Report::errorInfo() const { return mErrorInfo; }
+bool SyncDownloadManager::Report::wasSuccessful() const { return mFinishStatus == FinishStatus::Success; }
+
+//===============================================================================================================
 // SYNC DOWNLOAD MANAGER
 //===============================================================================================================
 
 //-Constructor-------------------------------------------------------------------------------------------------------
 //Public:
-SyncDownloadManager::SyncDownloadManager()
+SyncDownloadManager::SyncDownloadManager(QObject* parent) : QObject(parent)
 {
     // Configure access managers
     mDownloadAccessMan.setAutoDeleteReplies(true);
@@ -56,7 +98,7 @@ NetworkReplyError SyncDownloadManager::enumerateTotalSize()
     for(const DownloadTask& task : qAsConst(mPendingDownloads))
     {
         // Get download size
-        quint64 singleFileSize = 0;
+        qint64 singleFileSize = 0;
         NetworkReplyError errorStatus = getFileSize(singleFileSize, task.target);
 
         // Check for network error
@@ -64,17 +106,17 @@ NetworkReplyError SyncDownloadManager::enumerateTotalSize()
             return errorStatus;
 
         // Add to total size
-        mTotalBytes += singleFileSize;
+        mTotalBytes.setValue(task, singleFileSize);
     }
 
     // Emit calculated total
-    emit downloadTotalChanged(mTotalBytes);
+    emit downloadTotalChanged(mTotalBytes.total());
 
     // Return no error
     return NetworkReplyError();
 }
 
-NetworkReplyError SyncDownloadManager::getFileSize(quint64& returnBuffer, QUrl target)
+NetworkReplyError SyncDownloadManager::getFileSize(qint64& returnBuffer, QUrl target)
 {
     // Ensure return buffer is reset
     returnBuffer = 0;
@@ -94,7 +136,7 @@ NetworkReplyError SyncDownloadManager::getFileSize(quint64& returnBuffer, QUrl t
 
         // Set size return buffer
         if(sizeReply->error() == QNetworkReply::NoError) // clazy:exclude=lambda-in-connect
-            returnBuffer = sizeReply->header(QNetworkRequest::ContentLengthHeader).toULongLong();
+            returnBuffer = sizeReply->header(QNetworkRequest::ContentLengthHeader).toLongLong();
 
         // End wait loop
         sizeCheckWait.quit(); // clazy:exclude=lambda-in-connect
@@ -109,10 +151,6 @@ NetworkReplyError SyncDownloadManager::getFileSize(quint64& returnBuffer, QUrl t
 
 IOOpReport SyncDownloadManager::startDownload(DownloadTask task)
 {
-    //QNetworkRequest downloadReq(i.key());
-    //downloadReq.setAttribute(QNetworkRequest::RedirectPolicyAttribute, mRedirectPolicy);
-    //mDownloadAccessMan.get(downloadReq);
-
     // Create stream writer
     std::shared_ptr<FileStreamWriter> fileWriter = std::make_shared<FileStreamWriter>(*task.dest, mOverwrite ? WriteMode:: Overwrite : WriteMode::NewOnly, true);
 
@@ -133,6 +171,9 @@ IOOpReport SyncDownloadManager::startDownload(DownloadTask task)
     // Add to active list
     mActiveDownloads[reply] = fileWriter;
 
+    // Add reply to task map
+    mReplyTaskMap[reply] = task;
+
     // Return success
     return IOOpReport();
 }
@@ -150,8 +191,25 @@ void SyncDownloadManager::cancelAll()
     mActiveDownloads.clear();
 }
 
+void SyncDownloadManager::reset()
+{
+    // Reset state
+    mPendingDownloads.clear();
+    mActiveDownloads.clear();
+    mReplyTaskMap.clear();
+    mCurrentBytes.clear();
+    mTotalBytes.clear();
+    mFinishStatus = FinishStatus::Success;
+}
+
 //Public:
-void SyncDownloadManager::appendTask(DownloadTask task) { mPendingDownloads.append(task); }
+void SyncDownloadManager::appendTask(DownloadTask task)
+{
+    // Don't let the same task be added twice
+    if(!mDownloading && !mPendingDownloads.contains(task))
+        mPendingDownloads.append(task);
+}
+
 void SyncDownloadManager::setMaxSimultaneous(int maxSimultaneous) { mMaxSimultaneous = maxSimultaneous; }
 void SyncDownloadManager::setRedirectPolicy(QNetworkRequest::RedirectPolicy redirectPolicy)
 {
@@ -163,15 +221,21 @@ void SyncDownloadManager::setRedirectPolicy(QNetworkRequest::RedirectPolicy redi
 void SyncDownloadManager::setOverwrite(bool overwrite) { mOverwrite = overwrite; }
 void SyncDownloadManager::setAutoAbort(bool autoAbort) { mAutoAbort = autoAbort; }
 
-GenericError SyncDownloadManager::processQueue()
+SyncDownloadManager::Report SyncDownloadManager::processQueue()
 {
     // Ensure error state is cleared
     mErrorList.clear();
 
+    // Ensure instance will reset when complete
+    QScopeGuard resetGuard([this](){ reset(); }); // Need lambda since function is private
+
+    // Set flag
+    QScopedValueRollback guard(mDownloading, true);
+
     // Get total task size
     NetworkReplyError enumError = enumerateTotalSize();
     if(enumError.isValid())
-        return GenericError(GenericError::Undefined, ERR_ENUM_TOTAL_SIZE.arg(enumError.getUrl().toString()), enumError.getText());
+        return Report(FinishStatus::Error, GenericError(GenericError::Undefined, ERR_ENUM_TOTAL_SIZE.arg(enumError.getUrl().toString()), enumError.getText()));
 
     // Add initial downloads
     for(int j = 0; j < mMaxSimultaneous && !mPendingDownloads.isEmpty(); j++)
@@ -185,30 +249,28 @@ GenericError SyncDownloadManager::processQueue()
 
     switch(mFinishStatus)
     {
-        case FinishStatus::SUCCESS:
+        case FinishStatus::Success:
             fe = GenericError();
             break;
 
-        case FinishStatus::USER_ABORT:
+        case FinishStatus::UserAbort:
             fe = GenericError(GenericError::Error, ERR_QUEUE_INCOMPL, ERR_OUTCOME_USER_ABORT);
             break;
 
-        case FinishStatus::AUTO_ABORT:
+        case FinishStatus::AutoAbort:
             fe = GenericError(GenericError::Error, ERR_QUEUE_INCOMPL, ERR_OUTCOME_AUTO_ABORT, "- " + mErrorList.join("\n- "));
             break;
 
-        case FinishStatus::OTHER:
+        case FinishStatus::Error:
             fe = GenericError(GenericError::Error, ERR_QUEUE_INCOMPL, ERR_OUTCOME_FAIL, "- " + mErrorList.join("\n- "));
             break;
     }
 
-    // Reset state
-    mCurrentBytes = 0;
-    mTotalBytes = 0;
-    mFinishStatus = FinishStatus::SUCCESS;
+    // Create report
+    Report report(mFinishStatus, fe);
 
-    // Return final error status
-    return fe;
+    // Return final report
+    return report;
 }
 
 //Private Slots:
@@ -231,12 +293,12 @@ void SyncDownloadManager::readyRead()
 
         if(mAutoAbort)
         {
-            mFinishStatus = FinishStatus::AUTO_ABORT;
+            mFinishStatus = FinishStatus::AutoAbort;
             cancelAll();
         }
         else
         {
-            mFinishStatus = FinishStatus::OTHER;
+            mFinishStatus = FinishStatus::Error;
             senderNetworkReply->abort();
         }
     }
@@ -244,8 +306,6 @@ void SyncDownloadManager::readyRead()
 
 void SyncDownloadManager::downloadProgressHandler(qint64 bytesCurrent, qint64 bytesTotal)
 {
-    Q_UNUSED(bytesTotal);
-
     // Get the object that called this slot
     QNetworkReply* senderNetworkReply = qobject_cast<QNetworkReply*>(sender());
 
@@ -253,14 +313,22 @@ void SyncDownloadManager::downloadProgressHandler(qint64 bytesCurrent, qint64 by
     if(senderNetworkReply == nullptr)
         throw std::runtime_error("Pointer conversion to network reply failed");
 
-    // Update cumulative progress
-    mCurrentBytes += bytesCurrent - mInvididualBytes.value(senderNetworkReply);
+    // Update total size if needed
+    if(bytesTotal != 0)
+    {
+        DownloadTask taskOfReply = mReplyTaskMap.value(senderNetworkReply);
+        if(mTotalBytes.value(taskOfReply) != bytesTotal)
+        {
+            mTotalBytes.setValue(taskOfReply, bytesTotal);
+            emit downloadTotalChanged(mTotalBytes.total());
+        }
+    }
 
-    // Update individual progress
-    mInvididualBytes[senderNetworkReply] = bytesCurrent;
+    // Update cumulative progress
+    mCurrentBytes.setValue(senderNetworkReply, bytesCurrent);
 
     // Emit progress
-    emit downloadProgress(mCurrentBytes);
+    emit downloadProgress(mCurrentBytes.total());
 }
 
 void SyncDownloadManager::downloadFinished(QNetworkReply *reply)
@@ -278,15 +346,15 @@ void SyncDownloadManager::downloadFinished(QNetworkReply *reply)
 
         if(mAutoAbort)
         {
-            mFinishStatus = FinishStatus::AUTO_ABORT;
+            mFinishStatus = FinishStatus::AutoAbort;
             cancelAll();
         }
         else
-            mFinishStatus = FinishStatus::OTHER;
+            mFinishStatus = FinishStatus::Error;
     }
 
     // Add next pending download if not aborting
-    if(mFinishStatus != FinishStatus::AUTO_ABORT && mFinishStatus != FinishStatus::USER_ABORT && !mPendingDownloads.isEmpty())
+    if(mFinishStatus != FinishStatus::AutoAbort && mFinishStatus != FinishStatus::UserAbort && !mPendingDownloads.isEmpty())
         startDownload(mPendingDownloads.takeFirst());
     else if(mPendingDownloads.isEmpty()) // Release wait loop if all downloads are finished
         mDownloadWait.quit();
@@ -295,8 +363,11 @@ void SyncDownloadManager::downloadFinished(QNetworkReply *reply)
 //Public Slots:
 void SyncDownloadManager::abort()
 {
-    mFinishStatus = FinishStatus::USER_ABORT;
-    cancelAll();
+    if(!mActiveDownloads.isEmpty() || !mPendingDownloads.isEmpty())
+    {
+        mFinishStatus = FinishStatus::UserAbort;
+        cancelAll();
+    }
 }
 
 void SyncDownloadManager::sslErrorHandler(QNetworkReply* reply, const QList<QSslError>& errors)
@@ -316,7 +387,7 @@ void SyncDownloadManager::sslErrorHandler(QNetworkReply* reply, const QList<QSsl
     {
         reply->abort();
         mErrorList.append(ERR_SINGLE_ABORT.arg(reply->url().toString()));
-        mFinishStatus = FinishStatus::OTHER;
+        mFinishStatus = FinishStatus::Error;
     }
     else
         reply->ignoreSslErrors();
@@ -337,7 +408,7 @@ void SyncDownloadManager::authHandler(QNetworkReply* reply, QAuthenticator* auth
     {
         reply->abort();
         mErrorList.append(ERR_SINGLE_ABORT.arg(reply->url().toString()));
-        mFinishStatus = FinishStatus::OTHER;
+        mFinishStatus = FinishStatus::Error;
     }
     else
     {
