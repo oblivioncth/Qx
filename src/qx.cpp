@@ -308,6 +308,10 @@ QString GenericError::secondaryInfo() const { return mSecondaryInfo; }
 QString GenericError::detailedInfo() const { return mDetailedInfo; }
 
 GenericError& GenericError::setErrorLevel(ErrorLevel errorLevel) { mErrorLevel = errorLevel; return *this; }
+Qx::GenericError& GenericError::setCaption(QString caption) { mCaption = caption; return *this; }
+Qx::GenericError& GenericError::setPrimaryInfo(QString primaryInfo) { mPrimaryInfo = primaryInfo; return *this; }
+Qx::GenericError& GenericError::setSecondaryInfo(QString secondaryInfo) { mSecondaryInfo = secondaryInfo; return *this; }
+Qx::GenericError& GenericError::setDetailedInfo(QString detailedInfo) { mDetailedInfo = detailedInfo; return *this; }
 
 #ifdef QT_WIDGETS_LIB // Only enabled for Widget applications
 int GenericError::exec(QMessageBox::StandardButtons choices, QMessageBox::StandardButton defChoice) const

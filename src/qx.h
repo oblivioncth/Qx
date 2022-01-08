@@ -632,6 +632,10 @@ public:
     QString detailedInfo() const;
 
     Qx::GenericError& setErrorLevel(ErrorLevel errorLevel);
+    Qx::GenericError& setCaption(QString caption);
+    Qx::GenericError& setPrimaryInfo(QString primaryInfo);
+    Qx::GenericError& setSecondaryInfo(QString secondaryInfo);
+    Qx::GenericError& setDetailedInfo(QString detailedInfo);
 
 #ifdef QT_WIDGETS_LIB // Only enabled for Widget applications
     int exec(QMessageBox::StandardButtons choices, QMessageBox::StandardButton defChoice = QMessageBox::NoButton) const;
