@@ -161,7 +161,7 @@ public:
     IOOpReport status();
     FileStreamWriter& writeRawData(const QByteArray& data);
 
-    template<typename T, ENABLE_IF(defines_left_shift<QDataStream, T>)>
+    template<typename T, QX_ENABLE_IF(defines_left_shift<QDataStream, T>)>
     FileStreamWriter& operator<<(T d) { mStreamWriter << d; return *this; }
 
     // New functions
@@ -193,7 +193,7 @@ public:
     void skipRawData(int len);
     IOOpReport status();
 
-    template<typename T, ENABLE_IF(defines_right_shift<QDataStream, T&>)>
+    template<typename T, QX_ENABLE_IF(defines_right_shift<QDataStream, T&>)>
     FileStreamReader& operator>>(T& d) { mStreamReader >> d; return *this; }
 
     // New functions

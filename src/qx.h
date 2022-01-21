@@ -1,8 +1,15 @@
 #ifndef QX_H
 #define QX_H
 
-#define ENABLE_IF(...) std::enable_if_t<__VA_ARGS__::value, int> = 0 // enable_if Macro; allows ENABLE_IF(std::is_arithmetic<T>) for example
-#define ENABLE_IF2(...) std::enable_if_t<__VA_ARGS__::value, int> // enable_if Macro with no default argument, use if template was already forward declared
+//-Macros-------------------------------------------------------------------------------------------------------------
+#define QX_ENABLE_IF(...) std::enable_if_t<__VA_ARGS__::value, int> = 0 // enable_if Macro; allows QX_ENABLE_IF(std::is_arithmetic<T>) for example
+#define QX_ENABLE_IF_D(...) std::enable_if_t<__VA_ARGS__::value, int> // enable_if Macro with no default argument, use if template was already forward declared
+
+#define QX_SCOPED_ENUM_HASH_FUNC(T) \
+inline uint qHash(const T &t, uint seed) { \
+    return ::qHash(static_cast<typename std::underlying_type<T>::type>(t), seed); \
+}
+
 
 #ifdef QT_WIDGETS_LIB // Only enabled for Widget applications
 #include <QWidget>
@@ -98,14 +105,14 @@ template<typename T>
 using is_datastream_type = std::bool_constant<is_any<T, bool, double, QString, QJsonArray, QJsonObject>::value>;
 
 //-Class Forward Declarations---------------------------------------------------------------------------------------------
-template <typename T, ENABLE_IF(std::is_arithmetic<T>)>
+template <typename T, QX_ENABLE_IF(std::is_arithmetic<T>)>
 class NII;
 
 //-Functions----------------------------------------------------------------------------------------------------
 template <typename T>
 struct typeIdentifier {typedef T type; }; // Forces compiler to deduce the type of T from only one argument so that implicit conversions can be used for the others
 
-template<typename T, ENABLE_IF(std::is_integral<T>)>
+template<typename T, QX_ENABLE_IF(std::is_integral<T>)>
 T rangeToLength(T start, T end)
 {
     // Returns the length from start to end including start, primarily for support of NII (Negative Is Infinity)
@@ -114,10 +121,10 @@ T rangeToLength(T start, T end)
     return length;
 }
 
-template<typename T, ENABLE_IF(std::is_arithmetic<T>)>
+template<typename T, QX_ENABLE_IF(std::is_arithmetic<T>)>
 static bool isOdd(T num) { return num % 2; }
 
-template<typename T, ENABLE_IF(std::is_arithmetic<T>)>
+template<typename T, QX_ENABLE_IF(std::is_arithmetic<T>)>
 static bool isEven(T num) { return !isOdd(num); }
 
 //-Classes------------------------------------------------------------------------------------------------------
@@ -200,7 +207,7 @@ class ByteArray
 {
 //-Class Functions----------------------------------------------------------------------------------------------
 public:
-    template<typename T, ENABLE_IF(std::is_integral<T>)>
+    template<typename T, QX_ENABLE_IF(std::is_integral<T>)>
     static QByteArray RAWFromPrimitive(T primitive, Endian::Endianness endianness = Endian::LE)
     {
         QByteArray rawBytes;
@@ -224,7 +231,7 @@ public:
         return rawBytes;
     }
 
-    template<typename T, ENABLE_IF(std::is_floating_point<T>)>
+    template<typename T, QX_ENABLE_IF(std::is_floating_point<T>)>
     static QByteArray RAWFromPrimitive(T primitive, Endian::Endianness endianness = Endian::LE)
     {
         QByteArray rawBytes;
@@ -260,7 +267,7 @@ public:
         return rawBytes;
     }
 
-    template<typename T, ENABLE_IF(std::is_fundamental<T>)>
+    template<typename T, QX_ENABLE_IF(std::is_fundamental<T>)>
     static T RAWToPrimitive(QByteArray ba, Endian::Endianness endianness = Endian::LE)
     {
         static_assert(std::numeric_limits<float>::is_iec559, "Only supports IEC 559 (IEEE 754) float"); // For floats
@@ -326,7 +333,7 @@ public:
 
 //-Class Functions----------------------------------------------------------------------------------------------
 public:
-    template<typename T, ENABLE_IF(std::is_integral<T>)>
+    template<typename T, QX_ENABLE_IF(std::is_integral<T>)>
     static BitArray fromInteger(const T& integer)
     {
         int bitCount = sizeof(T)*8;
@@ -342,7 +349,7 @@ public:
 
 //-Instance Functions-------------------------------------------------------------------------------------------
 public:
-    template<typename T, ENABLE_IF(std::is_integral<T>)>
+    template<typename T, QX_ENABLE_IF(std::is_integral<T>)>
     T toInteger()
     {
         int bitCount = sizeof(T)*8;
@@ -359,7 +366,7 @@ public:
     void append(bool bit = false);
     void replace(const BitArray& bits, int start = 0, int length = -1);
 
-    template<typename T, ENABLE_IF(std::is_integral<T>)>
+    template<typename T, QX_ENABLE_IF(std::is_integral<T>)>
     void replace(T integer, int start = 0, int length = -1)
     {
         BitArray converted = BitArray::fromInteger(integer);
@@ -392,7 +399,7 @@ public:
 };
 #endif
 
-template <typename K, typename V, ENABLE_IF(std::is_arithmetic<V>)>
+template <typename K, typename V, QX_ENABLE_IF(std::is_arithmetic<V>)>
 class Cumulation
 {
 //-Instance Variables----------------------------------------------------------------------------------------------
@@ -441,7 +448,7 @@ public:
     static QDateTime fromMSFileTime(qint64 fileTime);
 };
 
-template <typename T, ENABLE_IF(std::is_integral<T>)>
+template <typename T, QX_ENABLE_IF(std::is_integral<T>)>
 class FreeIndexTracker
 {
 //-Class Members-------------------------------------------------------------------------------------------------
@@ -676,7 +683,7 @@ public:
     static Qx::GenericError checkedKeyRetrieval(QJsonObject& valueBuffer, QJsonObject jObject, QString key);
 };
 
-template <typename T, ENABLE_IF2(std::is_arithmetic<T>)>
+template <typename T, QX_ENABLE_IF_D(std::is_arithmetic<T>)>
 class NII // Negative Is Infinity - Wrapper class (0 is minimum)
 {
 //-Class Members-------------------------------------------------------------------------------------------------
@@ -884,7 +891,7 @@ public:
             return a - b;
     }
 
-    template <typename T, ENABLE_IF(std::is_integral<T>)>
+    template <typename T, QX_ENABLE_IF(std::is_integral<T>)>
     static T roundToNearestMultiple(T num, T mult)
     {
         // Ignore negative multiples
@@ -903,7 +910,7 @@ public:
         return (abs(num) - abs(towardsZero) >= abs(awayFromZero) - abs(num))? awayFromZero : towardsZero;
     }
 
-    template <typename T, ENABLE_IF(std::is_integral<T>)>
+    template <typename T, QX_ENABLE_IF(std::is_integral<T>)>
     static T ceilPowOfTwo(T num)
     {
         // Return if num already is power of 2
@@ -918,7 +925,7 @@ public:
         return powOfTwo;
     }
 
-    template <typename T, ENABLE_IF(std::is_integral<T>)>
+    template <typename T, QX_ENABLE_IF(std::is_integral<T>)>
     static T floorPowOfTwo(T num)
     {
         // Return if num already is power of 2
@@ -934,7 +941,7 @@ public:
         return powOfTwo;
     }
 
-    template <typename T, ENABLE_IF(std::is_integral<T>)>
+    template <typename T, QX_ENABLE_IF(std::is_integral<T>)>
     static T roundPowOfTwo(T num)
     {
        T above = ceilPowOfTwo(num);

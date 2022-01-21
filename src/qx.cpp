@@ -178,10 +178,10 @@ void BitArray::operator+=(const BitArray& rhs) { (*this) = (*this) + rhs; }
 
 //-Class Functions-----------------------------------------------------------------------------------------------
 //Public:
-//template<typename T, ENABLE_IF(std::is_integral<T>)>
+//template<typename T, QX_ENABLE_IF(std::is_integral<T>)>
 //static QByteArray RAWFromPrimitive(T primitive, Endian::Endianness endianness = Endian::LE) { defined in .h }
 
-//template<typename T, ENABLE_IF(std::is_floating_point<T>)>
+//template<typename T, QX_ENABLE_IF(std::is_floating_point<T>)>
 //static QByteArray RAWFromPrimitive(T primitive, Endian::Endianness endianness = Endian::LE) { defined in .h }
 
 //===============================================================================================================
