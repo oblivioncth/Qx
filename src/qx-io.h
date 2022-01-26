@@ -142,13 +142,13 @@ class FileStreamWriter // Specialized wrapper for QDataStream
 //-Instance Variables------------------------------------------------------------------------------------------------
 private:
     QDataStream mStreamWriter;
-    QFile& mTargetFile;
+    QFile* mTargetFile;
     WriteMode mWriteMode;
     bool mCreateDirs;
 
 //-Constructor-------------------------------------------------------------------------------------------------------
 public:
-    FileStreamWriter(QFile& file, WriteMode writeMode = Append, bool createDirs = true);
+    FileStreamWriter(QFile* file, WriteMode writeMode = Append, bool createDirs = true);
 
 //-Instance Functions------------------------------------------------------------------------------------------------
 public:
@@ -164,6 +164,8 @@ public:
     template<typename T, QX_ENABLE_IF(defines_left_shift<QDataStream, T>)>
     FileStreamWriter& operator<<(T d) { mStreamWriter << d; return *this; }
 
+    QFile* file();
+
     // New functions
     IOOpReport openFile();
     void closeFile();
@@ -174,11 +176,11 @@ class FileStreamReader // Specialized wrapper for QDataStream
 //-Instance Variables------------------------------------------------------------------------------------------------
 private:
     QDataStream mStreamReader;
-    QFile& mSourceFile;
+    QFile* mSourceFile;
 
 //-Constructor-------------------------------------------------------------------------------------------------------
 public:
-    FileStreamReader(QFile& file);
+    FileStreamReader(QFile* file);
 
 //-Instance Functions------------------------------------------------------------------------------------------------
 public:
@@ -195,6 +197,8 @@ public:
 
     template<typename T, QX_ENABLE_IF(defines_right_shift<QDataStream, T&>)>
     FileStreamReader& operator>>(T& d) { mStreamReader >> d; return *this; }
+
+    QFile* file();
 
     // New functions
     IOOpReport openFile();

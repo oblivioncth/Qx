@@ -180,7 +180,7 @@ bool TextPos::isNull() const { return mLineNum == -2 && mCharNum == -2; }
 
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
-FileStreamWriter::FileStreamWriter(QFile& file, WriteMode writeMode, bool createDirs) :
+FileStreamWriter::FileStreamWriter(QFile* file, WriteMode writeMode, bool createDirs) :
     mTargetFile(file), mWriteMode(writeMode), mCreateDirs(createDirs) {}
 
 //-Instance Functions--------------------------------------------------------------------------------------------
@@ -193,7 +193,7 @@ void FileStreamWriter::setFloatingPointPrecision(QDataStream::FloatingPointPreci
 
 IOOpReport FileStreamWriter::status()
 {
-    return IOOpReport(IOOpType::IO_OP_WRITE, DATA_STRM_STAT_MAP.value(mStreamWriter.status()), mTargetFile);
+    return IOOpReport(IOOpType::IO_OP_WRITE, DATA_STRM_STAT_MAP.value(mStreamWriter.status()), *mTargetFile);
 }
 
 FileStreamWriter& FileStreamWriter::writeRawData(const QByteArray& data)
@@ -206,41 +206,43 @@ FileStreamWriter& FileStreamWriter::writeRawData(const QByteArray& data)
 
 //template<typename T> FileStreamWriter& operator<<(T d) { defined in .h }
 
+QFile* FileStreamWriter::file() { return mTargetFile; }
+
 IOOpReport FileStreamWriter::openFile()
 {
     // Check file
-    IOOpResultType fileCheckResult = fileCheck(mTargetFile);
+    IOOpResultType fileCheckResult = fileCheck(*mTargetFile);
 
     if(fileCheckResult == IO_ERR_NOT_A_FILE)
-        return IOOpReport(IO_OP_WRITE, fileCheckResult, mTargetFile);
+        return IOOpReport(IO_OP_WRITE, fileCheckResult, *mTargetFile);
     else if(fileCheckResult == IO_SUCCESS && mWriteMode == NewOnly)
-        return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_EXISTS, mTargetFile);
+        return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_EXISTS, *mTargetFile);
 
     // Make folders if wanted and necessary
-    QDir filePath(QFileInfo(mTargetFile).absolutePath());
+    QDir filePath(QFileInfo(*mTargetFile).absolutePath());
     IOOpResultType dirCheckResult = directoryCheck(filePath);
 
     if(dirCheckResult == IO_ERR_NOT_A_DIR || (dirCheckResult == IO_ERR_DIR_DNE && !mCreateDirs))
-        return IOOpReport(IO_OP_WRITE, dirCheckResult, mTargetFile);
+        return IOOpReport(IO_OP_WRITE, dirCheckResult, *mTargetFile);
     else if(dirCheckResult == IO_ERR_DIR_DNE)
     {
         if(!QDir().mkpath(filePath.absolutePath()))
-            return IOOpReport(IO_OP_WRITE, IO_ERR_CANT_MAKE_DIR, mTargetFile);
+            return IOOpReport(IO_OP_WRITE, IO_ERR_CANT_MAKE_DIR, *mTargetFile);
     }
 
     // Attempt to open file
-    IOOpResultType openResult = parsedOpen(mTargetFile, QFile::WriteOnly | WRITE_OPEN_FLAGS_MAP[mWriteMode]);
+    IOOpResultType openResult = parsedOpen(*mTargetFile, QFile::WriteOnly | WRITE_OPEN_FLAGS_MAP[mWriteMode]);
     if(openResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_WRITE, openResult, mTargetFile);
+        return IOOpReport(IO_OP_WRITE, openResult, *mTargetFile);
 
     // Set data stream IO device
-    mStreamWriter.setDevice(&mTargetFile);
+    mStreamWriter.setDevice(mTargetFile);
 
     // Return no error
-    return IOOpReport(IO_OP_WRITE, IO_SUCCESS, mTargetFile);
+    return IOOpReport(IO_OP_WRITE, IO_SUCCESS, *mTargetFile);
 }
 
-void FileStreamWriter::closeFile() { mTargetFile.close(); }
+void FileStreamWriter::closeFile() { mTargetFile->close(); }
 
 //===============================================================================================================
 // FILE STREAM READER
@@ -248,7 +250,7 @@ void FileStreamWriter::closeFile() { mTargetFile.close(); }
 
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
-FileStreamReader::FileStreamReader(QFile& file) : mSourceFile(file) {}
+FileStreamReader::FileStreamReader(QFile* file) : mSourceFile(file) {}
 
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:
@@ -272,32 +274,34 @@ void FileStreamReader::skipRawData(int len) { mStreamReader.skipRawData(len); }
 
 IOOpReport FileStreamReader::status()
 {
-    return IOOpReport(IOOpType::IO_OP_READ, DATA_STRM_STAT_MAP.value(mStreamReader.status()), mSourceFile);
+    return IOOpReport(IOOpType::IO_OP_READ, DATA_STRM_STAT_MAP.value(mStreamReader.status()), *mSourceFile);
 }
 
 //template<typename T> FileStreamWriter& operator>>(T d) { defined in .h }
 
+QFile* FileStreamReader::file() { return mSourceFile; }
+
 IOOpReport FileStreamReader::openFile()
 {
     // Check file
-    IOOpResultType fileCheckResult = fileCheck(mSourceFile);
+    IOOpResultType fileCheckResult = fileCheck(*mSourceFile);
 
     if(fileCheckResult == IO_ERR_NOT_A_FILE)
-        return IOOpReport(IO_OP_WRITE, fileCheckResult, mSourceFile);
+        return IOOpReport(IO_OP_WRITE, fileCheckResult, *mSourceFile);
 
     // Attempt to open file
-    IOOpResultType openResult = parsedOpen(mSourceFile, QFile::ReadOnly);
+    IOOpResultType openResult = parsedOpen(*mSourceFile, QFile::ReadOnly);
     if(openResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_WRITE, openResult, mSourceFile);
+        return IOOpReport(IO_OP_WRITE, openResult, *mSourceFile);
 
     // Set data stream IO device
-    mStreamReader.setDevice(&mSourceFile);
+    mStreamReader.setDevice(mSourceFile);
 
     // Return no error
-    return IOOpReport(IO_OP_WRITE, IO_SUCCESS, mSourceFile);
+    return IOOpReport(IO_OP_WRITE, IO_SUCCESS, *mSourceFile);
 }
 
-void FileStreamReader::closeFile() { mSourceFile.close(); }
+void FileStreamReader::closeFile() { mSourceFile->close(); }
 
 //===============================================================================================================
 // TEXT STREAM WRITTER
