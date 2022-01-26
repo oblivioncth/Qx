@@ -130,7 +130,7 @@ NetworkReplyError SyncDownloadManager::getFileSize(qint64& returnBuffer, QUrl ta
     QNetworkReply* sizeReply = mQueryAccessMan.head(sizeReq);
 
     // Result handler lambda
-    connect(sizeReply, &QNetworkReply::finished, [&]()
+    connect(sizeReply, &QNetworkReply::finished, this, [&]()
     {
         // clazy lamda warnings are disabled since the outer function can never return without this lamda being called
 
