@@ -151,8 +151,11 @@ NetworkReplyError SyncDownloadManager::getFileSize(qint64& returnBuffer, QUrl ta
 
 IOOpReport SyncDownloadManager::startDownload(DownloadTask task)
 {
+    // Create file handle
+    QFile* file = new QFile(task.dest, this); // Parent constructor ensures deletion when 'this' is deleted
+
     // Create stream writer
-    std::shared_ptr<FileStreamWriter> fileWriter = std::make_shared<FileStreamWriter>(*task.dest, mOverwrite ? WriteMode:: Overwrite : WriteMode::NewOnly, true);
+    std::shared_ptr<FileStreamWriter> fileWriter = std::make_shared<FileStreamWriter>(file, mOverwrite ? WriteMode:: Overwrite : WriteMode::NewOnly, true);
 
     // Open file
     IOOpReport streamOpen = fileWriter->openFile();
@@ -333,8 +336,12 @@ void SyncDownloadManager::downloadProgressHandler(qint64 bytesCurrent, qint64 by
 
 void SyncDownloadManager::downloadFinished(QNetworkReply *reply)
 {
-    // Close related file stream
+    // Get writer
+    std::shared_ptr<FileStreamWriter> fileWriter = mActiveDownloads[reply];
+
+    // Close and delete file
     mActiveDownloads[reply]->closeFile();
+    delete fileWriter->file();
 
     // Remove from active downloads
     mActiveDownloads.remove(reply);
