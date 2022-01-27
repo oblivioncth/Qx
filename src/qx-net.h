@@ -149,6 +149,7 @@ public:
     void setOverwrite(bool overwrite);
     void setAutoAbort(bool autoAbort);
     int taskCount();
+    bool hasTasks();
     Report processQueue();
 
 //-Slots------------------------------------------------------------------------------------------------------------
