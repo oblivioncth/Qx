@@ -148,6 +148,7 @@ public:
     void setRedirectPolicy(QNetworkRequest::RedirectPolicy redirectPolicy);
     void setOverwrite(bool overwrite);
     void setAutoAbort(bool autoAbort);
+    int taskCount();
     Report processQueue();
 
 //-Slots------------------------------------------------------------------------------------------------------------

@@ -223,6 +223,7 @@ void SyncDownloadManager::setRedirectPolicy(QNetworkRequest::RedirectPolicy redi
 
 void SyncDownloadManager::setOverwrite(bool overwrite) { mOverwrite = overwrite; }
 void SyncDownloadManager::setAutoAbort(bool autoAbort) { mAutoAbort = autoAbort; }
+int SyncDownloadManager::taskCount() { return mPendingDownloads.count() + mActiveDownloads.count(); }
 
 SyncDownloadManager::Report SyncDownloadManager::processQueue()
 {
