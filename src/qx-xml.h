@@ -35,8 +35,8 @@ private:
         {QXmlStreamReader::PrematureEndOfDocumentError, "The input stream ended before a well-formed XML document was parsed."},
         {QXmlStreamReader::UnexpectedElementError, "The parser encountered an element that was different to those it expected."}
     };
-
-    //TODO: Because of the missed errorString() method that is part of QIODevice, this hash isn't needed (is this true?)
+    //TODO: See if there is a better way to get strings of these errors, but it seems doubtful (there's a slight chance
+    //      that calling device().errorString() on the reader might give these)
 
 //-Instance Members----------------------------------------------------------------------------------------------
 private:
