@@ -204,8 +204,6 @@ FileStreamWriter& FileStreamWriter::writeRawData(const QByteArray& data)
     return *this;
 }
 
-//template<typename T> FileStreamWriter& operator<<(T d) { defined in .h }
-
 QFile* FileStreamWriter::file() { return mTargetFile; }
 
 IOOpReport FileStreamWriter::openFile()
@@ -276,8 +274,6 @@ IOOpReport FileStreamReader::status()
 {
     return IOOpReport(IOOpType::IO_OP_READ, DATA_STRM_STAT_MAP.value(mStreamReader.status()), *mSourceFile);
 }
-
-//template<typename T> FileStreamWriter& operator>>(T d) { defined in .h }
 
 QFile* FileStreamReader::file() { return mSourceFile; }
 

@@ -14,41 +14,6 @@ namespace Qx
 // Qx (GLOBAL NAMESPACE)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-//-Functions----------------------------------------------------------------------------------------------------
-//template <typename T>
-//struct typeIdentifier { defined in .h }
-
-//template<typename T>
-//T rangeToLength(T start, T end) { defined in .h }
-
-//template<typename T, std::enable_if_t<std::is_arithmetic<T>, int> = 0>
-//static bool isOdd(T num) { defined in .h }
-
-//template<typename T, std::enable_if_t<std::is_arithmetic<T>, int> = 0>
-//static bool isEven(T num) { defined in .h }
-
-//-Classes-----------------------------------------------------------------------------------------------------
-
-//===============================================================================================================
-// ARRAY
-//===============================================================================================================
-
-//-Class Functions-----------------------------------------------------------------------------------------------
-//template <typename T, int N>
-//static constexpr int constDim(T(&)[N]) { defined in .h }
-
-//template <typename T, int N>
-//static int indexOf(T(&array) [N], typename typeIdentifier<T>::type query) { defined in .h }
-
-//template<typename T, int N>
-//static T maxOf(T(&array) [N]) { defined in .h }
-
-//template<typename T, int N>
-//static T minOf(T(&array) [N]) { defined in .h }
-
-//template<typename T, int N>
-//static T mostFrequent(T(&array) [N]) { defined in .h }
-
 //===============================================================================================================
 // BITARRAY
 //===============================================================================================================
@@ -57,10 +22,6 @@ namespace Qx
 //Public:
 BitArray::BitArray() : QBitArray() {}
 BitArray::BitArray(int size, bool value) : QBitArray(size, value) {}
-
-//-Class Functions-----------------------------------------------------------------------------------------------
-//Public:
-//template<typename T> static BitArray fromInteger(const T& integer, Endian::Endianness endianness) { defined in .h }
 
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:
@@ -103,8 +64,6 @@ void BitArray::replace(const BitArray& bits, int start, int length)
     for(int i = start, j = 0; i < count() && j < bits.count() && j != length - 1; i++, j++)
         setBit(i, bits.at(j));
 }
-
-//template<typename T> void replace(T integer, Endian::Endianness endianness, int start, int length) { defined in .h }
 
 BitArray BitArray::extract(int start, int length)
 {
@@ -171,19 +130,6 @@ BitArray BitArray::operator+(BitArray rhs)
 
 void BitArray::operator+=(const BitArray& rhs) { (*this) = (*this) + rhs; }
 
-
-//===============================================================================================================
-// BYTEARRAY
-//===============================================================================================================
-
-//-Class Functions-----------------------------------------------------------------------------------------------
-//Public:
-//template<typename T, QX_ENABLE_IF(std::is_integral<T>)>
-//static QByteArray RAWFromPrimitive(T primitive, Endian::Endianness endianness = Endian::LE) { defined in .h }
-
-//template<typename T, QX_ENABLE_IF(std::is_floating_point<T>)>
-//static QByteArray RAWFromPrimitive(T primitive, Endian::Endianness endianness = Endian::LE) { defined in .h }
-
 //===============================================================================================================
 // CHAR
 //===============================================================================================================
@@ -243,39 +189,6 @@ QDateTime DateTime::fromMSFileTime(qint64 fileTime)
     else
         return QDateTime();
 }
-
-//===============================================================================================================
-// FreeIndexTracker {defined in .h}
-//===============================================================================================================
-
-//-Constructor---------------------------------------------------------------------------------------------------
-//Public:
-//template <typename T, std::enable_if_t<std::is_arithmetic<T>, int>>
-//FreeIndexTracker(T minIndex, T maxIndex, QSet<T> reservedIndicies) { defined in .h }
-
-//-Instance Functions----------------------------------------------------------------------------------------------
-//Private:
-//int reserveInternal(int index) { defined in .h }
-//int releaseInternal(int index) { defined in .h }
-
-//Public:
-//bool isReserved(T index) { defined in .h }
-//T minimum() { defined in .h }
-//T maximum() { defined in .h }
-//T firstReserved() { defined in .h }
-//T lastReserved() { defined in .h }
-//T firstFree() { defined in .h }
-//T lastFree() { defined in .h }
-//bool reserve(int index) { defined in .h }
-//T reserveFirstFree() { defined in .h }
-//T reserveLastFree() { defined in .h }
-//bool release(int index) { defined in .h }
-
-//===============================================================================================================
-// ENDIAN
-//===============================================================================================================
-
-// Types/Constants only
 
 //===============================================================================================================
 // Generic Error
@@ -470,9 +383,6 @@ GenericError Json::checkedKeyRetrieval(QJsonObject& valueBuffer, QJsonObject jOb
 // LIST
 //===============================================================================================================
 
-//template<typename T> static QList<T>* getListThatContains(T element, QList<QList<T>*> listOfLists) defined in .h
-//template<typename T> static QList<T> subtractAB(QList<T> &listA, QList<T> &listB) defined in .h
-
 #ifdef QT_WIDGETS_LIB // Only enabled for Widget applications
 QWidgetList List::objectListToWidgetList(QObjectList list)
 {
@@ -571,49 +481,6 @@ MMRB MMRB::fromString(QString string)
 
     return MMRB(versions[0], versions[1], versions[2], versions[3]);
 }
-
-//===============================================================================================================
-// NII {defined in .h}
-//===============================================================================================================
-
-//-Constructor------------------------------------------------------------------------------------------------
-//Public:
-//NII() { defined in .h; }
-//NII(T value, bool boundAtZero = false) { defined in .h }
-
-//-Class Functions----------------------------------------------------------------------------------------------
-//Private:
-//T forceBounds(bool boundAtZero) { defined in .h }
-
-//-Instance Functions----------------------------------------------------------------------------------------------
-//Public::
-//bool operator==(const NII& otherNII) { defined in .h }
-//bool operator!=(const NII& otherNII) { defined in .h }
-//bool operator<(const NII& otherNII) { defined in .h }
-//bool operator<=(const NII& otherNII) { defined in .h }
-//bool operator>(const NII& otherNII) { defined in .h }
-//bool operator>=(const NII& otherNII) { defined in .h }
-//NII operator-(const NII& otherNII) { defined in .h }
-//NII operator/(const NII& otherNII) { defined in .h }
-//NII operator*(const NII& otherNII) { defined in .h }
-//void operator++() { defined in .h }
-//void operator--() { defined in .h }
-//void setInf() { defined in .h }
-//void setNull() { defined in .h }
-//bool isInf() const { defined in .h }
-//T value() const { defined in .h }
-
-//===============================================================================================================
-// NUMBER
-//===============================================================================================================
-
-//-Class Functions----------------------------------------------------------------------------------------------
-//Public:
-//T typeLimitedAdd(T a, T b) { defined in .h }
-//T typeLimitedSub(T a, T b) { defined in .h }
-//T ceilPowOfTwo(T num) { defined in .h }
-//T floorPowOfTwo(T num) { defined in .h }
-//T roundPowOfTwo(T num) { defined in .h }
 
 //===============================================================================================================
 // STRING
@@ -731,14 +598,10 @@ QString String::formattedHex(QByteArray data, QChar separator, Endian::Endiannes
 
 QString String::stripToHexOnly(QString string) { return string.replace(RegEx::anyNonHex, ""); }
 
-//QString String::join(QList<T> list, QString separator, F&& toStringFunc) { defined in .h }
-
 QString String::join(QList<QString> set, QString separator, QString prefix) // Overload for T = QString
 {
     return join(set, [](const QString& str)->const QString&{ return str; }, separator, prefix);
 }
-
-//QString String::join(QSet<T> set, F&& toStringFunc, QString separator = "", QString prefix = "") { defined in .h }
 
 QString String::join(QSet<QString> set, QString separator, QString prefix) // Overload for T = QString
 {
