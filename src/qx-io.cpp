@@ -74,6 +74,23 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
         else
             return IO_ERR_DIR_DNE;
     }
+
+    IOOpReport handlePathCreation(const QFile& file, bool createPaths)
+    {
+        // Make folders if wanted and necessary
+        QDir filePath(QFileInfo(file).absolutePath());
+        IOOpResultType dirCheckResult = directoryCheck(filePath);
+
+        if(dirCheckResult == IO_ERR_NOT_A_DIR || (dirCheckResult == IO_ERR_DIR_DNE && !createPaths))
+            return IOOpReport(IO_OP_WRITE, dirCheckResult, file);
+        else if(dirCheckResult == IO_ERR_DIR_DNE)
+        {
+            if(!QDir().mkpath(filePath.absolutePath()))
+                return IOOpReport(IO_OP_WRITE, IO_ERR_CANT_MAKE_DIR, file);
+        }
+
+        return IOOpReport(IO_OP_WRITE, IO_SUCCESS, file);
+    }
 }
 
 //-Classes-------------------------------------------------------------------------------------------------------
@@ -217,16 +234,9 @@ IOOpReport FileStreamWriter::openFile()
         return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_EXISTS, *mTargetFile);
 
     // Make folders if wanted and necessary
-    QDir filePath(QFileInfo(*mTargetFile).absolutePath());
-    IOOpResultType dirCheckResult = directoryCheck(filePath);
-
-    if(dirCheckResult == IO_ERR_NOT_A_DIR || (dirCheckResult == IO_ERR_DIR_DNE && !mCreateDirs))
-        return IOOpReport(IO_OP_WRITE, dirCheckResult, *mTargetFile);
-    else if(dirCheckResult == IO_ERR_DIR_DNE)
-    {
-        if(!QDir().mkpath(filePath.absolutePath()))
-            return IOOpReport(IO_OP_WRITE, IO_ERR_CANT_MAKE_DIR, *mTargetFile);
-    }
+    IOOpReport pathCreationResult = handlePathCreation(*mTargetFile, mCreateDirs);
+    if(!pathCreationResult.wasSuccessful())
+        return pathCreationResult;
 
     // Attempt to open file
     IOOpResultType openResult = parsedOpen(*mTargetFile, QFile::WriteOnly | WRITE_OPEN_FLAGS_MAP[mWriteMode]);
@@ -321,16 +331,9 @@ IOOpReport TextStreamWriter::openFile()
         return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_EXISTS, mTargetFile);
 
     // Make folders if wanted and necessary
-    QDir filePath(QFileInfo(mTargetFile).absolutePath());
-    IOOpResultType dirCheckResult = directoryCheck(filePath);
-
-    if(dirCheckResult == IO_ERR_NOT_A_DIR || (dirCheckResult == IO_ERR_DIR_DNE && !mCreateDirs))
-        return IOOpReport(IO_OP_WRITE, dirCheckResult, mTargetFile);
-    else if(dirCheckResult == IO_ERR_DIR_DNE)
-    {
-        if(!QDir().mkpath(filePath.absolutePath()))
-            return IOOpReport(IO_OP_WRITE, IO_ERR_CANT_MAKE_DIR, mTargetFile);
-    }
+    IOOpReport pathCreationResult = handlePathCreation(mTargetFile, mCreateDirs);
+    if(!pathCreationResult.wasSuccessful())
+        return pathCreationResult;
 
     // Attempt to open file
     QIODevice::OpenMode om = QFile::WriteOnly | QFile::Text | WRITE_OPEN_FLAGS_MAP[mWriteMode];
@@ -836,16 +839,9 @@ IOOpReport writeStringAsFile(QFile& textFile, const QString& text, bool overwrit
         textFile.resize(0); // Clear file contents
 
     // Make folders if wanted and necessary
-    QDir filePath(QFileInfo(textFile).absolutePath());
-    IOOpResultType dirCheckResult = directoryCheck(filePath);
-
-    if(dirCheckResult == IO_ERR_NOT_A_DIR || (dirCheckResult == IO_ERR_DIR_DNE && !createDirs))
-        return IOOpReport(IO_OP_WRITE, dirCheckResult, textFile);
-    else if(dirCheckResult == IO_ERR_DIR_DNE)
-    {
-        if(!QDir().mkpath(filePath.absolutePath()))
-            return IOOpReport(IO_OP_WRITE, IO_ERR_CANT_MAKE_DIR, textFile);
-    }
+    IOOpReport pathCreationResult = handlePathCreation(textFile, createDirs);
+    if(!pathCreationResult.wasSuccessful())
+        return pathCreationResult;
 
     // Attempt to open file
     IOOpResultType openResult = parsedOpen(textFile, QFile::WriteOnly | QFile::Text);
@@ -890,16 +886,9 @@ IOOpReport writeStringToEndOfFile(QFile &textFile, const QString &text, bool ens
     }
 
     // Make folders if wanted and necessary
-    QDir filePath(QFileInfo(textFile).absolutePath());
-    IOOpResultType dirCheckResult = directoryCheck(filePath);
-
-    if(dirCheckResult == IO_ERR_NOT_A_DIR || (dirCheckResult == IO_ERR_DIR_DNE && !createDirs))
-        return IOOpReport(IO_OP_WRITE, dirCheckResult, textFile);
-    else if(dirCheckResult == IO_ERR_DIR_DNE)
-    {
-        if(!QDir().mkpath(filePath.absolutePath()))
-            return IOOpReport(IO_OP_WRITE, IO_ERR_CANT_MAKE_DIR, textFile);
-    }
+    IOOpReport pathCreationResult = handlePathCreation(textFile, createDirs);
+    if(!pathCreationResult.wasSuccessful())
+        return pathCreationResult;
 
     // Attempt to open file
     IOOpResultType openResult = parsedOpen(textFile, QFile::Append | QFile::Text);
@@ -1166,17 +1155,10 @@ IOOpReport writeBytesAsFile(QFile &file, const QByteArray &byteArray, bool overw
     if(fileCheckResult == IO_SUCCESS)
         file.resize(0); // Clear file contents
 
-    // Make folders if wanted and necessary TODO: Turn this mostly copy and pasted segment used in many functions into its own function
-    QDir filePath(QFileInfo(file).absolutePath());
-    IOOpResultType dirCheckResult = directoryCheck(filePath);
-
-    if(dirCheckResult == IO_ERR_NOT_A_DIR || (dirCheckResult == IO_ERR_DIR_DNE && !createDirs))
-        return IOOpReport(IO_OP_WRITE, dirCheckResult, file);
-    else if(dirCheckResult == IO_ERR_DIR_DNE)
-    {
-        if(!QDir().mkpath(filePath.absolutePath()))
-            return IOOpReport(IO_OP_WRITE, IO_ERR_CANT_MAKE_DIR, file);
-    }
+    // Make folders if wanted and necessary
+    IOOpReport pathCreationResult = handlePathCreation(file, createDirs);
+    if(!pathCreationResult.wasSuccessful())
+        return pathCreationResult;
 
     // Attempt to open file
     IOOpResultType openResult = parsedOpen(file, QFile::WriteOnly);
