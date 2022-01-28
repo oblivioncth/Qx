@@ -60,13 +60,6 @@ struct right_shift {
 };
 
 //-Traits-------------------------------------------------------------------------------------------------------
-// TODO: Get these working where they make sense
-//template <class T, template <class...> class Template>
-//struct is_specialization : std::false_type {};
-
-//template <template <class...> class Template, class... Args>
-//struct is_specialization<Template<Args...>, Template> : std::true_type {};
-
 template<typename T, typename... Others>
 struct is_any : std::disjunction<std::is_same<T, Others>...>
 {};
