@@ -690,7 +690,10 @@ IOOpReport readTextRangeFromFile(QString& returnBuffer, QFile& textFile, TextPos
              if(startPos.getCharNum() == -1) // Last char is desired
                  returnBuffer = lastLine.right(1);
              else // Some range of last line is desired
-                 returnBuffer = lastLine.mid(startPos.getCharNum(), rangeToLength(startPos.getCharNum(), endPos.getCharNum()));
+             {
+                 int endPoint = endPos.getCharNum() == -1 ? -1 : rangeToLength(startPos.getCharNum(), endPos.getCharNum());
+                 returnBuffer = lastLine.mid(startPos.getCharNum(), endPoint);
+             }
          }
          else // Some range of file is desired
          {
@@ -706,7 +709,10 @@ IOOpReport readTextRangeFromFile(QString& returnBuffer, QFile& textFile, TextPos
                      if(startPos.getCharNum() == -1) // Last char is desired
                          returnBuffer = fileTextStream.readLine().right(1);
                      else // Some range of single line segment is desired
-                         returnBuffer = fileTextStream.readLine().mid(startPos.getCharNum(), rangeToLength(startPos.getCharNum(), endPos.getCharNum()));
+                     {
+                         int endPoint = endPos.getCharNum() == -1 ? -1 : rangeToLength(startPos.getCharNum(), endPos.getCharNum());
+                         returnBuffer = fileTextStream.readLine().mid(startPos.getCharNum(), endPoint);
+                     }
                  }
                  else // Multiple lines are desired
                  {
