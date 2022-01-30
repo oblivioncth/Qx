@@ -205,6 +205,27 @@ public:
     void closeFile();
 };
 
+class TextStream : public QTextStream
+{
+//-Instance Variables------------------------------------------------------------------------------------------------
+private:
+    int mMinCharWidth;
+    const QTextCodec* mLastCodec;
+
+//-Constructor-------------------------------------------------------------------------------------------------------
+public:
+    TextStream(const QByteArray &array, QIODevice::OpenMode openMode = QIODevice::ReadOnly);
+    TextStream(QByteArray* array, QIODevice::OpenMode openMode = QIODevice::ReadWrite);
+    TextStream(QString* string, QIODevice::OpenMode openMode = QIODevice::ReadWrite);
+    TextStream(FILE* fileHandle, QIODevice::OpenMode openMode = QIODevice::ReadWrite);
+    TextStream(QIODevice* device);
+
+//-Instance Functions------------------------------------------------------------------------------------------------
+public:
+    bool precedingBreak();
+    QString readLineWithBreak(qint64 maxlen = 0); //TODO: In docs note that this is very slow when maxlen != 0
+};
+
 class TextStreamWriter
 {
 //-Instance Variables------------------------------------------------------------------------------------------------

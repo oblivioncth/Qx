@@ -1,6 +1,7 @@
 #include "qx-io.h"
 #include <stdexcept>
 #include <QDataStream>
+#include <QTextCodec>
 
 namespace Qx
 {
@@ -308,6 +309,82 @@ IOOpReport FileStreamReader::openFile()
 }
 
 void FileStreamReader::closeFile() { mSourceFile->close(); }
+
+//===============================================================================================================
+// TEXT STREAM
+//===============================================================================================================
+
+//-Constructor---------------------------------------------------------------------------------------------------
+//Public:
+TextStream::TextStream(const QByteArray &array, QIODevice::OpenMode openMode) : QTextStream(array, openMode) {}
+TextStream::TextStream(QByteArray* array, QIODevice::OpenMode openMode) : QTextStream(array, openMode) {}
+TextStream::TextStream(QString* string, QIODevice::OpenMode openMode) : QTextStream(string, openMode) {}
+TextStream::TextStream(FILE* fileHandle, QIODevice::OpenMode openMode): QTextStream(fileHandle, openMode) {}
+TextStream::TextStream(QIODevice* device) : QTextStream(device) {}
+
+//-Instance Functions--------------------------------------------------------------------------------------------
+//Public:
+bool TextStream::precedingBreak()
+{
+    /* This approach (seeking backwards n-bytes based on the stream's codec) will work for all encodings that
+     * use a single byte for control characters with 0x0A as linefeed, as well as all primary versions of
+     * unicode. It has been tested to work with ANSI, UTF-8, UTF-16LE, UTF-16BE, UTF-32LE, and UTF-32BE, but
+     * in theory it should work with all supported encodings mentioned on the following page, becuase they
+     * all derive from ASCII for at least control characters.
+     *
+     * https://doc.qt.io/qt-5/qtextcodec.html#details
+     *
+     * The one partial exception is IBM 850 which replaces 0x0A with a graphic character; however, it seems that
+     * often in practice this graphic is ignored and still treated as a linefeed by many parsers, so while this
+     * method doesn't follow spec for this one encoding, it does follow convention.
+    */
+
+    // Update Codec Name if necessary
+    if(codec() != mLastCodec)
+    {
+        mLastCodec = codec();
+        QString lastCodecName = codec()->name();
+
+        if(lastCodecName.startsWith("UTF-8"))
+            mMinCharWidth = 1;
+        else if(lastCodecName.startsWith("UTF-16"))
+            mMinCharWidth = 2;
+        else if(lastCodecName.startsWith("UTF-32"))
+            mMinCharWidth = 4;
+        else
+            mMinCharWidth = 1; // Assume 1 byte min per-character
+    }
+
+    // Store current pos
+    qint64 origPos = pos();
+
+    // Go back by min character width (in case of /r/n, this is still fine since /n comes first in reverse)
+    seek(origPos - mMinCharWidth);
+
+    // Check if character is newline
+    bool newLinePrecedes = read(1) == ENDL;
+
+    // Restore cursor pos
+    seek(origPos);
+
+    return newLinePrecedes;
+}
+
+QString TextStream::readLineWithBreak(qint64 maxlen)
+{
+    // If not keeping linebreak use standard behavior
+    if(atEnd())
+        return QString();
+    else
+    {
+        QString buffer = QTextStream::readLine(maxlen);
+
+        if(atEnd() || maxlen > 0)
+            return precedingBreak() ? buffer + "\n" : buffer;
+        else
+            return buffer + "\n";
+    }
+}
 
 //===============================================================================================================
 // TEXT STREAM WRITTER
