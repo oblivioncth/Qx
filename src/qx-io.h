@@ -271,7 +271,8 @@ public:
 //-Functions-------------------------------------------------------------------------------------------------------------
 // General:
     bool fileIsEmpty(const QFile& file);
-    bool fileIsEmpty(const QFile& file, IOOpReport& reportBuffer);
+    IOOpReport fileIsEmpty(bool& returnBuffer, const QFile& file);
+
     QString kosherizeFileName(QString fileName);
 
 // Text Based:

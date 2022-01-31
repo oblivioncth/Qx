@@ -477,22 +477,20 @@ void TextStreamWriter::closeFile() { mTargetFile.close(); }
 //Public:
 bool fileIsEmpty(const QFile& file) { return file.size() == 0; }
 
-bool fileIsEmpty(const QFile &file, IOOpReport& reportBuffer)
+IOOpReport fileIsEmpty(bool& returnBuffer, const QFile& file)
 {
-    // Empty buffer
-    reportBuffer = IOOpReport();
-
     // Check file
     IOOpResultType fileCheckResult = fileCheck(file);
     if(fileCheckResult != IO_SUCCESS)
     {
-        reportBuffer = IOOpReport(IO_OP_INSPECT, fileCheckResult, file);
-        return true; // While not accurate, is closer than "file isn't empty"
+        // File doesn't exist
+        returnBuffer = true; // While totally not accurate, is closer than "file isn't empty"
+        return IOOpReport(IO_OP_INSPECT, fileCheckResult, file);
     }
     else
     {
-        reportBuffer = IOOpReport(IO_OP_INSPECT, IO_SUCCESS, file);
-        return fileIsEmpty(file); // Use reportless function
+        returnBuffer = fileIsEmpty(file); // Use reportless function
+        return IOOpReport(IO_OP_INSPECT, IO_SUCCESS, file);
     }
 }
 
