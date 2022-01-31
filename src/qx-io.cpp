@@ -520,7 +520,48 @@ QString kosherizeFileName(QString fileName) // Can return empty name if all char
     return fileName;
 }
 
-IOOpReport getLineCountOfFile(long long& returnBuffer, QFile &textFile)
+IOOpReport textFileEndsWithNewline(bool& returnBuffer, QFile& textFile)
+{
+    // Default to false
+    returnBuffer = false;
+
+    // Check file
+    IOOpResultType fileCheckResult = fileCheck(textFile);
+    if(fileCheckResult != IO_SUCCESS)
+        return IOOpReport(IO_OP_INSPECT, fileCheckResult, textFile);
+
+    // Return false is file is empty
+    if(fileIsEmpty(textFile))
+    {
+        returnBuffer = false;
+        return IOOpReport(IO_OP_INSPECT, IO_SUCCESS, textFile);
+    }
+    else
+    {
+        // Attempt to open file
+        IOOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly | QFile::Text);
+        if(openResult != IO_SUCCESS)
+            return IOOpReport(IO_OP_INSPECT, openResult, textFile);
+
+        // Text stream
+        TextStream fileTextStream(&textFile);
+
+        // Read one line so that encoding is set
+        fileTextStream.readLineInto(nullptr);
+
+        // Go to end
+        fileTextStream.seek(textFile.size());
+
+        // Set buffer result
+        returnBuffer = fileTextStream.precedingBreak();
+
+        // Close file and return stream status
+        textFile.close();
+        return IOOpReport(IO_OP_INSPECT, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
+    }
+}
+
+IOOpReport textFileLineCount(quint64& returnBuffer, QFile& textFile, bool ignoreTrailingEmpty)
 {
     // Check file
     IOOpResultType fileCheckResult = fileCheck(textFile);
@@ -540,17 +581,20 @@ IOOpReport getLineCountOfFile(long long& returnBuffer, QFile &textFile)
         return IOOpReport(IO_OP_READ, openResult, textFile);
 
     // Create Text Stream
-    QTextStream fileTextStream(&textFile);
+    Qx::TextStream fileTextStream(&textFile);
 
     // Count lines
     returnBuffer = 0;
-    while(!fileTextStream.atEnd())
-    {
-        fileTextStream.readLine();
-        returnBuffer++;
-    }
+    for(; !fileTextStream.atEnd(); ++returnBuffer)
+        fileTextStream.readLineInto(nullptr);
 
-    return IOOpReport(IO_OP_INSPECT, IO_SUCCESS, textFile);
+    // Account for blank line if present and desired
+    if(!ignoreTrailingEmpty && fileTextStream.precedingBreak())
+        ++returnBuffer;
+
+    // Close file and return status
+    textFile.close();
+    return IOOpReport(IO_OP_ENUMERATE, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
 }
 
 IOOpReport findStringInFile(TextPos& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity caseSensitivity, int hitsToSkip)
