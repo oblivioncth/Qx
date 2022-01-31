@@ -667,7 +667,7 @@ IOOpReport fileContainsString(bool& returnBuffer, QFile& textFile, const QString
     return searchReport;
 }
 
-IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos textPos, int characters)
+IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos, int count, ReadOptions readOptions)
 {
     // Empty buffer
     returnBuffer = QString();
@@ -677,8 +677,8 @@ IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos text
     if(fileCheckResult != IO_SUCCESS)
         return IOOpReport(IO_OP_READ, fileCheckResult, textFile);
 
-    // Return null string if file is empty
-    if(fileIsEmpty(textFile))
+    // Return null string if file is empty or 0 characters are to be read
+    if(fileIsEmpty(textFile) || count == 0)
         returnBuffer = QString();
     else
     {
@@ -689,32 +689,67 @@ IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos text
 
         //Last line tracker and text stream
         QString lastLine;
-        QTextStream fileTextStream(&textFile);
+        Qx::TextStream fileTextStream(&textFile);
 
-        if(textPos.getLineNum() == -1) //Last line is desired
+        if(startPos.getLineNum() == -1) // Range of last line desired
         {
             // Go straight to last line
             while(!fileTextStream.atEnd())
                 lastLine = fileTextStream.readLine();
 
-            if(textPos.getCharNum() == -1) // Last char is desired
+            // If there was a trailing linebreak that isn't to be ignored, last line is actually blank
+            if(!readOptions.testFlag(IgnoreTrailingBreak) && fileTextStream.precedingBreak())
+                returnBuffer = "";
+            else if(startPos.getCharNum() == -1) // Last char is desired
                 returnBuffer = lastLine.right(1);
             else // Some range of last line is desired
-                returnBuffer = lastLine.mid(textPos.getCharNum(), characters);
+                returnBuffer = lastLine.mid(startPos.getCharNum(), count);
         }
         else
         {
             // Attempt to get to start line
             int currentLine; // Declared outside for loop so the loops endpoint can be determined
-            for (currentLine = 0; currentLine != textPos.getLineNum() && !fileTextStream.atEnd(); currentLine++)
-                fileTextStream.readLine(); // Burn lines until desired line or last line is reached
+            for (currentLine = 0; currentLine != startPos.getLineNum() && !fileTextStream.atEnd(); currentLine++)
+                fileTextStream.readLineInto(nullptr); // Burn lines until desired line or last line is reached
 
-            if(currentLine == textPos.getLineNum() && !fileTextStream.atEnd()) // Desired line index is within file bounds
+            if(currentLine == startPos.getLineNum() && !fileTextStream.atEnd()) // Desired line index is within file bounds
             {
-                if(textPos.getCharNum() == -1) // Last char is desired
-                    returnBuffer = fileTextStream.readLine().right(1);
-                else // Some range of last line is desired
-                    returnBuffer = fileTextStream.readLine().mid(textPos.getCharNum(), characters);
+                // Get char from start line
+                if(startPos.getCharNum() == -1) // Last char is start
+                {
+                    returnBuffer = fileTextStream.readLine().back();
+                    if(count != -1)
+                        --count;
+                }
+                else
+                {
+                    returnBuffer = fileTextStream.readLine().mid(startPos.getCharNum(), count);
+                    if(count != -1)
+                        count -= returnBuffer.size();
+                }
+
+                // If there is still reading to do, perform the rest of it
+                if(count != 0 && !fileTextStream.atEnd())
+                {
+                    if(count == -1)
+                    {
+                        returnBuffer += ENDL + fileTextStream.readAll();
+
+                        // If end was reached, remove trailing break if present and undesired
+                        if(fileTextStream.atEnd() && readOptions.testFlag(IgnoreTrailingBreak) && returnBuffer.back() == ENDL)
+                            returnBuffer.chop(1);
+                    }
+                    else
+                    {
+                        while(count != 0 && !fileTextStream.atEnd())
+                        {
+                            QString line = fileTextStream.readLine(count);
+                            returnBuffer += ENDL + line;
+                            count -= line.size();
+                        }
+                        // Since newlines don't count towards the character count, trailing newline doesn't need to be checked
+                    }
+                }
             }
             else // Desired line index is outside file founds
                 returnBuffer = QString();
@@ -726,7 +761,7 @@ IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos text
     return IOOpReport(IO_OP_READ, IO_SUCCESS, textFile);
 }
 
-IOOpReport readTextRangeFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos, TextPos endPos)
+IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos, TextPos endPos, ReadOptions readOptions)
 {
     // Returns a string of a portion of the passed file [startPos, endPos] (inclusive for both)
 
@@ -755,16 +790,27 @@ IOOpReport readTextRangeFromFile(QString& returnBuffer, QFile& textFile, TextPos
 
          // Last line tracker and text stream
          QString lastLine;
-         QTextStream fileTextStream(&textFile);
+         Qx::TextStream fileTextStream(&textFile);
 
          // Cover each possible range type
+         if(startPos == TextPos::START && endPos == TextPos::END) // Whole file is desired
+         {
+             returnBuffer = fileTextStream.readAll();
+
+             // Remove trailing linebreak if present and undesired
+             if(readOptions.testFlag(IgnoreTrailingBreak) && returnBuffer.back() == ENDL)
+                returnBuffer.chop(1);
+         }
          if(startPos.getLineNum() == -1) // Last line is desired
          {
              // Go straight to last line
              while(!fileTextStream.atEnd())
                  lastLine = fileTextStream.readLine();
 
-             if(startPos.getCharNum() == -1) // Last char is desired
+             // If there was a trailing linebreak that isn't to be ignored, last line is actually blank
+             if(!readOptions.testFlag(IgnoreTrailingBreak) && fileTextStream.precedingBreak())
+                 returnBuffer = "";
+             else if(startPos.getCharNum() == -1) // Last char is desired
                  returnBuffer = lastLine.right(1);
              else // Some range of last line is desired
              {
@@ -777,7 +823,7 @@ IOOpReport readTextRangeFromFile(QString& returnBuffer, QFile& textFile, TextPos
              // Attempt to get to start line
              int currentLine; // Declared outside for loop so the loops endpoint can be determined
              for (currentLine = 0; currentLine != startPos.getLineNum() && !fileTextStream.atEnd(); currentLine++)
-                 fileTextStream.readLine(); // Burn lines until desired line or last line is reached
+                 fileTextStream.readLineInto(nullptr); // Burn lines until desired line or last line is reached
 
              if(currentLine == startPos.getLineNum()) // Start line index is within file bounds
              {
@@ -806,14 +852,20 @@ IOOpReport readTextRangeFromFile(QString& returnBuffer, QFile& textFile, TextPos
                      for(; currentLine != endPos.getLineNum() && !fileTextStream.atEnd(); currentLine++)
                          returnBuffer += ENDL + fileTextStream.readLine();
 
-                     // Process last line if it is within range, or truncate previous line to desired char if
-                     // endPos is the last line, but not the last character
+                     // Process last line if it is within range, handle lastline or do nothing if end target was past EOF
                      if(!fileTextStream.atEnd())
                          returnBuffer += fileTextStream.readLine().leftRef(endPos.getCharNum());
-                     else if(endPos.getLineNum() == -1 && endPos.getCharNum() != -1)
+                     else
                      {
-                         int lastLineStart = returnBuffer.lastIndexOf(ENDL) + ENDL.size();
-                         returnBuffer.chop(returnBuffer.size() - (lastLineStart + endPos.getCharNum()) - 1);
+                         // If there was a trailing linebreak that isn't to be ignored, last line is actually blank
+                         if(!readOptions.testFlag(IgnoreTrailingBreak) && fileTextStream.precedingBreak())
+                             returnBuffer += ENDL; // Blank line regardless of end target overshoot or desired char on last line
+                         else if(endPos.getLineNum() == -1 && endPos.getCharNum() != -1) // Non-last character of last line desired
+                         {
+                             int lastLineStart = returnBuffer.lastIndexOf(ENDL) + ENDL.size();
+                             returnBuffer.chop(returnBuffer.size() - (lastLineStart + endPos.getCharNum()) - 1);
+                         }
+
                      }
                  }
              }
@@ -827,7 +879,7 @@ IOOpReport readTextRangeFromFile(QString& returnBuffer, QFile& textFile, TextPos
     return IOOpReport(IO_OP_READ, IO_SUCCESS, textFile);
 }
 
-IOOpReport readTextFromFileByLine(QStringList& returnBuffer, QFile& textFile, int startLine, int endLine)
+IOOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, int startLine, int endLine, ReadOptions readOptions)
 {
      // Ensure positions are valid
      if(NII(startLine) > NII(endLine))
@@ -849,7 +901,7 @@ IOOpReport readTextFromFileByLine(QStringList& returnBuffer, QFile& textFile, in
          if(openResult != IO_SUCCESS)
              return IOOpReport(IO_OP_READ, openResult, textFile);
 
-         QTextStream fileTextStream(&textFile);
+         Qx::TextStream fileTextStream(&textFile);
 
          if(startLine == -1) // Last line is desired
          {
@@ -859,6 +911,10 @@ IOOpReport readTextFromFileByLine(QStringList& returnBuffer, QFile& textFile, in
              while(!fileTextStream.atEnd())
                  lastLine = fileTextStream.readLine();
 
+             // If there was a trailing linebreak that isn't to be ignored, last line is actually blank
+             if(!readOptions.testFlag(IgnoreTrailingBreak) && fileTextStream.precedingBreak())
+                 lastLine = "";
+
              // Add last line to list
              returnBuffer.append(lastLine);
          }
@@ -867,13 +923,17 @@ IOOpReport readTextFromFileByLine(QStringList& returnBuffer, QFile& textFile, in
              // Attempt to get to start line
              int currentLine; // Declared outside for loop so the loops endpoint can be determined
              for (currentLine = 0; currentLine != startLine && !fileTextStream.atEnd(); currentLine++)
-                 fileTextStream.readLine(); // Burn lines until desired line or last line is reached
+                 fileTextStream.readLineInto(nullptr); // Burn lines until desired line or last line is reached
 
-             if(currentLine == startLine) // Start line index is within file bounds (if not, do nothing)
+             if(currentLine == startLine) // Start line index is within file bounds
              {
                  // Process start line to end line or end of file
                  for(; (endLine == -1 || currentLine != endLine + 1) && !fileTextStream.atEnd(); currentLine++)
                      returnBuffer.append(fileTextStream.readLine());
+
+                 // If end was reached and there was a trailing linebreak that isn't to be ignored, there is one more blank line
+                 if(fileTextStream.atEnd() && !readOptions.testFlag(IgnoreTrailingBreak) && fileTextStream.precedingBreak())
+                     returnBuffer.append("");
              }
          }
      }
@@ -881,28 +941,6 @@ IOOpReport readTextFromFileByLine(QStringList& returnBuffer, QFile& textFile, in
      // Make sure to close file before return
      textFile.close();
      return IOOpReport(IO_OP_READ, IO_SUCCESS, textFile);
-}
-
-IOOpReport readAllTextFromFile(QString& returnBuffer, QFile& textFile)
-{
-    // Empty buffer
-    returnBuffer = QString();
-
-    // Check file
-    IOOpResultType fileCheckResult = fileCheck(textFile);
-    if(fileCheckResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_READ, fileCheckResult, textFile);
-
-    // Attempt to open file
-    IOOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly | QFile::Text);
-    if(openResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_READ, openResult, textFile);
-
-    // Read all
-    QTextStream fileStream(&textFile);
-    returnBuffer = fileStream.readAll();
-    textFile.close();
-    return IOOpReport(IO_OP_READ, IO_SUCCESS, textFile);
 }
 
 IOOpReport writeStringAsFile(QFile& textFile, const QString& text, bool overwriteIfExist, bool createDirs)
@@ -959,7 +997,7 @@ IOOpReport writeStringToEndOfFile(QFile &textFile, const QString &text, bool ens
     if(fileCheckResult == IO_SUCCESS && ensureNewLine)
     {
         QStringList currentLines;
-        IOOpReport lineCheck = readTextFromFileByLine(currentLines,textFile,-1); // Read last line only
+        IOOpReport lineCheck = readTextFromFile(currentLines,textFile,-1); // Read last line only
 
         if(lineCheck.getResult() != IO_SUCCESS)
             return IOOpReport(IO_OP_WRITE, lineCheck.getResult(), textFile);
@@ -1018,11 +1056,11 @@ IOOpReport deleteTextRangeFromFile(QFile &textFile, TextPos startPos, TextPos en
         beforeDeletion = "";
     else if(startPos.getCharNum() == -1)
     {
-        transientReport = readTextRangeFromFile(beforeDeletion, textFile, TextPos::START, TextPos(startPos.getLineNum(), -1));
+        transientReport = readTextFromFile(beforeDeletion, textFile, TextPos::START, TextPos(startPos.getLineNum(), -1));
         beforeDeletion = beforeDeletion.chopped(1);
     }
     else
-        transientReport = readTextRangeFromFile(beforeDeletion, textFile, TextPos::START, TextPos(startPos.getLineNum(), startPos.getCharNum() - 1));
+        transientReport = readTextFromFile(beforeDeletion, textFile, TextPos::START, TextPos(startPos.getLineNum(), startPos.getCharNum() - 1));
 
     // Check for transient errors
     if(!transientReport.isNull() && transientReport.getResult() != IO_SUCCESS)
@@ -1032,9 +1070,9 @@ IOOpReport deleteTextRangeFromFile(QFile &textFile, TextPos startPos, TextPos en
     if(endPos == TextPos::END)
         afterDeletion = "";
     else if(endPos.getCharNum() == -1)
-        transientReport = readTextRangeFromFile(afterDeletion, textFile, TextPos(endPos.getLineNum() + 1, 0), TextPos::END);
+        transientReport = readTextFromFile(afterDeletion, textFile, TextPos(endPos.getLineNum() + 1, 0), TextPos::END);
     else
-        transientReport = readTextRangeFromFile(afterDeletion, textFile, TextPos(endPos.getLineNum(), endPos.getCharNum() + 1), TextPos::END);
+        transientReport = readTextFromFile(afterDeletion, textFile, TextPos(endPos.getLineNum(), endPos.getCharNum() + 1), TextPos::END);
 
     // Check for transient errors
     if(transientReport.getResult() != IO_SUCCESS)

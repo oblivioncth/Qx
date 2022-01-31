@@ -26,6 +26,13 @@ enum IOOpResultType { IO_SUCCESS, IO_ERR_UNKNOWN, IO_ERR_ACCESS_DENIED, IO_ERR_N
 enum IOOpTargetType { IO_FILE, IO_DIR };
 enum WriteMode { Append, Overwrite, NewOnly, ExistingOnly }; // TODO - Modify all classes in this unit to use this instead of overwrite bool
 
+enum ReadOption {
+    NoReadOptions = 0x0,
+    IgnoreTrailingBreak = 0x1
+};
+Q_DECLARE_FLAGS(ReadOptions, ReadOption)
+Q_DECLARE_OPERATORS_FOR_FLAGS(ReadOptions)
+
 //-Classes--------------------------------------------------------------------------------------------
 class IOOpReport
 {
@@ -272,10 +279,10 @@ public:
     IOOpReport findStringInFile(TextPos& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive, int hitsToSkip = 0 );
     IOOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive, int hitLimit = -1);
     IOOpReport fileContainsString(bool& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive);
-    IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos textPos, int characters = -1);
-    IOOpReport readTextRangeFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos, TextPos endPos = TextPos::END);
-    IOOpReport readTextFromFileByLine(QStringList& returnBuffer, QFile &textFile, int startLine = 0, int endLine = -1);
-    IOOpReport readAllTextFromFile(QString& returnBuffer, QFile& textFile);
+    IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos, int count, ReadOptions readOptions = NoReadOptions);
+    IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos = TextPos::START, TextPos endPos = TextPos::END, ReadOptions readOptions = NoReadOptions);
+    IOOpReport readTextFromFile(QStringList& returnBuffer, QFile &textFile, int startLine = 0, int endLine = -1, ReadOptions readOptions = NoReadOptions);
+
     IOOpReport writeStringAsFile(QFile &textFile, const QString& text, bool overwriteIfExist = false, bool createDirs = true);
     IOOpReport writeStringToEndOfFile(QFile &textFile, const QString& text, bool ensureNewLine = false, bool createIfDNE = false, bool createDirs = true); // Consider making function just writeStringToFile and use TextPos with bool for overwrite vs insert
     IOOpReport deleteTextRangeFromFile(QFile &textFile, TextPos startPos, TextPos endPos);
