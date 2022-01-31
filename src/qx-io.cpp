@@ -679,7 +679,7 @@ IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
 
     // Return null string if file is empty or 0 characters are to be read
     if(fileIsEmpty(textFile) || count == 0)
-        returnBuffer = QString();
+        return IOOpReport(IO_OP_READ, IO_SUCCESS, textFile);
     else
     {
         // Attempt to open file
@@ -751,14 +751,12 @@ IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
                     }
                 }
             }
-            else // Desired line index is outside file founds
-                returnBuffer = QString();
         }
-    }
 
-    // Make sure to close file before return
-    textFile.close();
-    return IOOpReport(IO_OP_READ, IO_SUCCESS, textFile);
+        // Close file and return stream status
+        textFile.close();
+        return IOOpReport(IO_OP_READ, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
+    }
 }
 
 IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos, TextPos endPos, ReadOptions readOptions)
@@ -780,7 +778,7 @@ IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
 
      // Return null string if file is empty
      if(fileIsEmpty(textFile))
-         returnBuffer = QString();
+         return IOOpReport(IO_OP_READ, IO_SUCCESS, textFile);
      else
      {
          // Attempt to open file
@@ -801,7 +799,7 @@ IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
              if(readOptions.testFlag(IgnoreTrailingBreak) && returnBuffer.back() == ENDL)
                 returnBuffer.chop(1);
          }
-         if(startPos.getLineNum() == -1) // Last line is desired
+         else if(startPos.getLineNum() == -1) // Last line is desired
          {
              // Go straight to last line
              while(!fileTextStream.atEnd())
@@ -869,14 +867,12 @@ IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
                      }
                  }
              }
-             else // Start line index is outside file founds
-                 returnBuffer = QString();
          }
-     }
 
-    // Make sure to close file before return
-    textFile.close();
-    return IOOpReport(IO_OP_READ, IO_SUCCESS, textFile);
+         // Close file and return stream status
+         textFile.close();
+         return IOOpReport(IO_OP_READ, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
+     }
 }
 
 IOOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, int startLine, int endLine, ReadOptions readOptions)
@@ -894,7 +890,9 @@ IOOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, int star
          return IOOpReport(IO_OP_READ, fileCheckResult, textFile);
 
      // Return null list if file is empty
-     if(!fileIsEmpty(textFile))
+     if(fileIsEmpty(textFile))
+         return IOOpReport(IO_OP_READ, IO_SUCCESS, textFile);
+     else
      {
          // Attempt to open file
          IOOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly | QFile::Text);
@@ -936,11 +934,11 @@ IOOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, int star
                      returnBuffer.append("");
              }
          }
-     }
 
-     // Make sure to close file before return
-     textFile.close();
-     return IOOpReport(IO_OP_READ, IO_SUCCESS, textFile);
+         // Close file and return stream status
+         textFile.close();
+         return IOOpReport(IO_OP_READ, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
+     }
 }
 
 IOOpReport writeStringAsFile(QFile& textFile, const QString& text, bool overwriteIfExist, bool createDirs)
