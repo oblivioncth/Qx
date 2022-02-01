@@ -24,7 +24,20 @@ enum IOOpResultType { IO_SUCCESS, IO_ERR_UNKNOWN, IO_ERR_ACCESS_DENIED, IO_ERR_N
                       IO_ERR_FILE_EXISTS, IO_ERR_CANT_MAKE_DIR, IO_ERR_FILE_SIZE_MISMATCH, IO_ERR_CURSOR_OOB,
                       IO_ERR_FILE_NOT_OPEN};
 enum IOOpTargetType { IO_FILE, IO_DIR };
-enum WriteMode { Append, Overwrite, NewOnly, ExistingOnly }; // TODO - Modify all classes in this unit to use this instead of overwrite bool
+
+enum WriteMode {Insert, Overwrite, Append, Truncate};
+
+enum WriteOption {
+    NoOptions = 0x0,
+    CreatePath = 0x1,
+    ExistingOnly = 0x2,
+    NewOnly = 0x4,
+    EnsureBreak = 0x8,
+    Pad = 0x10,
+    NonBuffered = 0x20
+};
+Q_DECLARE_FLAGS(WriteOptions, WriteOption)
+Q_DECLARE_OPERATORS_FOR_FLAGS(WriteOptions)
 
 enum ReadOption {
     NoReadOptions = 0x0,
@@ -240,13 +253,12 @@ private:
     QTextStream mStreamWriter;
     QFile& mTargetFile;
     WriteMode mWriteMode;
-    bool mCreateDirs;
-    bool mBuffered;
+    WriteOptions mWriteOptions;
     bool mAtLineStart;
 
 //-Constructor-------------------------------------------------------------------------------------------------------
 public:
-    TextStreamWriter(QFile& file, WriteMode writeMode = Append, bool createDirs = true, bool buffered = true);
+    TextStreamWriter(QFile& file, WriteMode writeMode = Truncate, WriteOptions writeOptions = NoOptions);
 
 //-Instance Functions------------------------------------------------------------------------------------------------
 public:
@@ -256,17 +268,9 @@ public:
     void closeFile();
 };
 
-
 //-Variables------------------------------------------------------------------------------------------------------------
-    const QString ENDL = "\n"; //Auto cross platform thanks to QIODevice::OpenMode Text
+    const QChar ENDL = '\n'; //Auto cross platform thanks to QIODevice::OpenMode Text
     const QString LIST_ITM_PRFX = "- ";
-
-    const QHash<WriteMode, QIODevice::OpenMode> WRITE_OPEN_FLAGS_MAP = {
-        {Append, QIODevice::Append},
-        {Overwrite, QIODevice::Truncate},
-        {NewOnly, QIODevice::NewOnly},
-        {ExistingOnly, QIODevice::ExistingOnly | QIODevice::Append}
-    };
 
 //-Functions-------------------------------------------------------------------------------------------------------------
 // General:
@@ -282,12 +286,13 @@ public:
     IOOpReport findStringInFile(TextPos& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive, int hitsToSkip = 0 );
     IOOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive, int hitLimit = -1);
     IOOpReport fileContainsString(bool& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive);
+
     IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos, int count, ReadOptions readOptions = NoReadOptions);
     IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos = TextPos::START, TextPos endPos = TextPos::END, ReadOptions readOptions = NoReadOptions);
     IOOpReport readTextFromFile(QStringList& returnBuffer, QFile &textFile, int startLine = 0, int endLine = -1, ReadOptions readOptions = NoReadOptions);
 
-    IOOpReport writeStringAsFile(QFile &textFile, const QString& text, bool overwriteIfExist = false, bool createDirs = true);
-    IOOpReport writeStringToEndOfFile(QFile &textFile, const QString& text, bool ensureNewLine = false, bool createIfDNE = false, bool createDirs = true); // Consider making function just writeStringToFile and use TextPos with bool for overwrite vs insert
+    IOOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode writeMode = Truncate, TextPos startPos = TextPos::START, WriteOptions writeOptions = NoOptions);
+
     IOOpReport deleteTextRangeFromFile(QFile &textFile, TextPos startPos, TextPos endPos);
 
 // Directory Based:

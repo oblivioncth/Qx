@@ -92,6 +92,41 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
 
         return IOOpReport(IO_OP_WRITE, IO_SUCCESS, file);
     }
+
+    IOOpReport writePrep(bool& fileExists, QFile& file, WriteOptions writeOptions)
+    {
+        // Check file
+        IOOpResultType fileCheckResult = fileCheck(file);
+        fileExists = fileCheckResult == IO_SUCCESS;
+
+        if(fileCheckResult == IO_ERR_NOT_A_FILE)
+            return IOOpReport(IO_OP_WRITE, IO_ERR_NOT_A_FILE, file);
+        else if(fileCheckResult == IO_ERR_FILE_DNE && writeOptions.testFlag(ExistingOnly))
+            return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_DNE, file);
+        else if(fileExists && writeOptions.testFlag(NewOnly))
+            return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_EXISTS, file);
+
+        // Create Path if required
+        if(!fileExists)
+        {
+            // Make folders if wanted and necessary
+            IOOpReport pathCreationResult = handlePathCreation(file, writeOptions.testFlag(CreatePath));
+            if(!pathCreationResult.wasSuccessful())
+                return pathCreationResult;
+        }
+
+        // Return success
+        return IOOpReport(IO_OP_WRITE, IO_SUCCESS, file);
+    }
+
+    void matchAppendConditionParams(WriteMode& writeMode, TextPos& startPos)
+    {
+        // Match append condition parameters
+        if(startPos == TextPos::END)
+            writeMode = Append;
+        else if(writeMode == Append)
+            startPos = TextPos::END;
+    }
 }
 
 //-Classes-------------------------------------------------------------------------------------------------------
@@ -392,29 +427,41 @@ QString TextStream::readLineWithBreak(qint64 maxlen)
 
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
-TextStreamWriter::TextStreamWriter(QFile& file, WriteMode writeMode, bool createDirs, bool buffered) :
-    mTargetFile(file), mWriteMode(writeMode), mCreateDirs(createDirs), mBuffered(buffered) {}
+TextStreamWriter::TextStreamWriter(QFile& file, WriteMode writeMode, WriteOptions writeOptions) :
+    mTargetFile(file), mWriteMode(writeMode), mWriteOptions(writeOptions), mAtLineStart(true)
+{
+    // Map unsupported modes to supported ones
+    if(mWriteMode == Insert)
+        mWriteMode = Append;
+    else if(mWriteMode == Overwrite)
+        mWriteMode = Truncate;
+
+    if(mTargetFile.isOpen())
+        mTargetFile.close(); // Must open using member function for proper behavior
+}
 
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:
 IOOpReport TextStreamWriter::openFile()
 {
-    // Check file
-    IOOpResultType fileCheckResult = fileCheck(mTargetFile);
+    // Perform write preperations
+    bool fileExists;
+    IOOpReport prepResult = writePrep(fileExists, mTargetFile, mWriteOptions);
+    if(!prepResult.wasSuccessful())
+        return prepResult;
 
-    if(fileCheckResult == IO_ERR_NOT_A_FILE)
-        return IOOpReport(IO_OP_WRITE, fileCheckResult, mTargetFile);
-    else if(fileCheckResult == IO_SUCCESS && mWriteMode == NewOnly)
-        return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_EXISTS, mTargetFile);
-
-    // Make folders if wanted and necessary
-    IOOpReport pathCreationResult = handlePathCreation(mTargetFile, mCreateDirs);
-    if(!pathCreationResult.wasSuccessful())
-        return pathCreationResult;
+    // If file exists and mode is append, test if it starts on a new line
+    if(mWriteMode == Append && fileExists)
+    {
+        IOOpReport inspectResult = textFileEndsWithNewline(mAtLineStart, mTargetFile);
+        if(!inspectResult.wasSuccessful())
+            return IOOpReport(IO_OP_WRITE, inspectResult.getResult(), mTargetFile);
+    }
 
     // Attempt to open file
-    QIODevice::OpenMode om = QFile::WriteOnly | QFile::Text | WRITE_OPEN_FLAGS_MAP[mWriteMode];
-    if(!mBuffered)
+    QIODevice::OpenMode om = QFile::WriteOnly | QFile::Text;
+    om |= mWriteMode == Truncate ? QFile::Truncate : QFile::Append;
+    if(mWriteOptions.testFlag(NonBuffered))
         om |= QIODevice::Unbuffered;
 
     IOOpResultType openResult = parsedOpen(mTargetFile, om);
@@ -424,6 +471,13 @@ IOOpReport TextStreamWriter::openFile()
     // Set data stream IO device
     mStreamWriter.setDevice(&mTargetFile);
 
+    // Write linebreak if needed
+    if(!mAtLineStart && mWriteOptions.testFlag(EnsureBreak))
+    {
+        mStreamWriter << ENDL;
+        mAtLineStart = true;
+    }
+
     // Return no error
     return IOOpReport(IO_OP_WRITE, IO_SUCCESS, mTargetFile);
 }
@@ -432,17 +486,17 @@ IOOpReport TextStreamWriter::writeLine(QString line, bool ensureLineStart)
 {
     if(mTargetFile.isOpen())
     {
-        // Mark that text will end at line start
-        mAtLineStart = true;
-
         // Ensure line start if requested
         if(ensureLineStart && !mAtLineStart)
             mStreamWriter << ENDL;
 
         // Write line to file
         mStreamWriter << line << ENDL;
-        if(!mBuffered)
+        if(mWriteOptions.testFlag(NonBuffered))
             mStreamWriter.flush();
+
+        // Mark that text will end at line start
+        mAtLineStart = true;
 
         // Return stream status
         return IOOpReport(IO_OP_WRITE, TXT_STRM_STAT_MAP.value(mStreamWriter.status()), mTargetFile);
@@ -460,7 +514,7 @@ IOOpReport TextStreamWriter::writeText(QString text)
 
         // Write text to file
         mStreamWriter << text;
-        if(!mBuffered)
+        if(mWriteOptions.testFlag(NonBuffered))
             mStreamWriter.flush();
 
         // Return stream status
@@ -484,7 +538,7 @@ IOOpReport fileIsEmpty(bool& returnBuffer, const QFile& file)
     if(fileCheckResult != IO_SUCCESS)
     {
         // File doesn't exist
-        returnBuffer = true; // While totally not accurate, is closer than "file isn't empty"
+        returnBuffer = true; // While not completely accurate, is closer than "file isn't empty"
         return IOOpReport(IO_OP_INSPECT, fileCheckResult, file);
     }
     else
@@ -902,7 +956,7 @@ IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
                              returnBuffer += ENDL; // Blank line regardless of end target overshoot or desired char on last line
                          else if(endPos.getLineNum() == -1 && endPos.getCharNum() != -1) // Non-last character of last line desired
                          {
-                             int lastLineStart = returnBuffer.lastIndexOf(ENDL) + ENDL.size();
+                             int lastLineStart = returnBuffer.lastIndexOf(ENDL) + 1;
                              int lastLineSize = returnBuffer.size() - lastLineStart;
                              returnBuffer.chop(lastLineSize - (endPos.getCharNum() + 1));
                          }
@@ -917,6 +971,7 @@ IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
          return IOOpReport(IO_OP_READ, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
      }
 }
+
 IOOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, int startLine, int endLine, ReadOptions readOptions)
 {
      // Ensure positions are valid
@@ -983,91 +1038,160 @@ IOOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, int star
      }
 }
 
-IOOpReport writeStringAsFile(QFile& textFile, const QString& text, bool overwriteIfExist, bool createDirs)
+IOOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode writeMode, TextPos startPos, WriteOptions writeOptions)
 {
-    // Prints the entire string as a text file. If the file already exists and overwriteIfExist is true, the file is replaced.
+    // Match append condition parameters
+    matchAppendConditionParams(writeMode, startPos);
 
-    // Check file
-    IOOpResultType fileCheckResult = fileCheck(textFile);
-
-    if(fileCheckResult == IO_ERR_NOT_A_FILE)
-        return IOOpReport(IO_OP_WRITE, fileCheckResult, textFile);
-    else if(fileCheckResult == IO_SUCCESS && !overwriteIfExist)
-        return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_EXISTS, textFile);
-
-    // Delete file if it exists since overwrite is desired
-    if(fileCheckResult == IO_SUCCESS)
-        textFile.resize(0); // Clear file contents
-
-    // Make folders if wanted and necessary
-    IOOpReport pathCreationResult = handlePathCreation(textFile, createDirs);
-    if(!pathCreationResult.wasSuccessful())
-        return pathCreationResult;
-
-    // Attempt to open file
-    IOOpResultType openResult = parsedOpen(textFile, QFile::WriteOnly | QFile::Text);
-    if(openResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_WRITE, openResult, textFile);
+    // Perform write preperations
+    bool fileExists;
+    IOOpReport prepResult = writePrep(fileExists, textFile, writeOptions);
+    if(!prepResult.wasSuccessful())
+        return prepResult;
 
     // Construct TextStream
-    QTextStream fileStream(&textFile);
+    QTextStream textStream(&textFile);
 
-    // Write string to file
-    fileStream << text;
-
-    // Close file and return stream status
-    textFile.close();
-    return IOOpReport(IO_OP_WRITE, TXT_STRM_STAT_MAP.value(fileStream.status()), textFile);
-}
-
-IOOpReport writeStringToEndOfFile(QFile &textFile, const QString &text, bool ensureNewLine, bool createIfDNE, bool createDirs)
-{
-    // Appends the given string to the given file, makes sure the appended string starts in a new line if ensureNewLine is true
-
-    // Check file
-    IOOpResultType fileCheckResult = fileCheck(textFile);
-
-    if(fileCheckResult == IO_ERR_NOT_A_FILE)
-        return IOOpReport(IO_OP_WRITE, IO_ERR_NOT_A_FILE, textFile);
-    else if(fileCheckResult == IO_ERR_FILE_DNE && !createIfDNE)
-        return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_DNE, textFile);
-
-    // Check if line break is needed if file exists
-    bool needLineBreak = false;
-    if(fileCheckResult == IO_SUCCESS && ensureNewLine)
+    if(writeMode == Append)
     {
-        QStringList currentLines;
-        IOOpReport lineCheck = readTextFromFile(currentLines,textFile,-1); // Read last line only
+        // Check if line break is needed if file exists
+        bool needsNewLine = false;
+        if(fileExists && writeOptions.testFlag(EnsureBreak))
+        {
+            bool onNewLine;
+            IOOpReport inspectResult = textFileEndsWithNewline(onNewLine, textFile);
+            if(!inspectResult.wasSuccessful())
+                return IOOpReport(IO_OP_WRITE, inspectResult.getResult(), textFile);
+            needsNewLine = !onNewLine;
+        }
 
-        if(lineCheck.getResult() != IO_SUCCESS)
-            return IOOpReport(IO_OP_WRITE, lineCheck.getResult(), textFile);
+        // Attempt to open file
+        IOOpResultType openResult = parsedOpen(textFile, QFile::WriteOnly | QFile::Append | QFile::Text);
+        if(openResult != IO_SUCCESS)
+            return IOOpReport(IO_OP_WRITE, openResult, textFile);
 
-        if(!currentLines.value(0).isEmpty())
-            needLineBreak = true;
+        // Write linebreak if needed
+        if(needsNewLine)
+            textStream << ENDL;
+
+        // Write main text
+        textStream << text;
+    }
+    else if(!fileExists || writeMode == Truncate)
+    {
+        // Attempt to open file
+        IOOpResultType openResult = parsedOpen(textFile, QFile::WriteOnly | QFile::Text | QFile::Truncate);
+        if(openResult != IO_SUCCESS)
+            return IOOpReport(IO_OP_WRITE, openResult, textFile);
+
+        // Pad if required
+        if(writeOptions.testFlag(Pad))
+        {
+            for(int i = 0; i < startPos.getLineNum(); ++i)
+                textStream << ENDL;
+            for(int i = 0; i < startPos.getCharNum(); ++i)
+                textStream << " ";
+        }
+
+        // Write main text
+        textStream << text;
+    }
+    else
+    {
+        // Construct output buffers
+        QString beforeNew;
+        QString afterNew;
+
+        // Fill beforeNew
+        TextPos beforeEnd = TextPos(startPos.getLineNum(), startPos.getCharNum() - 1);
+        IOOpReport readBefore = readTextFromFile(beforeNew, textFile, TextPos::START, beforeEnd);
+        if(!readBefore.wasSuccessful())
+            return readBefore;
+
+        // Pad beforeNew if required
+        bool padded = false;
+        if(writeOptions.testFlag(Pad))
+        {
+            if(startPos.getLineNum() != -1)
+            {
+                int lineCount = beforeNew.count(ENDL) + 1;
+                int linesNeeded = std::max(startPos.getLineNum() - lineCount, 0);
+                beforeNew += QString(ENDL).repeated(linesNeeded);
+
+                if(linesNeeded > 0)
+                    padded = true;
+            }
+            if(startPos.getCharNum() != -1)
+            {
+                int lastLineCharCount = beforeNew.count() - (beforeNew.lastIndexOf(ENDL) + 1);
+                int charNeeded = std::max(startPos.getCharNum() - lastLineCharCount, 0);
+                beforeNew += QString(" ").repeated(charNeeded);
+
+                if(charNeeded > 0)
+                    padded = true;
+            }
+        }
+
+        // Ensure linebreak if required
+        if(!padded && writeOptions.testFlag(EnsureBreak))
+            if(*beforeNew.rbegin() != ENDL)
+                beforeNew += ENDL;
+
+        // Fill afterNew, unless padding occured, in which case there will be no afterNew
+        if(!padded)
+        {
+            // This will return a null string if there is no afterNew anyway, even without padding enabled
+            IOOpReport readAfter = readTextFromFile(afterNew, textFile, startPos);
+            if(!readAfter.wasSuccessful())
+                return readAfter;
+        }
+
+        // If overwriting, truncate afterNew to create an effective overwrite
+        if(writeMode == Overwrite && !afterNew.isEmpty())
+        {
+            int newTextLines = text.count(ENDL) + 1;
+            int lastNewLineLength = text.count() - (text.lastIndexOf(ENDL) + 1);
+
+            // Find start and end of last line to remove
+            int lineCount = 0;
+            qint64 lastLf = -1;
+            qint64 nextLf = -1;
+
+            for(; lineCount == 0 || (lineCount != newTextLines && nextLf != -1); ++lineCount)
+            {
+                // Shift indicies back 1
+                lastLf = nextLf;
+
+                // Find next line feed char
+                nextLf = afterNew.indexOf(ENDL, lastLf + 1);
+            }
+
+            // If afterNew text has less lines than new text, discard all of it
+            if(lineCount < newTextLines)
+                afterNew.clear();
+            else
+            {
+                // Determine last overwritten line start, end, and length
+                qint64 lastLineStart = lastLf + 1;
+                qint64 lastLineEnd = (nextLf == -1 ? afterNew.count(): nextLf) - 1;
+                qint64 lastLineLength = rangeToLength(lastLineStart, lastLineEnd);
+
+                // Keep portion of last line that is past replacement last line
+                afterNew = afterNew.mid(lastLineEnd + 1 - std::max(lastLineLength - lastNewLineLength, qint64(0)));
+            }
+        }
+        // Attempt to open file
+        IOOpResultType openResult = parsedOpen(textFile, QFile::WriteOnly | QFile::Truncate |QFile::Text);
+        if(openResult != IO_SUCCESS)
+            return IOOpReport(IO_OP_WRITE, openResult, textFile);
+
+        // Write all text;
+        textStream << beforeNew << text << afterNew;
     }
 
-    // Make folders if wanted and necessary
-    IOOpReport pathCreationResult = handlePathCreation(textFile, createDirs);
-    if(!pathCreationResult.wasSuccessful())
-        return pathCreationResult;
-
-    // Attempt to open file
-    IOOpResultType openResult = parsedOpen(textFile, QFile::Append | QFile::Text);
-    if(openResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_WRITE, openResult, textFile);
-
-    // Construct TextStream
-    QTextStream fileStream(&textFile);
-
-    // Write string to file
-    if(needLineBreak)
-        fileStream << ENDL;
-    fileStream << text;
-
     // Close file and return stream status
     textFile.close();
-    return IOOpReport(IO_OP_WRITE, TXT_STRM_STAT_MAP.value(fileStream.status()), textFile);
-
+    return IOOpReport(IO_OP_WRITE, TXT_STRM_STAT_MAP.value(textStream.status()), textFile);
 }
 
 IOOpReport deleteTextRangeFromFile(QFile &textFile, TextPos startPos, TextPos endPos)
