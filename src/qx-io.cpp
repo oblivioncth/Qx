@@ -1391,14 +1391,14 @@ IOOpReport readAllBytesFromFile(QByteArray& returnBuffer, QFile& file)
     return IOOpReport(IO_OP_READ, IO_SUCCESS, file);
 }
 
-IOOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, long long startByte, long long endByte)
+IOOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, qint64 startPos, qint64 endPos)
 {
     // Ensure positions are valid
-     if(NII(startByte) > NII(endByte))
+     if(NII(startPos) > NII(endPos))
          throw std::runtime_error("Error: endPos must be greater than or euqal to startPos for Qx::readBytesFromFile()");
 
     // Empty buffer
-    returnBuffer = QByteArray();
+    returnBuffer.clear();
 
     // Check file
     IOOpResultType fileCheckResult = fileCheck(file);
@@ -1410,16 +1410,38 @@ IOOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, long long st
     if(openResult != IO_SUCCESS)
         return IOOpReport(IO_OP_READ, openResult, file);
 
-    if(endByte == -1)
-        endByte = file.size() - 1;
+    // Adjust input indicies to true positions
+    qint64 fileIndexMax = file.size() - 1;
 
-    // Read desired data + necessary, but unwanted prequel data
-    long long desiredDataLength = rangeToLength(startByte, endByte);
-    QByteArray data = file.read(rangeToLength(startByte, endByte) + startByte);
-    returnBuffer = data.mid(int(startByte), int(desiredDataLength)); // TODO: Remove unwanted prequel data using long long (lack of mid() that accepts more than int makes this awkward,
-                                         // long term solution may require detecting when the limit of int is reached and splitting the data
-                                         // into multiple QByteArrays as required). Make a template function for this under Qx that is effectively a more robust "mid"
+    if(startPos > fileIndexMax)
+        return IOOpReport(IO_OP_READ, FILE_DEV_ERR_MAP.value(file.error()), file);// Return empty buffer
 
+    if(endPos == -1 || endPos > fileIndexMax)
+    {
+        endPos = fileIndexMax;
+        if(startPos == -1)
+            startPos = fileIndexMax;
+    }
+
+    // Determine data length and allocate buffer
+    qint64 bufferSize = rangeToLength(startPos, endPos);
+    returnBuffer.resize(bufferSize);
+
+    // Skip to start pos
+    if(startPos != 0)
+    {
+        if(!file.seek(startPos))
+            return IOOpReport(IO_OP_READ, IO_ERR_CURSOR_OOB, file);
+    }
+
+    // Read data
+    qint64 readBytes = file.read(returnBuffer.data(), bufferSize);
+    if(readBytes == -1)
+        return IOOpReport(IO_OP_READ, FILE_DEV_ERR_MAP.value(file.error()), file);
+    else if(readBytes != bufferSize)
+       return IOOpReport(IO_OP_READ, IO_ERR_FILE_SIZE_MISMATCH, file);
+
+    // Close file, return success and buffer
     file.close();
     return IOOpReport(IO_OP_READ, IO_SUCCESS, file);
 }

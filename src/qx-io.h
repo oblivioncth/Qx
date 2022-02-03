@@ -306,8 +306,7 @@ public:
     IOOpReport fileMatchesChecksum(bool& returnBuffer, QFile& file, QString checksum, QCryptographicHash::Algorithm hashAlgorithm);
 
 // Raw Based
-    IOOpReport readAllBytesFromFile(QByteArray& returnBuffer, QFile &file);
-    IOOpReport readBytesFromFile(QByteArray& returnBuffer, QFile &file, long long start, long long end = -1);
+    IOOpReport readBytesFromFile(QByteArray& returnBuffer, QFile &file, qint64 startPos = 0, qint64 endPos = -1);
     IOOpReport writeBytesAsFile(QFile &file, const QByteArray &byteArray, bool overwriteIfExist = false, bool createDirs = true);
 }
 
