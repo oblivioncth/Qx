@@ -164,11 +164,11 @@ private:
     QDataStream mStreamWriter;
     QFile* mTargetFile;
     WriteMode mWriteMode;
-    bool mCreateDirs;
+    WriteOptions mWriteOptions;
 
 //-Constructor-------------------------------------------------------------------------------------------------------
 public:
-    FileStreamWriter(QFile* file, WriteMode writeMode = Append, bool createDirs = true);
+    FileStreamWriter(QFile* file, WriteMode writeMode = Append, WriteOptions writeOptions = NoWriteOptions);
 
 //-Instance Functions------------------------------------------------------------------------------------------------
 public:
@@ -305,9 +305,9 @@ public:
     IOOpReport calculateFileChecksum(QString& returnBuffer, QFile& file, QCryptographicHash::Algorithm hashAlgorithm);
     IOOpReport fileMatchesChecksum(bool& returnBuffer, QFile& file, QString checksum, QCryptographicHash::Algorithm hashAlgorithm);
 
-// Raw Based
+// Binary Based
     IOOpReport readBytesFromFile(QByteArray& returnBuffer, QFile &file, qint64 startPos = 0, qint64 endPos = -1);
-    IOOpReport writeBytesAsFile(QFile &file, const QByteArray &byteArray, bool overwriteIfExist = false, bool createDirs = true);
+    IOOpReport writeBytesToFile(QFile& file, const QByteArray& bytes, WriteMode writeMode = Truncate, qint64 startPos = 0, WriteOptions writeOptions = NoWriteOptions);
 }
 
 #endif // IO_H

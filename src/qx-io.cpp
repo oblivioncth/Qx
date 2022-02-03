@@ -128,6 +128,15 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
         else if(writeMode == Append)
             startPos = TextPos::END;
     }
+
+    void matchAppendConditionParams(WriteMode& writeMode, qint64& startPos)
+    {
+        // Match append condition parameters
+        if(startPos == -1)
+            writeMode = Append;
+        else if(writeMode == Append)
+            startPos = -1;
+    }
 }
 
 //-Classes-------------------------------------------------------------------------------------------------------
@@ -234,8 +243,18 @@ bool TextPos::isNull() const { return mLineNum == -2 && mCharNum == -2; }
 
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
-FileStreamWriter::FileStreamWriter(QFile* file, WriteMode writeMode, bool createDirs) :
-    mTargetFile(file), mWriteMode(writeMode), mCreateDirs(createDirs) {}
+FileStreamWriter::FileStreamWriter(QFile* file, WriteMode writeMode, WriteOptions writeOptions) :
+    mTargetFile(file), mWriteMode(writeMode), mWriteOptions(writeOptions)
+{
+    // Map unsupported modes to supported ones
+    if(mWriteMode == Insert)
+        mWriteMode = Append;
+    else if(mWriteMode == Overwrite)
+        mWriteMode = Truncate;
+
+    if(mTargetFile->isOpen())
+        mTargetFile->close(); // Must open using member function for proper behavior
+}
 
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:
@@ -262,21 +281,19 @@ QFile* FileStreamWriter::file() { return mTargetFile; }
 
 IOOpReport FileStreamWriter::openFile()
 {
-    // Check file
-    IOOpResultType fileCheckResult = fileCheck(*mTargetFile);
-
-    if(fileCheckResult == IO_ERR_NOT_A_FILE)
-        return IOOpReport(IO_OP_WRITE, fileCheckResult, *mTargetFile);
-    else if(fileCheckResult == IO_SUCCESS && mWriteMode == NewOnly)
-        return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_EXISTS, *mTargetFile);
-
-    // Make folders if wanted and necessary
-    IOOpReport pathCreationResult = handlePathCreation(*mTargetFile, mCreateDirs);
-    if(!pathCreationResult.wasSuccessful())
-        return pathCreationResult;
+    // Perform write preperations
+    bool fileExists;
+    IOOpReport prepResult = writePrep(fileExists, *mTargetFile, mWriteOptions);
+    if(!prepResult.wasSuccessful())
+        return prepResult;
 
     // Attempt to open file
-    IOOpResultType openResult = parsedOpen(*mTargetFile, QFile::WriteOnly | WRITE_OPEN_FLAGS_MAP[mWriteMode]);
+    QIODevice::OpenMode om = QFile::WriteOnly;
+    om |= mWriteMode == Truncate ? QFile::Truncate : QFile::Append;
+    if(mWriteOptions.testFlag(NonBuffered))
+        om |= QIODevice::Unbuffered;
+
+    IOOpResultType openResult = parsedOpen(*mTargetFile, om);
     if(openResult != IO_SUCCESS)
         return IOOpReport(IO_OP_WRITE, openResult, *mTargetFile);
 
@@ -1204,8 +1221,7 @@ IOOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode wri
         textStream << beforeNew << text << afterNew;
     }
 
-    // Close file and return stream status
-    textFile.close();
+    // Return stream status
     return IOOpReport(IO_OP_WRITE, TXT_STRM_STAT_MAP.value(textStream.status()), textFile);
 }
 
@@ -1267,7 +1283,7 @@ IOOpReport deleteTextRangeFromFile(QFile &textFile, TextPos startPos, TextPos en
     else
         truncatedText = beforeDeletion + ENDL + afterDeletion;
 
-    return writeStringAsFile(textFile, truncatedText, true);
+    return writeStringToFile(textFile, truncatedText);
 }
 
 IOOpReport getDirFileList(QStringList& returnBuffer, QDir directory, QStringList extFilter, QDirIterator::IteratorFlag traversalFlags, Qt::CaseSensitivity caseSensitivity)
@@ -1442,43 +1458,69 @@ IOOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, qint64 start
     return IOOpReport(IO_OP_READ, IO_SUCCESS, file);
 }
 
-IOOpReport writeBytesAsFile(QFile &file, const QByteArray &byteArray, bool overwriteIfExist, bool createDirs)
+IOOpReport writeBytesToFile(QFile& file, const QByteArray& bytes, WriteMode writeMode, qint64 startPos, WriteOptions writeOptions)
 {
-    // Write the entire byte array to file. If the file already exists and overwriteIfExist is true, the file is replaced.
+    // Match append condition parameters
+    matchAppendConditionParams(writeMode, startPos);
 
-    // Check file
-    IOOpResultType fileCheckResult = fileCheck(file);
+    // Perform write preperations
+    bool existingFile;
+    IOOpReport prepResult = writePrep(existingFile, file, writeOptions);
+    if(!prepResult.wasSuccessful())
+        return prepResult;
 
-    if(fileCheckResult == IO_ERR_NOT_A_FILE)
-        return IOOpReport(IO_OP_WRITE, fileCheckResult, file);
-    else if(fileCheckResult == IO_SUCCESS && !overwriteIfExist)
-        return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_EXISTS, file);
+    // Post data for Inserts and Overwrites
+    QByteArray afterNew;
 
-    // Delete file if it exists since overwrite is desired
-    if(fileCheckResult == IO_SUCCESS)
-        file.resize(0); // Clear file contents
-
-    // Make folders if wanted and necessary
-    IOOpReport pathCreationResult = handlePathCreation(file, createDirs);
-    if(!pathCreationResult.wasSuccessful())
-        return pathCreationResult;
+    // Get post data if required
+    if(existingFile && writeMode == Insert)
+    {
+        Qx::IOOpReport readAfter = Qx::readBytesFromFile(afterNew, file, startPos);
+        if(!readAfter.wasSuccessful())
+            return readAfter;
+    }
 
     // Attempt to open file
-    IOOpResultType openResult = parsedOpen(file, QFile::WriteOnly);
+    QIODevice::OpenMode om = QFile::ReadWrite; // WriteOnly implies truncate which isn't always wanted here
+    if(writeMode == Append)
+        om |= QFile::Append;
+    else if(writeMode == Truncate)
+        om |= QFile::Truncate;
+
+    IOOpResultType openResult = parsedOpen(file, om);
     if(openResult != IO_SUCCESS)
         return IOOpReport(IO_OP_WRITE, openResult, file);
 
     // Ensure file is closed upon return
     QScopeGuard fileGuard([&file](){ file.close(); });
 
-    // Construct DataStream
-    QDataStream fileStream(&file);
+    // Adjust startPos to bounds if not padding
+    if((writeMode == Insert || writeMode == Overwrite) &&
+       !writeOptions.testFlag(Pad) && startPos > file.size())
+        startPos = file.size();
 
-    // Write data to file
-    if(fileStream.writeRawData(byteArray, byteArray.size()) == byteArray.size())
-        return IOOpReport(IO_OP_WRITE, IO_SUCCESS, file);
-    else
-        return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_SIZE_MISMATCH, file);
+    // Seek to start point
+    file.seek(startPos);
+
+    // Write data
+    qint64 written = file.write(bytes);
+    if(written == -1)
+        return IOOpReport(IO_OP_WRITE, FILE_DEV_ERR_MAP.value(file.error()), file);
+    else if(written != bytes.size())
+        return IOOpReport(IO_OP_WRITE, IO_ERR_WRITE, file);
+
+    // Write after new data
+    if(!afterNew.isEmpty())
+    {
+        written = file.write(afterNew);
+        if(written == -1)
+            return IOOpReport(IO_OP_WRITE, FILE_DEV_ERR_MAP.value(file.error()), file);
+        else if(written != afterNew.size())
+            return IOOpReport(IO_OP_WRITE, IO_ERR_WRITE, file);
+    }
+
+    // Return file status
+    return IOOpReport(IO_OP_WRITE, FILE_DEV_ERR_MAP.value(file.error()), file);
 }
 
 }
