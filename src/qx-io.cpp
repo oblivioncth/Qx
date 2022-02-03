@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <QDataStream>
 #include <QTextCodec>
+#include <QScopeGuard>
 
 namespace Qx
 {
@@ -595,6 +596,9 @@ IOOpReport textFileEndsWithNewline(bool& returnBuffer, QFile& textFile)
         if(openResult != IO_SUCCESS)
             return IOOpReport(IO_OP_INSPECT, openResult, textFile);
 
+        // Ensure file is closed upon return
+        QScopeGuard fileGuard([&textFile](){ textFile.close(); });
+
         // Text stream
         TextStream fileTextStream(&textFile);
 
@@ -607,8 +611,7 @@ IOOpReport textFileEndsWithNewline(bool& returnBuffer, QFile& textFile)
         // Set buffer result
         returnBuffer = fileTextStream.precedingBreak();
 
-        // Close file and return stream status
-        textFile.close();
+        // Return stream status
         return IOOpReport(IO_OP_INSPECT, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
     }
 }
@@ -632,6 +635,9 @@ IOOpReport textFileLineCount(quint64& returnBuffer, QFile& textFile, bool ignore
     if(openResult != IO_SUCCESS)
         return IOOpReport(IO_OP_READ, openResult, textFile);
 
+    // Ensure file is closed upon return
+    QScopeGuard fileGuard([&textFile](){ textFile.close(); });
+
     // Create Text Stream
     Qx::TextStream fileTextStream(&textFile);
 
@@ -644,8 +650,7 @@ IOOpReport textFileLineCount(quint64& returnBuffer, QFile& textFile, bool ignore
     if(!ignoreTrailingEmpty && fileTextStream.precedingBreak())
         ++returnBuffer;
 
-    // Close file and return status
-    textFile.close();
+    // Return status
     return IOOpReport(IO_OP_ENUMERATE, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
 }
 
@@ -668,6 +673,9 @@ IOOpReport findStringInFile(TextPos& returnBuffer, QFile& textFile, const QStrin
     IOOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly | QFile::Text);
     if(openResult != IO_SUCCESS)
         return IOOpReport(IO_OP_READ, openResult, textFile);
+
+    // Ensure file is closed upon return
+    QScopeGuard fileGuard([&textFile](){ textFile.close(); });
 
     TextPos lastHit = TextPos(); // Null position in the event no match is found
     int skipCount = 0;
@@ -699,9 +707,6 @@ IOOpReport findStringInFile(TextPos& returnBuffer, QFile& textFile, const QStrin
         }
     }
 
-    // Make sure to close file before return
-    textFile.close();
-
     // Return last hit if that was requested, otherwise existing position, null or not
     if(hitsToSkip == -1)
         returnBuffer = lastHit;
@@ -726,6 +731,9 @@ IOOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const
     if(openResult != IO_SUCCESS)
         return IOOpReport(IO_OP_READ, openResult, textFile);
 
+    // Ensure file is closed upon return
+    QScopeGuard fileGuard([&textFile](){ textFile.close(); });
+
     int currentLine = 0;
     int currentChar = 0;
     QTextStream fileTextStream(&textFile);
@@ -748,9 +756,7 @@ IOOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const
         currentLine++;
     }
 
-    // Make sure to close file before return
-    textFile.close();
-
+    // Return success
     return IOOpReport(IO_OP_READ, IO_SUCCESS, textFile);
 }
 
@@ -782,6 +788,9 @@ IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
         IOOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly | QFile::Text);
         if(openResult != IO_SUCCESS)
             return IOOpReport(IO_OP_READ, openResult, textFile);
+
+        // Ensure file is closed upon return
+        QScopeGuard fileGuard([&textFile](){ textFile.close(); });
 
         //Last line tracker and text stream
         QString lastLine;
@@ -849,8 +858,7 @@ IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
             }
         }
 
-        // Close file and return stream status
-        textFile.close();
+        // Return stream status
         return IOOpReport(IO_OP_READ, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
     }
 }
@@ -881,6 +889,9 @@ IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
          IOOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly | QFile::Text);
          if(openResult != IO_SUCCESS)
              return IOOpReport(IO_OP_READ, openResult, textFile);
+
+         // Ensure file is closed upon return
+         QScopeGuard fileGuard([&textFile](){ textFile.close(); });
 
          // Last line tracker and text stream
          QString lastLine;
@@ -966,8 +977,7 @@ IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
              }
          }
 
-         // Close file and return stream status
-         textFile.close();
+         // Return stream status
          return IOOpReport(IO_OP_READ, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
      }
 }
@@ -995,6 +1005,9 @@ IOOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, int star
          IOOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly | QFile::Text);
          if(openResult != IO_SUCCESS)
              return IOOpReport(IO_OP_READ, openResult, textFile);
+
+         // Ensure file is closed upon return
+         QScopeGuard fileGuard([&textFile](){ textFile.close(); });
 
          Qx::TextStream fileTextStream(&textFile);
 
@@ -1032,8 +1045,7 @@ IOOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, int star
              }
          }
 
-         // Close file and return stream status
-         textFile.close();
+         // Return stream status
          return IOOpReport(IO_OP_READ, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
      }
 }
@@ -1048,6 +1060,9 @@ IOOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode wri
     IOOpReport prepResult = writePrep(existingFile, textFile, writeOptions);
     if(!prepResult.wasSuccessful())
         return prepResult;
+
+    // Ensure file is closed upon return
+    QScopeGuard fileGuard([&textFile](){ if(textFile.isOpen()) textFile.close(); });
 
     // Construct TextStream
     QTextStream textStream(&textFile);
@@ -1319,7 +1334,6 @@ bool dirContainsFiles(QDir directory, IOOpReport &reportBuffer, bool includeSubd
     }
 }
 
-
 IOOpReport calculateFileChecksum(QString& returnBuffer, QFile& file, QCryptographicHash::Algorithm hashAlgorithm)
 {
     // Empty buffer
@@ -1335,18 +1349,17 @@ IOOpReport calculateFileChecksum(QString& returnBuffer, QFile& file, QCryptograp
     if(openResult != IO_SUCCESS)
         return IOOpReport(IO_OP_READ, openResult, file);
 
+    // Ensure file is closed upon return
+    QScopeGuard fileGuard([&file](){ file.close(); });
+
     QCryptographicHash checksumHash(hashAlgorithm);
     if(checksumHash.addData(&file))
     {
         returnBuffer = checksumHash.result().toHex();
-        file.close();
         return IOOpReport(IO_OP_READ, IO_SUCCESS, file);
     }
     else
-    {
-        file.close();
         return IOOpReport(IO_OP_READ, IO_ERR_READ, file);
-    }
 }
 
 IOOpReport fileMatchesChecksum(bool& returnBuffer, QFile& file, QString checksum, QCryptographicHash::Algorithm hashAlgorithm)
@@ -1388,6 +1401,9 @@ IOOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, qint64 start
     if(openResult != IO_SUCCESS)
         return IOOpReport(IO_OP_READ, openResult, file);
 
+    // Ensure file is closed upon return
+    QScopeGuard fileGuard([&file](){ file.close(); });
+
     // Adjust input indicies to true positions
     qint64 fileIndexMax = file.size() - 1;
 
@@ -1422,8 +1438,7 @@ IOOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, qint64 start
     else if(readBytes != bufferSize)
        return IOOpReport(IO_OP_READ, IO_ERR_FILE_SIZE_MISMATCH, file);
 
-    // Close file, return success and buffer
-    file.close();
+    // Return success and buffer
     return IOOpReport(IO_OP_READ, IO_SUCCESS, file);
 }
 
@@ -1453,20 +1468,17 @@ IOOpReport writeBytesAsFile(QFile &file, const QByteArray &byteArray, bool overw
     if(openResult != IO_SUCCESS)
         return IOOpReport(IO_OP_WRITE, openResult, file);
 
+    // Ensure file is closed upon return
+    QScopeGuard fileGuard([&file](){ file.close(); });
+
     // Construct DataStream
     QDataStream fileStream(&file);
 
     // Write data to file
     if(fileStream.writeRawData(byteArray, byteArray.size()) == byteArray.size())
-    {
-        file.close();
         return IOOpReport(IO_OP_WRITE, IO_SUCCESS, file);
-    }
     else
-    {
-        file.close();
         return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_SIZE_MISMATCH, file);
-    }
 }
 
 }
