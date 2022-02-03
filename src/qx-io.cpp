@@ -445,13 +445,13 @@ TextStreamWriter::TextStreamWriter(QFile* file, WriteMode writeMode, WriteOption
 IOOpReport TextStreamWriter::openFile()
 {
     // Perform write preperations
-    bool fileExists;
-    IOOpReport prepResult = writePrep(fileExists, *mTargetFile, mWriteOptions);
+    bool existingFile;
+    IOOpReport prepResult = writePrep(existingFile, *mTargetFile, mWriteOptions);
     if(!prepResult.wasSuccessful())
         return prepResult;
 
     // If file exists and mode is append, test if it starts on a new line
-    if(mWriteMode == Append && fileExists)
+    if(mWriteMode == Append && existingFile)
     {
         IOOpReport inspectResult = textFileEndsWithNewline(mAtLineStart, *mTargetFile);
         if(!inspectResult.wasSuccessful())
@@ -1044,8 +1044,8 @@ IOOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode wri
     matchAppendConditionParams(writeMode, startPos);
 
     // Perform write preperations
-    bool fileExists;
-    IOOpReport prepResult = writePrep(fileExists, textFile, writeOptions);
+    bool existingFile;
+    IOOpReport prepResult = writePrep(existingFile, textFile, writeOptions);
     if(!prepResult.wasSuccessful())
         return prepResult;
 
@@ -1056,7 +1056,7 @@ IOOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode wri
     {
         // Check if line break is needed if file exists
         bool needsNewLine = false;
-        if(fileExists && writeOptions.testFlag(EnsureBreak))
+        if(existingFile && writeOptions.testFlag(EnsureBreak))
         {
             bool onNewLine;
             IOOpReport inspectResult = textFileEndsWithNewline(onNewLine, textFile);
@@ -1077,7 +1077,7 @@ IOOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode wri
         // Write main text
         textStream << text;
     }
-    else if(!fileExists || writeMode == Truncate)
+    else if(!existingFile || writeMode == Truncate)
     {
         // Attempt to open file
         IOOpResultType openResult = parsedOpen(textFile, QFile::WriteOnly | QFile::Text | QFile::Truncate);
@@ -1368,7 +1368,6 @@ IOOpReport fileMatchesChecksum(bool& returnBuffer, QFile& file, QString checksum
     // Return success
     return IOOpReport(IOOpType::IO_OP_INSPECT, IO_SUCCESS, file);
 }
-
 
 IOOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, qint64 startPos, qint64 endPos)
 {
