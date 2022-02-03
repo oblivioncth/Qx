@@ -427,7 +427,7 @@ QString TextStream::readLineWithBreak(qint64 maxlen)
 
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
-TextStreamWriter::TextStreamWriter(QFile& file, WriteMode writeMode, WriteOptions writeOptions) :
+TextStreamWriter::TextStreamWriter(QFile* file, WriteMode writeMode, WriteOptions writeOptions) :
     mTargetFile(file), mWriteMode(writeMode), mWriteOptions(writeOptions), mAtLineStart(true)
 {
     // Map unsupported modes to supported ones
@@ -436,8 +436,8 @@ TextStreamWriter::TextStreamWriter(QFile& file, WriteMode writeMode, WriteOption
     else if(mWriteMode == Overwrite)
         mWriteMode = Truncate;
 
-    if(mTargetFile.isOpen())
-        mTargetFile.close(); // Must open using member function for proper behavior
+    if(mTargetFile->isOpen())
+        mTargetFile->close(); // Must open using member function for proper behavior
 }
 
 //-Instance Functions--------------------------------------------------------------------------------------------
@@ -446,16 +446,16 @@ IOOpReport TextStreamWriter::openFile()
 {
     // Perform write preperations
     bool fileExists;
-    IOOpReport prepResult = writePrep(fileExists, mTargetFile, mWriteOptions);
+    IOOpReport prepResult = writePrep(fileExists, *mTargetFile, mWriteOptions);
     if(!prepResult.wasSuccessful())
         return prepResult;
 
     // If file exists and mode is append, test if it starts on a new line
     if(mWriteMode == Append && fileExists)
     {
-        IOOpReport inspectResult = textFileEndsWithNewline(mAtLineStart, mTargetFile);
+        IOOpReport inspectResult = textFileEndsWithNewline(mAtLineStart, *mTargetFile);
         if(!inspectResult.wasSuccessful())
-            return IOOpReport(IO_OP_WRITE, inspectResult.getResult(), mTargetFile);
+            return IOOpReport(IO_OP_WRITE, inspectResult.getResult(), *mTargetFile);
     }
 
     // Attempt to open file
@@ -464,12 +464,12 @@ IOOpReport TextStreamWriter::openFile()
     if(mWriteOptions.testFlag(NonBuffered))
         om |= QIODevice::Unbuffered;
 
-    IOOpResultType openResult = parsedOpen(mTargetFile, om);
+    IOOpResultType openResult = parsedOpen(*mTargetFile, om);
     if(openResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_WRITE, openResult, mTargetFile);
+        return IOOpReport(IO_OP_WRITE, openResult, *mTargetFile);
 
     // Set data stream IO device
-    mStreamWriter.setDevice(&mTargetFile);
+    mStreamWriter.setDevice(mTargetFile);
 
     // Write linebreak if needed
     if(!mAtLineStart && mWriteOptions.testFlag(EnsureBreak))
@@ -479,12 +479,12 @@ IOOpReport TextStreamWriter::openFile()
     }
 
     // Return no error
-    return IOOpReport(IO_OP_WRITE, IO_SUCCESS, mTargetFile);
+    return IOOpReport(IO_OP_WRITE, IO_SUCCESS, *mTargetFile);
 }
 
 IOOpReport TextStreamWriter::writeLine(QString line, bool ensureLineStart)
 {
-    if(mTargetFile.isOpen())
+    if(mTargetFile->isOpen())
     {
         // Ensure line start if requested
         if(ensureLineStart && !mAtLineStart)
@@ -499,15 +499,15 @@ IOOpReport TextStreamWriter::writeLine(QString line, bool ensureLineStart)
         mAtLineStart = true;
 
         // Return stream status
-        return IOOpReport(IO_OP_WRITE, TXT_STRM_STAT_MAP.value(mStreamWriter.status()), mTargetFile);
+        return IOOpReport(IO_OP_WRITE, TXT_STRM_STAT_MAP.value(mStreamWriter.status()), *mTargetFile);
     }
     else
-        return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_NOT_OPEN, mTargetFile);
+        return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_NOT_OPEN, *mTargetFile);
 }
 
 IOOpReport TextStreamWriter::writeText(QString text)
 {
-    if(mTargetFile.isOpen())
+    if(mTargetFile->isOpen())
     {
         // Check if data will end at line start
         mAtLineStart = text.back() == ENDL;
@@ -518,13 +518,13 @@ IOOpReport TextStreamWriter::writeText(QString text)
             mStreamWriter.flush();
 
         // Return stream status
-        return IOOpReport(IO_OP_WRITE, TXT_STRM_STAT_MAP.value(mStreamWriter.status()), mTargetFile);
+        return IOOpReport(IO_OP_WRITE, TXT_STRM_STAT_MAP.value(mStreamWriter.status()), *mTargetFile);
     }
     else
-        return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_NOT_OPEN, mTargetFile);
+        return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_NOT_OPEN, *mTargetFile);
 }
 
-void TextStreamWriter::closeFile() { mTargetFile.close(); }
+void TextStreamWriter::closeFile() { mTargetFile->close(); }
 
 
 //-Functions (Cont.)----------------------------------------------------------------------------------------------

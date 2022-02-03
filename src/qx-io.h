@@ -251,14 +251,14 @@ class TextStreamWriter
 //-Instance Variables------------------------------------------------------------------------------------------------
 private:
     QTextStream mStreamWriter;
-    QFile& mTargetFile;
+    QFile* mTargetFile;
     WriteMode mWriteMode;
     WriteOptions mWriteOptions;
     bool mAtLineStart;
 
 //-Constructor-------------------------------------------------------------------------------------------------------
 public:
-    TextStreamWriter(QFile& file, WriteMode writeMode = Append, WriteOptions writeOptions = NoOptions);
+    TextStreamWriter(QFile* file, WriteMode writeMode = Append, WriteOptions writeOptions = NoOptions);
 
 //-Instance Functions------------------------------------------------------------------------------------------------
 public:
