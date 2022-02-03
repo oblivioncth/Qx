@@ -28,7 +28,7 @@ enum IOOpTargetType { IO_FILE, IO_DIR };
 enum WriteMode {Insert, Overwrite, Append, Truncate};
 
 enum WriteOption {
-    NoOptions = 0x0,
+    NoWriteOptions = 0x0,
     CreatePath = 0x1,
     ExistingOnly = 0x2,
     NewOnly = 0x4,
@@ -258,7 +258,7 @@ private:
 
 //-Constructor-------------------------------------------------------------------------------------------------------
 public:
-    TextStreamWriter(QFile* file, WriteMode writeMode = Append, WriteOptions writeOptions = NoOptions);
+    TextStreamWriter(QFile* file, WriteMode writeMode = Append, WriteOptions writeOptions = NoWriteOptions);
 
 //-Instance Functions------------------------------------------------------------------------------------------------
 public:
@@ -291,7 +291,7 @@ public:
     IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos = TextPos::START, TextPos endPos = TextPos::END, ReadOptions readOptions = NoReadOptions);
     IOOpReport readTextFromFile(QStringList& returnBuffer, QFile &textFile, int startLine = 0, int endLine = -1, ReadOptions readOptions = NoReadOptions);
 
-    IOOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode writeMode = Truncate, TextPos startPos = TextPos::START, WriteOptions writeOptions = NoOptions);
+    IOOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode writeMode = Truncate, TextPos startPos = TextPos::START, WriteOptions writeOptions = NoWriteOptions);
 
     IOOpReport deleteTextRangeFromFile(QFile &textFile, TextPos startPos, TextPos endPos);
 
