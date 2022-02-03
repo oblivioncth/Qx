@@ -258,7 +258,7 @@ private:
 
 //-Constructor-------------------------------------------------------------------------------------------------------
 public:
-    TextStreamWriter(QFile& file, WriteMode writeMode = Truncate, WriteOptions writeOptions = NoOptions);
+    TextStreamWriter(QFile& file, WriteMode writeMode = Append, WriteOptions writeOptions = NoOptions);
 
 //-Instance Functions------------------------------------------------------------------------------------------------
 public:
