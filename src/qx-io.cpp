@@ -1369,27 +1369,6 @@ IOOpReport fileMatchesChecksum(bool& returnBuffer, QFile& file, QString checksum
     return IOOpReport(IOOpType::IO_OP_INSPECT, IO_SUCCESS, file);
 }
 
-IOOpReport readAllBytesFromFile(QByteArray& returnBuffer, QFile& file)
-{
-    // Empty buffer
-    returnBuffer = QByteArray();
-
-    // Check file
-    IOOpResultType fileCheckResult = fileCheck(file);
-    if(fileCheckResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_READ, fileCheckResult, file);
-
-    // Attempt to open file
-    IOOpResultType openResult = parsedOpen(file, QFile::ReadOnly);
-    if(openResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_READ, openResult, file);
-
-    // Read all
-    returnBuffer = file.readAll();
-
-    file.close();
-    return IOOpReport(IO_OP_READ, IO_SUCCESS, file);
-}
 
 IOOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, qint64 startPos, qint64 endPos)
 {
@@ -1414,7 +1393,10 @@ IOOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, qint64 start
     qint64 fileIndexMax = file.size() - 1;
 
     if(startPos > fileIndexMax)
-        return IOOpReport(IO_OP_READ, FILE_DEV_ERR_MAP.value(file.error()), file);// Return empty buffer
+    {
+        returnBuffer = QByteArray(); // Set buffer to null
+        return IOOpReport(IO_OP_READ, IO_SUCCESS, file);
+    }
 
     if(endPos == -1 || endPos > fileIndexMax)
     {
