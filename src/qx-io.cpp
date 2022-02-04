@@ -633,8 +633,11 @@ IOOpReport textFileEndsWithNewline(bool& returnBuffer, QFile& textFile)
     }
 }
 
-IOOpReport textFileLineCount(quint64& returnBuffer, QFile& textFile, bool ignoreTrailingEmpty)
+IOOpReport textFileLayout(QList<int>& returnBuffer, QFile& textFile, bool ignoreTrailingEmpty)
 {
+    // Clear return buffer
+    returnBuffer.clear();
+
     // Check file
     IOOpResultType fileCheckResult = fileCheck(textFile);
     if(fileCheckResult != IO_SUCCESS)
@@ -642,10 +645,7 @@ IOOpReport textFileLineCount(quint64& returnBuffer, QFile& textFile, bool ignore
 
     // If file is empty return immediately
     if(fileIsEmpty(textFile))
-    {
-        returnBuffer = 0;
         return IOOpReport(IO_OP_INSPECT, IO_SUCCESS, textFile);
-    }
 
     // Attempt to open file
     IOOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly);
@@ -659,13 +659,12 @@ IOOpReport textFileLineCount(quint64& returnBuffer, QFile& textFile, bool ignore
     Qx::TextStream fileTextStream(&textFile);
 
     // Count lines
-    returnBuffer = 0;
-    for(; !fileTextStream.atEnd(); ++returnBuffer)
-        fileTextStream.readLineInto(nullptr);
+    while(!fileTextStream.atEnd())
+        returnBuffer.append(fileTextStream.readLine().count());
 
     // Account for blank line if present and desired
     if(!ignoreTrailingEmpty && fileTextStream.precedingBreak())
-        ++returnBuffer;
+        returnBuffer.append(0);
 
     // Return status
     return IOOpReport(IO_OP_ENUMERATE, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
