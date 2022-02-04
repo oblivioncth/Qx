@@ -273,35 +273,28 @@ public:
     const QString LIST_ITM_PRFX = "- ";
 
 //-Functions-------------------------------------------------------------------------------------------------------------
-// General:
+// File
     bool fileIsEmpty(const QFile& file);
     IOOpReport fileIsEmpty(bool& returnBuffer, const QFile& file);
-
     QString kosherizeFileName(QString fileName);
 
-// Text Based:
+// Text
     IOOpReport textFileEndsWithNewline(bool& returnBuffer, QFile& textFile);
     IOOpReport textFileLineCount(quint64& returnBuffer, QFile& textFile, bool ignoreTrailingEmpty);
-
     IOOpReport findStringInFile(TextPos& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive, int hitsToSkip = 0 );
     IOOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive, int hitLimit = -1);
     IOOpReport fileContainsString(bool& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive);
-
     IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos, int count, ReadOptions readOptions = NoReadOptions);
     IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos = TextPos::START, TextPos endPos = TextPos::END, ReadOptions readOptions = NoReadOptions);
     IOOpReport readTextFromFile(QStringList& returnBuffer, QFile &textFile, int startLine = 0, int endLine = -1, ReadOptions readOptions = NoReadOptions);
-
     IOOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode writeMode = Truncate, TextPos startPos = TextPos::START, WriteOptions writeOptions = NoWriteOptions);
-
     IOOpReport deleteTextFromFile(QFile &textFile, TextPos startPos, TextPos endPos);
 
-// Directory Based:
-    IOOpReport getDirFileList(QStringList& returnBuffer, QDir directory, QStringList extFilter = QStringList(), QDirIterator::IteratorFlag traversalFlags = QDirIterator::NoIteratorFlags,
-                              Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive); // Likely disolve in favor of QFileInfoList and QDir::entryInfoList()
-    bool dirContainsFiles(QDir directory, bool includeSubdirectories = false);
-    bool dirContainsFiles(QDir directory, IOOpReport& reportBuffer, bool includeSubdirectories = false);
+// Directory:
+    bool dirContainsFiles(QDir directory, QDirIterator::IteratorFlags iteratorFlags);
+    IOOpReport dirContainsFiles(bool& returnBuffer, QDir directory, QDirIterator::IteratorFlags iteratorFlags);
 
-// Integrity Based
+// Integrity
     IOOpReport calculateFileChecksum(QString& returnBuffer, QFile& file, QCryptographicHash::Algorithm hashAlgorithm);
     IOOpReport fileMatchesChecksum(bool& returnBuffer, QFile& file, QString checksum, QCryptographicHash::Algorithm hashAlgorithm);
 

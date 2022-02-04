@@ -1332,38 +1332,27 @@ IOOpReport getDirFileList(QStringList& returnBuffer, QDir directory, QStringList
     return IOOpReport(IO_OP_ENUMERATE, IO_SUCCESS, directory);
 }
 
-bool dirContainsFiles(QDir directory, bool includeSubdirectories)
+bool dirContainsFiles(QDir directory, QDirIterator::IteratorFlags iteratorFlags)
 {
-    // Setup flags
-    QDirIterator::IteratorFlags itFlags;
-
-    if(includeSubdirectories)
-        itFlags = QDirIterator::Subdirectories;
-    else
-        itFlags = QDirIterator::NoIteratorFlags;
-
     // Construct directory iterator
-    QDirIterator listIterator(directory.path(), QDir::Files | QDir::NoDotAndDotDot, itFlags);
+    QDirIterator listIterator(directory.path(), QDir::Files | QDir::NoDotAndDotDot, iteratorFlags);
 
     return listIterator.hasNext();
 }
 
-bool dirContainsFiles(QDir directory, IOOpReport &reportBuffer, bool includeSubdirectories)
+IOOpReport dirContainsFiles(bool& returnBuffer, QDir directory, QDirIterator::IteratorFlags iteratorFlags)
 {
-    // Empty buffer
-    reportBuffer = IOOpReport();
+    // Assume false
+    returnBuffer = false;
 
     // Check directory
     IOOpResultType dirCheckResult = directoryCheck(directory);
     if(dirCheckResult != IO_SUCCESS)
-    {
-        reportBuffer = IOOpReport(IO_OP_INSPECT, dirCheckResult, directory);
-        return false; // Non-existant directory can't contain files
-    }
+        return IOOpReport(IO_OP_INSPECT, dirCheckResult, directory);
     else
     {
-        reportBuffer = IOOpReport(IO_OP_INSPECT, IO_SUCCESS, directory);
-        return dirContainsFiles(directory, includeSubdirectories); // Use reportless function
+        returnBuffer = dirContainsFiles(directory, iteratorFlags); // Use reportless function
+        return IOOpReport(IO_OP_INSPECT, IO_SUCCESS, directory);
     }
 }
 
