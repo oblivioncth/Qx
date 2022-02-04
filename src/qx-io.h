@@ -293,7 +293,7 @@ public:
 
     IOOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode writeMode = Truncate, TextPos startPos = TextPos::START, WriteOptions writeOptions = NoWriteOptions);
 
-    IOOpReport deleteTextRangeFromFile(QFile &textFile, TextPos startPos, TextPos endPos);
+    IOOpReport deleteTextFromFile(QFile &textFile, TextPos startPos, TextPos endPos);
 
 // Directory Based:
     IOOpReport getDirFileList(QStringList& returnBuffer, QDir directory, QStringList extFilter = QStringList(), QDirIterator::IteratorFlag traversalFlags = QDirIterator::NoIteratorFlags,

@@ -1069,6 +1069,13 @@ IOOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, int star
 
 IOOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode writeMode, TextPos startPos, WriteOptions writeOptions)
 {
+    /* TODO: Memory usage can be improved for inserts/overwrites by reading lines until at target lines, then reading characters
+     * one by one until at target char - 1 and noting the position. Then like normal read in the afterText, then return to the
+     * marked position and just start writing from there. The file may need to be truncated first depending on QTextStream's behavior
+     * (it seems it may default to writing to end regardless of where read cursor was) and special handling would be required for when
+     * a LF is discovered before the target char - 1 point is reached. This may also work for things like text deletion
+    */
+
     // Match append condition parameters
     matchAppendConditionParams(writeMode, startPos);
 
@@ -1225,7 +1232,7 @@ IOOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode wri
     return IOOpReport(IO_OP_WRITE, TXT_STRM_STAT_MAP.value(textStream.status()), textFile);
 }
 
-IOOpReport deleteTextRangeFromFile(QFile &textFile, TextPos startPos, TextPos endPos)
+IOOpReport deleteTextFromFile(QFile &textFile, TextPos startPos, TextPos endPos)
 {
     // Removes a string of a portion of the passed file [startPos, endPos] (inclusive for both)
 
@@ -1251,8 +1258,8 @@ IOOpReport deleteTextRangeFromFile(QFile &textFile, TextPos startPos, TextPos en
         beforeDeletion = "";
     else if(startPos.getCharNum() == -1)
     {
-        transientReport = readTextFromFile(beforeDeletion, textFile, TextPos::START, TextPos(startPos.getLineNum(), -1));
-        beforeDeletion = beforeDeletion.chopped(1);
+        transientReport = readTextFromFile(beforeDeletion, textFile, TextPos::START, startPos);
+        beforeDeletion.chop(1);
     }
     else
         transientReport = readTextFromFile(beforeDeletion, textFile, TextPos::START, TextPos(startPos.getLineNum(), startPos.getCharNum() - 1));
@@ -1273,17 +1280,27 @@ IOOpReport deleteTextRangeFromFile(QFile &textFile, TextPos startPos, TextPos en
     if(transientReport.getResult() != IO_SUCCESS)
         return IOOpReport(IO_OP_WRITE, transientReport.getResult(), textFile);
 
-    // Combine strings
-    QString truncatedText;
+    // Attempt to open file
+    IOOpResultType openResult = parsedOpen(textFile, QFile::WriteOnly | QFile::Truncate | QFile::Text);
+    if(openResult != IO_SUCCESS)
+        return IOOpReport(IO_OP_WRITE, openResult, textFile);
 
-    if(beforeDeletion.isEmpty())
-        truncatedText = afterDeletion;
-    else if(afterDeletion.isEmpty())
-        truncatedText = beforeDeletion;
-    else
-        truncatedText = beforeDeletion + ENDL + afterDeletion;
+    QScopeGuard fileGuard([&textFile](){ textFile.close(); });
 
-    return writeStringToFile(textFile, truncatedText);
+    // Write strings
+    QTextStream textStream(&textFile);
+
+    if(!beforeDeletion.isEmpty())
+    {
+        textStream << beforeDeletion;
+        if(!afterDeletion.isEmpty())
+            textStream << ENDL;
+    }
+    if(!afterDeletion.isEmpty())
+        textStream << afterDeletion;
+
+    // Return status
+    return IOOpReport(IO_OP_WRITE, TXT_STRM_STAT_MAP.value(textStream.status()), textFile);
 }
 
 IOOpReport getDirFileList(QStringList& returnBuffer, QDir directory, QStringList extFilter, QDirIterator::IteratorFlag traversalFlags, Qt::CaseSensitivity caseSensitivity)
