@@ -155,7 +155,10 @@ IOOpReport SyncDownloadManager::startDownload(DownloadTask task)
     QFile* file = new QFile(task.dest, this); // Parent constructor ensures deletion when 'this' is deleted
 
     // Create stream writer
-    std::shared_ptr<FileStreamWriter> fileWriter = std::make_shared<FileStreamWriter>(file, mOverwrite ? WriteMode:: Overwrite : WriteMode::NewOnly, true);
+    WriteOptions wo = WriteOption::CreatePath;
+    if(!mOverwrite)
+        wo |= WriteOption::NewOnly;
+    std::shared_ptr<FileStreamWriter> fileWriter = std::make_shared<FileStreamWriter>(file, WriteMode::Truncate, wo);
 
     // Open file
     IOOpReport streamOpen = fileWriter->openFile();
