@@ -641,16 +641,16 @@ IOOpReport textFileLayout(QList<int>& returnBuffer, QFile& textFile, bool ignore
     // Check file
     IOOpResultType fileCheckResult = fileCheck(textFile);
     if(fileCheckResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_READ, fileCheckResult, textFile);
+        return IOOpReport(IO_OP_ENUMERATE, fileCheckResult, textFile);
 
     // If file is empty return immediately
     if(fileIsEmpty(textFile))
-        return IOOpReport(IO_OP_INSPECT, IO_SUCCESS, textFile);
+        return IOOpReport(IO_OP_ENUMERATE, IO_SUCCESS, textFile);
 
     // Attempt to open file
     IOOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly);
     if(openResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_READ, openResult, textFile);
+        return IOOpReport(IO_OP_ENUMERATE, openResult, textFile);
 
     // Ensure file is closed upon return
     QScopeGuard fileGuard([&textFile](){ textFile.close(); });
