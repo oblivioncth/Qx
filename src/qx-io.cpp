@@ -769,72 +769,8 @@ IOOpReport textFileAbsolutePosition(TextPos& textPos, QFile& textFile, bool igno
     return IOOpReport(IO_OP_ENUMERATE, IO_SUCCESS, textFile);
 }
 
-IOOpReport findStringInFile(TextPos& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity caseSensitivity, int hitsToSkip)
-{
-    // Returns the found match after skipping the requested hits if it exists, otherwise returns a null position
-    // hitsToSkip = -1 returns the last match if any.
-
-    // TODO: The current implementation does not allow searching for line breaks
-
-    // Empty buffer
-    returnBuffer = TextPos();
-
-    // Check file
-    IOOpResultType fileCheckResult = fileCheck(textFile);
-    if(fileCheckResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_READ, fileCheckResult, textFile);
-
-    // Attempt to open file
-    IOOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly | QFile::Text);
-    if(openResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_READ, openResult, textFile);
-
-    // Ensure file is closed upon return
-    QScopeGuard fileGuard([&textFile](){ textFile.close(); });
-
-    TextPos lastHit = TextPos(); // Null position in the event no match is found
-    int skipCount = 0;
-    int currentLine = 0;
-    int currentChar = 0;
-    QTextStream fileTextStream(&textFile);
-
-    while(!fileTextStream.atEnd())
-    {
-        currentChar = fileTextStream.readLine().indexOf(query, 0, caseSensitivity);
-
-        if(currentChar == -1)
-            currentLine++;
-        else
-        {
-            // Check if this find is the desired one
-            if(skipCount == hitsToSkip)
-            {
-                returnBuffer = TextPos(currentLine, currentChar);
-                break;
-            }
-            else
-            {
-                lastHit.setLineNum(currentLine);
-                lastHit.setCharNum(currentChar);
-                skipCount++;
-                currentLine++;
-            }
-        }
-    }
-
-    // Return last hit if that was requested, otherwise existing position, null or not
-    if(hitsToSkip == -1)
-        returnBuffer = lastHit;
-
-    return IOOpReport(IO_OP_READ, IO_SUCCESS, textFile);
-}
-
 IOOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const TextQuery& query, ReadOptions readOptions)
 {
-    // Returns every occurs of the given query found in the given file up to the hitLimit, all if hitLimit == -1
-
-    // TODO: throw if hits to skip >= hit limit
-
     // Empty buffer
     returnBuffer.clear();
 

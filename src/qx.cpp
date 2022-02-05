@@ -138,6 +138,11 @@ void BitArray::operator+=(const BitArray& rhs) { (*this) = (*this) + rhs; }
 //Public:
 bool Char::isHexNumber(QChar hexNum) { return RegEx::hexOnly.match(hexNum).hasMatch(); }
 
+bool Char::compare(QChar cOne, QChar cTwo, Qt::CaseSensitivity cs)
+{
+    return cOne == cTwo || (cs == Qt::CaseInsensitive && cOne.toLower() == cTwo.toLower());
+}
+
 #ifdef QT_GUI_LIB // Only enabled for GUI applications
 //===============================================================================================================
 // COLOR
