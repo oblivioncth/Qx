@@ -364,6 +364,37 @@ IOOpReport FileStreamReader::openFile()
 void FileStreamReader::closeFile() { mSourceFile->close(); }
 
 //===============================================================================================================
+// TEXT QUERY
+//===============================================================================================================
+
+//-Constructor---------------------------------------------------------------------------------------------------
+//Public:
+TextQuery::TextQuery(const QString& string, Qt::CaseSensitivity cs) :
+    mString(string),
+    mCaseSensitivity(cs),
+    mStartPos(TextPos::START),
+    mHitsToSkip(0),
+    mHitLimit(-1),
+    mAllowSplit(false)
+{}
+
+//-Instance Functions--------------------------------------------------------------------------------------------
+//Public:
+const QString& TextQuery::string() const { return mString; }
+Qt::CaseSensitivity TextQuery::caseSensitivity() const { return mCaseSensitivity; }
+TextPos TextQuery::startPosition() const { return mStartPos; }
+int TextQuery::hitsToSkip() const { return mHitsToSkip; }
+int TextQuery::hitLimit() const { return mHitLimit; }
+bool TextQuery::allowSplit() const{ return mAllowSplit; }
+
+void TextQuery::setString(QString string) { mString = string; }
+void TextQuery::setCaseSensitivity(Qt::CaseSensitivity caseSensitivity) { mCaseSensitivity = caseSensitivity; }
+void TextQuery::setStartPosition(TextPos startPosition) { mStartPos = startPosition; }
+void TextQuery::setHitsToSkip(int hitsToSkip) { mHitsToSkip = std::min(hitsToSkip, 0); }
+void TextQuery::setHitLimit(int hitLimit) { mHitLimit = hitLimit; }
+void TextQuery::setAllowSplit(bool allowSplit) { mAllowSplit = allowSplit; }
+
+//===============================================================================================================
 // TEXT STREAM
 //===============================================================================================================
 
@@ -798,57 +829,125 @@ IOOpReport findStringInFile(TextPos& returnBuffer, QFile& textFile, const QStrin
     return IOOpReport(IO_OP_READ, IO_SUCCESS, textFile);
 }
 
-IOOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity caseSensitivity, int hitLimit)
+IOOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const TextQuery& query, ReadOptions readOptions)
 {
     // Returns every occurs of the given query found in the given file up to the hitLimit, all if hitLimit == -1
+
+    // TODO: throw if hits to skip >= hit limit
 
     // Empty buffer
     returnBuffer.clear();
 
+    // If for whatever reason hit limit is 0, or the query is empty, return
+    if(query.hitLimit() == 0 || query.string().count() == 0)
+        return IOOpReport(IO_OP_INSPECT, IO_SUCCESS, textFile);
+
     // Check file
     IOOpResultType fileCheckResult = fileCheck(textFile);
     if(fileCheckResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_READ, fileCheckResult, textFile);
+        return IOOpReport(IO_OP_INSPECT, fileCheckResult, textFile);
+
+    // Query tracking
+    TextPos trueStartPos = query.startPosition();
+    TextPos currentPos = TextPos::START;
+    TextPos possibleMatch = TextPos::END;
+    int hitsSkipped = 0;
+    QString::const_iterator queryIt = query.string().constBegin();
+    QChar currentChar;
+
+    // Stream
+    QTextStream fileTextStream(&textFile);
+
+    // Translate start position to absolute position
+    if(trueStartPos != TextPos::START)
+    {
+        IOOpReport translate = textFileAbsolutePosition(trueStartPos, textFile, readOptions.testFlag(IgnoreTrailingBreak));
+        if(!translate.wasSuccessful())
+            return IOOpReport(IO_OP_INSPECT, translate.getResult(), textFile);
+
+        // Return if position is outside bounds
+        if(trueStartPos.isNull())
+            return IOOpReport(IO_OP_INSPECT, translate.getResult(), textFile);
+    }
 
     // Attempt to open file
     IOOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly | QFile::Text);
     if(openResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_READ, openResult, textFile);
+        return IOOpReport(IO_OP_INSPECT, openResult, textFile);
 
     // Ensure file is closed upon return
     QScopeGuard fileGuard([&textFile](){ textFile.close(); });
 
-    int currentLine = 0;
-    int currentChar = 0;
-    QTextStream fileTextStream(&textFile);
-
-    while(!fileTextStream.atEnd())
+    // Skip to start pos
+    if(trueStartPos != TextPos::START)
     {
-        currentChar = fileTextStream.readLine().indexOf(query, 0, caseSensitivity);
+        int line;
+        // Skip to start line
+        for(line = 0; line != trueStartPos.getLineNum(); ++line)
+            fileTextStream.readLineInto(nullptr);
 
-        if(currentChar != -1)
-        {
-            // Add hit location to list
-            returnBuffer.append(TextPos(currentLine, currentChar));
+        // Skip to start character
+        int c;
+        for(c = 0; c != trueStartPos.getCharNum(); ++c)
+            fileTextStream.read(1);
 
-            // Check if hit limit has been reached
-            if(returnBuffer.size() == hitLimit)
-                break;
-        }
-
-        // Increase line count
-        currentLine++;
+        currentPos = trueStartPos;
     }
 
-    // Return success
-    return IOOpReport(IO_OP_READ, IO_SUCCESS, textFile);
+    // Search for query
+    while(!fileTextStream.atEnd())
+    {
+        fileTextStream >> currentChar;
+
+        if(Char::compare(currentChar, *queryIt, query.caseSensitivity()))
+        {
+            if(possibleMatch == TextPos::END)
+                possibleMatch = currentPos;
+            ++queryIt;
+        }
+        else if(!(currentChar == ENDL && query.allowSplit()))
+        {
+            possibleMatch = TextPos::END;
+            queryIt = query.string().constBegin();
+        }
+
+        if(queryIt == query.string().constEnd())
+        {
+            if(hitsSkipped == query.hitsToSkip())
+                returnBuffer.append(possibleMatch);
+            else
+                ++hitsSkipped;
+
+            if(returnBuffer.size() == query.hitLimit())
+                return IOOpReport(IO_OP_INSPECT, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
+
+            possibleMatch = TextPos::END;
+            queryIt = query.string().constBegin();
+        }
+
+        if(currentChar == ENDL)
+        {
+            currentPos.setLineNum(currentPos.getLineNum() + 1);
+            currentPos.setCharNum(0);
+        }
+        else
+            currentPos.setCharNum(currentPos.getCharNum() + 1);
+    }
+
+    // Return status
+    return IOOpReport(IO_OP_INSPECT, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
 }
 
-IOOpReport fileContainsString(bool& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity caseSensitivity)
+IOOpReport fileContainsString(bool& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity cs, bool allowSplit)
 {
-    TextPos queryLocation;
-    IOOpReport searchReport = findStringInFile(queryLocation, textFile, query, caseSensitivity);
-    returnBuffer = !queryLocation.isNull();
+    // Prepare query
+    TextQuery tq(query, cs);
+    tq.setAllowSplit(allowSplit);
+    tq.setHitLimit(1);
+
+    QList<TextPos> hit;
+    IOOpReport searchReport = findStringInFile(hit, textFile, tq, NoReadOptions);
+    returnBuffer = !hit.isEmpty();
 
     return searchReport;
 }

@@ -225,6 +225,38 @@ public:
     void closeFile();
 };
 
+class TextQuery
+{
+//-Instance Variables------------------------------------------------------------------------------------------------
+private:
+    QString mString;
+    Qt::CaseSensitivity mCaseSensitivity;
+    TextPos mStartPos;
+    int mHitsToSkip;
+    int mHitLimit;
+    bool mAllowSplit;
+
+//-Constructor-------------------------------------------------------------------------------------------------------
+public:
+    TextQuery(const QString& string, Qt::CaseSensitivity cs = Qt::CaseSensitive);
+
+//-Instance Functions------------------------------------------------------------------------------------------------
+public:
+    const QString& string() const;
+    Qt::CaseSensitivity caseSensitivity() const;
+    TextPos startPosition() const;
+    int hitsToSkip() const;
+    int hitLimit() const;
+    bool allowSplit() const;
+
+    void setString(QString string);
+    void setCaseSensitivity(Qt::CaseSensitivity caseSensitivity);
+    void setStartPosition(TextPos startPosition);
+    void setHitsToSkip(int hitsToSkip);
+    void setHitLimit(int hitLimit);
+    void setAllowSplit(bool allowSplit);
+};
+
 class TextStream : public QTextStream
 {
 //-Instance Variables------------------------------------------------------------------------------------------------
@@ -280,12 +312,11 @@ public:
 
 // Text
     IOOpReport textFileEndsWithNewline(bool& returnBuffer, QFile& textFile);
-    IOOpReport textFileLayout(QList<int>& returnBuffer, QFile& textFile, bool ignoreTrailingEmpty = false);
+    IOOpReport textFileLayout(QList<int>& returnBuffer, QFile& textFile, bool ignoreTrailingEmpty);
     IOOpReport textFileLineCount(int& returnBuffer, QFile& textFile, bool ignoreTrailingEmpty);
     IOOpReport textFileAbsolutePosition(TextPos& textPos, QFile& textFile, bool ignoreTrailingEmpty);
-    IOOpReport findStringInFile(TextPos& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive, int hitsToSkip = 0 );
-    IOOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive, int hitLimit = -1);
-    IOOpReport fileContainsString(bool& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive);
+    IOOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const TextQuery& query, ReadOptions readOptions = NoReadOptions);
+    IOOpReport fileContainsString(bool& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive, bool allowSplit = false);
     IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos, int count, ReadOptions readOptions = NoReadOptions);
     IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos = TextPos::START, TextPos endPos = TextPos::END, ReadOptions readOptions = NoReadOptions);
     IOOpReport readTextFromFile(QStringList& returnBuffer, QFile &textFile, int startLine = 0, int endLine = -1, ReadOptions readOptions = NoReadOptions);
