@@ -670,6 +670,74 @@ IOOpReport textFileLayout(QList<int>& returnBuffer, QFile& textFile, bool ignore
     return IOOpReport(IO_OP_ENUMERATE, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
 }
 
+IOOpReport textFileLineCount(int& returnBuffer, QFile& textFile, bool ignoreTrailingEmpty)
+{
+    // Reset return buffer
+    returnBuffer = 0;
+
+    // Check file
+    IOOpResultType fileCheckResult = fileCheck(textFile);
+    if(fileCheckResult != IO_SUCCESS)
+        return IOOpReport(IO_OP_ENUMERATE, fileCheckResult, textFile);
+
+    // If file is empty return immediately
+    if(fileIsEmpty(textFile))
+        return IOOpReport(IO_OP_ENUMERATE, IO_SUCCESS, textFile);
+
+    // Attempt to open file
+    IOOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly);
+    if(openResult != IO_SUCCESS)
+        return IOOpReport(IO_OP_ENUMERATE, openResult, textFile);
+
+    // Ensure file is closed upon return
+    QScopeGuard fileGuard([&textFile](){ textFile.close(); });
+
+    // Create Text Stream
+    Qx::TextStream fileTextStream(&textFile);
+
+    // Count lines
+    for(; !fileTextStream.atEnd(); ++returnBuffer)
+        fileTextStream.readLineInto(nullptr);
+
+    // Account for blank line if present and desired
+    if(!ignoreTrailingEmpty && fileTextStream.precedingBreak())
+        ++returnBuffer;
+
+    // Return status
+    return IOOpReport(IO_OP_ENUMERATE, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
+}
+
+IOOpReport textFileAbsolutePosition(TextPos& textPos, QFile& textFile, bool ignoreTrailingEmpty)
+{
+    // Do nothing if position is null
+    if(textPos.isNull())
+        return IOOpReport(IO_OP_ENUMERATE, IO_SUCCESS, textFile);
+
+    // Get file layout
+    QList<int> textLayout;
+    IOOpReport layoutCheck = textFileLayout(textLayout, textFile, ignoreTrailingEmpty);
+    if(!layoutCheck.wasSuccessful())
+        return layoutCheck;
+
+    // Translate line number
+    if(textPos.getLineNum() == -1)
+        textPos.setLineNum(textLayout.count() - 1);
+    else if(textPos.getLineNum() >= textLayout.count())
+    {
+        textPos = TextPos();
+        return IOOpReport(IO_OP_ENUMERATE, IO_SUCCESS, textFile);
+    }
+
+    // Translate character number
+    if(textPos.getCharNum() == -1)
+        textPos.setCharNum(textLayout.value(textPos.getLineNum()) - 1);
+    else if(textPos.getCharNum() >= textLayout.value(textPos.getLineNum()))
+        textPos.setCharNum(textLayout.value(textPos.getLineNum())); // Reel back to line end so that \n is still included
+
+
+    return IOOpReport(IO_OP_ENUMERATE, IO_SUCCESS, textFile);
+}
+
 IOOpReport findStringInFile(TextPos& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity caseSensitivity, int hitsToSkip)
 {
     // Returns the found match after skipping the requested hits if it exists, otherwise returns a null position
