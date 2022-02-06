@@ -10,7 +10,6 @@ inline uint qHash(const T &t, uint seed) { \
     return ::qHash(static_cast<typename std::underlying_type<T>::type>(t), seed); \
 }
 
-
 #ifdef QT_WIDGETS_LIB // Only enabled for Widget applications
 #include <QWidget>
 #include <QMessageBox>
@@ -201,7 +200,7 @@ class ByteArray
 //-Class Functions----------------------------------------------------------------------------------------------
 public:
     template<typename T, QX_ENABLE_IF(std::is_integral<T>)>
-    static QByteArray RAWFromPrimitive(T primitive, Endian::Endianness endianness = Endian::LE)
+    static QByteArray fromPrimitive(T primitive, Endian::Endianness endianness = Endian::LE)
     {
         QByteArray rawBytes;
 
@@ -225,7 +224,7 @@ public:
     }
 
     template<typename T, QX_ENABLE_IF(std::is_floating_point<T>)>
-    static QByteArray RAWFromPrimitive(T primitive, Endian::Endianness endianness = Endian::LE)
+    static QByteArray fromPrimitive(T primitive, Endian::Endianness endianness = Endian::LE)
     {
         QByteArray rawBytes;
 
@@ -261,7 +260,7 @@ public:
     }
 
     template<typename T, QX_ENABLE_IF(std::is_fundamental<T>)>
-    static T RAWToPrimitive(QByteArray ba, Endian::Endianness endianness = Endian::LE)
+    static T toPrimitive(QByteArray ba, Endian::Endianness endianness = Endian::LE)
     {
         static_assert(std::numeric_limits<float>::is_iec559, "Only supports IEC 559 (IEEE 754) float"); // For floats
         assert((ba.size() >= 2 && ba.size() <= 8 && isEven(ba.size())) || ba.size() == 1);
@@ -781,7 +780,7 @@ class List
 //-Class Functions----------------------------------------------------------------------------------------------
 public:
     template<typename T>
-    static QList<T>* getSubListThatContains(T element, QList<QList<T>*> listOfLists)
+    static QList<T>* subListThatContains(T element, QList<QList<T>*> listOfLists)
     {
         // Returns pointer to the first list that contains "element". Returns nullptr if none
         for(QList<T>* currentList : listOfLists)
@@ -791,7 +790,7 @@ public:
         return nullptr;
     }
 
-    template<typename T> static QList<T> subtractAB(QList<T> &listA, QList<T> &listB)
+    template<typename T> static QList<T> difference(QList<T> &listA, QList<T> &listB)
     {
         // Difference list to fill
         QList<T> differenceList;
