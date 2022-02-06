@@ -599,12 +599,11 @@ class GenericError //TODO - Have Qx functions that use this class return "defaul
 {
 //-Class Enums-----------------------------------------------------------------------------------------------
 public:
-    enum ErrorLevel { Undefined, Warning, Error, Critical };
+    enum ErrorLevel {Warning, Error, Critical };
 
 //-Class Members---------------------------------------------------------------------------------------------
 private:
     static inline const QHash<ErrorLevel, QString> ERR_LVL_STRING_MAP = {
-        {ErrorLevel::Undefined, "Undefined Severity"},
         {ErrorLevel::Warning, "Warning"},
         {ErrorLevel::Error, "Error"},
         {ErrorLevel::Critical, "Critical"},

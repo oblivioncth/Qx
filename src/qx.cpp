@@ -205,7 +205,7 @@ const GenericError GenericError::UNKNOWN_ERROR = Qx::GenericError(GenericError::
 
 //-Constructor----------------------------------------------------------------------------------------------
 //Public:
-GenericError::GenericError() : mErrorLevel(Undefined) {}
+GenericError::GenericError() : mErrorLevel(Error) {}
 GenericError::GenericError(ErrorLevel errorLevel, QString primaryInfo, QString secondaryInfo, QString detailedInfo, QString caption)
     : mErrorLevel(errorLevel), mCaption(caption), mPrimaryInfo(primaryInfo), mSecondaryInfo(secondaryInfo), mDetailedInfo(detailedInfo) {}
 
@@ -239,10 +239,6 @@ int GenericError::exec(QMessageBox::StandardButtons choices, QMessageBox::Standa
 
     switch(mErrorLevel)
     {
-        case Undefined:
-            icon = QMessageBox::NoIcon;
-            break;
-
         case Warning:
             icon = QMessageBox::Warning;
             break;
@@ -325,10 +321,10 @@ GenericError Json::checkedKeyRetrieval(bool& valueBuffer, QJsonObject jObject, Q
     QJsonValue potentialBool;
 
     if((potentialBool = jObject.value(key)).isUndefined())
-        return GenericError(GenericError::Undefined, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_BOOL, key), ERR_KEY_DOESNT_EXIST.arg(key));
+        return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_BOOL, key), ERR_KEY_DOESNT_EXIST.arg(key));
 
     if(!potentialBool.isBool())
-        return GenericError(GenericError::Undefined, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_BOOL, key), ERR_KEY_TYPE_MISMATCH.arg(key, JSON_TYPE_BOOL));
+        return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_BOOL, key), ERR_KEY_TYPE_MISMATCH.arg(key, JSON_TYPE_BOOL));
     else
         valueBuffer = potentialBool.toBool();
 
@@ -343,10 +339,10 @@ GenericError Json::checkedKeyRetrieval(double& valueBuffer, QJsonObject jObject,
     QJsonValue potentialDouble;
 
     if((potentialDouble = jObject.value(key)).isUndefined())
-        return GenericError(GenericError::Undefined, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_DOUBLE, key), ERR_KEY_DOESNT_EXIST.arg(key));
+        return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_DOUBLE, key), ERR_KEY_DOESNT_EXIST.arg(key));
 
     if(!potentialDouble.isDouble())
-        return GenericError(GenericError::Undefined, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_DOUBLE, key), ERR_KEY_TYPE_MISMATCH.arg(key, JSON_TYPE_DOUBLE));
+        return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_DOUBLE, key), ERR_KEY_TYPE_MISMATCH.arg(key, JSON_TYPE_DOUBLE));
     else
         valueBuffer = potentialDouble.toDouble();
 
@@ -361,10 +357,10 @@ GenericError Json::checkedKeyRetrieval(QString& valueBuffer, QJsonObject jObject
     QJsonValue potentialString;
 
     if((potentialString = jObject.value(key)).isUndefined())
-        return GenericError(GenericError::Undefined, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_STRING, key), ERR_KEY_DOESNT_EXIST.arg(key));
+        return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_STRING, key), ERR_KEY_DOESNT_EXIST.arg(key));
 
     if(!potentialString.isString())
-        return GenericError(GenericError::Undefined, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_STRING, key), ERR_KEY_TYPE_MISMATCH.arg(key, JSON_TYPE_STRING));
+        return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_STRING, key), ERR_KEY_TYPE_MISMATCH.arg(key, JSON_TYPE_STRING));
     else
         valueBuffer = potentialString.toString();
 
@@ -379,10 +375,10 @@ GenericError Json:: checkedKeyRetrieval(QJsonArray& valueBuffer, QJsonObject jOb
     QJsonValue potentialArray;
 
     if((potentialArray = jObject.value(key)).isUndefined())
-        return GenericError(GenericError::Undefined, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_ARRAY, key), ERR_KEY_DOESNT_EXIST.arg(key));
+        return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_ARRAY, key), ERR_KEY_DOESNT_EXIST.arg(key));
 
     if(!potentialArray.isArray())
-        return GenericError(GenericError::Undefined, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_ARRAY, key), ERR_KEY_TYPE_MISMATCH.arg(key, JSON_TYPE_ARRAY));
+        return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_ARRAY, key), ERR_KEY_TYPE_MISMATCH.arg(key, JSON_TYPE_ARRAY));
     else
         valueBuffer = potentialArray.toArray();
 
@@ -397,10 +393,10 @@ GenericError Json::checkedKeyRetrieval(QJsonObject& valueBuffer, QJsonObject jOb
     QJsonValue potentialObject;
 
     if((potentialObject = jObject.value(key)).isUndefined())
-        return GenericError(GenericError::Undefined, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_OBJECT, key), ERR_KEY_DOESNT_EXIST.arg(key));
+        return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_OBJECT, key), ERR_KEY_DOESNT_EXIST.arg(key));
 
     if(!potentialObject.isObject())
-        return GenericError(GenericError::Undefined, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_OBJECT, key), ERR_KEY_TYPE_MISMATCH.arg(key, JSON_TYPE_OBJECT));
+        return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_OBJECT, key), ERR_KEY_TYPE_MISMATCH.arg(key, JSON_TYPE_OBJECT));
     else
         valueBuffer = potentialObject.toObject();
 

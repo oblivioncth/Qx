@@ -243,7 +243,7 @@ SyncDownloadManager::Report SyncDownloadManager::processQueue()
     // Get total task size
     NetworkReplyError enumError = enumerateTotalSize();
     if(enumError.isValid())
-        return Report(FinishStatus::Error, GenericError(GenericError::Undefined, ERR_ENUM_TOTAL_SIZE.arg(enumError.getUrl().toString()), enumError.getText()));
+        return Report(FinishStatus::Error, GenericError(GenericError::Error, ERR_ENUM_TOTAL_SIZE.arg(enumError.getUrl().toString()), enumError.getText()));
 
     // Add initial downloads
     for(int j = 0; j < mMaxSimultaneous && !mPendingDownloads.isEmpty(); j++)
