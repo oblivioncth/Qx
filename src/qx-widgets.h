@@ -71,7 +71,7 @@ private slots:
     void rejectHandler();
 };
 
-class StandardItemModelX : public QStandardItemModel
+class StandardItemModel : public QStandardItemModel
 {
 //-Instance Members---------------------------------------------------------------------------------------------------
 private:
@@ -80,7 +80,7 @@ private:
 
 //-Constructor-------------------------------------------------------------------------------------------------------
 public:
-    StandardItemModelX();
+    StandardItemModel();
 
 //-Instance Functions----------------------------------------------------------------------------------------------
 public:

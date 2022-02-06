@@ -104,11 +104,11 @@ void LoginDialog::rejectHandler()
 
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
-StandardItemModelX::StandardItemModelX() {}
+StandardItemModel::StandardItemModel() {}
 
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Private:
-void StandardItemModelX::autoTristateChildren(QStandardItem* changingItem, const QVariant & value, int role)
+void StandardItemModel::autoTristateChildren(QStandardItem* changingItem, const QVariant & value, int role)
 {
     for( int i = 0; i < changingItem->rowCount() ; i++ )
     {
@@ -118,7 +118,7 @@ void StandardItemModelX::autoTristateChildren(QStandardItem* changingItem, const
     }
 }
 
-void StandardItemModelX::autoTristateParents(QStandardItem* changingItem, const QVariant & changingValue)
+void StandardItemModel::autoTristateParents(QStandardItem* changingItem, const QVariant & changingValue)
 {
     QStandardItem* itemParent = changingItem->parent();
     if(itemParent && (itemParent->isAutoTristate() || mAutoTristate) && data(itemParent->index(), Qt::CheckStateRole).isValid())
@@ -159,7 +159,7 @@ void StandardItemModelX::autoTristateParents(QStandardItem* changingItem, const 
 }
 
 //Public:
-bool StandardItemModelX::setData(const QModelIndex & index, const QVariant & value, int role)
+bool StandardItemModel::setData(const QModelIndex & index, const QVariant & value, int role)
 {
     if(role == Qt::CheckStateRole)
     {
@@ -178,10 +178,10 @@ bool StandardItemModelX::setData(const QModelIndex & index, const QVariant & val
     return QStandardItemModel::setData(index, value, role);
 }
 
-bool StandardItemModelX::isAutoTristate() { return mAutoTristate; }
-void StandardItemModelX::setAutoTristate(bool autoTristate) { mAutoTristate = autoTristate; }
+bool StandardItemModel::isAutoTristate() { return mAutoTristate; }
+void StandardItemModel::setAutoTristate(bool autoTristate) { mAutoTristate = autoTristate; }
 
-void StandardItemModelX::forEachItem(const std::function<void (QStandardItem*)>& func, QModelIndex parent)
+void StandardItemModel::forEachItem(const std::function<void (QStandardItem*)>& func, QModelIndex parent)
 {
     for(int r = 0; r < rowCount(parent); ++r)
     {
@@ -193,7 +193,7 @@ void StandardItemModelX::forEachItem(const std::function<void (QStandardItem*)>&
     }
 }
 
-void StandardItemModelX::selectAll() { forEachItem([](QStandardItem* item){ item->setCheckState(Qt::Checked); }); }
-void StandardItemModelX::selectNone() { forEachItem([](QStandardItem* item){ item->setCheckState(Qt::Unchecked); }); }
+void StandardItemModel::selectAll() { forEachItem([](QStandardItem* item){ item->setCheckState(Qt::Checked); }); }
+void StandardItemModel::selectNone() { forEachItem([](QStandardItem* item){ item->setCheckState(Qt::Unchecked); }); }
 
 }
