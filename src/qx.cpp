@@ -273,6 +273,29 @@ int GenericError::exec(QMessageBox::StandardButtons choices, QMessageBox::Standa
     // Show dialog and return user response
     return genericErrorMessage.exec();
 }
+#else
+void GenericError::print() const
+{
+    // Primary heading
+    cerr << errorLevelString() << ": ";
+    if(!mCaption.isEmpty())
+        cerr << mCaption;
+    cerr << Qt::endl;
+
+    // Primary info
+    cerr << mPrimaryInfo << Qt::endl;
+
+    // Secondary info
+    if(!mSecondaryInfo.isEmpty())
+        cerr << mSecondaryInfo << Qt::endl;
+
+    // Detailed info
+    if(!mDetailedInfo.isEmpty())
+        cerr << Qt::endl << DETAILED_INFO_HEADING << Qt::endl << mDetailedInfo << Qt::endl;
+
+    // Pad
+    cerr << Qt::endl;
+}
 #endif
 
 //===============================================================================================================

@@ -27,6 +27,7 @@ inline uint qHash(const T &t, uint seed) { \
 
 #include <QBitArray>
 #include <stdexcept>
+#include <iostream>
 #include "assert.h"
 
 //-Non-namspace Functions-------------------------------------------------------------------------------------------------
@@ -95,6 +96,11 @@ using is_json_type = std::bool_constant<is_any<T, bool, double, QString, QJsonAr
 
 template<typename T>
 using is_datastream_type = std::bool_constant<is_any<T, bool, double, QString, QJsonArray, QJsonObject>::value>;
+
+//-Namespace Members--------------------------------------------------------------------------------------------
+static QTextStream cout; // QTextStream version of std::cout
+static QTextStream cerr; // QTextStream version of std::cerr
+static QTextStream cin; // QTextStream version of std::cin
 
 //-Class Forward Declarations---------------------------------------------------------------------------------------------
 template <typename T, QX_ENABLE_IF(std::is_arithmetic<T>)>
@@ -604,6 +610,8 @@ private:
         {ErrorLevel::Critical, "Critical"},
     };
 
+    QString DETAILED_INFO_HEADING = "Details:\n--------";
+
 public:
     static const GenericError UNKNOWN_ERROR;
 
@@ -639,7 +647,10 @@ public:
 
 #ifdef QT_WIDGETS_LIB // Only enabled for Widget applications
     int exec(QMessageBox::StandardButtons choices, QMessageBox::StandardButton defChoice = QMessageBox::NoButton) const;
+#else
+    void print() const;
 #endif
+
 };
 
 class Integrity
