@@ -549,40 +549,7 @@ bool String::isHexNumber(QString hexNum) { return RegEx::hexOnly.match(hexNum).h
 
 bool String::isValidChecksum(QString checksum, QCryptographicHash::Algorithm hashAlgorithm)
 {
-    int correctLength;
-
-    switch(hashAlgorithm)
-    {
-        case QCryptographicHash::Md4:
-        case QCryptographicHash::Md5:
-            correctLength = 32;
-        break;
-        case QCryptographicHash::Sha1:
-            correctLength = 40;
-        break;
-        case QCryptographicHash::Sha224:
-        case QCryptographicHash::Sha3_224:
-        case QCryptographicHash::Keccak_224:
-            correctLength = 56;
-        break;
-        case QCryptographicHash::Sha256:
-        case QCryptographicHash::Sha3_256:
-        case QCryptographicHash::Keccak_256:
-            correctLength = 64;
-        break;
-        case QCryptographicHash::Sha384:
-        case QCryptographicHash::Sha3_384:
-        case QCryptographicHash::Keccak_384:
-            correctLength = 96;
-        break;
-        case QCryptographicHash::Sha512:
-        case QCryptographicHash::Sha3_512:
-        case QCryptographicHash::Keccak_512:
-            correctLength = 128;
-        break;
-    }
-
-    return checksum.length() == correctLength && isHexNumber(checksum);
+    return (checksum.length() == QCryptographicHash::hashLength(hashAlgorithm) * 2) && isHexNumber(checksum);
 }
 
 QString String::fromByteArrayDirectly(QByteArray data)
