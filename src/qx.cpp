@@ -305,7 +305,7 @@ void GenericError::print() const
 
 //-Class Functions---------------------------------------------------------------------------------------------
 //Public:
-QString Integrity::generateChecksum(QByteArray &data, QCryptographicHash::Algorithm hashAlgorithm)
+QString Integrity::generateChecksum(QByteArray& data, QCryptographicHash::Algorithm hashAlgorithm)
 {
     QCryptographicHash checksumHash(hashAlgorithm);
     checksumHash.addData(data);
@@ -444,12 +444,12 @@ Mmrb::Mmrb(int major, int minor, int revision, int build) :
 
 //-Member Functions--------------------------------------------------------------------------------------------
 //Public:
-bool Mmrb::operator== (const Mmrb &otherMmrb)
+bool Mmrb::operator== (const Mmrb& otherMmrb)
 {
     return mMajor == otherMmrb.mMajor && mMinor == otherMmrb.mMinor && mRevision == otherMmrb.mRevision && mBuild == otherMmrb.mBuild;
 }
-bool Mmrb::operator!= (const Mmrb &otherMmrb) { return !(*this == otherMmrb); }
-bool Mmrb::operator> (const Mmrb &otherMmrb)
+bool Mmrb::operator!= (const Mmrb& otherMmrb) { return !(*this == otherMmrb); }
+bool Mmrb::operator> (const Mmrb& otherMmrb)
 {
     if(mMajor == otherMmrb.mMajor)
     {
@@ -466,9 +466,9 @@ bool Mmrb::operator> (const Mmrb &otherMmrb)
     else
         return mMajor > otherMmrb.mMajor;
 }
-bool Mmrb::operator>= (const Mmrb &otherMmrb) { return *this == otherMmrb || *this > otherMmrb; }
-bool Mmrb::operator< (const Mmrb &otherMmrb) { return !(*this >= otherMmrb); }
-bool Mmrb::operator<= (const Mmrb &otherMmrb) { return !(*this > otherMmrb); }
+bool Mmrb::operator>= (const Mmrb& otherMmrb) { return *this == otherMmrb || *this > otherMmrb; }
+bool Mmrb::operator< (const Mmrb& otherMmrb) { return !(*this >= otherMmrb); }
+bool Mmrb::operator<= (const Mmrb& otherMmrb) { return !(*this > otherMmrb); }
 
 bool Mmrb::isNull() { return mMajor == -1 && mMinor == -1 && mRevision == -1 && mBuild == -1; }
 

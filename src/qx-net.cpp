@@ -345,7 +345,7 @@ void SyncDownloadManager::downloadProgressHandler(qint64 bytesCurrent, qint64 by
     emit downloadProgress(mCurrentBytes.total());
 }
 
-void SyncDownloadManager::downloadFinished(QNetworkReply *reply)
+void SyncDownloadManager::downloadFinished(QNetworkReply* reply)
 {
     // Get writer
     std::shared_ptr<FileStreamWriter> fileWriter = mActiveDownloads[reply];

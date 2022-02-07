@@ -46,7 +46,7 @@ void TreeInputDialog::setModel(QAbstractItemModel* model) { mTreeView->setModel(
 
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
-LoginDialog::LoginDialog(QWidget *parent, QString prompt) : QDialog(parent)
+LoginDialog::LoginDialog(QWidget* parent, QString prompt) : QDialog(parent)
 {
     // Setup LineEdits
     mUsernameLineEdit = new QLineEdit(this);
@@ -108,17 +108,17 @@ StandardItemModel::StandardItemModel() {}
 
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Private:
-void StandardItemModel::autoTristateChildren(QStandardItem* changingItem, const QVariant & value, int role)
+void StandardItemModel::autoTristateChildren(QStandardItem* changingItem, const QVariant&  value, int role)
 {
     for( int i = 0; i < changingItem->rowCount() ; i++ )
     {
-        QStandardItem *childItem = changingItem->child(i);
+        QStandardItem* childItem = changingItem->child(i);
         if((childItem->isAutoTristate() || mAutoTristate) && data(childItem->index(), Qt::CheckStateRole).isValid())
             setData(childItem->index(), value, role);
     }
 }
 
-void StandardItemModel::autoTristateParents(QStandardItem* changingItem, const QVariant & changingValue)
+void StandardItemModel::autoTristateParents(QStandardItem* changingItem, const QVariant&  changingValue)
 {
     QStandardItem* itemParent = changingItem->parent();
     if(itemParent && (itemParent->isAutoTristate() || mAutoTristate) && data(itemParent->index(), Qt::CheckStateRole).isValid())
@@ -127,7 +127,7 @@ void StandardItemModel::autoTristateParents(QStandardItem* changingItem, const Q
         bool hasUncheckedSiblings = false;
         for(int i = 0; i < itemParent->rowCount(); i++)
         {
-            QStandardItem *sibling = itemParent->child(i);
+            QStandardItem* sibling = itemParent->child(i);
             int checkState = sibling == changingItem ? changingValue.toInt() : sibling->checkState();
 
             hasCheckedSiblings = hasCheckedSiblings ||
@@ -159,7 +159,7 @@ void StandardItemModel::autoTristateParents(QStandardItem* changingItem, const Q
 }
 
 //Public:
-bool StandardItemModel::setData(const QModelIndex & index, const QVariant & value, int role)
+bool StandardItemModel::setData(const QModelIndex&  index, const QVariant&  value, int role)
 {
     if(role == Qt::CheckStateRole)
     {

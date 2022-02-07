@@ -149,12 +149,12 @@ public:
     void setNull();
     bool isNull() const;
 
-    bool operator== (const TextPos &otherTextPos);
-    bool operator!= (const TextPos &otherTextPos);
-    bool operator> (const TextPos &otherTextPos);
-    bool operator>= (const TextPos &otherTextPos);
-    bool operator< (const TextPos &otherTextPos);
-    bool operator<= (const TextPos &otherTextPos);
+    bool operator== (const TextPos& otherTextPos);
+    bool operator!= (const TextPos& otherTextPos);
+    bool operator> (const TextPos& otherTextPos);
+    bool operator>= (const TextPos& otherTextPos);
+    bool operator< (const TextPos& otherTextPos);
+    bool operator<= (const TextPos& otherTextPos);
 };
 
 class FileStreamWriter // Specialized wrapper for QDataStream
@@ -266,7 +266,7 @@ private:
 
 //-Constructor-------------------------------------------------------------------------------------------------------
 public:
-    TextStream(const QByteArray &array, QIODevice::OpenMode openMode = QIODevice::ReadOnly);
+    TextStream(const QByteArray& array, QIODevice::OpenMode openMode = QIODevice::ReadOnly);
     TextStream(QByteArray* array, QIODevice::OpenMode openMode = QIODevice::ReadWrite);
     TextStream(QString* string, QIODevice::OpenMode openMode = QIODevice::ReadWrite);
     TextStream(FILE* fileHandle, QIODevice::OpenMode openMode = QIODevice::ReadWrite);
@@ -319,9 +319,9 @@ public:
     IoOpReport fileContainsString(bool& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive, bool allowSplit = false);
     IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos, int count, ReadOptions readOptions = NoReadOptions);
     IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos = TextPos::START, TextPos endPos = TextPos::END, ReadOptions readOptions = NoReadOptions);
-    IoOpReport readTextFromFile(QStringList& returnBuffer, QFile &textFile, int startLine = 0, int endLine = -1, ReadOptions readOptions = NoReadOptions);
+    IoOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, int startLine = 0, int endLine = -1, ReadOptions readOptions = NoReadOptions);
     IoOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode writeMode = Truncate, TextPos startPos = TextPos::START, WriteOptions writeOptions = NoWriteOptions);
-    IoOpReport deleteTextFromFile(QFile &textFile, TextPos startPos, TextPos endPos);
+    IoOpReport deleteTextFromFile(QFile& textFile, TextPos startPos, TextPos endPos);
 
 // Directory:
     bool dirContainsFiles(QDir directory, QDirIterator::IteratorFlags iteratorFlags);
@@ -332,7 +332,7 @@ public:
     IoOpReport fileMatchesChecksum(bool& returnBuffer, QFile& file, QString checksum, QCryptographicHash::Algorithm hashAlgorithm);
 
 // Binary Based
-    IoOpReport readBytesFromFile(QByteArray& returnBuffer, QFile &file, qint64 startPos = 0, qint64 endPos = -1);
+    IoOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, qint64 startPos = 0, qint64 endPos = -1);
     IoOpReport writeBytesToFile(QFile& file, const QByteArray& bytes, WriteMode writeMode = Truncate, qint64 startPos = 0, WriteOptions writeOptions = NoWriteOptions);
 }
 

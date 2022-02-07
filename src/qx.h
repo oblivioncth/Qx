@@ -6,7 +6,7 @@
 #define QX_ENABLE_IF_D(...) std::enable_if_t<__VA_ARGS__::value, int> // enable_if Macro with no default argument, use if template was already forward declared
 
 #define QX_SCOPED_ENUM_HASH_FUNC(T) \
-inline uint qHash(const T &t, uint seed) { \
+inline uint qHash(const T& t, uint seed) { \
     return ::qHash(static_cast<typename std::underlying_type<T>::type>(t), seed); \
 }
 
@@ -656,7 +656,7 @@ class Integrity
 {
 //-Class Functions---------------------------------------------------------------------------------------------
 public:
-    static QString generateChecksum(QByteArray &data, QCryptographicHash::Algorithm hashAlgorithm);
+    static QString generateChecksum(QByteArray& data, QCryptographicHash::Algorithm hashAlgorithm);
 };
 
 class Json
@@ -800,7 +800,7 @@ public:
         return nullptr;
     }
 
-    template<typename T> static QList<T> difference(QList<T> &listA, QList<T> &listB)
+    template<typename T> static QList<T> difference(QList<T>& listA, QList<T>& listB)
     {
         // Difference list to fill
         QList<T> differenceList;
@@ -838,12 +838,12 @@ public:
 
 //-Member Functions--------------------------------------------------------------------------------------------
 public:
-    bool operator== (const Mmrb &otherMMRB);
-    bool operator!= (const Mmrb &otherMMRB);
-    bool operator> (const Mmrb &otherMMRB);
-    bool operator>= (const Mmrb &otherMMRB);
-    bool operator< (const Mmrb &otherMMRB);
-    bool operator<= (const Mmrb &otherMMRB);
+    bool operator== (const Mmrb& otherMMRB);
+    bool operator!= (const Mmrb& otherMMRB);
+    bool operator> (const Mmrb& otherMMRB);
+    bool operator>= (const Mmrb& otherMMRB);
+    bool operator< (const Mmrb& otherMMRB);
+    bool operator<= (const Mmrb& otherMMRB);
 
     bool isNull();
     QString toString(StringFormat format = StringFormat::Full);

@@ -23,11 +23,11 @@ private:
 
 //-Constructor-------------------------------------------------------------------------------------------------------
 public:
-    explicit TreeInputDialog(QWidget *parent = nullptr);
+    explicit TreeInputDialog(QWidget* parent = nullptr);
 
 //-Instance Functions----------------------------------------------------------------------------------------------
 public:
-    void setModel(QAbstractItemModel *model);
+    void setModel(QAbstractItemModel* model);
 
 //-Signals---------------------------------------------------------------------------------------------------------
 signals:
@@ -57,7 +57,7 @@ private:
 
 //-Constructor-------------------------------------------------------------------------------------------------------
 public:
-    explicit LoginDialog(QWidget *parent = nullptr, QString prompt = LABEL_DEF_PRMT);
+    explicit LoginDialog(QWidget* parent = nullptr, QString prompt = LABEL_DEF_PRMT);
 
 //-Instance Functions----------------------------------------------------------------------------------------------
 public:
@@ -84,11 +84,11 @@ public:
 
 //-Instance Functions----------------------------------------------------------------------------------------------
 public:
-    void autoTristateChildren(QStandardItem* changingItem, const QVariant & value, int role);
-    void autoTristateParents(QStandardItem* changingItem, const QVariant & changingValue);
+    void autoTristateChildren(QStandardItem* changingItem, const QVariant&  value, int role);
+    void autoTristateParents(QStandardItem* changingItem, const QVariant&  changingValue);
 
 public:
-    virtual bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
+    virtual bool setData(const QModelIndex&  index, const QVariant&  value, int role = Qt::EditRole);
     bool isAutoTristate();
     void setAutoTristate(bool autoTristate);
     void forEachItem(std::function<void(QStandardItem*)> const& func, QModelIndex parent = QModelIndex());

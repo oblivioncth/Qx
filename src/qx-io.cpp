@@ -43,7 +43,7 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
     };
 
     //-Unit Functions-----------------------------------------------------------------------------------------------------
-    IoOpResultType parsedOpen(QFile &file, QIODevice::OpenMode openMode)
+    IoOpResultType parsedOpen(QFile& file, QIODevice::OpenMode openMode)
     {
         if(file.open(openMode))
             return IO_SUCCESS;
@@ -51,7 +51,7 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
             return FILE_DEV_ERR_MAP.value(file.error());
     }
 
-    IoOpResultType fileCheck(const QFile &file)
+    IoOpResultType fileCheck(const QFile& file)
     {
         if(file.exists())
         {
@@ -64,7 +64,7 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
             return IO_ERR_FILE_DNE;
     }
 
-    IoOpResultType directoryCheck(QDir &dir)
+    IoOpResultType directoryCheck(QDir& dir)
     {
         if(dir.exists())
         {
@@ -227,18 +227,18 @@ TextPos::TextPos(int lineNum, int charNum) :
 
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:
-bool TextPos::operator==(const TextPos &otherTextPos) { return mLineNum == otherTextPos.mLineNum && mCharNum == otherTextPos.mCharNum; }
-bool TextPos::operator!= (const TextPos &otherTextPos) { return !(*this == otherTextPos); }
-bool TextPos::operator> (const TextPos &otherTextPos)
+bool TextPos::operator==(const TextPos& otherTextPos) { return mLineNum == otherTextPos.mLineNum && mCharNum == otherTextPos.mCharNum; }
+bool TextPos::operator!= (const TextPos& otherTextPos) { return !(*this == otherTextPos); }
+bool TextPos::operator> (const TextPos& otherTextPos)
 {
     if(mLineNum == otherTextPos.mLineNum)
         return NII<int>(mCharNum) > NII<int>(otherTextPos.mCharNum);
     else
         return NII<int>(mLineNum) > NII<int>(otherTextPos.mLineNum);
 }
-bool TextPos::operator>= (const TextPos &otherTextPos) { return *this == otherTextPos || *this > otherTextPos; }
-bool TextPos::operator< (const TextPos &otherTextPos) { return !(*this >= otherTextPos); }
-bool TextPos::operator<= (const TextPos &otherTextPos) { return !(*this > otherTextPos); }
+bool TextPos::operator>= (const TextPos& otherTextPos) { return *this == otherTextPos || *this > otherTextPos; }
+bool TextPos::operator< (const TextPos& otherTextPos) { return !(*this >= otherTextPos); }
+bool TextPos::operator<= (const TextPos& otherTextPos) { return !(*this > otherTextPos); }
 
 int TextPos::getLineNum() const { return mLineNum; }
 int TextPos::getCharNum() const { return mCharNum; }
@@ -427,7 +427,7 @@ void TextQuery::setAllowSplit(bool allowSplit) { mAllowSplit = allowSplit; }
 
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
-TextStream::TextStream(const QByteArray &array, QIODevice::OpenMode openMode) : QTextStream(array, openMode) {}
+TextStream::TextStream(const QByteArray& array, QIODevice::OpenMode openMode) : QTextStream(array, openMode) {}
 TextStream::TextStream(QByteArray* array, QIODevice::OpenMode openMode) : QTextStream(array, openMode) {}
 TextStream::TextStream(QString* string, QIODevice::OpenMode openMode) : QTextStream(string, openMode) {}
 TextStream::TextStream(FILE* fileHandle, QIODevice::OpenMode openMode): QTextStream(fileHandle, openMode) {}
@@ -1373,7 +1373,7 @@ IoOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode wri
     return IoOpReport(IO_OP_WRITE, TXT_STRM_STAT_MAP.value(textStream.status()), textFile);
 }
 
-IoOpReport deleteTextFromFile(QFile &textFile, TextPos startPos, TextPos endPos)
+IoOpReport deleteTextFromFile(QFile& textFile, TextPos startPos, TextPos endPos)
 {
     // Removes a string of a portion of the passed file [startPos, endPos] (inclusive for both)
 
