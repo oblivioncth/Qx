@@ -206,8 +206,13 @@ const GenericError GenericError::UNKNOWN_ERROR = Qx::GenericError(GenericError::
 //-Constructor----------------------------------------------------------------------------------------------
 //Public:
 GenericError::GenericError() : mErrorLevel(Error) {}
-GenericError::GenericError(ErrorLevel errorLevel, QString primaryInfo, QString secondaryInfo, QString detailedInfo, QString caption)
-    : mErrorLevel(errorLevel), mCaption(caption), mPrimaryInfo(primaryInfo), mSecondaryInfo(secondaryInfo), mDetailedInfo(detailedInfo) {}
+GenericError::GenericError(ErrorLevel errorLevel, QString primaryInfo, QString secondaryInfo, QString detailedInfo, QString caption) :
+    mErrorLevel(errorLevel),
+    mCaption(caption),
+    mPrimaryInfo(primaryInfo),
+    mSecondaryInfo(secondaryInfo),
+    mDetailedInfo(detailedInfo)
+{}
 
 //-Instance Functions----------------------------------------------------------------------------------------------
 //Public:
@@ -423,9 +428,19 @@ QWidgetList List::objectListToWidgetList(QObjectList list)
 //===============================================================================================================
 
 //-Constructor-------------------------------------------------------------------------------------------------
-MMRB::MMRB() { mMajor = -1; mMinor = -1; mRevision = -1; mBuild = -1; }
-MMRB::MMRB(int major, int minor, int revision, int build)
-    : mMajor(major), mMinor(minor), mRevision(revision), mBuild(build) {}
+MMRB::MMRB() :
+    mMajor(-1),
+    mMinor(-1),
+    mRevision(-1),
+    mBuild(-1)
+{}
+
+MMRB::MMRB(int major, int minor, int revision, int build) :
+    mMajor(major),
+    mMinor(minor),
+    mRevision(revision),
+    mBuild(build)
+{}
 
 //-Member Functions--------------------------------------------------------------------------------------------
 //Public:
@@ -638,7 +653,11 @@ QString String::join(QSet<QString> set, QString separator, QString prefix) // Ov
 
 //-Constructor-------------------------------------------------------------------------------------------------------
 //Public:
-StringTraverser::StringTraverser(const QString& string) : mIndex(0), mIterator(string.constBegin()), mEnd(string.constEnd()) {}
+StringTraverser::StringTraverser(const QString& string) :
+    mIndex(0),
+    mIterator(string.constBegin()),
+    mEnd(string.constEnd())
+{}
 
 //-Instance Functions--------------------------------------------------------------------------------------------------
 //Public:

@@ -34,10 +34,15 @@ uint qHash(const DownloadTask& key, uint seed) noexcept
 
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
-NetworkReplyError::NetworkReplyError()
-    : mErrorType(QNetworkReply::NoError), mUrl(QUrl()), mErrorText(QString()) {}
-NetworkReplyError::NetworkReplyError(QNetworkReply* reply, QUrl url)
-    : mErrorType(reply->error()), mUrl(url), mErrorText(reply->errorString()) {}
+NetworkReplyError::NetworkReplyError() :
+    mErrorType(QNetworkReply::NoError),
+    mUrl(QUrl()), mErrorText(QString())
+{}
+
+NetworkReplyError::NetworkReplyError(QNetworkReply* reply, QUrl url) :
+    mErrorType(reply->error()),
+    mUrl(url), mErrorText(reply->errorString())
+{}
 
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:
@@ -53,6 +58,7 @@ QString NetworkReplyError::getText() { return mErrorText; }
 //-Constructor-------------------------------------------------------------------------------------------------------
 //Public:
 SyncDownloadManager::Report::Report() : mFinishStatus(FinishStatus::Success) {}
+
 SyncDownloadManager::Report::Report(FinishStatus finishStatus, GenericError errorInfo) :
     mFinishStatus(finishStatus),
     mErrorInfo(errorInfo)

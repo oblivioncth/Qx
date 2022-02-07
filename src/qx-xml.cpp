@@ -18,11 +18,13 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
 
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
-XmlStreamWriterError::XmlStreamWriterError()
-    : mErrorText() {}
+XmlStreamWriterError::XmlStreamWriterError() :
+    mErrorText()
+{}
 
-XmlStreamWriterError::XmlStreamWriterError(QString errorText)
-    : mErrorText(errorText) {}
+XmlStreamWriterError::XmlStreamWriterError(QString errorText) :
+    mErrorText(errorText)
+{}
 
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:
@@ -35,14 +37,20 @@ QString XmlStreamWriterError::getText() { return mErrorText; }
 
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
-XmlStreamReaderError::XmlStreamReaderError()
-    : mErrorType(QXmlStreamReader::NoError), mErrorText(STD_ERR_TXT.value(QXmlStreamReader::NoError)) {}
+XmlStreamReaderError::XmlStreamReaderError() :
+    mErrorType(QXmlStreamReader::NoError),
+    mErrorText(STD_ERR_TXT.value(QXmlStreamReader::NoError))
+{}
 
-XmlStreamReaderError::XmlStreamReaderError(QXmlStreamReader::Error standardError)
-    : mErrorType(standardError), mErrorText(STD_ERR_TXT.value(standardError)) {}
+XmlStreamReaderError::XmlStreamReaderError(QXmlStreamReader::Error standardError) :
+    mErrorType(standardError),
+    mErrorText(STD_ERR_TXT.value(standardError))
+{}
 
-XmlStreamReaderError::XmlStreamReaderError(QString customError)
-    : mErrorType(QXmlStreamReader::Error::CustomError), mErrorText(customError) {}
+XmlStreamReaderError::XmlStreamReaderError(QString customError) :
+    mErrorType(QXmlStreamReader::Error::CustomError),
+    mErrorText(customError)
+{}
 
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:

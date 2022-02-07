@@ -210,10 +210,14 @@ const TextPos TextPos::END = TextPos(-1,-1); // Intialization of constant refere
 
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
-TextPos::TextPos() { mLineNum = -2; mCharNum = -2; }
+TextPos::TextPos() :
+    mLineNum(-2),
+    mCharNum(-2)
+{}
 
-TextPos::TextPos(int lineNum, int charNum)
- : mLineNum(lineNum), mCharNum(charNum)
+TextPos::TextPos(int lineNum, int charNum) :
+    mLineNum(lineNum),
+    mCharNum(charNum)
 {
     if(mLineNum < -1)
         mLineNum = -1;
@@ -265,7 +269,9 @@ bool TextPos::isNull() const { return mLineNum == -2 && mCharNum == -2; }
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
 FileStreamWriter::FileStreamWriter(QFile* file, WriteMode writeMode, WriteOptions writeOptions) :
-    mTargetFile(file), mWriteMode(writeMode), mWriteOptions(writeOptions)
+    mTargetFile(file),
+    mWriteMode(writeMode),
+    mWriteOptions(writeOptions)
 {
     // Map unsupported modes to supported ones
     if(mWriteMode == Insert)
@@ -498,7 +504,10 @@ QString TextStream::readLineWithBreak(qint64 maxlen)
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
 TextStreamWriter::TextStreamWriter(QFile* file, WriteMode writeMode, WriteOptions writeOptions) :
-    mTargetFile(file), mWriteMode(writeMode), mWriteOptions(writeOptions), mAtLineStart(true)
+    mTargetFile(file),
+    mWriteMode(writeMode),
+    mWriteOptions(writeOptions),
+    mAtLineStart(true)
 {
     // Map unsupported modes to supported ones
     if(mWriteMode == Insert)
