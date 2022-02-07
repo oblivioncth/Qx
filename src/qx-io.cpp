@@ -1444,36 +1444,6 @@ IoOpReport deleteTextFromFile(QFile& textFile, TextPos startPos, TextPos endPos)
     return IoOpReport(IO_OP_WRITE, TXT_STRM_STAT_MAP.value(textStream.status()), textFile);
 }
 
-//TODO: REmove me
-IoOpReport getDirFileList(QStringList& returnBuffer, QDir directory, QStringList extFilter, QDirIterator::IteratorFlag traversalFlags, Qt::CaseSensitivity caseSensitivity)
-{
-    // Empty buffer
-    returnBuffer = QStringList();
-
-    // Check directory
-    IoOpResultType dirCheckResult = directoryCheck(directory);
-    if(dirCheckResult != IO_SUCCESS)
-        return IoOpReport(IO_OP_ENUMERATE, dirCheckResult, directory);
-
-    // Normalize leading dot for extensions
-    for(QString& ext : extFilter)
-        while(ext.front() == '.')
-            ext.remove(0,1);
-
-    // Construct directory iterator
-    QDirIterator listIterator(directory.path(), QDir::Files | QDir::NoDotAndDotDot, traversalFlags);
-
-    while(listIterator.hasNext())
-    {
-        QString filePath = listIterator.next();
-        QFileInfo fileInfo(filePath);
-        if(extFilter.isEmpty() || extFilter.contains(fileInfo.suffix(), caseSensitivity))
-            returnBuffer.append(filePath);
-    }
-
-    return IoOpReport(IO_OP_ENUMERATE, IO_SUCCESS, directory);
-}
-
 bool dirContainsFiles(QDir directory, QDirIterator::IteratorFlags iteratorFlags)
 {
     // Construct directory iterator
