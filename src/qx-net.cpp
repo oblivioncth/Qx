@@ -17,7 +17,7 @@ bool operator== (const DownloadTask& lhs, const DownloadTask& rhs) noexcept
 }
 
 //-Hashing------------------------------------------------------------------------------------------------------
-uint qHash(const DownloadTask& key, uint seed) noexcept
+size_t qHash(const DownloadTask& key, size_t seed) noexcept
 {
     QtPrivate::QHashCombine hash;
     seed = hash(seed, key.target);

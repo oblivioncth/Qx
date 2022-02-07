@@ -261,8 +261,8 @@ class TextStream : public QTextStream
 {
 //-Instance Variables------------------------------------------------------------------------------------------------
 private:
-    int mMinCharWidth;
-    const QTextCodec* mLastCodec;
+    int mMinCharWidth = 1;
+    QStringConverter::Encoding mLastEncoding = QStringConverter::Utf8;
 
 //-Constructor-------------------------------------------------------------------------------------------------------
 public:

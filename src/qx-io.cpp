@@ -1,7 +1,6 @@
 #include "qx-io.h"
 #include <stdexcept>
 #include <QDataStream>
-#include <QTextCodec>
 #include <QScopeGuard>
 
 namespace Qx
@@ -448,22 +447,40 @@ bool TextStream::precedingBreak()
      * The one partial exception is IBM 850 which replaces 0x0A with a graphic character; however, it seems that
      * often in practice this graphic is ignored and still treated as a linefeed by many parsers, so while this
      * method doesn't follow spec for this one encoding, it does follow convention.
-    */
+     * As of Qt 6 QTextStream uses QStringConverter which only supports Unicode formats, though this method will
+     * still work for the now removed formats noted above. The native Qt functionality for handling these legacy
+     * codecs was supposed to have been moved somewhere else within Qt after having been removed from QtCore, but
+     * no reference to such implementation could be found as of 6.2.3; regardless, since this is for QTextStream
+     * it no longer matters and this method works 100% with the encodings that QTextStream is designed to work with.
+     */
 
-    // Update Codec Name if necessary
-    if(codec() != mLastCodec)
-    {
-        mLastCodec = codec();
-        QString lastCodecName = codec()->name();
+   // Update Codec Name if necessary
+   if(encoding() != mLastEncoding)
+   {
+       mLastEncoding = encoding();
 
-        if(lastCodecName.startsWith("UTF-8"))
-            mMinCharWidth = 1;
-        else if(lastCodecName.startsWith("UTF-16"))
-            mMinCharWidth = 2;
-        else if(lastCodecName.startsWith("UTF-32"))
-            mMinCharWidth = 4;
-        else
-            mMinCharWidth = 1; // Assume 1 byte min per-character
+       //Update min char width
+       switch(mLastEncoding)
+       {
+           case QStringConverter::Utf8:
+           case QStringConverter::Latin1:
+           case QStringConverter::System:
+           default:
+               mMinCharWidth = 1;
+               break;
+
+           case QStringConverter::Utf16:
+           case QStringConverter::Utf16LE:
+           case QStringConverter::Utf16BE:
+               mMinCharWidth = 2;
+               break;
+
+           case QStringConverter::Utf32:
+           case QStringConverter::Utf32LE:
+           case QStringConverter::Utf32BE:
+               mMinCharWidth = 4;
+               break;
+       }
     }
 
     // Store current pos
@@ -1108,7 +1125,7 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
 
                      // Process last line if it is within range, handle lastline or do nothing if end target was past EOF
                      if(!fileTextStream.atEnd())
-                         returnBuffer += ENDL + fileTextStream.readLine().leftRef(endPos.charNum() + 1);
+                         returnBuffer += ENDL + fileTextStream.readLine().left(endPos.charNum() + 1);
                      else
                      {
                          // If there was a trailing linebreak that isn't to be ignored, last line is actually blank

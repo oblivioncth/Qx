@@ -17,11 +17,8 @@ LIB_VER_MNR = 0
 LIB_VER_REV = 7
 LIB_VER_BLD = 15
 
-contains(QT_ARCH, i386) {
-    ARCH_STR = 32
-} else {
-    ARCH_STR = 64
-}
+# x64 Only
+ARCH_STR = 64
 
 VERSION = $${LIB_VER_MJR}.$${LIB_VER_MNR}.$${LIB_VER_REV}.$${LIB_VER_BLD}
 
@@ -42,7 +39,7 @@ CONFIG += staticlib
 
 CONFIG += c++17
 
-DEFINES += QT_DEPRECATED_WARNINGS
+DEFINES += QT_DEPRECATED_WARNINGS QT_DISABLE_DEPRECATED_BEFORE=0x050F00
 
 #--------- Edition Common -----------------------
 SOURCES += \
@@ -82,9 +79,3 @@ win32 {
 unix:!macx {
 
 }
-
-# Default rules for deployment.
-#unix {
-#    target.path = $$[QT_INSTALL_PLUGINS]/generic
-#}
-#!isEmpty(target.path): INSTALLS += target
