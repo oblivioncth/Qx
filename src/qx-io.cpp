@@ -315,9 +315,9 @@ IoOpReport FileStreamWriter::openFile()
         return prepResult;
 
     // Attempt to open file
-    QIODevice::OpenMode om = QFile::WriteOnly;
-    om |= mWriteMode == Truncate ? QFile::Truncate : QFile::Append;
-    if(mWriteOptions.testFlag(NonBuffered))
+    QIODevice::OpenMode om = QIODevice::WriteOnly;
+    om |= mWriteMode == Truncate ? QIODevice::Truncate : QIODevice::Append;
+    if(mWriteOptions.testFlag(Unbuffered))
         om |= QIODevice::Unbuffered;
 
     IoOpResultType openResult = parsedOpen(*mTargetFile, om);
@@ -377,7 +377,7 @@ IoOpReport FileStreamReader::openFile()
         return IoOpReport(IO_OP_WRITE, fileCheckResult, *mSourceFile);
 
     // Attempt to open file
-    IoOpResultType openResult = parsedOpen(*mSourceFile, QFile::ReadOnly);
+    IoOpResultType openResult = parsedOpen(*mSourceFile, QIODevice::ReadOnly);
     if(openResult != IO_SUCCESS)
         return IoOpReport(IO_OP_WRITE, openResult, *mSourceFile);
 
@@ -538,9 +538,9 @@ IoOpReport TextStreamWriter::openFile()
     }
 
     // Attempt to open file
-    QIODevice::OpenMode om = QFile::WriteOnly | QFile::Text;
-    om |= mWriteMode == Truncate ? QFile::Truncate : QFile::Append;
-    if(mWriteOptions.testFlag(NonBuffered))
+    QIODevice::OpenMode om = QIODevice::WriteOnly | QIODevice::Text;
+    om |= mWriteMode == Truncate ? QIODevice::Truncate : QIODevice::Append;
+    if(mWriteOptions.testFlag(Unbuffered))
         om |= QIODevice::Unbuffered;
 
     IoOpResultType openResult = parsedOpen(*mTargetFile, om);
@@ -571,7 +571,7 @@ IoOpReport TextStreamWriter::writeLine(QString line, bool ensureLineStart)
 
         // Write line to file
         mStreamWriter << line << ENDL;
-        if(mWriteOptions.testFlag(NonBuffered))
+        if(mWriteOptions.testFlag(Unbuffered))
             mStreamWriter.flush();
 
         // Mark that text will end at line start
@@ -593,7 +593,7 @@ IoOpReport TextStreamWriter::writeText(QString text)
 
         // Write text to file
         mStreamWriter << text;
-        if(mWriteOptions.testFlag(NonBuffered))
+        if(mWriteOptions.testFlag(Unbuffered))
             mStreamWriter.flush();
 
         // Return stream status
@@ -670,7 +670,7 @@ IoOpReport textFileEndsWithNewline(bool& returnBuffer, QFile& textFile)
     else
     {
         // Attempt to open file
-        IoOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly | QFile::Text);
+        IoOpResultType openResult = parsedOpen(textFile, QIODevice::ReadOnly | QIODevice::Text);
         if(openResult != IO_SUCCESS)
             return IoOpReport(IO_OP_INSPECT, openResult, textFile);
 
@@ -709,7 +709,7 @@ IoOpReport textFileLayout(QList<int>& returnBuffer, QFile& textFile, bool ignore
         return IoOpReport(IO_OP_ENUMERATE, IO_SUCCESS, textFile);
 
     // Attempt to open file
-    IoOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly);
+    IoOpResultType openResult = parsedOpen(textFile, QIODevice::ReadOnly);
     if(openResult != IO_SUCCESS)
         return IoOpReport(IO_OP_ENUMERATE, openResult, textFile);
 
@@ -746,7 +746,7 @@ IoOpReport textFileLineCount(int& returnBuffer, QFile& textFile, bool ignoreTrai
         return IoOpReport(IO_OP_ENUMERATE, IO_SUCCESS, textFile);
 
     // Attempt to open file
-    IoOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly);
+    IoOpResultType openResult = parsedOpen(textFile, QIODevice::ReadOnly);
     if(openResult != IO_SUCCESS)
         return IoOpReport(IO_OP_ENUMERATE, openResult, textFile);
 
@@ -837,7 +837,7 @@ IoOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const
     }
 
     // Attempt to open file
-    IoOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly | QFile::Text);
+    IoOpResultType openResult = parsedOpen(textFile, QIODevice::ReadOnly | QIODevice::Text);
     if(openResult != IO_SUCCESS)
         return IoOpReport(IO_OP_INSPECT, openResult, textFile);
 
@@ -934,7 +934,7 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
     else
     {
         // Attempt to open file
-        IoOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly | QFile::Text);
+        IoOpResultType openResult = parsedOpen(textFile, QIODevice::ReadOnly | QIODevice::Text);
         if(openResult != IO_SUCCESS)
             return IoOpReport(IO_OP_READ, openResult, textFile);
 
@@ -1035,7 +1035,7 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
      else
      {
          // Attempt to open file
-         IoOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly | QFile::Text);
+         IoOpResultType openResult = parsedOpen(textFile, QIODevice::ReadOnly | QIODevice::Text);
          if(openResult != IO_SUCCESS)
              return IoOpReport(IO_OP_READ, openResult, textFile);
 
@@ -1151,7 +1151,7 @@ IoOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, int star
      else
      {
          // Attempt to open file
-         IoOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly | QFile::Text);
+         IoOpResultType openResult = parsedOpen(textFile, QIODevice::ReadOnly | QIODevice::Text);
          if(openResult != IO_SUCCESS)
              return IoOpReport(IO_OP_READ, openResult, textFile);
 
@@ -1237,7 +1237,10 @@ IoOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode wri
         }
 
         // Attempt to open file
-        IoOpResultType openResult = parsedOpen(textFile, QFile::WriteOnly | QFile::Append | QFile::Text);
+        QIODevice::OpenMode om = QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text;
+        if(writeOptions.testFlag(Unbuffered))
+            om |= QIODevice::Unbuffered;
+        IoOpResultType openResult = parsedOpen(textFile, om);
         if(openResult != IO_SUCCESS)
             return IoOpReport(IO_OP_WRITE, openResult, textFile);
 
@@ -1251,7 +1254,10 @@ IoOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode wri
     else if(!existingFile || writeMode == Truncate)
     {
         // Attempt to open file
-        IoOpResultType openResult = parsedOpen(textFile, QFile::WriteOnly | QFile::Text | QFile::Truncate);
+        QIODevice::OpenMode om = QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text;
+        if(writeOptions.testFlag(Unbuffered))
+            om |= QIODevice::Unbuffered;
+        IoOpResultType openResult = parsedOpen(textFile, om);
         if(openResult != IO_SUCCESS)
             return IoOpReport(IO_OP_WRITE, openResult, textFile);
 
@@ -1352,7 +1358,10 @@ IoOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode wri
             }
         }
         // Attempt to open file
-        IoOpResultType openResult = parsedOpen(textFile, QFile::WriteOnly | QFile::Truncate |QFile::Text);
+        QIODevice::OpenMode om = QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text;
+        if(writeOptions.testFlag(Unbuffered))
+            om |= QIODevice::Unbuffered;
+        IoOpResultType openResult = parsedOpen(textFile, om);
         if(openResult != IO_SUCCESS)
             return IoOpReport(IO_OP_WRITE, openResult, textFile);
 
@@ -1413,7 +1422,7 @@ IoOpReport deleteTextFromFile(QFile &textFile, TextPos startPos, TextPos endPos)
         return IoOpReport(IO_OP_WRITE, transientReport.getResult(), textFile);
 
     // Attempt to open file
-    IoOpResultType openResult = parsedOpen(textFile, QFile::WriteOnly | QFile::Truncate | QFile::Text);
+    IoOpResultType openResult = parsedOpen(textFile, QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text);
     if(openResult != IO_SUCCESS)
         return IoOpReport(IO_OP_WRITE, openResult, textFile);
 
@@ -1499,7 +1508,7 @@ IoOpReport calculateFileChecksum(QString& returnBuffer, QFile& file, QCryptograp
         return IoOpReport(IO_OP_READ, fileCheckResult, file);
 
     // Attempt to open file
-    IoOpResultType openResult = parsedOpen(file, QFile::ReadOnly);
+    IoOpResultType openResult = parsedOpen(file, QIODevice::ReadOnly);
     if(openResult != IO_SUCCESS)
         return IoOpReport(IO_OP_READ, openResult, file);
 
@@ -1551,7 +1560,7 @@ IoOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, qint64 start
         return IoOpReport(IO_OP_READ, fileCheckResult, file);
 
     // Attempt to open file
-    IoOpResultType openResult = parsedOpen(file, QFile::ReadOnly);
+    IoOpResultType openResult = parsedOpen(file, QIODevice::ReadOnly);
     if(openResult != IO_SUCCESS)
         return IoOpReport(IO_OP_READ, openResult, file);
 
@@ -1619,11 +1628,13 @@ IoOpReport writeBytesToFile(QFile& file, const QByteArray& bytes, WriteMode writ
     }
 
     // Attempt to open file
-    QIODevice::OpenMode om = QFile::ReadWrite; // WriteOnly implies truncate which isn't always wanted here
+    QIODevice::OpenMode om = QIODevice::ReadWrite; // WriteOnly implies truncate which isn't always wanted here
+    if(writeOptions.testFlag(Unbuffered))
+        om |= QIODevice::Unbuffered;
     if(writeMode == Append)
-        om |= QFile::Append;
+        om |= QIODevice::Append;
     else if(writeMode == Truncate)
-        om |= QFile::Truncate;
+        om |= QIODevice::Truncate;
 
     IoOpResultType openResult = parsedOpen(file, om);
     if(openResult != IO_SUCCESS)

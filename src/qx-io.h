@@ -34,7 +34,7 @@ enum WriteOption {
     NewOnly = 0x4,
     EnsureBreak = 0x8,
     Pad = 0x10,
-    NonBuffered = 0x20
+    Unbuffered = 0x20
 };
 Q_DECLARE_FLAGS(WriteOptions, WriteOption)
 Q_DECLARE_OPERATORS_FOR_FLAGS(WriteOptions)
