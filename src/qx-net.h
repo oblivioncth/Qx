@@ -138,7 +138,7 @@ public:
 private:
     NetworkReplyError enumerateTotalSize();
     NetworkReplyError getFileSize(qint64& returnBuffer, QUrl target);
-    IOOpReport startDownload(DownloadTask task);
+    IoOpReport startDownload(DownloadTask task);
     void cancelAll();
     void reset();
 

@@ -149,7 +149,7 @@ NetworkReplyError SyncDownloadManager::getFileSize(qint64& returnBuffer, QUrl ta
     return NetworkReplyError(sizeReply, target);
 }
 
-IOOpReport SyncDownloadManager::startDownload(DownloadTask task)
+IoOpReport SyncDownloadManager::startDownload(DownloadTask task)
 {
     // Create file handle
     QFile* file = new QFile(task.dest, this); // Parent constructor ensures deletion when 'this' is deleted
@@ -161,7 +161,7 @@ IOOpReport SyncDownloadManager::startDownload(DownloadTask task)
     std::shared_ptr<FileStreamWriter> fileWriter = std::make_shared<FileStreamWriter>(file, WriteMode::Truncate, wo);
 
     // Open file
-    IOOpReport streamOpen = fileWriter->openFile();
+    IoOpReport streamOpen = fileWriter->openFile();
     if(!streamOpen.wasSuccessful())
         return streamOpen;
 
@@ -181,7 +181,7 @@ IOOpReport SyncDownloadManager::startDownload(DownloadTask task)
     mReplyTaskMap[reply] = task;
 
     // Return success
-    return IOOpReport();
+    return IoOpReport();
 }
 
 void SyncDownloadManager::cancelAll()

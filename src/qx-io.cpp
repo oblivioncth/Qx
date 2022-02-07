@@ -10,7 +10,7 @@ namespace Qx
 namespace  // Anonymous namespace for effectively private (to this cpp) functions
 {
     //-Unit Variables-----------------------------------------------------------------------------------------------------
-    const QHash<QFileDevice::FileError, IOOpResultType> FILE_DEV_ERR_MAP = {
+    const QHash<QFileDevice::FileError, IoOpResultType> FILE_DEV_ERR_MAP = {
         {QFileDevice::NoError, IO_SUCCESS},
         {QFileDevice::ReadError, IO_ERR_READ},
         {QFileDevice::WriteError, IO_ERR_WRITE},
@@ -28,14 +28,14 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
         {QFileDevice::CopyError, IO_ERR_COPY}
     };
 
-    const QHash<QTextStream::Status, IOOpResultType> TXT_STRM_STAT_MAP = {
+    const QHash<QTextStream::Status, IoOpResultType> TXT_STRM_STAT_MAP = {
         {QTextStream::Ok, IO_SUCCESS},
         {QTextStream::ReadPastEnd, IO_ERR_CURSOR_OOB},
         {QTextStream::ReadCorruptData, IO_ERR_READ},
         {QTextStream::WriteFailed, IO_ERR_WRITE}
     };
 
-    const QHash<QDataStream::Status, IOOpResultType> DATA_STRM_STAT_MAP = {
+    const QHash<QDataStream::Status, IoOpResultType> DATA_STRM_STAT_MAP = {
         {QDataStream::Ok, IO_SUCCESS},
         {QDataStream::ReadPastEnd, IO_ERR_CURSOR_OOB},
         {QDataStream::ReadCorruptData, IO_ERR_READ},
@@ -43,7 +43,7 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
     };
 
     //-Unit Functions-----------------------------------------------------------------------------------------------------
-    IOOpResultType parsedOpen(QFile &file, QIODevice::OpenMode openMode)
+    IoOpResultType parsedOpen(QFile &file, QIODevice::OpenMode openMode)
     {
         if(file.open(openMode))
             return IO_SUCCESS;
@@ -51,7 +51,7 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
             return FILE_DEV_ERR_MAP.value(file.error());
     }
 
-    IOOpResultType fileCheck(const QFile &file)
+    IoOpResultType fileCheck(const QFile &file)
     {
         if(file.exists())
         {
@@ -64,7 +64,7 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
             return IO_ERR_FILE_DNE;
     }
 
-    IOOpResultType directoryCheck(QDir &dir)
+    IoOpResultType directoryCheck(QDir &dir)
     {
         if(dir.exists())
         {
@@ -77,47 +77,47 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
             return IO_ERR_DIR_DNE;
     }
 
-    IOOpReport handlePathCreation(const QFile& file, bool createPaths)
+    IoOpReport handlePathCreation(const QFile& file, bool createPaths)
     {
         // Make folders if wanted and necessary
         QDir filePath(QFileInfo(file).absolutePath());
-        IOOpResultType dirCheckResult = directoryCheck(filePath);
+        IoOpResultType dirCheckResult = directoryCheck(filePath);
 
         if(dirCheckResult == IO_ERR_NOT_A_DIR || (dirCheckResult == IO_ERR_DIR_DNE && !createPaths))
-            return IOOpReport(IO_OP_WRITE, dirCheckResult, file);
+            return IoOpReport(IO_OP_WRITE, dirCheckResult, file);
         else if(dirCheckResult == IO_ERR_DIR_DNE)
         {
             if(!QDir().mkpath(filePath.absolutePath()))
-                return IOOpReport(IO_OP_WRITE, IO_ERR_CANT_MAKE_DIR, file);
+                return IoOpReport(IO_OP_WRITE, IO_ERR_CANT_MAKE_DIR, file);
         }
 
-        return IOOpReport(IO_OP_WRITE, IO_SUCCESS, file);
+        return IoOpReport(IO_OP_WRITE, IO_SUCCESS, file);
     }
 
-    IOOpReport writePrep(bool& fileExists, QFile& file, WriteOptions writeOptions)
+    IoOpReport writePrep(bool& fileExists, QFile& file, WriteOptions writeOptions)
     {
         // Check file
-        IOOpResultType fileCheckResult = fileCheck(file);
+        IoOpResultType fileCheckResult = fileCheck(file);
         fileExists = fileCheckResult == IO_SUCCESS;
 
         if(fileCheckResult == IO_ERR_NOT_A_FILE)
-            return IOOpReport(IO_OP_WRITE, IO_ERR_NOT_A_FILE, file);
+            return IoOpReport(IO_OP_WRITE, IO_ERR_NOT_A_FILE, file);
         else if(fileCheckResult == IO_ERR_FILE_DNE && writeOptions.testFlag(ExistingOnly))
-            return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_DNE, file);
+            return IoOpReport(IO_OP_WRITE, IO_ERR_FILE_DNE, file);
         else if(fileExists && writeOptions.testFlag(NewOnly))
-            return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_EXISTS, file);
+            return IoOpReport(IO_OP_WRITE, IO_ERR_FILE_EXISTS, file);
 
         // Create Path if required
         if(!fileExists)
         {
             // Make folders if wanted and necessary
-            IOOpReport pathCreationResult = handlePathCreation(file, writeOptions.testFlag(CreatePath));
+            IoOpReport pathCreationResult = handlePathCreation(file, writeOptions.testFlag(CreatePath));
             if(!pathCreationResult.wasSuccessful())
                 return pathCreationResult;
         }
 
         // Return success
-        return IOOpReport(IO_OP_WRITE, IO_SUCCESS, file);
+        return IoOpReport(IO_OP_WRITE, IO_SUCCESS, file);
     }
 
     void matchAppendConditionParams(WriteMode& writeMode, TextPos& startPos)
@@ -147,27 +147,48 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
 
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
-IOOpReport::IOOpReport()
-    : mNull(true), mOperation(IO_OP_ENUMERATE), mResult(IO_SUCCESS), mTargetType(IO_FILE), mTarget(QString()) {}
-IOOpReport::IOOpReport(IOOpType op, IOOpResultType res, const QFile& tar)
-    : mNull(false), mOperation(op), mResult(res), mTargetType(IO_FILE), mTarget(tar.fileName()) { parseOutcome(); }
-IOOpReport::IOOpReport(IOOpType op, IOOpResultType res, const QDir& tar)
-    : mNull(false), mOperation(op), mResult(res), mTargetType(IO_DIR), mTarget(tar.absolutePath()) { parseOutcome(); }
+IoOpReport::IoOpReport() :
+    mNull(true),
+    mOperation(IO_OP_ENUMERATE),
+    mResult(IO_SUCCESS),
+    mTargetType(IO_FILE),
+    mTarget(QString())
+{}
+
+IoOpReport::IoOpReport(IoOpType op, IoOpResultType res, const QFile& tar) :
+    mNull(false),
+    mOperation(op),
+    mResult(res),
+    mTargetType(IO_FILE),
+    mTarget(tar.fileName())
+{
+    parseOutcome();
+}
+
+IoOpReport::IoOpReport(IoOpType op, IoOpResultType res, const QDir& tar) :
+     mNull(false),
+     mOperation(op),
+     mResult(res),
+     mTargetType(IO_DIR),
+     mTarget(tar.absolutePath())
+{
+    parseOutcome();
+}
 
 
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:
-IOOpType IOOpReport::getOperation() const { return mOperation; }
-IOOpResultType IOOpReport::getResult() const { return mResult; }
-IOOpTargetType IOOpReport::getTargetType() const { return mTargetType; }
-QString IOOpReport::getTarget() const { return mTarget; }
-QString IOOpReport::getOutcome() const { return mOutcome; }
-QString IOOpReport::getOutcomeInfo() const { return mOutcomeInfo; }
-bool IOOpReport::wasSuccessful() const { return mResult == IO_SUCCESS; }
-bool IOOpReport::isNull() const { return mNull; }
+IoOpType IoOpReport::getOperation() const { return mOperation; }
+IoOpResultType IoOpReport::getResult() const { return mResult; }
+IOOpTargetType IoOpReport::getTargetType() const { return mTargetType; }
+QString IoOpReport::getTarget() const { return mTarget; }
+QString IoOpReport::getOutcome() const { return mOutcome; }
+QString IoOpReport::getOutcomeInfo() const { return mOutcomeInfo; }
+bool IoOpReport::wasSuccessful() const { return mResult == IO_SUCCESS; }
+bool IoOpReport::isNull() const { return mNull; }
 
 //Private:
-void IOOpReport::parseOutcome()
+void IoOpReport::parseOutcome()
 {
     if(mResult == IO_SUCCESS)
         mOutcome = SUCCESS_TEMPLATE.arg(SUCCESS_VERBS.value(mOperation), TARGET_TYPES.value(mTargetType), QDir::toNativeSeparators(mTarget));
@@ -264,9 +285,9 @@ void FileStreamWriter::resetStatus() { mStreamWriter.resetStatus(); }
 void FileStreamWriter::setByteOrder(QDataStream::ByteOrder bo) { mStreamWriter.setByteOrder(bo); }
 void FileStreamWriter::setFloatingPointPrecision(QDataStream::FloatingPointPrecision precision) { mStreamWriter.setFloatingPointPrecision(precision); }
 
-IOOpReport FileStreamWriter::status()
+IoOpReport FileStreamWriter::status()
 {
-    return IOOpReport(IOOpType::IO_OP_WRITE, DATA_STRM_STAT_MAP.value(mStreamWriter.status()), *mTargetFile);
+    return IoOpReport(IoOpType::IO_OP_WRITE, DATA_STRM_STAT_MAP.value(mStreamWriter.status()), *mTargetFile);
 }
 
 FileStreamWriter& FileStreamWriter::writeRawData(const QByteArray& data)
@@ -279,11 +300,11 @@ FileStreamWriter& FileStreamWriter::writeRawData(const QByteArray& data)
 
 QFile* FileStreamWriter::file() { return mTargetFile; }
 
-IOOpReport FileStreamWriter::openFile()
+IoOpReport FileStreamWriter::openFile()
 {
     // Perform write preperations
     bool fileExists;
-    IOOpReport prepResult = writePrep(fileExists, *mTargetFile, mWriteOptions);
+    IoOpReport prepResult = writePrep(fileExists, *mTargetFile, mWriteOptions);
     if(!prepResult.wasSuccessful())
         return prepResult;
 
@@ -293,15 +314,15 @@ IOOpReport FileStreamWriter::openFile()
     if(mWriteOptions.testFlag(NonBuffered))
         om |= QIODevice::Unbuffered;
 
-    IOOpResultType openResult = parsedOpen(*mTargetFile, om);
+    IoOpResultType openResult = parsedOpen(*mTargetFile, om);
     if(openResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_WRITE, openResult, *mTargetFile);
+        return IoOpReport(IO_OP_WRITE, openResult, *mTargetFile);
 
     // Set data stream IO device
     mStreamWriter.setDevice(mTargetFile);
 
     // Return no error
-    return IOOpReport(IO_OP_WRITE, IO_SUCCESS, *mTargetFile);
+    return IoOpReport(IO_OP_WRITE, IO_SUCCESS, *mTargetFile);
 }
 
 void FileStreamWriter::closeFile() { mTargetFile->close(); }
@@ -334,31 +355,31 @@ void FileStreamReader::setByteOrder(QDataStream::ByteOrder bo) { mStreamReader.s
 void FileStreamReader::setFloatingPointPrecision(QDataStream::FloatingPointPrecision precision) { mStreamReader.setFloatingPointPrecision(precision); }
 void FileStreamReader::skipRawData(int len) { mStreamReader.skipRawData(len); }
 
-IOOpReport FileStreamReader::status()
+IoOpReport FileStreamReader::status()
 {
-    return IOOpReport(IOOpType::IO_OP_READ, DATA_STRM_STAT_MAP.value(mStreamReader.status()), *mSourceFile);
+    return IoOpReport(IoOpType::IO_OP_READ, DATA_STRM_STAT_MAP.value(mStreamReader.status()), *mSourceFile);
 }
 
 QFile* FileStreamReader::file() { return mSourceFile; }
 
-IOOpReport FileStreamReader::openFile()
+IoOpReport FileStreamReader::openFile()
 {
     // Check file
-    IOOpResultType fileCheckResult = fileCheck(*mSourceFile);
+    IoOpResultType fileCheckResult = fileCheck(*mSourceFile);
 
     if(fileCheckResult == IO_ERR_NOT_A_FILE)
-        return IOOpReport(IO_OP_WRITE, fileCheckResult, *mSourceFile);
+        return IoOpReport(IO_OP_WRITE, fileCheckResult, *mSourceFile);
 
     // Attempt to open file
-    IOOpResultType openResult = parsedOpen(*mSourceFile, QFile::ReadOnly);
+    IoOpResultType openResult = parsedOpen(*mSourceFile, QFile::ReadOnly);
     if(openResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_WRITE, openResult, *mSourceFile);
+        return IoOpReport(IO_OP_WRITE, openResult, *mSourceFile);
 
     // Set data stream IO device
     mStreamReader.setDevice(mSourceFile);
 
     // Return no error
-    return IOOpReport(IO_OP_WRITE, IO_SUCCESS, *mSourceFile);
+    return IoOpReport(IO_OP_WRITE, IO_SUCCESS, *mSourceFile);
 }
 
 void FileStreamReader::closeFile() { mSourceFile->close(); }
@@ -491,20 +512,20 @@ TextStreamWriter::TextStreamWriter(QFile* file, WriteMode writeMode, WriteOption
 
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:
-IOOpReport TextStreamWriter::openFile()
+IoOpReport TextStreamWriter::openFile()
 {
     // Perform write preperations
     bool existingFile;
-    IOOpReport prepResult = writePrep(existingFile, *mTargetFile, mWriteOptions);
+    IoOpReport prepResult = writePrep(existingFile, *mTargetFile, mWriteOptions);
     if(!prepResult.wasSuccessful())
         return prepResult;
 
     // If file exists and mode is append, test if it starts on a new line
     if(mWriteMode == Append && existingFile)
     {
-        IOOpReport inspectResult = textFileEndsWithNewline(mAtLineStart, *mTargetFile);
+        IoOpReport inspectResult = textFileEndsWithNewline(mAtLineStart, *mTargetFile);
         if(!inspectResult.wasSuccessful())
-            return IOOpReport(IO_OP_WRITE, inspectResult.getResult(), *mTargetFile);
+            return IoOpReport(IO_OP_WRITE, inspectResult.getResult(), *mTargetFile);
     }
 
     // Attempt to open file
@@ -513,9 +534,9 @@ IOOpReport TextStreamWriter::openFile()
     if(mWriteOptions.testFlag(NonBuffered))
         om |= QIODevice::Unbuffered;
 
-    IOOpResultType openResult = parsedOpen(*mTargetFile, om);
+    IoOpResultType openResult = parsedOpen(*mTargetFile, om);
     if(openResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_WRITE, openResult, *mTargetFile);
+        return IoOpReport(IO_OP_WRITE, openResult, *mTargetFile);
 
     // Set data stream IO device
     mStreamWriter.setDevice(mTargetFile);
@@ -528,10 +549,10 @@ IOOpReport TextStreamWriter::openFile()
     }
 
     // Return no error
-    return IOOpReport(IO_OP_WRITE, IO_SUCCESS, *mTargetFile);
+    return IoOpReport(IO_OP_WRITE, IO_SUCCESS, *mTargetFile);
 }
 
-IOOpReport TextStreamWriter::writeLine(QString line, bool ensureLineStart)
+IoOpReport TextStreamWriter::writeLine(QString line, bool ensureLineStart)
 {
     if(mTargetFile->isOpen())
     {
@@ -548,13 +569,13 @@ IOOpReport TextStreamWriter::writeLine(QString line, bool ensureLineStart)
         mAtLineStart = true;
 
         // Return stream status
-        return IOOpReport(IO_OP_WRITE, TXT_STRM_STAT_MAP.value(mStreamWriter.status()), *mTargetFile);
+        return IoOpReport(IO_OP_WRITE, TXT_STRM_STAT_MAP.value(mStreamWriter.status()), *mTargetFile);
     }
     else
-        return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_NOT_OPEN, *mTargetFile);
+        return IoOpReport(IO_OP_WRITE, IO_ERR_FILE_NOT_OPEN, *mTargetFile);
 }
 
-IOOpReport TextStreamWriter::writeText(QString text)
+IoOpReport TextStreamWriter::writeText(QString text)
 {
     if(mTargetFile->isOpen())
     {
@@ -567,10 +588,10 @@ IOOpReport TextStreamWriter::writeText(QString text)
             mStreamWriter.flush();
 
         // Return stream status
-        return IOOpReport(IO_OP_WRITE, TXT_STRM_STAT_MAP.value(mStreamWriter.status()), *mTargetFile);
+        return IoOpReport(IO_OP_WRITE, TXT_STRM_STAT_MAP.value(mStreamWriter.status()), *mTargetFile);
     }
     else
-        return IOOpReport(IO_OP_WRITE, IO_ERR_FILE_NOT_OPEN, *mTargetFile);
+        return IoOpReport(IO_OP_WRITE, IO_ERR_FILE_NOT_OPEN, *mTargetFile);
 }
 
 void TextStreamWriter::closeFile() { mTargetFile->close(); }
@@ -580,20 +601,20 @@ void TextStreamWriter::closeFile() { mTargetFile->close(); }
 //Public:
 bool fileIsEmpty(const QFile& file) { return file.size() == 0; }
 
-IOOpReport fileIsEmpty(bool& returnBuffer, const QFile& file)
+IoOpReport fileIsEmpty(bool& returnBuffer, const QFile& file)
 {
     // Check file
-    IOOpResultType fileCheckResult = fileCheck(file);
+    IoOpResultType fileCheckResult = fileCheck(file);
     if(fileCheckResult != IO_SUCCESS)
     {
         // File doesn't exist
         returnBuffer = true; // While not completely accurate, is closer than "file isn't empty"
-        return IOOpReport(IO_OP_INSPECT, fileCheckResult, file);
+        return IoOpReport(IO_OP_INSPECT, fileCheckResult, file);
     }
     else
     {
         returnBuffer = fileIsEmpty(file); // Use reportless function
-        return IOOpReport(IO_OP_INSPECT, IO_SUCCESS, file);
+        return IoOpReport(IO_OP_INSPECT, IO_SUCCESS, file);
     }
 }
 
@@ -621,28 +642,28 @@ QString kosherizeFileName(QString fileName) // Can return empty name if all char
     return fileName;
 }
 
-IOOpReport textFileEndsWithNewline(bool& returnBuffer, QFile& textFile)
+IoOpReport textFileEndsWithNewline(bool& returnBuffer, QFile& textFile)
 {
     // Default to false
     returnBuffer = false;
 
     // Check file
-    IOOpResultType fileCheckResult = fileCheck(textFile);
+    IoOpResultType fileCheckResult = fileCheck(textFile);
     if(fileCheckResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_INSPECT, fileCheckResult, textFile);
+        return IoOpReport(IO_OP_INSPECT, fileCheckResult, textFile);
 
     // Return false is file is empty
     if(fileIsEmpty(textFile))
     {
         returnBuffer = false;
-        return IOOpReport(IO_OP_INSPECT, IO_SUCCESS, textFile);
+        return IoOpReport(IO_OP_INSPECT, IO_SUCCESS, textFile);
     }
     else
     {
         // Attempt to open file
-        IOOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly | QFile::Text);
+        IoOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly | QFile::Text);
         if(openResult != IO_SUCCESS)
-            return IOOpReport(IO_OP_INSPECT, openResult, textFile);
+            return IoOpReport(IO_OP_INSPECT, openResult, textFile);
 
         // Ensure file is closed upon return
         QScopeGuard fileGuard([&textFile](){ textFile.close(); });
@@ -660,28 +681,28 @@ IOOpReport textFileEndsWithNewline(bool& returnBuffer, QFile& textFile)
         returnBuffer = fileTextStream.precedingBreak();
 
         // Return stream status
-        return IOOpReport(IO_OP_INSPECT, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
+        return IoOpReport(IO_OP_INSPECT, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
     }
 }
 
-IOOpReport textFileLayout(QList<int>& returnBuffer, QFile& textFile, bool ignoreTrailingEmpty)
+IoOpReport textFileLayout(QList<int>& returnBuffer, QFile& textFile, bool ignoreTrailingEmpty)
 {
     // Clear return buffer
     returnBuffer.clear();
 
     // Check file
-    IOOpResultType fileCheckResult = fileCheck(textFile);
+    IoOpResultType fileCheckResult = fileCheck(textFile);
     if(fileCheckResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_ENUMERATE, fileCheckResult, textFile);
+        return IoOpReport(IO_OP_ENUMERATE, fileCheckResult, textFile);
 
     // If file is empty return immediately
     if(fileIsEmpty(textFile))
-        return IOOpReport(IO_OP_ENUMERATE, IO_SUCCESS, textFile);
+        return IoOpReport(IO_OP_ENUMERATE, IO_SUCCESS, textFile);
 
     // Attempt to open file
-    IOOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly);
+    IoOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly);
     if(openResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_ENUMERATE, openResult, textFile);
+        return IoOpReport(IO_OP_ENUMERATE, openResult, textFile);
 
     // Ensure file is closed upon return
     QScopeGuard fileGuard([&textFile](){ textFile.close(); });
@@ -698,27 +719,27 @@ IOOpReport textFileLayout(QList<int>& returnBuffer, QFile& textFile, bool ignore
         returnBuffer.append(0);
 
     // Return status
-    return IOOpReport(IO_OP_ENUMERATE, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
+    return IoOpReport(IO_OP_ENUMERATE, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
 }
 
-IOOpReport textFileLineCount(int& returnBuffer, QFile& textFile, bool ignoreTrailingEmpty)
+IoOpReport textFileLineCount(int& returnBuffer, QFile& textFile, bool ignoreTrailingEmpty)
 {
     // Reset return buffer
     returnBuffer = 0;
 
     // Check file
-    IOOpResultType fileCheckResult = fileCheck(textFile);
+    IoOpResultType fileCheckResult = fileCheck(textFile);
     if(fileCheckResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_ENUMERATE, fileCheckResult, textFile);
+        return IoOpReport(IO_OP_ENUMERATE, fileCheckResult, textFile);
 
     // If file is empty return immediately
     if(fileIsEmpty(textFile))
-        return IOOpReport(IO_OP_ENUMERATE, IO_SUCCESS, textFile);
+        return IoOpReport(IO_OP_ENUMERATE, IO_SUCCESS, textFile);
 
     // Attempt to open file
-    IOOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly);
+    IoOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly);
     if(openResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_ENUMERATE, openResult, textFile);
+        return IoOpReport(IO_OP_ENUMERATE, openResult, textFile);
 
     // Ensure file is closed upon return
     QScopeGuard fileGuard([&textFile](){ textFile.close(); });
@@ -735,18 +756,18 @@ IOOpReport textFileLineCount(int& returnBuffer, QFile& textFile, bool ignoreTrai
         ++returnBuffer;
 
     // Return status
-    return IOOpReport(IO_OP_ENUMERATE, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
+    return IoOpReport(IO_OP_ENUMERATE, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
 }
 
-IOOpReport textFileAbsolutePosition(TextPos& textPos, QFile& textFile, bool ignoreTrailingEmpty)
+IoOpReport textFileAbsolutePosition(TextPos& textPos, QFile& textFile, bool ignoreTrailingEmpty)
 {
     // Do nothing if position is null
     if(textPos.isNull())
-        return IOOpReport(IO_OP_ENUMERATE, IO_SUCCESS, textFile);
+        return IoOpReport(IO_OP_ENUMERATE, IO_SUCCESS, textFile);
 
     // Get file layout
     QList<int> textLayout;
-    IOOpReport layoutCheck = textFileLayout(textLayout, textFile, ignoreTrailingEmpty);
+    IoOpReport layoutCheck = textFileLayout(textLayout, textFile, ignoreTrailingEmpty);
     if(!layoutCheck.wasSuccessful())
         return layoutCheck;
 
@@ -756,7 +777,7 @@ IOOpReport textFileAbsolutePosition(TextPos& textPos, QFile& textFile, bool igno
     else if(textPos.getLineNum() >= textLayout.count())
     {
         textPos = TextPos();
-        return IOOpReport(IO_OP_ENUMERATE, IO_SUCCESS, textFile);
+        return IoOpReport(IO_OP_ENUMERATE, IO_SUCCESS, textFile);
     }
 
     // Translate character number
@@ -766,22 +787,22 @@ IOOpReport textFileAbsolutePosition(TextPos& textPos, QFile& textFile, bool igno
         textPos.setCharNum(textLayout.value(textPos.getLineNum())); // Reel back to line end so that \n is still included
 
 
-    return IOOpReport(IO_OP_ENUMERATE, IO_SUCCESS, textFile);
+    return IoOpReport(IO_OP_ENUMERATE, IO_SUCCESS, textFile);
 }
 
-IOOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const TextQuery& query, ReadOptions readOptions)
+IoOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const TextQuery& query, ReadOptions readOptions)
 {
     // Empty buffer
     returnBuffer.clear();
 
     // If for whatever reason hit limit is 0, or the query is empty, return
     if(query.hitLimit() == 0 || query.string().count() == 0)
-        return IOOpReport(IO_OP_INSPECT, IO_SUCCESS, textFile);
+        return IoOpReport(IO_OP_INSPECT, IO_SUCCESS, textFile);
 
     // Check file
-    IOOpResultType fileCheckResult = fileCheck(textFile);
+    IoOpResultType fileCheckResult = fileCheck(textFile);
     if(fileCheckResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_INSPECT, fileCheckResult, textFile);
+        return IoOpReport(IO_OP_INSPECT, fileCheckResult, textFile);
 
     // Query tracking
     TextPos trueStartPos = query.startPosition();
@@ -797,19 +818,19 @@ IOOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const
     // Translate start position to absolute position
     if(trueStartPos != TextPos::START)
     {
-        IOOpReport translate = textFileAbsolutePosition(trueStartPos, textFile, readOptions.testFlag(IgnoreTrailingBreak));
+        IoOpReport translate = textFileAbsolutePosition(trueStartPos, textFile, readOptions.testFlag(IgnoreTrailingBreak));
         if(!translate.wasSuccessful())
-            return IOOpReport(IO_OP_INSPECT, translate.getResult(), textFile);
+            return IoOpReport(IO_OP_INSPECT, translate.getResult(), textFile);
 
         // Return if position is outside bounds
         if(trueStartPos.isNull())
-            return IOOpReport(IO_OP_INSPECT, translate.getResult(), textFile);
+            return IoOpReport(IO_OP_INSPECT, translate.getResult(), textFile);
     }
 
     // Attempt to open file
-    IOOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly | QFile::Text);
+    IoOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly | QFile::Text);
     if(openResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_INSPECT, openResult, textFile);
+        return IoOpReport(IO_OP_INSPECT, openResult, textFile);
 
     // Ensure file is closed upon return
     QScopeGuard fileGuard([&textFile](){ textFile.close(); });
@@ -855,7 +876,7 @@ IOOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const
                 ++hitsSkipped;
 
             if(returnBuffer.size() == query.hitLimit())
-                return IOOpReport(IO_OP_INSPECT, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
+                return IoOpReport(IO_OP_INSPECT, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
 
             possibleMatch = TextPos::END;
             queryIt = query.string().constBegin();
@@ -871,10 +892,10 @@ IOOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const
     }
 
     // Return status
-    return IOOpReport(IO_OP_INSPECT, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
+    return IoOpReport(IO_OP_INSPECT, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
 }
 
-IOOpReport fileContainsString(bool& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity cs, bool allowSplit)
+IoOpReport fileContainsString(bool& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity cs, bool allowSplit)
 {
     // Prepare query
     TextQuery tq(query, cs);
@@ -882,31 +903,31 @@ IOOpReport fileContainsString(bool& returnBuffer, QFile& textFile, const QString
     tq.setHitLimit(1);
 
     QList<TextPos> hit;
-    IOOpReport searchReport = findStringInFile(hit, textFile, tq, NoReadOptions);
+    IoOpReport searchReport = findStringInFile(hit, textFile, tq, NoReadOptions);
     returnBuffer = !hit.isEmpty();
 
     return searchReport;
 }
 
-IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos, int count, ReadOptions readOptions)
+IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos, int count, ReadOptions readOptions)
 {
     // Empty buffer
     returnBuffer = QString();
 
     // Check file
-    IOOpResultType fileCheckResult = fileCheck(textFile);
+    IoOpResultType fileCheckResult = fileCheck(textFile);
     if(fileCheckResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_READ, fileCheckResult, textFile);
+        return IoOpReport(IO_OP_READ, fileCheckResult, textFile);
 
     // Return null string if file is empty or 0 characters are to be read
     if(fileIsEmpty(textFile) || count == 0)
-        return IOOpReport(IO_OP_READ, IO_SUCCESS, textFile);
+        return IoOpReport(IO_OP_READ, IO_SUCCESS, textFile);
     else
     {
         // Attempt to open file
-        IOOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly | QFile::Text);
+        IoOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly | QFile::Text);
         if(openResult != IO_SUCCESS)
-            return IOOpReport(IO_OP_READ, openResult, textFile);
+            return IoOpReport(IO_OP_READ, openResult, textFile);
 
         // Ensure file is closed upon return
         QScopeGuard fileGuard([&textFile](){ textFile.close(); });
@@ -978,11 +999,11 @@ IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
         }
 
         // Return stream status
-        return IOOpReport(IO_OP_READ, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
+        return IoOpReport(IO_OP_READ, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
     }
 }
 
-IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos, TextPos endPos, ReadOptions readOptions)
+IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos, TextPos endPos, ReadOptions readOptions)
 {
     // Returns a string of a portion of the passed file [startPos, endPos] (inclusive for both)
 
@@ -995,19 +1016,19 @@ IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
      returnBuffer = QString();
 
      // Check file
-     IOOpResultType fileCheckResult = fileCheck(textFile);
+     IoOpResultType fileCheckResult = fileCheck(textFile);
      if(fileCheckResult != IO_SUCCESS)
-         return IOOpReport(IO_OP_READ, fileCheckResult, textFile);
+         return IoOpReport(IO_OP_READ, fileCheckResult, textFile);
 
      // Return null string if file is empty
      if(fileIsEmpty(textFile))
-         return IOOpReport(IO_OP_READ, IO_SUCCESS, textFile);
+         return IoOpReport(IO_OP_READ, IO_SUCCESS, textFile);
      else
      {
          // Attempt to open file
-         IOOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly | QFile::Text);
+         IoOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly | QFile::Text);
          if(openResult != IO_SUCCESS)
-             return IOOpReport(IO_OP_READ, openResult, textFile);
+             return IoOpReport(IO_OP_READ, openResult, textFile);
 
          // Ensure file is closed upon return
          QScopeGuard fileGuard([&textFile](){ textFile.close(); });
@@ -1097,11 +1118,11 @@ IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
          }
 
          // Return stream status
-         return IOOpReport(IO_OP_READ, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
+         return IoOpReport(IO_OP_READ, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
      }
 }
 
-IOOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, int startLine, int endLine, ReadOptions readOptions)
+IoOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, int startLine, int endLine, ReadOptions readOptions)
 {
      // Ensure positions are valid
      if(NII(startLine) > NII(endLine))
@@ -1111,19 +1132,19 @@ IOOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, int star
      returnBuffer = QStringList();
 
      // Check file
-     IOOpResultType fileCheckResult = fileCheck(textFile);
+     IoOpResultType fileCheckResult = fileCheck(textFile);
      if(fileCheckResult != IO_SUCCESS)
-         return IOOpReport(IO_OP_READ, fileCheckResult, textFile);
+         return IoOpReport(IO_OP_READ, fileCheckResult, textFile);
 
      // Return null list if file is empty
      if(fileIsEmpty(textFile))
-         return IOOpReport(IO_OP_READ, IO_SUCCESS, textFile);
+         return IoOpReport(IO_OP_READ, IO_SUCCESS, textFile);
      else
      {
          // Attempt to open file
-         IOOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly | QFile::Text);
+         IoOpResultType openResult = parsedOpen(textFile, QFile::ReadOnly | QFile::Text);
          if(openResult != IO_SUCCESS)
-             return IOOpReport(IO_OP_READ, openResult, textFile);
+             return IoOpReport(IO_OP_READ, openResult, textFile);
 
          // Ensure file is closed upon return
          QScopeGuard fileGuard([&textFile](){ textFile.close(); });
@@ -1165,11 +1186,11 @@ IOOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, int star
          }
 
          // Return stream status
-         return IOOpReport(IO_OP_READ, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
+         return IoOpReport(IO_OP_READ, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
      }
 }
 
-IOOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode writeMode, TextPos startPos, WriteOptions writeOptions)
+IoOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode writeMode, TextPos startPos, WriteOptions writeOptions)
 {
     /* TODO: Memory usage can be improved for inserts/overwrites by reading lines until at target lines, then reading characters
      * one by one until at target char - 1 and noting the position. Then like normal read in the afterText, then return to the
@@ -1183,7 +1204,7 @@ IOOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode wri
 
     // Perform write preperations
     bool existingFile;
-    IOOpReport prepResult = writePrep(existingFile, textFile, writeOptions);
+    IoOpReport prepResult = writePrep(existingFile, textFile, writeOptions);
     if(!prepResult.wasSuccessful())
         return prepResult;
 
@@ -1200,16 +1221,16 @@ IOOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode wri
         if(existingFile && writeOptions.testFlag(EnsureBreak))
         {
             bool onNewLine;
-            IOOpReport inspectResult = textFileEndsWithNewline(onNewLine, textFile);
+            IoOpReport inspectResult = textFileEndsWithNewline(onNewLine, textFile);
             if(!inspectResult.wasSuccessful())
-                return IOOpReport(IO_OP_WRITE, inspectResult.getResult(), textFile);
+                return IoOpReport(IO_OP_WRITE, inspectResult.getResult(), textFile);
             needsNewLine = !onNewLine;
         }
 
         // Attempt to open file
-        IOOpResultType openResult = parsedOpen(textFile, QFile::WriteOnly | QFile::Append | QFile::Text);
+        IoOpResultType openResult = parsedOpen(textFile, QFile::WriteOnly | QFile::Append | QFile::Text);
         if(openResult != IO_SUCCESS)
-            return IOOpReport(IO_OP_WRITE, openResult, textFile);
+            return IoOpReport(IO_OP_WRITE, openResult, textFile);
 
         // Write linebreak if needed
         if(needsNewLine)
@@ -1221,9 +1242,9 @@ IOOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode wri
     else if(!existingFile || writeMode == Truncate)
     {
         // Attempt to open file
-        IOOpResultType openResult = parsedOpen(textFile, QFile::WriteOnly | QFile::Text | QFile::Truncate);
+        IoOpResultType openResult = parsedOpen(textFile, QFile::WriteOnly | QFile::Text | QFile::Truncate);
         if(openResult != IO_SUCCESS)
-            return IOOpReport(IO_OP_WRITE, openResult, textFile);
+            return IoOpReport(IO_OP_WRITE, openResult, textFile);
 
         // Pad if required
         if(writeOptions.testFlag(Pad))
@@ -1245,7 +1266,7 @@ IOOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode wri
 
         // Fill beforeNew
         TextPos beforeEnd = TextPos(startPos.getLineNum(), startPos.getCharNum() - 1);
-        IOOpReport readBefore = readTextFromFile(beforeNew, textFile, TextPos::START, beforeEnd);
+        IoOpReport readBefore = readTextFromFile(beforeNew, textFile, TextPos::START, beforeEnd);
         if(!readBefore.wasSuccessful())
             return readBefore;
 
@@ -1282,7 +1303,7 @@ IOOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode wri
         if(!padded)
         {
             // This will return a null string if there is no afterNew anyway, even without padding enabled
-            IOOpReport readAfter = readTextFromFile(afterNew, textFile, startPos);
+            IoOpReport readAfter = readTextFromFile(afterNew, textFile, startPos);
             if(!readAfter.wasSuccessful())
                 return readAfter;
         }
@@ -1322,19 +1343,19 @@ IOOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode wri
             }
         }
         // Attempt to open file
-        IOOpResultType openResult = parsedOpen(textFile, QFile::WriteOnly | QFile::Truncate |QFile::Text);
+        IoOpResultType openResult = parsedOpen(textFile, QFile::WriteOnly | QFile::Truncate |QFile::Text);
         if(openResult != IO_SUCCESS)
-            return IOOpReport(IO_OP_WRITE, openResult, textFile);
+            return IoOpReport(IO_OP_WRITE, openResult, textFile);
 
         // Write all text;
         textStream << beforeNew << text << afterNew;
     }
 
     // Return stream status
-    return IOOpReport(IO_OP_WRITE, TXT_STRM_STAT_MAP.value(textStream.status()), textFile);
+    return IoOpReport(IO_OP_WRITE, TXT_STRM_STAT_MAP.value(textStream.status()), textFile);
 }
 
-IOOpReport deleteTextFromFile(QFile &textFile, TextPos startPos, TextPos endPos)
+IoOpReport deleteTextFromFile(QFile &textFile, TextPos startPos, TextPos endPos)
 {
     // Removes a string of a portion of the passed file [startPos, endPos] (inclusive for both)
 
@@ -1344,16 +1365,16 @@ IOOpReport deleteTextFromFile(QFile &textFile, TextPos startPos, TextPos endPos)
         //TODO: create excpetion class that prints error and stashes the expection properly
 
     // Check file
-    IOOpResultType fileCheckResult = fileCheck(textFile);
+    IoOpResultType fileCheckResult = fileCheck(textFile);
     if(fileCheckResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_READ, fileCheckResult, textFile);
+        return IoOpReport(IO_OP_READ, fileCheckResult, textFile);
 
     // Text to keep
     QString beforeDeletion;
     QString afterDeletion;
 
     // Transient Ops Report
-    IOOpReport transientReport;
+    IoOpReport transientReport;
 
     // Determine beforeDeletion
     if(startPos == TextPos::START) // (0,0)
@@ -1368,7 +1389,7 @@ IOOpReport deleteTextFromFile(QFile &textFile, TextPos startPos, TextPos endPos)
 
     // Check for transient errors
     if(!transientReport.isNull() && transientReport.getResult() != IO_SUCCESS)
-        return IOOpReport(IO_OP_WRITE, transientReport.getResult(), textFile);
+        return IoOpReport(IO_OP_WRITE, transientReport.getResult(), textFile);
 
     // Determine afterDeletion
     if(endPos == TextPos::END)
@@ -1380,12 +1401,12 @@ IOOpReport deleteTextFromFile(QFile &textFile, TextPos startPos, TextPos endPos)
 
     // Check for transient errors
     if(transientReport.getResult() != IO_SUCCESS)
-        return IOOpReport(IO_OP_WRITE, transientReport.getResult(), textFile);
+        return IoOpReport(IO_OP_WRITE, transientReport.getResult(), textFile);
 
     // Attempt to open file
-    IOOpResultType openResult = parsedOpen(textFile, QFile::WriteOnly | QFile::Truncate | QFile::Text);
+    IoOpResultType openResult = parsedOpen(textFile, QFile::WriteOnly | QFile::Truncate | QFile::Text);
     if(openResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_WRITE, openResult, textFile);
+        return IoOpReport(IO_OP_WRITE, openResult, textFile);
 
     QScopeGuard fileGuard([&textFile](){ textFile.close(); });
 
@@ -1402,18 +1423,18 @@ IOOpReport deleteTextFromFile(QFile &textFile, TextPos startPos, TextPos endPos)
         textStream << afterDeletion;
 
     // Return status
-    return IOOpReport(IO_OP_WRITE, TXT_STRM_STAT_MAP.value(textStream.status()), textFile);
+    return IoOpReport(IO_OP_WRITE, TXT_STRM_STAT_MAP.value(textStream.status()), textFile);
 }
 
-IOOpReport getDirFileList(QStringList& returnBuffer, QDir directory, QStringList extFilter, QDirIterator::IteratorFlag traversalFlags, Qt::CaseSensitivity caseSensitivity)
+IoOpReport getDirFileList(QStringList& returnBuffer, QDir directory, QStringList extFilter, QDirIterator::IteratorFlag traversalFlags, Qt::CaseSensitivity caseSensitivity)
 {
     // Empty buffer
     returnBuffer = QStringList();
 
     // Check directory
-    IOOpResultType dirCheckResult = directoryCheck(directory);
+    IoOpResultType dirCheckResult = directoryCheck(directory);
     if(dirCheckResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_ENUMERATE, dirCheckResult, directory);
+        return IoOpReport(IO_OP_ENUMERATE, dirCheckResult, directory);
 
     // Normalize leading dot for extensions
     for(QString& ext : extFilter)
@@ -1431,7 +1452,7 @@ IOOpReport getDirFileList(QStringList& returnBuffer, QDir directory, QStringList
             returnBuffer.append(filePath);
     }
 
-    return IOOpReport(IO_OP_ENUMERATE, IO_SUCCESS, directory);
+    return IoOpReport(IO_OP_ENUMERATE, IO_SUCCESS, directory);
 }
 
 bool dirContainsFiles(QDir directory, QDirIterator::IteratorFlags iteratorFlags)
@@ -1442,36 +1463,36 @@ bool dirContainsFiles(QDir directory, QDirIterator::IteratorFlags iteratorFlags)
     return listIterator.hasNext();
 }
 
-IOOpReport dirContainsFiles(bool& returnBuffer, QDir directory, QDirIterator::IteratorFlags iteratorFlags)
+IoOpReport dirContainsFiles(bool& returnBuffer, QDir directory, QDirIterator::IteratorFlags iteratorFlags)
 {
     // Assume false
     returnBuffer = false;
 
     // Check directory
-    IOOpResultType dirCheckResult = directoryCheck(directory);
+    IoOpResultType dirCheckResult = directoryCheck(directory);
     if(dirCheckResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_INSPECT, dirCheckResult, directory);
+        return IoOpReport(IO_OP_INSPECT, dirCheckResult, directory);
     else
     {
         returnBuffer = dirContainsFiles(directory, iteratorFlags); // Use reportless function
-        return IOOpReport(IO_OP_INSPECT, IO_SUCCESS, directory);
+        return IoOpReport(IO_OP_INSPECT, IO_SUCCESS, directory);
     }
 }
 
-IOOpReport calculateFileChecksum(QString& returnBuffer, QFile& file, QCryptographicHash::Algorithm hashAlgorithm)
+IoOpReport calculateFileChecksum(QString& returnBuffer, QFile& file, QCryptographicHash::Algorithm hashAlgorithm)
 {
     // Empty buffer
     returnBuffer = QString();
 
     // Check file
-    IOOpResultType fileCheckResult = fileCheck(file);
+    IoOpResultType fileCheckResult = fileCheck(file);
     if(fileCheckResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_READ, fileCheckResult, file);
+        return IoOpReport(IO_OP_READ, fileCheckResult, file);
 
     // Attempt to open file
-    IOOpResultType openResult = parsedOpen(file, QFile::ReadOnly);
+    IoOpResultType openResult = parsedOpen(file, QFile::ReadOnly);
     if(openResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_READ, openResult, file);
+        return IoOpReport(IO_OP_READ, openResult, file);
 
     // Ensure file is closed upon return
     QScopeGuard fileGuard([&file](){ file.close(); });
@@ -1480,20 +1501,20 @@ IOOpReport calculateFileChecksum(QString& returnBuffer, QFile& file, QCryptograp
     if(checksumHash.addData(&file))
     {
         returnBuffer = checksumHash.result().toHex();
-        return IOOpReport(IO_OP_READ, IO_SUCCESS, file);
+        return IoOpReport(IO_OP_READ, IO_SUCCESS, file);
     }
     else
-        return IOOpReport(IO_OP_READ, IO_ERR_READ, file);
+        return IoOpReport(IO_OP_READ, IO_ERR_READ, file);
 }
 
-IOOpReport fileMatchesChecksum(bool& returnBuffer, QFile& file, QString checksum, QCryptographicHash::Algorithm hashAlgorithm)
+IoOpReport fileMatchesChecksum(bool& returnBuffer, QFile& file, QString checksum, QCryptographicHash::Algorithm hashAlgorithm)
 {
     // Reset return buffer
     returnBuffer = false;
 
     // Get checksum
     QString fileChecksum;
-    IOOpReport checksumReport = calculateFileChecksum(fileChecksum, file, hashAlgorithm);
+    IoOpReport checksumReport = calculateFileChecksum(fileChecksum, file, hashAlgorithm);
 
     if(!checksumReport.wasSuccessful())
         return checksumReport;
@@ -1503,10 +1524,10 @@ IOOpReport fileMatchesChecksum(bool& returnBuffer, QFile& file, QString checksum
         returnBuffer = true;
 
     // Return success
-    return IOOpReport(IOOpType::IO_OP_INSPECT, IO_SUCCESS, file);
+    return IoOpReport(IoOpType::IO_OP_INSPECT, IO_SUCCESS, file);
 }
 
-IOOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, qint64 startPos, qint64 endPos)
+IoOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, qint64 startPos, qint64 endPos)
 {
     // Ensure positions are valid
      if(NII(startPos) > NII(endPos))
@@ -1516,14 +1537,14 @@ IOOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, qint64 start
     returnBuffer.clear();
 
     // Check file
-    IOOpResultType fileCheckResult = fileCheck(file);
+    IoOpResultType fileCheckResult = fileCheck(file);
     if(fileCheckResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_READ, fileCheckResult, file);
+        return IoOpReport(IO_OP_READ, fileCheckResult, file);
 
     // Attempt to open file
-    IOOpResultType openResult = parsedOpen(file, QFile::ReadOnly);
+    IoOpResultType openResult = parsedOpen(file, QFile::ReadOnly);
     if(openResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_READ, openResult, file);
+        return IoOpReport(IO_OP_READ, openResult, file);
 
     // Ensure file is closed upon return
     QScopeGuard fileGuard([&file](){ file.close(); });
@@ -1534,7 +1555,7 @@ IOOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, qint64 start
     if(startPos > fileIndexMax)
     {
         returnBuffer = QByteArray(); // Set buffer to null
-        return IOOpReport(IO_OP_READ, IO_SUCCESS, file);
+        return IoOpReport(IO_OP_READ, IO_SUCCESS, file);
     }
 
     if(endPos == -1 || endPos > fileIndexMax)
@@ -1552,28 +1573,28 @@ IOOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, qint64 start
     if(startPos != 0)
     {
         if(!file.seek(startPos))
-            return IOOpReport(IO_OP_READ, IO_ERR_CURSOR_OOB, file);
+            return IoOpReport(IO_OP_READ, IO_ERR_CURSOR_OOB, file);
     }
 
     // Read data
     qint64 readBytes = file.read(returnBuffer.data(), bufferSize);
     if(readBytes == -1)
-        return IOOpReport(IO_OP_READ, FILE_DEV_ERR_MAP.value(file.error()), file);
+        return IoOpReport(IO_OP_READ, FILE_DEV_ERR_MAP.value(file.error()), file);
     else if(readBytes != bufferSize)
-       return IOOpReport(IO_OP_READ, IO_ERR_FILE_SIZE_MISMATCH, file);
+       return IoOpReport(IO_OP_READ, IO_ERR_FILE_SIZE_MISMATCH, file);
 
     // Return success and buffer
-    return IOOpReport(IO_OP_READ, IO_SUCCESS, file);
+    return IoOpReport(IO_OP_READ, IO_SUCCESS, file);
 }
 
-IOOpReport writeBytesToFile(QFile& file, const QByteArray& bytes, WriteMode writeMode, qint64 startPos, WriteOptions writeOptions)
+IoOpReport writeBytesToFile(QFile& file, const QByteArray& bytes, WriteMode writeMode, qint64 startPos, WriteOptions writeOptions)
 {
     // Match append condition parameters
     matchAppendConditionParams(writeMode, startPos);
 
     // Perform write preperations
     bool existingFile;
-    IOOpReport prepResult = writePrep(existingFile, file, writeOptions);
+    IoOpReport prepResult = writePrep(existingFile, file, writeOptions);
     if(!prepResult.wasSuccessful())
         return prepResult;
 
@@ -1583,7 +1604,7 @@ IOOpReport writeBytesToFile(QFile& file, const QByteArray& bytes, WriteMode writ
     // Get post data if required
     if(existingFile && writeMode == Insert)
     {
-        Qx::IOOpReport readAfter = Qx::readBytesFromFile(afterNew, file, startPos);
+        Qx::IoOpReport readAfter = Qx::readBytesFromFile(afterNew, file, startPos);
         if(!readAfter.wasSuccessful())
             return readAfter;
     }
@@ -1595,9 +1616,9 @@ IOOpReport writeBytesToFile(QFile& file, const QByteArray& bytes, WriteMode writ
     else if(writeMode == Truncate)
         om |= QFile::Truncate;
 
-    IOOpResultType openResult = parsedOpen(file, om);
+    IoOpResultType openResult = parsedOpen(file, om);
     if(openResult != IO_SUCCESS)
-        return IOOpReport(IO_OP_WRITE, openResult, file);
+        return IoOpReport(IO_OP_WRITE, openResult, file);
 
     // Ensure file is closed upon return
     QScopeGuard fileGuard([&file](){ file.close(); });
@@ -1613,22 +1634,22 @@ IOOpReport writeBytesToFile(QFile& file, const QByteArray& bytes, WriteMode writ
     // Write data
     qint64 written = file.write(bytes);
     if(written == -1)
-        return IOOpReport(IO_OP_WRITE, FILE_DEV_ERR_MAP.value(file.error()), file);
+        return IoOpReport(IO_OP_WRITE, FILE_DEV_ERR_MAP.value(file.error()), file);
     else if(written != bytes.size())
-        return IOOpReport(IO_OP_WRITE, IO_ERR_WRITE, file);
+        return IoOpReport(IO_OP_WRITE, IO_ERR_WRITE, file);
 
     // Write after new data
     if(!afterNew.isEmpty())
     {
         written = file.write(afterNew);
         if(written == -1)
-            return IOOpReport(IO_OP_WRITE, FILE_DEV_ERR_MAP.value(file.error()), file);
+            return IoOpReport(IO_OP_WRITE, FILE_DEV_ERR_MAP.value(file.error()), file);
         else if(written != afterNew.size())
-            return IOOpReport(IO_OP_WRITE, IO_ERR_WRITE, file);
+            return IoOpReport(IO_OP_WRITE, IO_ERR_WRITE, file);
     }
 
     // Return file status
-    return IOOpReport(IO_OP_WRITE, FILE_DEV_ERR_MAP.value(file.error()), file);
+    return IoOpReport(IO_OP_WRITE, FILE_DEV_ERR_MAP.value(file.error()), file);
 }
 
 }

@@ -16,8 +16,8 @@ namespace Qx
 {
 
 //-Types------------------------------------------------------------------------------------------------------
-enum IOOpType { IO_OP_READ, IO_OP_WRITE, IO_OP_ENUMERATE, IO_OP_INSPECT };
-enum IOOpResultType { IO_SUCCESS, IO_ERR_UNKNOWN, IO_ERR_ACCESS_DENIED, IO_ERR_NOT_A_FILE, IO_ERR_NOT_A_DIR, IO_ERR_OUT_OF_RES,
+enum IoOpType { IO_OP_READ, IO_OP_WRITE, IO_OP_ENUMERATE, IO_OP_INSPECT };
+enum IoOpResultType { IO_SUCCESS, IO_ERR_UNKNOWN, IO_ERR_ACCESS_DENIED, IO_ERR_NOT_A_FILE, IO_ERR_NOT_A_DIR, IO_ERR_OUT_OF_RES,
                       IO_ERR_READ, IO_ERR_WRITE, IO_ERR_FATAL, IO_ERR_OPEN, IO_ERR_ABORT,
                       IO_ERR_TIMEOUT, IO_ERR_REMOVE, IO_ERR_RENAME, IO_ERR_REPOSITION,
                       IO_ERR_RESIZE, IO_ERR_COPY, IO_ERR_FILE_DNE, IO_ERR_DIR_DNE,
@@ -47,26 +47,26 @@ Q_DECLARE_FLAGS(ReadOptions, ReadOption)
 Q_DECLARE_OPERATORS_FOR_FLAGS(ReadOptions)
 
 //-Classes--------------------------------------------------------------------------------------------
-class IOOpReport
+class IoOpReport
 {
 //-Class Members----------------------------------------------------------------------------------------------------
 public:
     static const inline QStringList TARGET_TYPES  = {"file", "directory"};
     static const inline QString SUCCESS_TEMPLATE = R"(Succesfully %1 %2 "%3")";
     static const inline QString ERROR_TEMPLATE = R"(Error while %1 %2 "%3")";
-    static const inline QHash<IOOpType, QString> SUCCESS_VERBS = {
+    static const inline QHash<IoOpType, QString> SUCCESS_VERBS = {
         {IO_OP_READ, "read"},
         {IO_OP_WRITE, "wrote"},
         {IO_OP_ENUMERATE, "enumerated"},
         {IO_OP_INSPECT, "inspected"}
     };
-    static const inline QHash<IOOpType, QString> ERROR_VERBS = {
+    static const inline QHash<IoOpType, QString> ERROR_VERBS = {
         {IO_OP_READ, "reading"},
         {IO_OP_WRITE, "writing"},
         {IO_OP_ENUMERATE, "enumerating"},
         {IO_OP_INSPECT, "inspecting"}
     };
-    static const inline QHash<IOOpResultType, QString> ERROR_INFO = {
+    static const inline QHash<IoOpResultType, QString> ERROR_INFO = {
         {IO_ERR_UNKNOWN, "An unknown error has occured."},
         {IO_ERR_ACCESS_DENIED, "Access denied."},
         {IO_ERR_NOT_A_FILE, "Target is not a file."},
@@ -95,8 +95,8 @@ public:
 //-Instance Members-------------------------------------------------------------------------------------------------
 private:
     bool mNull;
-    IOOpType mOperation;
-    IOOpResultType mResult;
+    IoOpType mOperation;
+    IoOpResultType mResult;
     IOOpTargetType mTargetType;
     QString mTarget = QString();
     QString mOutcome = QString();
@@ -104,17 +104,17 @@ private:
 
 //-Constructor-------------------------------------------------------------------------------------------------------
 public:
-    IOOpReport();
-    IOOpReport(IOOpType op, IOOpResultType res, const QFile& tar);
-    IOOpReport(IOOpType op, IOOpResultType res, const QDir& tar);
+    IoOpReport();
+    IoOpReport(IoOpType op, IoOpResultType res, const QFile& tar);
+    IoOpReport(IoOpType op, IoOpResultType res, const QDir& tar);
 
 //-Instance Functions----------------------------------------------------------------------------------------------
 private:
     void parseOutcome();
 
 public:
-    IOOpType getOperation() const;
-    IOOpResultType getResult() const;
+    IoOpType getOperation() const;
+    IoOpResultType getResult() const;
     IOOpTargetType getTargetType() const;
     QString getTarget() const;
     QString getOutcome() const;
@@ -178,7 +178,7 @@ public:
     void resetStatus();
     void setByteOrder(QDataStream::ByteOrder bo);
     void setFloatingPointPrecision(QDataStream::FloatingPointPrecision precision);
-    IOOpReport status();
+    IoOpReport status();
     FileStreamWriter& writeRawData(const QByteArray& data);
 
     template<typename T, QX_ENABLE_IF(defines_left_shift<QDataStream, T>)>
@@ -187,7 +187,7 @@ public:
     QFile* file();
 
     // New functions
-    IOOpReport openFile();
+    IoOpReport openFile();
     void closeFile();
 };
 
@@ -213,7 +213,7 @@ public:
     void setByteOrder(QDataStream::ByteOrder bo);
     void setFloatingPointPrecision(QDataStream::FloatingPointPrecision precision);
     void skipRawData(int len);
-    IOOpReport status();
+    IoOpReport status();
 
     template<typename T, QX_ENABLE_IF(defines_right_shift<QDataStream, T&>)>
     FileStreamReader& operator>>(T& d) { mStreamReader >> d; return *this; }
@@ -221,7 +221,7 @@ public:
     QFile* file();
 
     // New functions
-    IOOpReport openFile();
+    IoOpReport openFile();
     void closeFile();
 };
 
@@ -294,9 +294,9 @@ public:
 
 //-Instance Functions------------------------------------------------------------------------------------------------
 public:
-    IOOpReport openFile();
-    IOOpReport writeLine(QString line, bool ensureLineStart = true);
-    IOOpReport writeText(QString text);
+    IoOpReport openFile();
+    IoOpReport writeLine(QString line, bool ensureLineStart = true);
+    IoOpReport writeText(QString text);
     void closeFile();
 };
 
@@ -307,33 +307,33 @@ public:
 //-Functions-------------------------------------------------------------------------------------------------------------
 // File
     bool fileIsEmpty(const QFile& file);
-    IOOpReport fileIsEmpty(bool& returnBuffer, const QFile& file);
+    IoOpReport fileIsEmpty(bool& returnBuffer, const QFile& file);
     QString kosherizeFileName(QString fileName);
 
 // Text
-    IOOpReport textFileEndsWithNewline(bool& returnBuffer, QFile& textFile);
-    IOOpReport textFileLayout(QList<int>& returnBuffer, QFile& textFile, bool ignoreTrailingEmpty);
-    IOOpReport textFileLineCount(int& returnBuffer, QFile& textFile, bool ignoreTrailingEmpty);
-    IOOpReport textFileAbsolutePosition(TextPos& textPos, QFile& textFile, bool ignoreTrailingEmpty);
-    IOOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const TextQuery& query, ReadOptions readOptions = NoReadOptions);
-    IOOpReport fileContainsString(bool& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive, bool allowSplit = false);
-    IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos, int count, ReadOptions readOptions = NoReadOptions);
-    IOOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos = TextPos::START, TextPos endPos = TextPos::END, ReadOptions readOptions = NoReadOptions);
-    IOOpReport readTextFromFile(QStringList& returnBuffer, QFile &textFile, int startLine = 0, int endLine = -1, ReadOptions readOptions = NoReadOptions);
-    IOOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode writeMode = Truncate, TextPos startPos = TextPos::START, WriteOptions writeOptions = NoWriteOptions);
-    IOOpReport deleteTextFromFile(QFile &textFile, TextPos startPos, TextPos endPos);
+    IoOpReport textFileEndsWithNewline(bool& returnBuffer, QFile& textFile);
+    IoOpReport textFileLayout(QList<int>& returnBuffer, QFile& textFile, bool ignoreTrailingEmpty);
+    IoOpReport textFileLineCount(int& returnBuffer, QFile& textFile, bool ignoreTrailingEmpty);
+    IoOpReport textFileAbsolutePosition(TextPos& textPos, QFile& textFile, bool ignoreTrailingEmpty);
+    IoOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const TextQuery& query, ReadOptions readOptions = NoReadOptions);
+    IoOpReport fileContainsString(bool& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive, bool allowSplit = false);
+    IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos, int count, ReadOptions readOptions = NoReadOptions);
+    IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos = TextPos::START, TextPos endPos = TextPos::END, ReadOptions readOptions = NoReadOptions);
+    IoOpReport readTextFromFile(QStringList& returnBuffer, QFile &textFile, int startLine = 0, int endLine = -1, ReadOptions readOptions = NoReadOptions);
+    IoOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode writeMode = Truncate, TextPos startPos = TextPos::START, WriteOptions writeOptions = NoWriteOptions);
+    IoOpReport deleteTextFromFile(QFile &textFile, TextPos startPos, TextPos endPos);
 
 // Directory:
     bool dirContainsFiles(QDir directory, QDirIterator::IteratorFlags iteratorFlags);
-    IOOpReport dirContainsFiles(bool& returnBuffer, QDir directory, QDirIterator::IteratorFlags iteratorFlags);
+    IoOpReport dirContainsFiles(bool& returnBuffer, QDir directory, QDirIterator::IteratorFlags iteratorFlags);
 
 // Integrity
-    IOOpReport calculateFileChecksum(QString& returnBuffer, QFile& file, QCryptographicHash::Algorithm hashAlgorithm);
-    IOOpReport fileMatchesChecksum(bool& returnBuffer, QFile& file, QString checksum, QCryptographicHash::Algorithm hashAlgorithm);
+    IoOpReport calculateFileChecksum(QString& returnBuffer, QFile& file, QCryptographicHash::Algorithm hashAlgorithm);
+    IoOpReport fileMatchesChecksum(bool& returnBuffer, QFile& file, QString checksum, QCryptographicHash::Algorithm hashAlgorithm);
 
 // Binary Based
-    IOOpReport readBytesFromFile(QByteArray& returnBuffer, QFile &file, qint64 startPos = 0, qint64 endPos = -1);
-    IOOpReport writeBytesToFile(QFile& file, const QByteArray& bytes, WriteMode writeMode = Truncate, qint64 startPos = 0, WriteOptions writeOptions = NoWriteOptions);
+    IoOpReport readBytesFromFile(QByteArray& returnBuffer, QFile &file, qint64 startPos = 0, qint64 endPos = -1);
+    IoOpReport writeBytesToFile(QFile& file, const QByteArray& bytes, WriteMode writeMode = Truncate, qint64 startPos = 0, WriteOptions writeOptions = NoWriteOptions);
 }
 
 #endif // IO_H
