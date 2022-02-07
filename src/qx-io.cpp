@@ -180,7 +180,7 @@ IoOpReport::IoOpReport(IoOpType op, IoOpResultType res, const QDir& tar) :
 //Public:
 IoOpType IoOpReport::getOperation() const { return mOperation; }
 IoOpResultType IoOpReport::getResult() const { return mResult; }
-IOOpTargetType IoOpReport::getTargetType() const { return mTargetType; }
+IoOpTargetType IoOpReport::getTargetType() const { return mTargetType; }
 QString IoOpReport::getTarget() const { return mTarget; }
 QString IoOpReport::getOutcome() const { return mOutcome; }
 QString IoOpReport::getOutcomeInfo() const { return mOutcomeInfo; }

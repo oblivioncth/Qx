@@ -42,7 +42,7 @@ public:
 };
 
 //TODO: Add AsyncDownloadManager using a finished signal instead and a dynamically managed progress output
-//TODO: Potentially implement a full DownloadOpReport class similar to IOOpReport that is good for info on
+//TODO: Potentially implement a full DownloadOpReport class similar to IoOpReport that is good for info on
 //      success and fail
 class SyncDownloadManager: public QObject
 {

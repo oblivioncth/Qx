@@ -23,7 +23,7 @@ enum IoOpResultType { IO_SUCCESS, IO_ERR_UNKNOWN, IO_ERR_ACCESS_DENIED, IO_ERR_N
                       IO_ERR_RESIZE, IO_ERR_COPY, IO_ERR_FILE_DNE, IO_ERR_DIR_DNE,
                       IO_ERR_FILE_EXISTS, IO_ERR_CANT_MAKE_DIR, IO_ERR_FILE_SIZE_MISMATCH, IO_ERR_CURSOR_OOB,
                       IO_ERR_FILE_NOT_OPEN};
-enum IOOpTargetType { IO_FILE, IO_DIR };
+enum IoOpTargetType { IO_FILE, IO_DIR };
 
 enum WriteMode {Insert, Overwrite, Append, Truncate};
 
@@ -97,7 +97,7 @@ private:
     bool mNull;
     IoOpType mOperation;
     IoOpResultType mResult;
-    IOOpTargetType mTargetType;
+    IoOpTargetType mTargetType;
     QString mTarget = QString();
     QString mOutcome = QString();
     QString mOutcomeInfo = QString();
@@ -115,7 +115,7 @@ private:
 public:
     IoOpType getOperation() const;
     IoOpResultType getResult() const;
-    IOOpTargetType getTargetType() const;
+    IoOpTargetType getTargetType() const;
     QString getTarget() const;
     QString getOutcome() const;
     QString getOutcomeInfo() const;
