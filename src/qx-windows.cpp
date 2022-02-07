@@ -57,10 +57,10 @@ bool FileDetails::isNull() { return mFileVersion.isNull() && mProductVersion.isN
 int FileDetails::stringTableCount() { return mStringTables.count(); }
 QList<QPair<QString, QString>> FileDetails::availableLangCodePages() { return mLangCodePageMap.keys(); }
 bool FileDetails::hasLangCodePage(QString lanuage, QString codePage) { return mLangCodePageMap.contains(qMakePair(lanuage.toUpper(), codePage.toUpper())); }
-MMRB FileDetails::metaStructVersion() { return mMetaStructVersion; }
+Mmrb FileDetails::metaStructVersion() { return mMetaStructVersion; }
 
-MMRB FileDetails::getFileVersion() { return mFileVersion; }
-MMRB FileDetails::getProductVersion() { return mProductVersion; }
+Mmrb FileDetails::getFileVersion() { return mFileVersion; }
+Mmrb FileDetails::getProductVersion() { return mProductVersion; }
 FileDetails::FileFlags FileDetails::getFileFlags() { return mFileFlags; }
 FileDetails::TargetSystems FileDetails::getTargetSystems() { return mTargetSystems; }
 FileDetails::FileType FileDetails::getFileType() { return mFileType; }
@@ -119,18 +119,18 @@ FileDetails getFileDetails(QString filePath)
                         if (fixedFileInfo->dwSignature == 0xfeef04bd)
                         {
                             // Get struct version
-                            workingFileDetails.mMetaStructVersion = MMRB(fixedFileInfo->dwStrucVersion >> 16,
+                            workingFileDetails.mMetaStructVersion = Mmrb(fixedFileInfo->dwStrucVersion >> 16,
                                                                          fixedFileInfo->dwStrucVersion & 0xFFFF,
                                                                          0, 0);
 
                             // Get file version
-                            workingFileDetails.mFileVersion = MMRB(fixedFileInfo->dwFileVersionMS >> 16,
+                            workingFileDetails.mFileVersion = Mmrb(fixedFileInfo->dwFileVersionMS >> 16,
                                                                    fixedFileInfo->dwFileVersionMS & 0xFFFF,
                                                                    fixedFileInfo->dwFileVersionLS >> 16,
                                                                    fixedFileInfo->dwFileVersionLS & 0xFFFF);
 
                             // Get product version
-                            workingFileDetails.mProductVersion = MMRB(fixedFileInfo->dwProductVersionMS >> 16,
+                            workingFileDetails.mProductVersion = Mmrb(fixedFileInfo->dwProductVersionMS >> 16,
                                                                       fixedFileInfo->dwProductVersionMS & 0xFFFF,
                                                                       fixedFileInfo->dwProductVersionLS >> 16,
                                                                       fixedFileInfo->dwProductVersionLS & 0xFFFF);

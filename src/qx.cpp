@@ -428,14 +428,14 @@ QWidgetList List::objectListToWidgetList(QObjectList list)
 //===============================================================================================================
 
 //-Constructor-------------------------------------------------------------------------------------------------
-MMRB::MMRB() :
+Mmrb::Mmrb() :
     mMajor(-1),
     mMinor(-1),
     mRevision(-1),
     mBuild(-1)
 {}
 
-MMRB::MMRB(int major, int minor, int revision, int build) :
+Mmrb::Mmrb(int major, int minor, int revision, int build) :
     mMajor(major),
     mMinor(minor),
     mRevision(revision),
@@ -444,35 +444,35 @@ MMRB::MMRB(int major, int minor, int revision, int build) :
 
 //-Member Functions--------------------------------------------------------------------------------------------
 //Public:
-bool MMRB::operator== (const MMRB &otherMMRB)
+bool Mmrb::operator== (const Mmrb &otherMmrb)
 {
-    return mMajor == otherMMRB.mMajor && mMinor == otherMMRB.mMinor && mRevision == otherMMRB.mRevision && mBuild == otherMMRB.mBuild;
+    return mMajor == otherMmrb.mMajor && mMinor == otherMmrb.mMinor && mRevision == otherMmrb.mRevision && mBuild == otherMmrb.mBuild;
 }
-bool MMRB::operator!= (const MMRB &otherMMRB) { return !(*this == otherMMRB); }
-bool MMRB::operator> (const MMRB &otherMMRB)
+bool Mmrb::operator!= (const Mmrb &otherMmrb) { return !(*this == otherMmrb); }
+bool Mmrb::operator> (const Mmrb &otherMmrb)
 {
-    if(mMajor == otherMMRB.mMajor)
+    if(mMajor == otherMmrb.mMajor)
     {
-        if(mMinor == otherMMRB.mMinor)
+        if(mMinor == otherMmrb.mMinor)
         {
-            if(mRevision == otherMMRB.mRevision)
-                return mBuild > otherMMRB.mBuild;
+            if(mRevision == otherMmrb.mRevision)
+                return mBuild > otherMmrb.mBuild;
             else
-                return mRevision > otherMMRB.mRevision;
+                return mRevision > otherMmrb.mRevision;
         }
         else
-            return mMinor > otherMMRB.mMinor;
+            return mMinor > otherMmrb.mMinor;
     }
     else
-        return mMajor > otherMMRB.mMajor;
+        return mMajor > otherMmrb.mMajor;
 }
-bool MMRB::operator>= (const MMRB &otherMMRB) { return *this == otherMMRB || *this > otherMMRB; }
-bool MMRB::operator< (const MMRB &otherMMRB) { return !(*this >= otherMMRB); }
-bool MMRB::operator<= (const MMRB &otherMMRB) { return !(*this > otherMMRB); }
+bool Mmrb::operator>= (const Mmrb &otherMmrb) { return *this == otherMmrb || *this > otherMmrb; }
+bool Mmrb::operator< (const Mmrb &otherMmrb) { return !(*this >= otherMmrb); }
+bool Mmrb::operator<= (const Mmrb &otherMmrb) { return !(*this > otherMmrb); }
 
-bool MMRB::isNull() { return mMajor == -1 && mMinor == -1 && mRevision == -1 && mBuild == -1; }
+bool Mmrb::isNull() { return mMajor == -1 && mMinor == -1 && mRevision == -1 && mBuild == -1; }
 
-QString MMRB::toString(MMRB::StringFormat format)
+QString Mmrb::toString(Mmrb::StringFormat format)
 {
     QString workingString = QString::number(mMajor);
 
@@ -488,28 +488,28 @@ QString MMRB::toString(MMRB::StringFormat format)
     return workingString;
 }
 
-int MMRB::getMajorVer() { return mMajor; }
-int MMRB::getMinorVer() { return mMinor; }
-int MMRB::getRevisionVer() { return mRevision; }
-int MMRB::getBuildVer() { return mBuild; }
+int Mmrb::getMajorVer() { return mMajor; }
+int Mmrb::getMinorVer() { return mMinor; }
+int Mmrb::getRevisionVer() { return mRevision; }
+int Mmrb::getBuildVer() { return mBuild; }
 
-void MMRB::setMajorVer(int major) { mMajor = major; }
-void MMRB::setMinorVer(int minor) { mMinor = minor; }
-void MMRB::setRevisionVer(int revision) { mRevision = revision; }
-void MMRB::setBuildVer(int build) { mBuild = build; }
+void Mmrb::setMajorVer(int major) { mMajor = major; }
+void Mmrb::setMinorVer(int minor) { mMinor = minor; }
+void Mmrb::setRevisionVer(int revision) { mRevision = revision; }
+void Mmrb::setBuildVer(int build) { mBuild = build; }
 
-void MMRB::incrementMajorVer() { mMajor++; }
-void MMRB::incrementMinorVer() { mMinor++; }
-void MMRB::incrementRevisionVer() { mRevision++; }
-void MMRB::incrementBuildVer() { mBuild++; }
+void Mmrb::incrementMajorVer() { mMajor++; }
+void Mmrb::incrementMinorVer() { mMinor++; }
+void Mmrb::incrementRevisionVer() { mRevision++; }
+void Mmrb::incrementBuildVer() { mBuild++; }
 
 //-Class Functions---------------------------------------------------------------------------------------------
 //Public:
-MMRB MMRB::fromString(QString string)
+Mmrb Mmrb::fromString(QString string)
 {
     // Check for valid string
-    if(!String::isValidMMRB(string))
-        return MMRB();
+    if(!String::isValidMmrb(string))
+        return Mmrb();
 
     int versions[] = {0, 0, 0, 0}; // Above check prevents going OOB with this
 
@@ -518,7 +518,7 @@ MMRB MMRB::fromString(QString string)
     for(int i = 0; i < segments.size(); i++)
         versions[i] = segments.at(i).toInt();
 
-    return MMRB(versions[0], versions[1], versions[2], versions[3]);
+    return Mmrb(versions[0], versions[1], versions[2], versions[3]);
 }
 
 //===============================================================================================================
@@ -529,7 +529,7 @@ MMRB MMRB::fromString(QString string)
 //Public:
 bool String::isOnlyNumbers(QString checkStr) { return RegEx::numbersOnly.match(checkStr).hasMatch() && !checkStr.isEmpty(); }
 
-bool String::isValidMMRB(QString version)
+bool String::isValidMmrb(QString version)
 {
     // MMRB: Major.Minor.Revision.Build
 

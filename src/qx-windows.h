@@ -177,9 +177,9 @@ private:
 
 //-Instance Members-------------------------------------------------------------------------------------------------
 private:
-    MMRB mMetaStructVersion;
-    MMRB mFileVersion;
-    MMRB mProductVersion;
+    Mmrb mMetaStructVersion;
+    Mmrb mFileVersion;
+    Mmrb mProductVersion;
     FileFlags mFileFlags = FF_NONE;
     TargetSystems mTargetSystems = TS_NONE;
     FileType mFileType = FT_NONE;
@@ -201,10 +201,10 @@ public:
     int stringTableCount();
     QList<QPair<QString, QString>> availableLangCodePages();
     bool hasLangCodePage(QString lanuage, QString codePage);
-    MMRB metaStructVersion();
+    Mmrb metaStructVersion();
 
-    MMRB getFileVersion();
-    MMRB getProductVersion();
+    Mmrb getFileVersion();
+    Mmrb getProductVersion();
     FileFlags getFileFlags();
     TargetSystems getTargetSystems();
     FileType getFileType();

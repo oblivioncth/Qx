@@ -818,7 +818,7 @@ public:
 #endif
 };
 
-class MMRB
+class Mmrb
 {
 //-Class Variables---------------------------------------------------------------------------------------------
 public:
@@ -833,17 +833,17 @@ private:
 
 //-Constructor-------------------------------------------------------------------------------------------------
 public:
-    MMRB();
-    MMRB(int major, int minor, int revision, int build);
+    Mmrb();
+    Mmrb(int major, int minor, int revision, int build);
 
 //-Member Functions--------------------------------------------------------------------------------------------
 public:
-    bool operator== (const MMRB &otherMMRB);
-    bool operator!= (const MMRB &otherMMRB);
-    bool operator> (const MMRB &otherMMRB);
-    bool operator>= (const MMRB &otherMMRB);
-    bool operator< (const MMRB &otherMMRB);
-    bool operator<= (const MMRB &otherMMRB);
+    bool operator== (const Mmrb &otherMMRB);
+    bool operator!= (const Mmrb &otherMMRB);
+    bool operator> (const Mmrb &otherMMRB);
+    bool operator>= (const Mmrb &otherMMRB);
+    bool operator< (const Mmrb &otherMMRB);
+    bool operator<= (const Mmrb &otherMMRB);
 
     bool isNull();
     QString toString(StringFormat format = StringFormat::Full);
@@ -867,7 +867,7 @@ private:
 
 //-Class Functions---------------------------------------------------------------------------------------------
 public:
-    static MMRB fromString(QString string);
+    static Mmrb fromString(QString string);
 };
 
 class Number
@@ -970,7 +970,7 @@ class String
 //-Class Functions----------------------------------------------------------------------------------------------
 public:
     static bool isOnlyNumbers(QString checkStr);
-    static bool isValidMMRB(QString version);
+    static bool isValidMmrb(QString version);
     static bool isHexNumber(QString hexNum);
     static bool isValidChecksum(QString checksum, QCryptographicHash::Algorithm hashAlgorithm);
     static QString fromByteArrayDirectly(QByteArray data);
