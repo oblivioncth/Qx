@@ -8,8 +8,6 @@ contains(DEFINES, EDITION_WIDGETS) {
     CONFIG += console
 }
 
-BUILDS
-
 LIB_NAME = Qxtended
 LIB_SHORT_NAME = Qx
 LIB_VER_MJR = 0
