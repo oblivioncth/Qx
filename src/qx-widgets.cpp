@@ -85,8 +85,8 @@ LoginDialog::LoginDialog(QWidget* parent, QString prompt) : QDialog(parent)
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:
 void LoginDialog::setPrompt(QString prompt) { mPromptLabel->setText(prompt); }
-QString LoginDialog::getUsername() { return mUsernameLineEdit->text(); }
-QString LoginDialog::getPassword() { return mPasswordLineEdit->text(); }
+QString LoginDialog::username() { return mUsernameLineEdit->text(); }
+QString LoginDialog::password() { return mPasswordLineEdit->text(); }
 
 //-Slots--------------------------------------------------------------------------------------------------------
 //Private:

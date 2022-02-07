@@ -21,7 +21,7 @@ public:
 //-Instance Functions--------------------------------------------------------------------------------------------
 public:
     bool isValid();
-    QString getText();
+    QString text();
 };
 
 class XmlStreamReaderError
@@ -52,8 +52,8 @@ public:
 //-Instance Functions--------------------------------------------------------------------------------------------
 public:
     bool isValid();
-    QXmlStreamReader::Error getType();
-    QString getText();
+    QXmlStreamReader::Error type();
+    QString text();
 };
 
 //-Functions-------------------------------------------------------------------------------------------------------------

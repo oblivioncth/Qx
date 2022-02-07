@@ -29,7 +29,7 @@ struct ShortcutProperties
 class FileDetails
 {
 //-Friends---------------------------------------------------------------------------------------------------------------
-friend FileDetails getFileDetails(QString filePath);
+friend FileDetails readFileDetails(QString filePath);
 
 //-Inner Enums-----------------------------------------------------------------------------------------------------------
 public:
@@ -203,25 +203,25 @@ public:
     bool hasLangCodePage(QString lanuage, QString codePage);
     Mmrb metaStructVersion();
 
-    Mmrb getFileVersion();
-    Mmrb getProductVersion();
-    FileFlags getFileFlags();
-    TargetSystems getTargetSystems();
-    FileType getFileType();
-    FileSubType getFileSubType();
-    int getVirtualDeviceID();
-    const StringTable getStringTable(int index = 0);
-    const StringTable getStringTable(QString language, QString codePage);
+    Mmrb fileVersion();
+    Mmrb productVersion();
+    FileFlags fileFlags();
+    TargetSystems targetSystems();
+    FileType fileType();
+    FileSubType fileSubType();
+    int virtualDeviceID();
+    const StringTable stringTable(int index = 0);
+    const StringTable stringTable(QString language, QString codePage);
 };
 
 //-Functions-------------------------------------------------------------------------------------------------------------
 
 // Files
-FileDetails getFileDetails(QString filePath);
+FileDetails readFileDetails(QString filePath);
 
 // Processes
-DWORD getProcessIDByName(QString processName);
-QString getProcessNameByID(DWORD processID);
+DWORD processIDByName(QString processName);
+QString processNameByID(DWORD processID);
 bool processIsRunning(QString processName);
 bool processIsRunning(DWORD processID);
 bool enforceSingleInstance();

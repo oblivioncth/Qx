@@ -36,9 +36,9 @@ public:
 //-Instance Functions--------------------------------------------------------------------------------------------
 public:
     bool isValid();
-    QNetworkReply::NetworkError getType();
-    QUrl getUrl();
-    QString getText();
+    QNetworkReply::NetworkError type();
+    QUrl url();
+    QString text();
 };
 
 //TODO: Add AsyncDownloadManager using a finished signal instead and a dynamically managed progress output
@@ -137,7 +137,7 @@ public:
 //-Instance Functions----------------------------------------------------------------------------------------------
 private:
     NetworkReplyError enumerateTotalSize();
-    NetworkReplyError getFileSize(qint64& returnBuffer, QUrl target);
+    NetworkReplyError queryFileSize(qint64& returnBuffer, QUrl target);
     IoOpReport startDownload(DownloadTask task);
     void cancelAll();
     void reset();

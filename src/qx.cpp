@@ -488,20 +488,20 @@ QString Mmrb::toString(Mmrb::StringFormat format)
     return workingString;
 }
 
-int Mmrb::getMajorVer() { return mMajor; }
-int Mmrb::getMinorVer() { return mMinor; }
-int Mmrb::getRevisionVer() { return mRevision; }
-int Mmrb::getBuildVer() { return mBuild; }
+int Mmrb::major() { return mMajor; }
+int Mmrb::minor() { return mMinor; }
+int Mmrb::revision() { return mRevision; }
+int Mmrb::build() { return mBuild; }
 
-void Mmrb::setMajorVer(int major) { mMajor = major; }
-void Mmrb::setMinorVer(int minor) { mMinor = minor; }
-void Mmrb::setRevisionVer(int revision) { mRevision = revision; }
-void Mmrb::setBuildVer(int build) { mBuild = build; }
+void Mmrb::setMajor(int major) { mMajor = major; }
+void Mmrb::setMinor(int minor) { mMinor = minor; }
+void Mmrb::setRevision(int revision) { mRevision = revision; }
+void Mmrb::setBuild(int build) { mBuild = build; }
 
-void Mmrb::incrementMajorVer() { mMajor++; }
-void Mmrb::incrementMinorVer() { mMinor++; }
-void Mmrb::incrementRevisionVer() { mRevision++; }
-void Mmrb::incrementBuildVer() { mBuild++; }
+void Mmrb::incrementMajor() { mMajor++; }
+void Mmrb::incrementMinor() { mMinor++; }
+void Mmrb::incrementRevision() { mRevision++; }
+void Mmrb::incrementBuild() { mBuild++; }
 
 //-Class Functions---------------------------------------------------------------------------------------------
 //Public:

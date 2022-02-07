@@ -59,15 +59,15 @@ QList<QPair<QString, QString>> FileDetails::availableLangCodePages() { return mL
 bool FileDetails::hasLangCodePage(QString lanuage, QString codePage) { return mLangCodePageMap.contains(qMakePair(lanuage.toUpper(), codePage.toUpper())); }
 Mmrb FileDetails::metaStructVersion() { return mMetaStructVersion; }
 
-Mmrb FileDetails::getFileVersion() { return mFileVersion; }
-Mmrb FileDetails::getProductVersion() { return mProductVersion; }
-FileDetails::FileFlags FileDetails::getFileFlags() { return mFileFlags; }
-FileDetails::TargetSystems FileDetails::getTargetSystems() { return mTargetSystems; }
-FileDetails::FileType FileDetails::getFileType() { return mFileType; }
-FileDetails::FileSubType FileDetails::getFileSubType() { return mFileSubType; }
-int FileDetails::getVirtualDeviceID() { return mVirtualDeviceID; }
+Mmrb FileDetails::fileVersion() { return mFileVersion; }
+Mmrb FileDetails::productVersion() { return mProductVersion; }
+FileDetails::FileFlags FileDetails::fileFlags() { return mFileFlags; }
+FileDetails::TargetSystems FileDetails::targetSystems() { return mTargetSystems; }
+FileDetails::FileType FileDetails::fileType() { return mFileType; }
+FileDetails::FileSubType FileDetails::fileSubType() { return mFileSubType; }
+int FileDetails::virtualDeviceID() { return mVirtualDeviceID; }
 
-const FileDetails::StringTable FileDetails::getStringTable(int index)
+const FileDetails::StringTable FileDetails::stringTable(int index)
 {
     if(index >= 0 && index < mStringTables.count())
         return mStringTables.at(index);
@@ -75,7 +75,7 @@ const FileDetails::StringTable FileDetails::getStringTable(int index)
         return FileDetails::StringTable();
 }
 
-const FileDetails::StringTable FileDetails::getStringTable(QString language, QString codePage)
+const FileDetails::StringTable FileDetails::stringTable(QString language, QString codePage)
 {
     if(hasLangCodePage(language.toUpper(), codePage.toUpper()))
         return mStringTables.at(mLangCodePageMap.value(qMakePair(language.toUpper(), codePage.toUpper())));
@@ -91,7 +91,7 @@ void FileDetails::addStringTable(StringTable stringTable)
 }
 
 //-Functions-------------------------------------------------------------------------------------------------------------
-FileDetails getFileDetails(QString filePath)
+FileDetails readFileDetails(QString filePath)
 {
     // File details to fill
     FileDetails workingFileDetails;
@@ -223,7 +223,7 @@ FileDetails getFileDetails(QString filePath)
     return workingFileDetails;
 }
 
-DWORD getProcessIDByName(QString processName)
+DWORD processIDByName(QString processName)
 {
     // Find process ID by name
     DWORD processID = 0;
@@ -250,7 +250,7 @@ DWORD getProcessIDByName(QString processName)
     return processID;
 }
 
-QString getProcessNameByID(DWORD processID)
+QString processNameByID(DWORD processID)
 {
     // Find process name by ID
     QString processName = QString();
@@ -277,8 +277,8 @@ QString getProcessNameByID(DWORD processID)
     return processName;
 }
 
-bool processIsRunning(QString processName) { return getProcessIDByName(processName); }
-bool processIsRunning(DWORD processID) { return getProcessNameByID(processID).isNull(); }
+bool processIsRunning(QString processName) { return processIDByName(processName); }
+bool processIsRunning(DWORD processID) { return processNameByID(processID).isNull(); }
 
 bool enforceSingleInstance()
 {

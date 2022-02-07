@@ -47,9 +47,9 @@ NetworkReplyError::NetworkReplyError(QNetworkReply* reply, QUrl url) :
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:
 bool NetworkReplyError::isValid() { return mErrorType != QNetworkReply::NetworkError::NoError; }
-QNetworkReply::NetworkError NetworkReplyError::getType() { return mErrorType; }
-QUrl NetworkReplyError::getUrl() { return mUrl; }
-QString NetworkReplyError::getText() { return mErrorText; }
+QNetworkReply::NetworkError NetworkReplyError::type() { return mErrorType; }
+QUrl NetworkReplyError::url() { return mUrl; }
+QString NetworkReplyError::text() { return mErrorText; }
 
 //===============================================================================================================
 // SyncDownloadManager::Report
@@ -105,7 +105,7 @@ NetworkReplyError SyncDownloadManager::enumerateTotalSize()
     {
         // Get download size
         qint64 singleFileSize = 0;
-        NetworkReplyError errorStatus = getFileSize(singleFileSize, task.target);
+        NetworkReplyError errorStatus = queryFileSize(singleFileSize, task.target);
 
         // Check for network error
         if(errorStatus.isValid())
@@ -122,7 +122,7 @@ NetworkReplyError SyncDownloadManager::enumerateTotalSize()
     return NetworkReplyError();
 }
 
-NetworkReplyError SyncDownloadManager::getFileSize(qint64& returnBuffer, QUrl target)
+NetworkReplyError SyncDownloadManager::queryFileSize(qint64& returnBuffer, QUrl target)
 {
     // Ensure return buffer is reset
     returnBuffer = 0;
@@ -249,7 +249,7 @@ SyncDownloadManager::Report SyncDownloadManager::processQueue()
     // Get total task size
     NetworkReplyError enumError = enumerateTotalSize();
     if(enumError.isValid())
-        return Report(FinishStatus::Error, GenericError(GenericError::Error, ERR_ENUM_TOTAL_SIZE.arg(enumError.getUrl().toString()), enumError.getText()));
+        return Report(FinishStatus::Error, GenericError(GenericError::Error, ERR_ENUM_TOTAL_SIZE.arg(enumError.url().toString()), enumError.text()));
 
     // Add initial downloads
     for(int j = 0; j < mMaxSimultaneous && !mPendingDownloads.isEmpty(); j++)
@@ -303,7 +303,7 @@ void SyncDownloadManager::readyRead()
 
     if(!writer->status().wasSuccessful())
     {
-        mErrorList.append(ERR_GEN_FAIL.arg(senderNetworkReply->url().toString(), writer->status().getOutcome() + ": " + writer->status().getOutcomeInfo()));
+        mErrorList.append(ERR_GEN_FAIL.arg(senderNetworkReply->url().toString(), writer->status().outcome() + ": " + writer->status().outcomeInfo()));
 
         if(mAutoAbort)
         {

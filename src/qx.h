@@ -848,20 +848,20 @@ public:
     bool isNull();
     QString toString(StringFormat format = StringFormat::Full);
 
-    int getMajorVer();
-    int getMinorVer();
-    int getRevisionVer();
-    int getBuildVer();
+    int major();
+    int minor();
+    int revision();
+    int build();
 
-    void setMajorVer(int major);
-    void setMinorVer(int minor);
-    void setRevisionVer(int revision);
-    void setBuildVer(int build);
+    void setMajor(int major);
+    void setMinor(int minor);
+    void setRevision(int revision);
+    void setBuild(int build);
 
-    void incrementMajorVer();
-    void incrementMinorVer();
-    void incrementRevisionVer();
-    void incrementBuildVer();
+    void incrementMajor();
+    void incrementMinor();
+    void incrementRevision();
+    void incrementBuild();
 
 private:
 

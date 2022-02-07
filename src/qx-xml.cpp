@@ -29,7 +29,7 @@ XmlStreamWriterError::XmlStreamWriterError(QString errorText) :
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:
 bool XmlStreamWriterError::isValid() { return !mErrorText.isNull(); }
-QString XmlStreamWriterError::getText() { return mErrorText; }
+QString XmlStreamWriterError::text() { return mErrorText; }
 
 //===============================================================================================================
 // XmlStreamReaderError
@@ -55,8 +55,8 @@ XmlStreamReaderError::XmlStreamReaderError(QString customError) :
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:
 bool XmlStreamReaderError::isValid() { return mErrorType != QXmlStreamReader::Error::NoError; }
-QXmlStreamReader::Error XmlStreamReaderError::getType() { return mErrorType; }
-QString XmlStreamReaderError::getText() { return mErrorText; }
+QXmlStreamReader::Error XmlStreamReaderError::type() { return mErrorType; }
+QString XmlStreamReaderError::text() { return mErrorText; }
 
 //-Functions------------------------------------------------------------------------------------------------------------
 QString xmlSanitized(QString string) { return string.replace(illegalXmlChar, ""); }

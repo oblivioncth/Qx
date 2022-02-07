@@ -113,12 +113,12 @@ private:
     void parseOutcome();
 
 public:
-    IoOpType getOperation() const;
-    IoOpResultType getResult() const;
-    IoOpTargetType getTargetType() const;
-    QString getTarget() const;
-    QString getOutcome() const;
-    QString getOutcomeInfo() const;
+    IoOpType operation() const;
+    IoOpResultType result() const;
+    IoOpTargetType resultTargetType() const;
+    QString target() const;
+    QString outcome() const;
+    QString outcomeInfo() const;
     bool wasSuccessful() const;
     bool isNull() const;
 };
@@ -142,8 +142,8 @@ public:
 
 //-Instance Functions------------------------------------------------------------------------------------------------
 public:
-    int getLineNum() const;
-    int getCharNum() const;
+    int lineNum() const;
+    int charNum() const;
     void setLineNum(int lineNum);
     void setCharNum(int charNum);
     void setNull();

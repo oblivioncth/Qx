@@ -62,8 +62,8 @@ public:
 //-Instance Functions----------------------------------------------------------------------------------------------
 public:
     void setPrompt(QString prompt);
-    QString getUsername();
-    QString getPassword();
+    QString username();
+    QString password();
 
 //-Slots----------------------------------------------------------------------------------------------------------
 private slots:
