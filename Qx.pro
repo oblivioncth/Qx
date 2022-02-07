@@ -49,6 +49,7 @@ SOURCES += \
 HEADERS += \
     src/qx-io.h \
     src/qx-net.h \
+    src/qx-utility.h \
     src/qx-xml.h \
     src/qx.h
 
