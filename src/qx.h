@@ -1,14 +1,7 @@
 #ifndef QX_H
 #define QX_H
 
-//-Macros-------------------------------------------------------------------------------------------------------------
-#define QX_ENABLE_IF(...) std::enable_if_t<__VA_ARGS__::value, int> = 0 // enable_if Macro; allows QX_ENABLE_IF(std::is_arithmetic<T>) for example
-#define QX_ENABLE_IF_D(...) std::enable_if_t<__VA_ARGS__::value, int> // enable_if Macro with no default argument, use if template was already forward declared
-
-#define QX_SCOPED_ENUM_HASH_FUNC(T) \
-inline uint qHash(const T& t, uint seed) { \
-    return ::qHash(static_cast<typename std::underlying_type<T>::type>(t), seed); \
-}
+#include "qx-utility.h"
 
 #ifdef QT_WIDGETS_LIB // Only enabled for Widget applications
 #include <QWidget>
@@ -30,99 +23,35 @@ inline uint qHash(const T& t, uint seed) { \
 #include <iostream>
 #include "assert.h"
 
-//-Non-namspace Functions-------------------------------------------------------------------------------------------------
-template <typename T>
-const T qAsConstR(T &&t) { return std::move(t); }
-
 namespace Qx
 {
-//-std::functional Extensions-----------------------------------------------------------------------------------
-struct left_shift {
-
-    template <typename L, typename R>
-    constexpr auto operator()(L&& l, R&& r) const
-    noexcept(noexcept(std::forward<L>(l) << std::forward<R>(r)))
-    -> decltype(std::forward<L>(l) << std::forward<R>(r))
-    {
-        return std::forward<L>(l) << std::forward<R>(r);
-    }
-};
-
-struct right_shift {
-
-    template <typename L, typename R>
-    constexpr auto operator()(L&& l, R&& r) const
-    noexcept(noexcept(std::forward<L>(l) >> std::forward<R>(r)))
-    -> decltype(std::forward<L>(l) >> std::forward<R>(r))
-    {
-        return std::forward<L>(l) >> std::forward<R>(r);
-    }
-};
-
-//-Traits-------------------------------------------------------------------------------------------------------
-template<typename T, typename... Others>
-struct is_any : std::disjunction<std::is_same<T, Others>...>
-{};
-
-template<typename X, typename Y, typename Op>
-struct defines_op_impl
-{
-    template<typename U, typename L, typename R>
-    static auto test(int) -> decltype(std::declval<U>()(std::declval<L>(), std::declval<R>()),
-                                      void(), std::true_type());
-
-    template<typename U, typename L, typename R>
-    static auto test(...) -> std::false_type;
-
-    using type = decltype(test<Op, X, Y>(0));
-
-};
-
-template<typename X, typename Y, typename Op> using defines_op = typename defines_op_impl<X, Y, Op>::type;
-
-template<class X, class Y> using defines_equality = defines_op<X, Y, std::equal_to<>>;
-template<class X, class Y> using defines_inequality = defines_op<X, Y, std::not_equal_to<>>;
-template<class X, class Y> using defines_less_than = defines_op<X, Y, std::less<>>;
-template<class X, class Y> using defines_less_equal = defines_op<X, Y, std::less_equal<>>;
-template<class X, class Y> using defines_greater_than = defines_op<X, Y, std::greater<>>;
-template<class X, class Y> using defines_greater_equal = defines_op<X, Y, std::greater_equal<>>;
-template<class X, class Y> using defines_bit_xor = defines_op<X, Y, std::bit_xor<>>;
-template<class X, class Y> using defines_bit_or = defines_op<X, Y, std::bit_or<>>;
-template<class X, class Y> using defines_left_shift = defines_op<X, Y, left_shift>;
-template<class X, class Y> using defines_right_shift = defines_op<X, Y, right_shift>;
-
-template<typename T>
-using is_json_type = std::bool_constant<is_any<T, bool, double, QString, QJsonArray, QJsonObject>::value>;
-
-template<typename T>
-using is_datastream_type = std::bool_constant<is_any<T, bool, double, QString, QJsonArray, QJsonObject>::value>;
-
 //-Namespace Members--------------------------------------------------------------------------------------------
 static QTextStream cout; // QTextStream version of std::cout
 static QTextStream cerr; // QTextStream version of std::cerr
 static QTextStream cin; // QTextStream version of std::cin
 
 //-Class Forward Declarations---------------------------------------------------------------------------------------------
-template <typename T, QX_ENABLE_IF(std::is_arithmetic<T>)>
+template<typename T>
+    requires arithmetic<T>
 class NII;
 
 //-Functions----------------------------------------------------------------------------------------------------
-template <typename T>
-struct typeIdentifier {typedef T type; }; // Forces compiler to deduce the type of T from only one argument so that implicit conversions can be used for the others
-
-template<typename T, QX_ENABLE_IF(std::is_integral<T>)>
+template<typename T>
+    requires std::integral<T>
 T rangeToLength(T start, T end)
 {
-    // Returns the length from start to end including start, primarily for support of NII (Negative Is Infinity)
+    // Returns the length from start to end including start
     T length = end - start;
     length++;
     return length;
 }
 
-template<typename T, QX_ENABLE_IF(std::is_arithmetic<T>)>
+template<typename T>
+    requires arithmetic<T>
 static bool isOdd(T num) { return num % 2; }
 
-template<typename T, QX_ENABLE_IF(std::is_arithmetic<T>)>
+template<typename T>
+    requires arithmetic<T>
 static bool isEven(T num) { return !isOdd(num); }
 
 //-Classes------------------------------------------------------------------------------------------------------
@@ -141,7 +70,7 @@ public:
     static constexpr int constDim(T(&)[N]) { return N; } // Allows using the size of a const array at runtime
 
     template <typename T, int N>
-    static int indexOf(T(&array) [N], typename typeIdentifier<T>::type query)
+    static int indexOf(T(&array) [N], T query)
     {
         for(int i = 0; i < N; i++)
             if(array[i] == query)
@@ -205,7 +134,8 @@ class ByteArray
 {
 //-Class Functions----------------------------------------------------------------------------------------------
 public:
-    template<typename T, QX_ENABLE_IF(std::is_integral<T>)>
+    template<typename T>
+        requires std::integral<T>
     static QByteArray fromPrimitive(T primitive, Endian::Endianness endianness = Endian::LE)
     {
         QByteArray rawBytes;
@@ -229,7 +159,8 @@ public:
         return rawBytes;
     }
 
-    template<typename T, QX_ENABLE_IF(std::is_floating_point<T>)>
+    template<typename T>
+        requires std::floating_point<T>
     static QByteArray fromPrimitive(T primitive, Endian::Endianness endianness = Endian::LE)
     {
         QByteArray rawBytes;
@@ -265,7 +196,8 @@ public:
         return rawBytes;
     }
 
-    template<typename T, QX_ENABLE_IF(std::is_fundamental<T>)>
+    template<typename T>
+        requires fundamental<T>
     static T toPrimitive(QByteArray ba, Endian::Endianness endianness = Endian::LE)
     {
         static_assert(std::numeric_limits<float>::is_iec559, "Only supports IEC 559 (IEEE 754) float"); // For floats
@@ -331,7 +263,8 @@ public:
 
 //-Class Functions----------------------------------------------------------------------------------------------
 public:
-    template<typename T, QX_ENABLE_IF(std::is_integral<T>)>
+    template<typename T>
+        requires std::integral<T>
     static BitArray fromInteger(const T& integer)
     {
         int bitCount = sizeof(T)*8;
@@ -347,7 +280,8 @@ public:
 
 //-Instance Functions-------------------------------------------------------------------------------------------
 public:
-    template<typename T, QX_ENABLE_IF(std::is_integral<T>)>
+    template<typename T>
+        requires std::integral<T>
     T toInteger()
     {
         int bitCount = sizeof(T)*8;
@@ -364,7 +298,8 @@ public:
     void append(bool bit = false);
     void replace(const BitArray& bits, int start = 0, int length = -1);
 
-    template<typename T, QX_ENABLE_IF(std::is_integral<T>)>
+    template<typename T>
+        requires std::integral<T>
     void replace(T integer, int start = 0, int length = -1)
     {
         BitArray converted = BitArray::fromInteger(integer);
@@ -398,7 +333,8 @@ public:
 };
 #endif
 
-template <typename K, typename V, QX_ENABLE_IF(std::is_arithmetic<V>)>
+template <typename K, typename V>
+    requires arithmetic<V>
 class Cumulation
 {
 //-Instance Variables----------------------------------------------------------------------------------------------
@@ -447,7 +383,8 @@ public:
     static QDateTime fromMSFileTime(qint64 fileTime);
 };
 
-template <typename T, QX_ENABLE_IF(std::is_integral<T>)>
+template<typename T>
+    requires std::integral<T>
 class FreeIndexTracker
 {
 //-Class Members-------------------------------------------------------------------------------------------------
@@ -686,7 +623,8 @@ public:
     static Qx::GenericError checkedKeyRetrieval(QJsonObject& valueBuffer, QJsonObject jObject, QString key);
 };
 
-template <typename T, QX_ENABLE_IF_D(std::is_arithmetic<T>)>
+template <typename T>
+    requires arithmetic<T>
 class NII // Negative Is Infinity - Wrapper class (0 is minimum)
 {
 //-Class Members-------------------------------------------------------------------------------------------------
@@ -875,7 +813,8 @@ class Number
 //-Class Functions---------------------------------------------------------------------------------------------
 public:
     template <typename T>
-    static T typeLimitedAdd(T a, T b)
+        requires arithmetic<T>
+    static T constrainedAdd(T a, T b)
     {
         if(((b > 0) && (a > (std::numeric_limits<T>::max() - b))) ||
            ((b < 0) && (a < (std::numeric_limits<T>::min() - b))))
@@ -885,7 +824,8 @@ public:
     }
 
     template <typename T>
-    static T typeLimitedSub(T a, T b)
+        requires arithmetic<T>
+    static T constrainedSub(T a, T b)
     {
         if((b > 0 && a < std::numeric_limits<T>::min() + b) ||
            (b < 0 && a > std::numeric_limits<T>::max() + b))
@@ -894,7 +834,8 @@ public:
             return a - b;
     }
 
-    template <typename T, QX_ENABLE_IF(std::is_integral<T>)>
+    template<typename T>
+        requires std::integral<T>
     static T roundToNearestMultiple(T num, T mult)
     {
         // Ignore negative multiples
@@ -907,13 +848,14 @@ public:
             return num;
 
         T towardsZero = (num / mult) * mult;
-        T awayFromZero = num < 0 ? typeLimitedSub(towardsZero, mult) : typeLimitedAdd(towardsZero, mult);
+        T awayFromZero = num < 0 ? constrainedSub(towardsZero, mult) : constrainedAdd(towardsZero, mult);
 
         // Return of closest the two directions
         return (abs(num) - abs(towardsZero) >= abs(awayFromZero) - abs(num))? awayFromZero : towardsZero;
     }
 
-    template <typename T, QX_ENABLE_IF(std::is_integral<T>)>
+    template <typename T>
+        requires std::integral<T>
     static T ceilPowOfTwo(T num)
     {
         // Return if num already is power of 2
@@ -928,7 +870,8 @@ public:
         return powOfTwo;
     }
 
-    template <typename T, QX_ENABLE_IF(std::is_integral<T>)>
+    template <typename T>
+        requires std::integral<T>
     static T floorPowOfTwo(T num)
     {
         // Return if num already is power of 2
@@ -944,7 +887,8 @@ public:
         return powOfTwo;
     }
 
-    template <typename T, QX_ENABLE_IF(std::is_integral<T>)>
+    template <typename T>
+        requires std::integral<T>
     static T roundPowOfTwo(T num)
     {
        T above = ceilPowOfTwo(num);

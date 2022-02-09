@@ -185,7 +185,7 @@ QDateTime DateTime::fromMSFileTime(qint64 fileTime)
     qint64 msFileTime = fileTime/10000;
 
     // Offset to unix epoch time, if underflow would occur use min
-    qint64 msEpochTime = Number::typeLimitedSub(msFileTime, FILETIME_EPOCH_OFFSET_MS);
+    qint64 msEpochTime = Number::constrainedSub(msFileTime, FILETIME_EPOCH_OFFSET_MS);
 
     // Check QDateTime bounds (the bounds can be slightly further than this as the min/max month/day/time within the
     // min/max years are not accounted for, but this should be more than sufficient for most cases
