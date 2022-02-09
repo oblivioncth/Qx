@@ -38,7 +38,7 @@ class NII;
 //-Functions----------------------------------------------------------------------------------------------------
 template<typename T>
     requires std::integral<T>
-T rangeToLength(T start, T end)
+T lengthOfRange(T start, T end)
 {
     // Returns the length from start to end including start
     T length = end - start;
@@ -483,7 +483,7 @@ public:
     T firstFree()
     {
         // Quick check for all reserved
-        if(mReservedIndicies.count() == rangeToLength(mMinIndex, mMaxIndex))
+        if(mReservedIndicies.count() == lengthOfRange(mMinIndex, mMaxIndex))
             return -1;
 
         // Full check for first available
@@ -498,7 +498,7 @@ public:
     T lastFree()
     {
         // Quick check for all reserved
-        if(mReservedIndicies.count() == rangeToLength(mMinIndex, mMaxIndex))
+        if(mReservedIndicies.count() == lengthOfRange(mMinIndex, mMaxIndex))
             return -1;
 
         // Full check for first available (backwards)
