@@ -549,7 +549,7 @@ private:
         {ErrorLevel::Critical, "Critical"},
     };
 
-    QString DETAILED_INFO_HEADING = "Details:\n--------";
+    static inline const QString DETAILED_INFO_HEADING = "Details:\n--------";
 
 public:
     static const GenericError UNKNOWN_ERROR;
