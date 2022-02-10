@@ -400,7 +400,10 @@ private:
 
 //-Constructor---------------------------------------------------------------------------------------------------
 public:
-    FreeIndexTracker(T minIndex = 0, T maxIndex = 0, QSet<T> reservedIndicies = QSet<T>()) : mMinIndex(minIndex), mMaxIndex(maxIndex), mReservedIndicies(reservedIndicies)
+    FreeIndexTracker(T minIndex = 0, T maxIndex = 0, QSet<T> reservedIndicies = QSet<T>()) :
+        mMinIndex(minIndex),
+        mMaxIndex(maxIndex),
+        mReservedIndicies(reservedIndicies)
     {
         // Determine programatic limit if "type max" (-1) is specified
         if(maxIndex < 0)
