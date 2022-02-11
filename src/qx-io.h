@@ -320,7 +320,7 @@ public:
     IoOpReport fileContainsString(bool& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive, bool allowSplit = false);
     IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos, int count, ReadOptions readOptions = NoReadOptions);
     IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos = TextPos::START, TextPos endPos = TextPos::END, ReadOptions readOptions = NoReadOptions);
-    IoOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, int startLine = 0, int endLine = -1, ReadOptions readOptions = NoReadOptions);
+    IoOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, Index32 startLine = 0, Index32 endLine = Index32::LAST, ReadOptions readOptions = NoReadOptions);
     IoOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode writeMode = Truncate, TextPos startPos = TextPos::START, WriteOptions writeOptions = NoWriteOptions);
     IoOpReport deleteTextFromFile(QFile& textFile, TextPos startPos, TextPos endPos);
 

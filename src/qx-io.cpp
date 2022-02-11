@@ -1142,11 +1142,13 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
     }
 }
 
-IoOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, int startLine, int endLine, ReadOptions readOptions)
+IoOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, Index32 startLine, Index32 endLine, ReadOptions readOptions)
 {
-     // Ensure positions are valid
-     if(NII(startLine) > NII(endLine))
-         throw std::invalid_argument("Error: endLine must be greater than or equal to startLine for Qx::readTextFromFile()");
+    // Ensure positions are valid
+    if(startLine.isNull() || endLine.isNull())
+        throw std::invalid_argument("Error: The start and end lines cannot be null!");
+    else if(startLine > endLine)
+        throw std::invalid_argument("Error: endLine must be greater than or equal to startLine for Qx::readTextFromFile()");
 
      // Empty buffer
      returnBuffer = QStringList();
@@ -1171,7 +1173,7 @@ IoOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, int star
 
          Qx::TextStream fileTextStream(&textFile);
 
-         if(startLine == -1) // Last line is desired
+         if(startLine.isLast()) // Last line is desired
          {
              QString lastLine;
 
@@ -1196,7 +1198,7 @@ IoOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, int star
              if(currentLine == startLine) // Start line index is within file bounds
              {
                  // Process start line to end line or end of file
-                 for(; (endLine == -1 || currentLine != endLine + 1) && !fileTextStream.atEnd(); currentLine++)
+                 for(; (endLine.isLast() || currentLine != endLine + 1) && !fileTextStream.atEnd(); currentLine++)
                      returnBuffer.append(fileTextStream.readLine());
 
                  // If end was reached and there was a trailing linebreak that isn't to be ignored, there is one more blank line
