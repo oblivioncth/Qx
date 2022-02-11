@@ -205,24 +205,19 @@ void IoOpReport::parseOutcome()
 //-Class Variables-----------------------------------------------------------------------------------------------
 //Public:
 const TextPos TextPos::START = TextPos(0,0); // Intialization of constant reference TextPos
-const TextPos TextPos::END = TextPos(-1,-1); // Intialization of constant reference TextPos
+const TextPos TextPos::END = TextPos(Index32::LAST, Index32::LAST); // Intialization of constant reference TextPos
 
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
 TextPos::TextPos() :
-    mLine(-2),
-    mCharacter(-2)
+    mLine(Index32()),
+    mCharacter(Index32())
 {}
 
-TextPos::TextPos(int lineNum, int charNum) :
-    mLine(lineNum),
-    mCharacter(charNum)
-{
-    if(mLine < -1)
-        mLine = -1;
-    if(this->mCharacter < -1)
-        this->mCharacter = -1;
-}
+TextPos::TextPos(Index32 line, Index32 character) :
+    mLine(line),
+    mCharacter(character)
+{}
 
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:
@@ -231,32 +226,19 @@ bool TextPos::operator!= (const TextPos& otherTextPos) { return !(*this == other
 bool TextPos::operator> (const TextPos& otherTextPos)
 {
     if(mLine == otherTextPos.mLine)
-        return NII<int>(mCharacter) > NII<int>(otherTextPos.mCharacter);
+        return mCharacter > otherTextPos.mCharacter;
     else
-        return NII<int>(mLine) > NII<int>(otherTextPos.mLine);
+        return mLine > otherTextPos.mLine;
 }
 bool TextPos::operator>= (const TextPos& otherTextPos) { return *this == otherTextPos || *this > otherTextPos; }
 bool TextPos::operator< (const TextPos& otherTextPos) { return !(*this >= otherTextPos); }
 bool TextPos::operator<= (const TextPos& otherTextPos) { return !(*this > otherTextPos); }
 
-int TextPos::line() const { return mLine; }
-int TextPos::character() const { return mCharacter; }
-
-void TextPos::setLine(int lineNum)
-{
-    if(lineNum < -1)
-        mLine = -1;
-    else
-        mLine = lineNum;
-}
-
-void TextPos::setCharacter(int charNum)
-{
-    if(charNum < -1)
-        mCharacter = -1;
-    else
-        mCharacter = charNum;
-}
+Index32 TextPos::line() const { return mLine; }
+Index32 TextPos::character() const { return mCharacter; }
+void TextPos::setLine(Index32 line) { mLine = line; }
+void TextPos::setCharacter(Index32 character) { mCharacter = character; }
+bool TextPos::isNull() const { return mLine.isNull() || mCharacter.isNull(); }
 
 //===============================================================================================================
 // FileStreamWriter
@@ -794,21 +776,27 @@ IoOpReport textFileAbsolutePosition(TextPos& textPos, QFile& textFile, bool igno
     if(!layoutCheck.wasSuccessful())
         return layoutCheck;
 
+    // Return null pos if text file is empty
+    if(textLayout.isEmpty())
+    {
+        textPos = TextPos();
+        return IoOpReport(IO_OP_ENUMERATE, IO_SUCCESS, textFile);
+    }
+
     // Translate line number
-    if(textPos.line() == -1)
+    if(textPos.line().isLast())
         textPos.setLine(textLayout.count() - 1);
-    else if(textPos.line() >= textLayout.count())
+    else if(textPos.line() >= textLayout.count()) // Pos is OOB
     {
         textPos = TextPos();
         return IoOpReport(IO_OP_ENUMERATE, IO_SUCCESS, textFile);
     }
 
     // Translate character number
-    if(textPos.character() == -1)
-        textPos.setCharacter(textLayout.value(textPos.line()) - 1);
-    else if(textPos.character() >= textLayout.value(textPos.line()))
-        textPos.setCharacter(textLayout.value(textPos.line())); // Reel back to line end so that \n is still included
-
+    if(textPos.character().isLast())
+        textPos.setCharacter(textLayout.value(*textPos.line()) - 1);
+    else if(textPos.character() > textLayout.value(*textPos.line()))
+        textPos.setCharacter(textLayout.value(*textPos.line())); // Set to line end so that \n is still included
 
     return IoOpReport(IO_OP_ENUMERATE, IO_SUCCESS, textFile);
 }
@@ -830,7 +818,7 @@ IoOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const
     // Query tracking
     TextPos trueStartPos = query.startPosition();
     TextPos currentPos = TextPos::START;
-    TextPos possibleMatch = TextPos::END;
+    TextPos possibleMatch = TextPos();
     int hitsSkipped = 0;
     QString::const_iterator queryIt = query.string().constBegin();
     QChar currentChar;
@@ -881,13 +869,13 @@ IoOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const
 
         if(Char::compare(currentChar, *queryIt, query.caseSensitivity()))
         {
-            if(possibleMatch == TextPos::END)
+            if(possibleMatch.isNull())
                 possibleMatch = currentPos;
             ++queryIt;
         }
         else if(!(currentChar == ENDL && query.allowSplit()))
         {
-            possibleMatch = TextPos::END;
+            possibleMatch = TextPos();
             queryIt = query.string().constBegin();
         }
 
@@ -901,7 +889,7 @@ IoOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const
             if(returnBuffer.size() == query.hitLimit())
                 return IoOpReport(IO_OP_INSPECT, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
 
-            possibleMatch = TextPos::END;
+            possibleMatch = TextPos();
             queryIt = query.string().constBegin();
         }
 
@@ -959,7 +947,7 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
         QString lastLine;
         Qx::TextStream fileTextStream(&textFile);
 
-        if(startPos.line() == -1) // Range of last line desired
+        if(startPos.line().isLast()) // Range of last line desired
         {
             // Go straight to last line
             while(!fileTextStream.atEnd())
@@ -968,10 +956,10 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
             // If there was a trailing linebreak that isn't to be ignored, last line is actually blank
             if(!readOptions.testFlag(IgnoreTrailingBreak) && fileTextStream.precedingBreak())
                 returnBuffer = "";
-            else if(startPos.character() == -1) // Last char is desired
+            else if(startPos.character().isLast()) // Last char is desired
                 returnBuffer = lastLine.right(1);
             else // Some range of last line is desired
-                returnBuffer = lastLine.mid(startPos.character(), count);
+                returnBuffer = lastLine.mid(*startPos.character(), count);
         }
         else
         {
@@ -983,7 +971,7 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
             if(currentLine == startPos.line() && !fileTextStream.atEnd()) // Desired line index is within file bounds
             {
                 // Get char from start line
-                if(startPos.character() == -1) // Last char is start
+                if(startPos.character().isLast()) // Last char is start
                 {
                     returnBuffer = fileTextStream.readLine().back();
                     if(count != -1)
@@ -991,7 +979,7 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
                 }
                 else
                 {
-                    returnBuffer = fileTextStream.readLine().mid(startPos.character(), count);
+                    returnBuffer = fileTextStream.readLine().mid(*startPos.character(), count);
                     if(count != -1)
                         count -= returnBuffer.size();
                 }
@@ -1069,7 +1057,7 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
              if(readOptions.testFlag(IgnoreTrailingBreak) && returnBuffer.back() == ENDL)
                 returnBuffer.chop(1);
          }
-         else if(startPos.line() == -1) // Last line is desired
+         else if(startPos.line().isLast()) // Last line is desired
          {
              // Go straight to last line
              while(!fileTextStream.atEnd())
@@ -1078,12 +1066,12 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
              // If there was a trailing linebreak that isn't to be ignored, last line is actually blank
              if(!readOptions.testFlag(IgnoreTrailingBreak) && fileTextStream.precedingBreak())
                  returnBuffer = "";
-             else if(startPos.character() == -1) // Last char is desired
+             else if(startPos.character().isLast()) // Last char is desired
                  returnBuffer = lastLine.right(1);
              else // Some range of last line is desired
              {
-                 int endPoint = endPos.character() == -1 ? -1 : lengthOfRange(startPos.character(), endPos.character());
-                 returnBuffer = lastLine.mid(startPos.character(), endPoint);
+                 int endPoint = endPos.character().isLast() ? -1 : lengthOfRange(*startPos.character(), *endPos.character());
+                 returnBuffer = lastLine.mid(*startPos.character(), endPoint);
              }
          }
          else // Some range of file is desired
@@ -1097,21 +1085,21 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
              {
                  if(startPos.line() == endPos.line()) // Single line segment is desired
                  {
-                     if(startPos.character() == -1) // Last char is desired
+                     if(startPos.character().isLast()) // Last char is desired
                          returnBuffer = fileTextStream.readLine().right(1);
                      else // Some range of single line segment is desired
                      {
-                         int endPoint = endPos.character() == -1 ? -1 : lengthOfRange(startPos.character(), endPos.character());
-                         returnBuffer = fileTextStream.readLine().mid(startPos.character(), endPoint);
+                         int endPoint = endPos.character().isLast() ? -1 : lengthOfRange(*startPos.character(), *endPos.character());
+                         returnBuffer = fileTextStream.readLine().mid(*startPos.character(), endPoint);
                      }
                  }
                  else // Multiple lines are desired
                  {
                      // Process first line
-                     if(startPos.character() == -1) // Last char is desired
+                     if(startPos.character().isLast()) // Last char is desired
                          returnBuffer = fileTextStream.readLine().right(1);
                      else // Some range of first line is desired
-                         returnBuffer = fileTextStream.readLine().mid(startPos.character());
+                         returnBuffer = fileTextStream.readLine().mid(*startPos.character());
 
                      // Update current line position
                      currentLine++;
@@ -1122,17 +1110,17 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
 
                      // Process last line if it is within range, handle lastline or do nothing if end target was past EOF
                      if(!fileTextStream.atEnd())
-                         returnBuffer += ENDL + fileTextStream.readLine().left(endPos.character() + 1);
+                         returnBuffer += ENDL + fileTextStream.readLine().left(*endPos.character() + 1);
                      else
                      {
                          // If there was a trailing linebreak that isn't to be ignored, last line is actually blank
                          if(!readOptions.testFlag(IgnoreTrailingBreak) && fileTextStream.precedingBreak())
                              returnBuffer += ENDL; // Blank line regardless of end target overshoot or desired char on last line
-                         else if(endPos.line() == -1 && endPos.character() != -1) // Non-last character of last line desired
+                         else if(endPos.line().isLast() && !endPos.character().isLast()) // Non-last character of last line desired
                          {
                              int lastLineStart = returnBuffer.lastIndexOf(ENDL) + 1;
                              int lastLineSize = returnBuffer.size() - lastLineStart;
-                             returnBuffer.chop(lastLineSize - (endPos.character() + 1));
+                             returnBuffer.chop(lastLineSize - (*endPos.character() + 1));
                          }
 
                      }
@@ -1278,9 +1266,9 @@ IoOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode wri
         // Pad if required
         if(writeOptions.testFlag(Pad))
         {
-            for(int i = 0; i < startPos.line(); ++i)
+            for(int i = 0; i < *startPos.line(); ++i)
                 textStream << ENDL;
-            for(int i = 0; i < startPos.character(); ++i)
+            for(int i = 0; i < *startPos.character(); ++i)
                 textStream << " ";
         }
 
@@ -1303,19 +1291,19 @@ IoOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode wri
         bool padded = false;
         if(writeOptions.testFlag(Pad))
         {
-            if(startPos.line() != -1)
+            if(!startPos.line().isLast())
             {
                 int lineCount = beforeNew.count(ENDL) + 1;
-                int linesNeeded = std::max(startPos.line() - lineCount, 0);
+                int linesNeeded = std::max(*startPos.line() - lineCount, 0);
                 beforeNew += QString(ENDL).repeated(linesNeeded);
 
                 if(linesNeeded > 0)
                     padded = true;
             }
-            if(startPos.character() != -1)
+            if(!startPos.character().isLast())
             {
                 int lastLineCharCount = beforeNew.count() - (beforeNew.lastIndexOf(ENDL) + 1);
-                int charNeeded = std::max(startPos.character() - lastLineCharCount, 0);
+                int charNeeded = std::max(*startPos.character() - lastLineCharCount, 0);
                 beforeNew += QString(" ").repeated(charNeeded);
 
                 if(charNeeded > 0)
@@ -1411,7 +1399,7 @@ IoOpReport deleteTextFromFile(QFile& textFile, TextPos startPos, TextPos endPos)
     // Determine beforeDeletion
     if(startPos == TextPos::START) // (0,0)
         beforeDeletion = "";
-    else if(startPos.character() == -1)
+    else if(startPos.character().isLast())
     {
         transientReport = readTextFromFile(beforeDeletion, textFile, TextPos::START, startPos);
         beforeDeletion.chop(1);
@@ -1426,7 +1414,7 @@ IoOpReport deleteTextFromFile(QFile& textFile, TextPos startPos, TextPos endPos)
     // Determine afterDeletion
     if(endPos == TextPos::END)
         afterDeletion = "";
-    else if(endPos.character() == -1)
+    else if(endPos.character().isLast())
         transientReport = readTextFromFile(afterDeletion, textFile, TextPos(endPos.line() + 1, 0), TextPos::END);
     else
         transientReport = readTextFromFile(afterDeletion, textFile, TextPos(endPos.line(), endPos.character() + 1), TextPos::END);

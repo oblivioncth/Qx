@@ -132,20 +132,20 @@ public:
 
 //-Instance Variables------------------------------------------------------------------------------------------------
 private:
-    int mLine;
-    int mCharacter;
+    Index32 mLine;
+    Index32 mCharacter;
 
 //-Constructor-------------------------------------------------------------------------------------------------------
 public:
     TextPos();
-    TextPos(int lineNum, int charNum);
+    TextPos(Index32 line, Index32 character);
 
 //-Instance Functions------------------------------------------------------------------------------------------------
 public:
-    int line() const;
-    int character() const;
-    void setLine(int lineNum);
-    void setCharacter(int charNum);
+    Index32 line() const;
+    Index32 character() const;
+    void setLine(Index32 line);
+    void setCharacter(Index32 character);
     bool isNull() const;
 
     bool operator== (const TextPos& otherTextPos);
