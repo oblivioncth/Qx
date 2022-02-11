@@ -258,7 +258,6 @@ void TextPos::setCharNum(int charNum)
         mCharNum = charNum;
 }
 
-void TextPos::setNull() { mLineNum = -2; mCharNum = -2; }
 bool TextPos::isNull() const { return mLineNum == -2 && mCharNum == -2; }
 
 //===============================================================================================================

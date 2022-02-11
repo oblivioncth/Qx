@@ -146,7 +146,6 @@ public:
     int charNum() const;
     void setLineNum(int lineNum);
     void setCharNum(int charNum);
-    void setNull();
     bool isNull() const;
 
     bool operator== (const TextPos& otherTextPos);
