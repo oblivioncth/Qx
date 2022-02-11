@@ -132,8 +132,8 @@ public:
 
 //-Instance Variables------------------------------------------------------------------------------------------------
 private:
-    int mLineNum;
-    int mCharNum;
+    int mLine;
+    int mCharacter;
 
 //-Constructor-------------------------------------------------------------------------------------------------------
 public:
@@ -142,10 +142,10 @@ public:
 
 //-Instance Functions------------------------------------------------------------------------------------------------
 public:
-    int lineNum() const;
-    int charNum() const;
-    void setLineNum(int lineNum);
-    void setCharNum(int charNum);
+    int line() const;
+    int character() const;
+    void setLine(int lineNum);
+    void setCharacter(int charNum);
     bool isNull() const;
 
     bool operator== (const TextPos& otherTextPos);
