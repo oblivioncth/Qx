@@ -41,19 +41,7 @@ class Index;
 //-Functions----------------------------------------------------------------------------------------------------
 template<typename T>
     requires std::integral<T>
-T lengthOfRange(T start, T end)
-{
-    // Returns the length from start to end including start
-    T length = end - start;
-    return ++length;
-}
-
-template<typename T>
-T lengthOfRange(Index<T> start, Index<T> end)
-{
-    Index<T> length = end -start;
-    return ++length;
-}
+T lengthOfRange(T start, T end) { return (end - start) + 1; }
 
 template<typename T>
     requires arithmetic<T>
@@ -1047,6 +1035,7 @@ public:
 //-Instance Functions----------------------------------------------------------------------------------------------
 public:
     bool isNull() const { return mType == Type::Null; }
+    bool isLast() const { return mType == Type::End; }
 
     /* Static casts in operators here make sure that in cases where the non-index operand is unsigned it is
      * always the value of the Index that is converted to an unsigned integer instead of the other operand
@@ -1056,13 +1045,13 @@ public:
     */
     bool operator==(const Index& other) const { return mType == other.mType && mValue == other.mValue; }
 
-    template<typename N> requires std::integral<N>
-    bool operator==(const N& integer) const { return mType == Type::Value && static_cast<N>(mValue) == integer; }
+//    template<typename N> requires std::integral<N>
+//    bool operator==(const N& integer) const { return mType == Type::Value && static_cast<N>(mValue) == integer; }
 
     bool operator!=(const Index& other) const { return !(*this == other); }
 
-    template<typename N> requires std::integral<N>
-    bool operator!=(const N& integer) const { return !(*this == integer); }
+//    template<typename N> requires std::integral<N>
+//    bool operator!=(const N& integer) const { return !(*this == integer); }
 
     bool operator<(const Index& other) const
     {
@@ -1080,41 +1069,41 @@ public:
         }
     }
 
-    template<typename N> requires std::integral<N>
-    bool operator<(const N& integer) const
-    {
-        return mType == Type::Null || (mType == Type::Value && static_cast<N>(mValue) < integer);
-    }
+//    template<typename N> requires std::integral<N>
+//    bool operator<(const N& integer) const
+//    {
+//        return mType == Type::Null || (mType == Type::Value && static_cast<N>(mValue) < integer);
+//    }
 
-    template<typename N> requires std::integral<N>
-    friend bool operator<(const N& integer, const Index<T>& index)
-    {
-        return index.mType == Type::End || (index.mType == Type::Value && integer < static_cast<N>(index.mValue));
-    }
+//    template<typename N> requires std::integral<N>
+//    friend bool operator<(const N& integer, const Index<T>& index)
+//    {
+//        return index.mType == Type::End || (index.mType == Type::Value && integer < static_cast<N>(index.mValue));
+//    }
 
     bool operator<=(const Index& other) const { return !(*this > other); }
 
-    template<typename N> requires std::integral<N>
-    bool operator<=(const N& integer) const { return !(*this > integer); }
+//    template<typename N> requires std::integral<N>
+//    bool operator<=(const N& integer) const { return !(*this > integer); }
 
-    template<typename N> requires std::integral<N>
-    friend bool operator<=(const N& integer, const Index<T>& index) { return !(integer > index); }
+//    template<typename N> requires std::integral<N>
+//    friend bool operator<=(const N& integer, const Index<T>& index) { return !(integer > index); }
 
     bool operator>(const Index& other) const { return other < *this; }
 
-    template<typename N> requires std::integral<N>
-    bool operator>(const N& integer) const { return integer < *this; }
+//    template<typename N> requires std::integral<N>
+//    bool operator>(const N& integer) const { return integer < *this; }
 
-    template<typename N> requires std::integral<N>
-    friend bool operator>(const N& integer, const Index<T>& index) { return index < integer; }
+//    template<typename N> requires std::integral<N>
+//    friend bool operator>(const N& integer, const Index<T>& index) { return index < integer; }
 
     bool operator>=(const Index& other) const { return !(*this < other); }
 
-    template<typename N> requires std::integral<N>
-    bool operator>=(const N& integer) const { return !(*this < integer); }
+//    template<typename N> requires std::integral<N>
+//    bool operator>=(const N& integer) const { return !(*this < integer); }
 
-    template<typename N> requires std::integral<N>
-    friend bool operator>=(const N& integer, const Index<T>& index) { return !(integer < index); }
+//    template<typename N> requires std::integral<N>
+//    friend bool operator>=(const N& integer, const Index<T>& index) { return !(integer < index); }
 
     Index operator-(const Index& other)
     {
@@ -1126,25 +1115,25 @@ public:
             return Qx::Number::constrainedSub(mValue, other.mValue, 0);
     }
 
-    template<typename N> requires std::integral<N>
-    Index operator-(const N& integer)
-    {
-        if(mType == Type::End)
-            return LAST;
-        else
-            return Qx::Number::constrainedSub(static_cast<N>(mValue), integer, 0);
-    }
+//    template<typename N> requires std::integral<N>
+//    Index operator-(const N& integer)
+//    {
+//        if(mType == Type::End)
+//            return LAST;
+//        else
+//            return Qx::Number::constrainedSub(static_cast<N>(mValue), integer, 0);
+//    }
 
-    template<typename N> requires std::integral<N>
-    friend T operator-(N integer, const Index<T>& index) { integer -= index; return integer; }
+//    template<typename N> requires std::integral<N>
+//    friend T operator-(N integer, const Index<T>& index) { integer -= index; return integer; }
 
     Index& operator-=(const Index& other) { *this = *this - other; return *this; }
 
-    template<typename N> requires std::integral<N>
-    Index& operator-=(const N& integer) { *this = *this - integer; return *this; }
+//    template<typename N> requires std::integral<N>
+//    Index& operator-=(const N& integer) { *this = *this - integer; return *this; }
 
-    template<typename N> requires std::integral<N>
-    friend T& operator-=(N& integer, const Index<T>& index) { integer -= static_cast<N>(index.mValue); return integer; }
+//    template<typename N> requires std::integral<N>
+//    friend T& operator-=(N& integer, const Index<T>& index) { integer -= static_cast<N>(index.mValue); return integer; }
 
     Index operator+(const Index& other)
     {
@@ -1152,22 +1141,22 @@ public:
                     LAST : Qx::Number::constrainedAdd(mValue, other.mValue, 0);
     }
 
-    template<typename N> requires std::integral<N>
-    Index operator+(const N& integer)
-    {
-        return mType == Type::End ? LAST : Qx::Number::constrainedAdd(static_cast<N>(mValue), integer, 0);
-    }
+//    template<typename N> requires std::integral<N>
+//    Index operator+(const N& integer)
+//    {
+//        return mType == Type::End ? LAST : Qx::Number::constrainedAdd(static_cast<N>(mValue), integer, 0);
+//    }
 
-    template<typename N> requires std::integral<N>
-    friend T operator+(N integer, const Index<T>& index) { integer += index; return integer; }
+//    template<typename N> requires std::integral<N>
+//    friend T operator+(N integer, const Index<T>& index) { integer += index; return integer; }
 
     Index& operator+=(const Index& other) { *this = *this + other; return *this; }
 
-    template<typename N> requires std::integral<N>
-    Index& operator+=(const N& integer) { *this = *this + integer; return *this; }
+//    template<typename N> requires std::integral<N>
+//    Index& operator+=(const N& integer) { *this = *this + integer; return *this; }
 
-    template<typename N> requires std::integral<N>
-    friend T& operator+=(N& integer, const Index<T>& index) { integer += static_cast<N>(index.mValue); return integer; }
+//    template<typename N> requires std::integral<N>
+//    friend T& operator+=(N& integer, const Index<T>& index) { integer += static_cast<N>(index.mValue); return integer; }
 
     Index operator/(const Index& other)
     {
@@ -1182,28 +1171,28 @@ public:
             return Qx::Number::constrainedDiv(mValue, other.mValue, 0);
     }
 
-    template<typename N> requires std::integral<N>
-    Index operator/(const N& integer)
-    {
-        if(integer == 0)
-            throw std::logic_error("Divide by zero");
+//    template<typename N> requires std::integral<N>
+//    Index operator/(const N& integer)
+//    {
+//        if(integer == 0)
+//            throw std::logic_error("Divide by zero");
 
-        if(mType == Type::End)
-            return LAST;
-        else
-            return Qx::Number::constrainedDiv(static_cast<N>(mValue), integer, 0);
-    }
+//        if(mType == Type::End)
+//            return LAST;
+//        else
+//            return Qx::Number::constrainedDiv(static_cast<N>(mValue), integer, 0);
+//    }
 
-    template<typename N> requires std::integral<N>
-    friend T operator/(N integer, const Index<T>& index) { integer /= index; return integer; }
+//    template<typename N> requires std::integral<N>
+//    friend T operator/(N integer, const Index<T>& index) { integer /= index; return integer; }
 
     Index& operator/=(const Index& other) { *this = *this/other; return *this;  }
 
-    template<typename N> requires std::integral<N>
-    Index& operator/=(const N& integer) { *this = *this/integer; return *this; }
+//    template<typename N> requires std::integral<N>
+//    Index& operator/=(const N& integer) { *this = *this/integer; return *this; }
 
-    template<typename N> requires std::integral<N>
-    friend T& operator/=(N& integer, const Index<T>& index) { integer /= static_cast<N>(index.mValue); return integer; }
+//    template<typename N> requires std::integral<N>
+//    friend T& operator/=(N& integer, const Index<T>& index) { integer /= static_cast<N>(index.mValue); return integer; }
 
     Index operator*(const Index& other)
     {
@@ -1216,27 +1205,27 @@ public:
 
     }
 
-    template<typename N> requires std::integral<N>
-    Index operator*(const N& integer)
-    {
-        if(mValue == 0 || integer == 0)
-            return 0;
-        else if(mType == Type::End)
-            return LAST;
-        else
-            return Qx::Number::constrainedMult(static_cast<N>(mValue), integer, 0);
-    }
+//    template<typename N> requires std::integral<N>
+//    Index operator*(const N& integer)
+//    {
+//        if(mValue == 0 || integer == 0)
+//            return 0;
+//        else if(mType == Type::End)
+//            return LAST;
+//        else
+//            return Qx::Number::constrainedMult(static_cast<N>(mValue), integer, 0);
+//    }
 
-    template<typename N> requires std::integral<N>
-    friend T operator*(N integer, const Index<T>& index) { integer *= index; return integer; }
+//    template<typename N> requires std::integral<N>
+//    friend T operator*(N integer, const Index<T>& index) { integer *= index; return integer; }
 
     Index& operator*=(const Index& other) { *this = *this * other; return *this; }
 
-    template<typename N> requires std::integral<N>
-    Index& operator*=(const N& integer) { *this = *this * integer; return *this; }
+//    template<typename N> requires std::integral<N>
+//    Index& operator*=(const N& integer) { *this = *this * integer; return *this; }
 
-    template<typename N> requires std::integral<N>
-    friend T& operator*=(N& integer, const Index<T>& index) { integer *= static_cast<N>(index.mValue); return integer; }
+//    template<typename N> requires std::integral<N>
+//    friend T& operator*=(N& integer, const Index<T>& index) { integer *= static_cast<N>(index.mValue); return integer; }
 
     Index& operator++()
     {
@@ -1263,7 +1252,7 @@ public:
         return idx;
     }
 
-    operator T() { return mValue; }
+    T& operator*() { return mValue; }
 };
 template<typename T>
     requires std::signed_integral<T>
