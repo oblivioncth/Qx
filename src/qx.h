@@ -816,25 +816,116 @@ class Number
 //-Class Functions---------------------------------------------------------------------------------------------
 public:
     template <typename T>
-        requires arithmetic<T>
-    static T constrainedAdd(T a, T b)
+        requires std::signed_integral<T>
+    static T constrainedAdd(T a, T b, T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max())
     {
-        if(((b > 0) && (a > (std::numeric_limits<T>::max() - b))) ||
-           ((b < 0) && (a < (std::numeric_limits<T>::min() - b))))
-            return std::numeric_limits<T>::max();
+        if((b >= 0) && (a > (max - b)))
+            return max; // Overflow
+        else if((b < 0) && (a < (min - b)))
+            return min; // Underflow
         else
             return a + b;
     }
 
     template <typename T>
-        requires arithmetic<T>
-    static T constrainedSub(T a, T b)
+        requires std::unsigned_integral<T>
+    static T constrainedAdd(T a, T b, T max = std::numeric_limits<T>::max())
     {
-        if((b > 0 && a < std::numeric_limits<T>::min() + b) ||
-           (b < 0 && a > std::numeric_limits<T>::max() + b))
-            return std::numeric_limits<T>::min();
+        if(max - a < b)
+            return max; // Overflow
+        else
+            return a + b;
+    }
+
+    template <typename T>
+        requires std::signed_integral<T>
+    static T constrainedSub(T a, T b, T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max())
+    {
+        if(b >= 0 && a < min + b)
+            return min; // Underflow
+        else if(b < 0 && a > max + b)
+            return max; // Overflow
         else
             return a - b;
+    }
+
+    template <typename T>
+        requires std::unsigned_integral<T>
+    static T constrainedSub(T a, T b, T min = 0)
+    {
+        if(a < b)
+            return min; // Underflow
+        else
+            return a - b;
+    }
+
+    template<typename T>
+        requires std::signed_integral<T>
+    static T constrainedMult(T a, T b, T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max())
+    {
+        if(a > 0)
+        {
+            if(b > 0 && a > (max / b))
+                return max; // Overflow
+            else if(b < (min / a))
+                return min; // Underflow
+        }
+        else if(a < 0)
+        {
+            if(b > 0 && a < (min / b))
+                return min; // Underflow
+            else if(b < (max / a))
+                return max; // Overflow
+        }
+
+        return a * b;
+    }
+
+    template<typename T>
+        requires std::unsigned_integral<T>
+    static T constrainedMult(T a, T b, T max = std::numeric_limits<T>::max())
+    {
+        if(a > max / b)
+            return max; // Overflow
+        else
+            return a * b;
+    }
+
+    template<typename T>
+        requires std::signed_integral<T>
+    static T constrainedDiv(T a, T b, T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max())
+    {
+        if(b == 0)
+            throw std::logic_error("Divide by zero");
+
+        if((a == std::numeric_limits<T>::min()) && (b == -1))
+            return max; // True overflow
+        else
+        {
+            T result = a/b;
+
+            if(result > max)
+                return max; // Argument based overflow
+            else if(result < min)
+                return min; // Argument based underflow
+            else
+                return result;
+        }
+    }
+
+    template<typename T>
+        requires std::unsigned_integral<T>
+    static T constrainedDiv(T a, T b, T max = std::numeric_limits<T>::max())
+    {
+        if(b == 0)
+            throw std::logic_error("Divide by zero");
+
+        T result = a/b;
+
+        if(result > max)
+            return max; // Argument based overflow
+        else
+            return result;
     }
 
     template<typename T>
