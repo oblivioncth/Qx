@@ -992,6 +992,211 @@ public:
     }
 };
 
+template<typename T>
+    requires std::signed_integral<T>
+class Index
+{
+//-Class Types----------------------------------------------------------------------------------------------------
+private:
+    enum class Type {Null, End, Value};
+    struct LastKey {};
+
+//-Class Members----------------------------------------------------------------------------------------------------
+public:
+    static const Index<T> FIRST;
+    static const Index<T> LAST;
+
+//-Instance Members----------------------------------------------------------------------------------------------------
+private:
+    Type mType;
+    T mValue;
+
+//-Constructor----------------------------------------------------------------------------------------------
+private:
+    Index(LastKey) :
+        mType(Type::End),
+        mValue(std::numeric_limits<T>::max())
+    {}
+
+public:
+    Index() :
+        mType(Type::Null),
+        mValue(0)
+    {}
+
+    Index(T value) :
+        mType(Type::Value),
+        mValue(value)
+    {
+        if(value < 0)
+        {
+            mType = Type::Null;
+            mValue = 0;
+        }
+    }
+
+//-Instance Functions----------------------------------------------------------------------------------------------
+public:
+    bool isNull() const { return mType == Type::Null; }
+
+    bool operator==(const Index& other) const { return mType == other.mType && mValue == other.mValue; }
+    bool operator==(const T& baseType) const { return mType == Type::Value && mValue == baseType; }
+    bool operator!=(const Index& other) const { return !(*this == other); }
+    bool operator!=(const T& baseType) const { return !(*this == baseType); }
+    bool operator<(const Index& other) const
+    {
+        switch(mType)
+        {
+            case Type::Null:
+                return other.mType != Type::Null;
+
+            case Type::End:
+                return false;
+
+            case Type::Value:
+            default:
+                return other.mType == Type::End || mValue < other.mValue;
+        }
+    }
+    bool operator<(const T& baseType) const
+    {
+        return mType == Type::Null || (mType == Type::Value && mValue < baseType);
+    }
+    friend bool operator<(const T& baseType, const Index<T>& index)
+    {
+        return index.mType == Type::End || (index.mType == Type::Value && baseType < index.mValue);
+    }
+
+    bool operator<=(const Index& other) const { return !(*this > other); }
+    bool operator<=(const T& baseType) const { return !(*this > baseType); }
+    friend bool operator<=(const T& baseType, const Index<T>& index) { return !(baseType > index); }
+    bool operator>(const Index& other) const { return other < *this; }
+    bool operator>(const T& baseType) const { return baseType < *this; }
+    friend bool operator>(const T& baseType, const Index<T>& index) { return index < baseType; }
+    bool operator>=(const Index& other) const { return !(*this < other); }
+    bool operator>=(const T& baseType) const { return !(*this < baseType); }
+    friend bool operator>=(const T& baseType, const Index<T>& index) { return !(baseType < index); }
+
+    Index operator-(const Index& other)
+    {
+        if(other.mType == Type::End)
+            return 0;
+        else if(mType == Type::End)
+            return LAST;
+        else
+            return Qx::Number::constrainedSub(mValue, other.mValue, 0);
+    }
+    Index operator-(const T& baseType)
+    {
+        if(mType == Type::End)
+            return LAST;
+        else
+            return Qx::Number::constrainedSub(mValue, baseType, 0);
+    }
+    friend T operator-(T baseType, const Index<T>& index) { baseType -= index; return baseType; }
+    Index& operator-=(const Index& other) { *this = *this - other; return *this; }
+    Index& operator-=(const T& baseType) { *this = *this - baseType; return *this; }
+    friend T& operator-=(T& baseType, const Index<T>& index) { baseType -= index.mValue; return baseType; }
+    Index operator+(const Index& other)
+    {
+        return (mType == Type::End || other.mType == Type::End) ?
+                    LAST : Qx::Number::constrainedAdd(mValue, other.mValue, 0);
+    }
+    Index operator+(const T& baseType)
+    {
+        return mType == Type::End ? LAST : Qx::Number::constrainedAdd(mValue, baseType, 0);
+    }
+    friend T operator+(T baseType, const Index<T>& index) { baseType += index; return baseType; }
+    Index& operator+=(const Index& other) { *this = *this + other; return *this; }
+
+    Index& operator+=(const T& baseType) { *this = *this + baseType; return *this; }
+    friend T& operator+=(T& baseType, const Index<T>& index) { baseType += index.mValue; return baseType; }
+    Index operator/(const Index& other)
+    {
+        if(other.mValue == 0)
+            throw std::logic_error("Divide by zero");
+
+        if(other.mType == Type::End)
+            return mType == Type::End ? 1 : 0;
+        else if(mType == Type::End)
+            return LAST;
+        else
+            return Qx::Number::constrainedDiv(mValue, other.mValue, 0);
+    }
+    Index operator/(const T& baseType)
+    {
+        if(baseType == 0)
+            throw std::logic_error("Divide by zero");
+
+        if(mType == Type::End)
+            return LAST;
+        else
+            return Qx::Number::constrainedDiv(mValue, baseType, 0);
+    }
+    friend T operator/(T baseType, const Index<T>& index) { baseType /= index; return baseType; }
+    Index& operator/=(const Index& other) { *this = *this/other; return *this;  }
+    Index& operator/=(const T& baseType) { *this = *this/baseType; return *this; }
+    friend T& operator/=(T& baseType, const Index<T>& index) { baseType /= index.mValue; return baseType; }
+    Index operator*(const Index& other)
+    {
+        if(mValue == 0 || other.mValue == 0)
+            return 0;
+        else if(mType == Type::End || other.mType == Type::End)
+            return LAST;
+        else
+            return Qx::Number::constrainedMult(mValue, other.mValue, 0);
+
+    }
+    Index operator*(const T& baseType)
+    {
+        if(mValue == 0 || baseType == 0)
+            return 0;
+        else if(mType == Type::End)
+            return LAST;
+        else
+            return Qx::Number::constrainedMult(mValue, baseType, 0);
+    }
+    friend T operator*(T baseType, const Index<T>& index) { baseType *= index; return baseType; }
+    Index& operator*=(const Index& other) { *this = *this * other; return *this; }
+    Index& operator*=(const T& baseType) { *this = *this * baseType; return *this; }
+    friend T& operator*=(T& baseType, const Index<T>& index) { baseType *= index.mValue; return baseType; }
+    Index& operator++()
+    {
+        if(mType != Type::End && mValue != std::numeric_limits<T>::max())
+            ++mValue;
+        return *this;
+    }
+    Index operator++(int)
+    {
+        Index idx = (*this);
+        operator++();
+        return idx;
+    }
+    Index& operator--()
+    {
+        if(!mType != Type::End && mValue != 0)
+            --mValue;
+        return *this;
+    }
+    Index operator--(int)
+    {
+        Index idx = (*this);
+        this->operator--();
+        return idx;
+    }
+};
+template<typename T>
+    requires std::signed_integral<T>
+const Index<T> Index<T>::FIRST = Index<T>();
+template<typename T>
+    requires std::signed_integral<T>
+const Index<T> Index<T>::LAST = Index<T>(LastKey{});
+
+typedef Index<qint8> Index8;
+typedef Index<qint16> Index16;
+typedef Index<qint32> Index32;
+typedef Index<qint32> Index64;
+
 class RegEx
 {
 //-Class Variables---------------------------------------------------------------------------------------------
