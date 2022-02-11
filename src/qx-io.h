@@ -333,8 +333,8 @@ public:
     IoOpReport fileMatchesChecksum(bool& returnBuffer, QFile& file, QString checksum, QCryptographicHash::Algorithm hashAlgorithm);
 
 // Binary Based
-    IoOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, qint64 startPos = 0, qint64 endPos = -1);
-    IoOpReport writeBytesToFile(QFile& file, const QByteArray& bytes, WriteMode writeMode = Truncate, qint64 startPos = 0, WriteOptions writeOptions = NoWriteOptions);
+    IoOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, Index64 startPos = 0, Index64 endPos = Index64::LAST);
+    IoOpReport writeBytesToFile(QFile& file, const QByteArray& bytes, WriteMode writeMode = Truncate, Index64 startPos = 0, WriteOptions writeOptions = NoWriteOptions);
 }
 
 #endif // IO_H

@@ -128,13 +128,14 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
             startPos = TextPos::END;
     }
 
-    void matchAppendConditionParams(WriteMode& writeMode, qint64& startPos)
+    template<typename T>
+    void matchAppendConditionParams(WriteMode& writeMode, Index<T>& startPos)
     {
         // Match append condition parameters
-        if(startPos == -1)
+        if(startPos.isLast())
             writeMode = Append;
         else if(writeMode == Append)
-            startPos = -1;
+            startPos = Index<T>::LAST;
     }
 }
 
@@ -1221,7 +1222,7 @@ IoOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode wri
      * a LF is discovered before the target char - 1 point is reached. This may also work for things like text deletion
     */
 
-    // Ensure positions are valid
+    // Ensure position is valid
     if(startPos.isNull())
         throw std::invalid_argument("Error: The start position cannot be null!");
 
@@ -1535,11 +1536,13 @@ IoOpReport fileMatchesChecksum(bool& returnBuffer, QFile& file, QString checksum
     return IoOpReport(IoOpType::IO_OP_INSPECT, IO_SUCCESS, file);
 }
 
-IoOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, qint64 startPos, qint64 endPos)
+IoOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, Index64 startPos, Index64 endPos)
 {
     // Ensure positions are valid
-     if(NII(startPos) > NII(endPos))
-         throw std::invalid_argument("Error: endPos must be greater than or euqal to startPos for Qx::readBytesFromFile()");
+    if(startPos.isNull() || endPos.isNull())
+        throw std::invalid_argument("Error: The start and end positions cannot be null!");
+    else if(startPos > endPos)
+        throw std::invalid_argument("Error: endPos must be greater than or equal to startPos for Qx::readBytesFromFile()");
 
     // Empty buffer
     returnBuffer.clear();
@@ -1566,21 +1569,21 @@ IoOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, qint64 start
         return IoOpReport(IO_OP_READ, IO_SUCCESS, file);
     }
 
-    if(endPos == -1 || endPos > fileIndexMax)
+    if(endPos.isLast() || endPos > fileIndexMax)
     {
         endPos = fileIndexMax;
-        if(startPos == -1)
+        if(startPos.isLast())
             startPos = fileIndexMax;
     }
 
     // Determine data length and allocate buffer
-    qint64 bufferSize = lengthOfRange(startPos, endPos);
+    qint64 bufferSize = lengthOfRange(*startPos, *endPos);
     returnBuffer.resize(bufferSize);
 
     // Skip to start pos
     if(startPos != 0)
     {
-        if(!file.seek(startPos))
+        if(!file.seek(*startPos))
             return IoOpReport(IO_OP_READ, IO_ERR_CURSOR_OOB, file);
     }
 
@@ -1595,8 +1598,12 @@ IoOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, qint64 start
     return IoOpReport(IO_OP_READ, IO_SUCCESS, file);
 }
 
-IoOpReport writeBytesToFile(QFile& file, const QByteArray& bytes, WriteMode writeMode, qint64 startPos, WriteOptions writeOptions)
+IoOpReport writeBytesToFile(QFile& file, const QByteArray& bytes, WriteMode writeMode, Index64 startPos, WriteOptions writeOptions)
 {
+    // Ensure start position is valid
+    if(startPos.isNull())
+        throw std::invalid_argument("Error: The start position cannot be null!");
+
     // Match append condition parameters
     matchAppendConditionParams(writeMode, startPos);
 
@@ -1639,7 +1646,7 @@ IoOpReport writeBytesToFile(QFile& file, const QByteArray& bytes, WriteMode writ
         startPos = file.size();
 
     // Seek to start point
-    file.seek(startPos);
+    file.seek(*startPos);
 
     // Write data
     qint64 written = file.write(bytes);
