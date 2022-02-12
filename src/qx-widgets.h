@@ -2,10 +2,13 @@
 #define QXWIDGETS_H
 
 #include <QDialog>
-#include <QLabel>
-#include <QTreeView>
-#include <QDialogButtonBox>
 #include <QStandardItemModel>
+
+//-Foward Declarations for pointers-----------------------------------------------------------------------------------
+class QLabel;
+class QTreeView;
+class QLineEdit;
+class QDialogButtonBox;
 
 namespace Qx
 {

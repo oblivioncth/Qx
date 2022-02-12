@@ -4,7 +4,6 @@
  #include <QColor>
 #endif
 
-#include <QRegularExpression>
 #include <QJsonArray>
 #include <QJsonObject>
 

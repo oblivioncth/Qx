@@ -2,7 +2,6 @@
 #define QXWINDOWS_H
 #include "Windows.h"
 #include "qx.h"
-#include <QString>
 
 namespace Qx
 {

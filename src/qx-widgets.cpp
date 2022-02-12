@@ -1,11 +1,14 @@
 #include "qx-widgets.h"
+
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QLineEdit>
+#include <QLabel>
+#include <QTreeView>
+#include <QDialogButtonBox>
 
 namespace Qx
 {
-
 //-Classes------------------------------------------------------------------------------------------------------------
 
 //===============================================================================================================

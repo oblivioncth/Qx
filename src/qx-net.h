@@ -1,7 +1,6 @@
 #ifndef QXNET_H
 #define QXNET_H
 
-#include <queue>
 #include <QtNetwork>
 #include "qx.h"
 #include "qx-io.h"

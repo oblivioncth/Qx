@@ -1,7 +1,4 @@
 #include "qx-io.h"
-#include <stdexcept>
-#include <QDataStream>
-#include <QScopeGuard>
 
 namespace Qx
 {

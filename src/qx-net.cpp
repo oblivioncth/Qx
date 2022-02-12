@@ -1,5 +1,4 @@
 #include "qx-net.h"
-#include <QScopedValueRollback>
 
 namespace Qx
 {

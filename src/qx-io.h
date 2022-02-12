@@ -3,13 +3,6 @@
 
 #include "qx.h"
 
-#include <QString>
-#include <QList>
-#include <QFile>
-#include <QDir>
-#include <QCryptographicHash>
-#include <QTextStream>
-#include <QDataStream>
 #include <QDirIterator>
 
 namespace Qx

@@ -4,23 +4,13 @@
 #include "qx-utility.h"
 
 #ifdef QT_WIDGETS_LIB // Only enabled for Widget applications
-#include <QWidget>
 #include <QMessageBox>
 #endif
 
-#include <QHash>
 #include <QCryptographicHash>
 #include <QRegularExpression>
-#include <QtEndian>
-#include <QJsonObject>
-#include <QJsonArray>
-
-#include <QSet>
 #include <QDateTime>
-
 #include <QBitArray>
-#include <stdexcept>
-#include "assert.h"
 
 namespace Qx
 {

@@ -2,15 +2,11 @@
 
 #include "qx-io.h"
 
-#include <QFileInfo>
 #include <QCoreApplication>
 
 #include <tlhelp32.h>
 #include "comdef.h"
-#include "winnls.h"
 #include "shobjidl.h"
-#include "objbase.h"
-#include "objidl.h"
 #include "shlguid.h"
 #include "atlbase.h"
 
