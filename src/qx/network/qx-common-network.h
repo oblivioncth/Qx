@@ -13,7 +13,7 @@ struct DownloadTask
     QString dest;
 
     friend bool operator== (const DownloadTask& lhs, const DownloadTask& rhs) noexcept;
-    friend uint qHash(const DownloadTask& key, uint seed) noexcept;
+    friend size_t qHash(const DownloadTask& key, size_t seed) noexcept;
 };
 
 }
