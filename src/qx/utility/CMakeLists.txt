@@ -1,19 +1,16 @@
-#================= Setup ==========================
+#================= Setup Module ==========================
 
-# Make lib target
-qt_add_library(qx-utility INTERFACE)
-
-#================= Build ==========================
+set(MODULE_TYPE INTERFACE)
 
 ################# Common Build #################
 
 #--------- Edition Common -----------------------
+
 # Headers
-target_sources(qx-utility
-    PUBLIC
-        qx-concepts.h
-        qx-helpers.h
-        qx-macros.h
+set(MODULE_PUBLIC_HEADERS
+    qx-concepts.h
+    qx-helpers.h
+    qx-macros.h
 )
 
 #--------- Edition Console -----------------------
@@ -25,3 +22,6 @@ endif()
 if(EDITION STREQUAL "widgets")
 
 endif()
+
+#=============== Module Handler =======================
+include(lib_module_rules)

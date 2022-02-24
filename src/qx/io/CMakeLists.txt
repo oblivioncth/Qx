@@ -1,44 +1,44 @@
-#================= Setup ==========================
+#================= Setup Module ==========================
 
-# Make lib target
-qt_add_library(qx-io STATIC)
-
-#================= Build ==========================
+set(MODULE_TYPE STATIC)
 
 ################# Common Build #################
 
 #--------- Edition Common -----------------------
-# Source Files
-target_sources(qx-io
-    PRIVATE
-        qx-common-io.cpp
-        qx-common-io_p.cpp
-        qx-filestreamreader.cpp
-        qx-filestreamwriter.cpp
-        qx-ioopreport.cpp
-        qx-textpos.cpp
-        qx-textquery.cpp
-        qx-textstream.cpp
-        qx-textstreamwriter.cpp
-)
 
 # Headers
-target_sources(qx-io
-    PRIVATE
-        qx-common-io_p.h
-    PUBLIC
-        qx-common-io.h
-        qx-filestreamreader.h
-        qx-filestreamwriter.h
-        qx-ioopreport.h
-        qx-textpos.h
-        qx-textquery.h
-        qx-textstream.h
-        qx-textstreamwriter.h
+set(MODULE_PUBLIC_HEADERS
+    qx-common-io.h
+    qx-filestreamreader.h
+    qx-filestreamwriter.h
+    qx-ioopreport.h
+    qx-textpos.h
+    qx-textquery.h
+    qx-textstream.h
+    qx-textstreamwriter.h
 )
 
-# Link to Qt libs
-target_link_libraries(qx-io PUBLIC Qt6::Core)
+set(MODULE_PRIVATE_HEADERS
+    qx-common-io_p.h
+)
+
+# Source Files
+set(MODULE_IMPL
+    qx-common-io.cpp
+    qx-common-io_p.cpp
+    qx-filestreamreader.cpp
+    qx-filestreamwriter.cpp
+    qx-ioopreport.cpp
+    qx-textpos.cpp
+    qx-textquery.cpp
+    qx-textstream.cpp
+    qx-textstreamwriter.cpp
+)
+
+# Links
+set(MODULE_PUBLIC_LINKS
+    Qt::Core
+)
 
 #--------- Edition Console -----------------------
 if(EDITION STREQUAL "console")
@@ -49,3 +49,7 @@ endif()
 if(EDITION STREQUAL "widgets")
 
 endif()
+
+#=============== Module Handler =======================
+include(lib_module_rules)
+

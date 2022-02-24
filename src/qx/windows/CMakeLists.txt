@@ -1,30 +1,28 @@
-#================= Setup ==========================
+#================= Setup Module ==========================
 
-# Make lib target
-qt_add_library(qx-windows STATIC)
+set(MODULE_TYPE STATIC)
 
 ################# Common Build #################
 
 #--------- Edition Common -----------------------
-# Source Files
-target_sources(qx-windows
-    PRIVATE
-        qx-common-windows.cpp
-        qx-filedetails.cpp
-)
 
 # Headers
-target_sources(qx-windows
-    PUBLIC
-        qx-common-windows.h
-        qx-filedetails.h
+set(MODULE_PUBLIC_HEADERS
+    qx-common-windows.h
+    qx-filedetails.h
 )
 
-# Link to Qt libs
-target_link_libraries(qx-windows PUBLIC Qt6::Core)
+# Source Files
+set(MODULE_IMPL
+    qx-common-windows.cpp
+    qx-filedetails.cpp
+)
 
-# Link to Windows Version.lib
-target_link_libraries(qx-windows PUBLIC Version.lib)
+# Links
+set(MODULE_PUBLIC_LINKS
+    Qt::Core
+    Version.lib
+)
 
 #--------- Edition Console -----------------------
 if(EDITION STREQUAL "console")
@@ -35,3 +33,7 @@ endif()
 if(EDITION STREQUAL "widgets")
 
 endif()
+
+#=============== Module Handler =======================
+include(lib_module_rules)
+

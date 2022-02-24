@@ -1,34 +1,29 @@
-#================= Setup ==========================
+#================= Setup Module ==========================
 
-# Make lib target
-qt_add_library(qx-network STATIC)
-
-#================= Build ==========================
+set(MODULE_TYPE STATIC)
 
 ################# Common Build #################
 
 #--------- Edition Common -----------------------
-# Source Files
-target_sources(qx-network
-    PRIVATE
-        qx-common-network.cpp
-        qx-networkreplyerror.cpp
-        qx-syncdownloadmanager.cpp
-)
 
 # Headers
-target_sources(qx-network
-    PUBLIC
-        qx-common-network.h
-        qx-networkreplyerror.h
-        qx-syncdownloadmanager.h
+set(MODULE_PUBLIC_HEADERS
+    qx-common-network.h
+    qx-networkreplyerror.h
+    qx-syncdownloadmanager.h
 )
 
-# Link to Qt libs
-target_link_libraries(qx-network
-    PUBLIC
-        Qt6::Core
-        Qt6::Network
+# Source Files
+set(MODULE_IMPL
+    qx-common-network.cpp
+    qx-networkreplyerror.cpp
+    qx-syncdownloadmanager.cpp
+)
+
+# Links
+set(MODULE_PUBLIC_LINKS
+    Qt6::Core
+    Qt6::Network
 )
 
 #--------- Edition Console -----------------------
@@ -40,3 +35,7 @@ endif()
 if(EDITION STREQUAL "widgets")
 
 endif()
+
+#=============== Module Handler =======================
+include(lib_module_rules)
+

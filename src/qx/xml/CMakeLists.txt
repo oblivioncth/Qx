@@ -1,39 +1,41 @@
-#================= Setup ==========================
+#================= Setup Module ==========================
 
-# Make lib target
-qt_add_library(qx-xml STATIC)
-
-#================= Build ==========================
+set(MODULE_TYPE STATIC)
 
 ################# Common Build #################
 
 #--------- Edition Common -----------------------
-# Source Files
-target_sources(qx-xml
-    PRIVATE
-        qx-common-xml.cpp
-        qx-xmlstreamreadererror.cpp
-        qx-xmlstreamwritererror.cpp
-)
 
 # Headers
-target_sources(qx-xml
-    PUBLIC
-        qx-common-xml.h
-        qx-xmlstreamreadererror.h
-        qx-xmlstreamwritererror.h
+set(MODULE_PUBLIC_HEADERS
+    qx-common-xml.h
+    qx-xmlstreamreadererror.h
+    qx-xmlstreamwritererror.h
 )
 
-# Link to Qt libs
-target_link_libraries(qx-xml
-    PUBLIC
-        Qt6::Core
-        Qt6::Xml
+# Source Files
+set(MODULE_IMPL
+    qx-common-xml.cpp
+    qx-xmlstreamreadererror.cpp
+    qx-xmlstreamwritererror.cpp
+)
+
+# Links
+set(MODULE_PUBLIC_LINKS
+    Qt6::Core
+    Qt6::Xml
 )
 
 #--------- Edition Console -----------------------
+if(EDITION STREQUAL "console")
+
+endif()
 
 #--------- Edition Widgets -----------------------
 if(EDITION STREQUAL "widgets")
 
 endif()
+
+#=============== Module Handler =======================
+include(lib_module_rules)
+
