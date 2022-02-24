@@ -15,6 +15,7 @@ endif()
 # C++
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(LIB_)
 
 # Build augmentation
 set(CMAKE_AUTOMOC ON)
@@ -81,12 +82,12 @@ endif()
 
 
 ################# Windows Build #################
-if(WIN32)
-	list(APPEND LIB_MODULES windows)
+if(CMAKE_SYSTEM_NAME STREQUAL Windows)
+    list(APPEND LIB_MODULES windows)
 endif()
 
 ################# Linux Build #################
-if(UNIX AND NOT APPLE)
+if(CMAKE_SYSTEM_NAME STREQUAL Linux)
 
 endif()
 
@@ -107,9 +108,14 @@ endforeach()
 
 # Set variables in install/code context
 install(CODE "set(CONFIG_FILE_DIR \"${CONFIG_FILE_DIR}\")")
+install(CODE "set(LIB_NAME \"${CMAKE_PROJECT_NAME}\")")
+install(CODE "set(LIB_EDITION \"${EDITION}\")")
+install(CODE "set(LIB_VER \"${CMAKE_PROJECT_VERSION}\")")
+install(CODE "set(QT_VER \"${Qt6_VERSION}\")")
+install(CODE "set(PLATFORM \"${CMAKE_SYSTEM_NAME}\")")
 install(CODE "set(PROJ_SHORT_NAME \"${PROJ_SHORT_NAME}\")")
-install(CODE "set(INCLUDE_GROUP_NAME \"${PROJ_SHORT_NAME_UC}_H\")")
-install(CODE "set(INCLUDE_GROUP_PATH \"${HEADER_INSTALL_PREFIX}/${PROJ_SHORT_NAME}.h\")")
+install(CODE "set(MAIN_INCLUDE_NAME \"${PROJ_SHORT_NAME_UC}_H\")")
+install(CODE "set(MAIN_INCLUDE_PATH \"${HEADER_INSTALL_PREFIX}/${PROJ_SHORT_NAME}.h\")")
 install(CODE "set(MODULE_INCLUDE_DIR \"${HEADER_INSTALL_PREFIX}/${PROJ_SHORT_NAME}\")")
 
 # Generate main public include header
@@ -122,22 +128,32 @@ install(CODE [[
 
     # Generate include statements
     foreach(modig ${MODULE_INCLUDE_GROUPS})
-        set(INCLUDE_GROUP_FILES "${INCLUDE_GROUP_FILES}#include \"${PROJ_SHORT_NAME}/${modig}\"\n")
+        set(MODULE_INCLUDE_FILES "${MODULE_INCLUDE_FILES}#include \"${PROJ_SHORT_NAME}/${modig}\"\n")
     endforeach()
+
+    # Get timestamp
+    string(TIMESTAMP BUILD_DATE "%Y-%m-%d @ %H:%M:%S ")
 
     # Copy template with modifications
     configure_file(
-        "${CONFIG_FILE_DIR}/include_group.h"
-        "${INCLUDE_GROUP_PATH}"
+        "${CONFIG_FILE_DIR}/main_include.h"
+        "${MAIN_INCLUDE_PATH}"
         NEWLINE_STYLE UNIX
     )
 
     # Unset variables in install context since they are global there and may reused
-    unset(INCLUDE_GROUP_FILES)
+    unset(MODULE_INCLUDE_FILES)
+    unset(BUILD_DATE)
     unset(CONFIG_FILE_DIR)
+    unset(LIB_NAME)
+    unset(LIB_EDITION)
+    unset(LIB_VER)
+    unset(QT_VER)
+    unset(PLATFORM)
+    unset(BUILD_DATE)
     unset(PROJ_SHORT_NAME)
-    unset(INCLUDE_GROUP_NAME)
-    unset(INCLUDE_GROUP_PATH)
+    unset(MAIN_INCLUDE_NAME)
+    unset(MAIN_INCLUDE_PATH)
     unset(MODULE_INCLUDE_DIR)
 
     ]]
