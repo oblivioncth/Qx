@@ -12,6 +12,9 @@ if(NOT EDITION)
     set(EDITION "widgets") # Default to widgets ("console" is other valid option)
 endif()
 
+# Set Edition letter
+set(EDITION_LETTER $<IF:$<STREQUAL:${EDITION},widgets>,W,C>)
+
 # C++
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
