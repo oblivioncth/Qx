@@ -3,7 +3,7 @@
 cmake_minimum_required(VERSION 3.21.1)
 
 # Project
-project(Qx VERSION 1.0.0 LANGUAGES CXX)
+project(Qx VERSION 0.1.0.0 LANGUAGES CXX)
 set(PROJ_SHORT_NAME qx)
 string(TOUPPER ${PROJ_SHORT_NAME} PROJ_SHORT_NAME_UC)
 
@@ -92,10 +92,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL Linux)
 endif()
 
 #================= Module Setup ==========================
-# Clean output directory
-#file(GLOB_RECURSE OLD_OUT_FILES "${INSTALL_PATH}/*.*")
-#file(REMOVE "${OLD_OUT_FILES}")
-
 # Find Qt package
 find_package(Qt6 REQUIRED COMPONENTS ${QT_FIND_COMPONENTS})
 
@@ -109,8 +105,16 @@ endforeach()
 # Set variables in install/code context
 install(CODE "set(CONFIG_FILE_DIR \"${CONFIG_FILE_DIR}\")")
 install(CODE "set(LIB_NAME \"${CMAKE_PROJECT_NAME}\")")
+install(CODE "set(LIB_NAME_UC \"${PROJ_SHORT_NAME_UC}\")")
 install(CODE "set(LIB_EDITION \"${EDITION}\")")
-install(CODE "set(LIB_VER \"${CMAKE_PROJECT_VERSION}\")")
+install(CODE "set(LIB_VER_MAJOR \"${CMAKE_PROJECT_VERSION_MAJOR}\")")
+install(CODE "set(LIB_VER_MINOR \"${CMAKE_PROJECT_VERSION_MINOR}\")")
+install(CODE "set(LIB_VER_REV \"${CMAKE_PROJECT_VERSION_PATCH}\")")
+install(CODE "set(LIB_VER_BUILD \"${CMAKE_PROJECT_VERSION_TWEAK}\")")
+install(CODE "string(CONCAT LIB_VER ${CMAKE_PROJECT_VERSION_MAJOR}
+                                    ${CMAKE_PROJECT_VERSION_MINOR}
+                                    ${CMAKE_PROJECT_VERSION_PATCH}
+                                    ${CMAKE_PROJECT_VERSION_TWEAK})")
 install(CODE "set(QT_VER \"${Qt6_VERSION}\")")
 install(CODE "set(PLATFORM \"${CMAKE_SYSTEM_NAME}\")")
 install(CODE "set(PROJ_SHORT_NAME \"${PROJ_SHORT_NAME}\")")
@@ -146,8 +150,13 @@ install(CODE [[
     unset(BUILD_DATE)
     unset(CONFIG_FILE_DIR)
     unset(LIB_NAME)
+    unset(LIB_NAME_UC)
     unset(LIB_EDITION)
     unset(LIB_VER)
+    unset(LIB_VER_MAJOR)
+    unset(LIB_VER_MINOR)
+    unset(LIB_VER_REV)
+    unset(LIB_VER_BUILD)
     unset(QT_VER)
     unset(PLATFORM)
     unset(BUILD_DATE)
