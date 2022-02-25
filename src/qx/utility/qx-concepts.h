@@ -2,6 +2,7 @@
 #define QX_CONCEPTS_H
 
 #include <utility>
+#include <iterator>
 
 namespace Qx
 {
@@ -475,6 +476,10 @@ concept arithmetic = std::is_arithmetic_v<K>;
 
 template<class K>
 concept fundamental = std::is_fundamental_v<K>;
+
+template<class K>
+concept traverseable = std::bidirectional_iterator<typename K::const_iterator> &&
+                       requires(K klass) {{ klass.size() } -> std::integral<>;};
 
 }
 

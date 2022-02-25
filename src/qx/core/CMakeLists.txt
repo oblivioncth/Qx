@@ -26,7 +26,7 @@ set(MODULE_PUBLIC_HEADERS
     qx-mmrb.h
     qx-regularexpression.h
     qx-string.h
-    qx-stringtraverser.h
+    qx-traverser.h
 )
 
 # Source Files
@@ -40,7 +40,6 @@ set(MODULE_IMPL
     qx-list.cpp
     qx-mmrb.cpp
     qx-string.cpp
-    qx-stringtraverser.cpp
 )
 
 # Links
