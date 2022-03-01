@@ -218,7 +218,7 @@ concept defines_address_of = requires(K klass) {{ &klass };};
 /* TODO: Not sure how to do this one, there is a "b" parameter but its type could be anything
  * template<class K, typename R>
  * concept defines_member_ptr_s = requires(K klass, R ret) {{ klass-> } -> std::same_as<R*>;};
-*/
+ */
 
 template<class K, typename T, typename R>
 concept defines_ptr_to_member_ptr_for_s = requires(K klass, T type, R ret) {{ klass->*type } -> std::same_as<R&>;};

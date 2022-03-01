@@ -65,7 +65,7 @@ public:
      * being converted to a signed integer. This is safe to do since mValue is guarenteed to never be less
      * than zero. In cases where the other operand is already an unsigned int, the static_cast should
      * be optimized to a no-op, causing no overhead, with pretty much every compiler
-    */
+     */
     bool operator==(const Index& other) const { return mType == other.mType && mValue == other.mValue; }
 
 //    template<typename N> requires std::integral<N>

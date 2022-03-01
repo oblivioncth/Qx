@@ -622,7 +622,7 @@ IoOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode wri
      * marked position and just start writing from there. The file may need to be truncated first depending on QTextStream's behavior
      * (it seems it may default to writing to end regardless of where read cursor was) and special handling would be required for when
      * a LF is discovered before the target char - 1 point is reached. This may also work for things like text deletion
-    */
+     */
 
     // Ensure position is valid
     if(startPos.isNull())
