@@ -4,18 +4,73 @@
 
 namespace Qx
 {
-	
 //===============================================================================================================
 // BitArray
 //===============================================================================================================
 
+/*!
+ *  @class BitArray
+ *
+ *  @brief The BitArray class is a more robust variant of QBitArray, which provides an array of bits.
+ *
+ *  BitArray derives from QBitArray and therefore shares all of its functionality, but this Qx variant
+ *  provides additional data manipulation and conversion methods that are missing from its base class.
+ *
+ *  The implementation of this class assumes that it contents will be stored and manipulated in big-endian
+ *  order when working with instances that may represent sets of bytes.
+ */
+
+//-Class Functions----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn template<typename T> requires std::integral<T> static BitArray BitArray::fromInteger(const T& integer)
+ *
+ *  Creates a bit array from @a integer. Multibyte integers are stored in big-endian order.
+ *
+ *  @snippet qx/core/bitarray.cpp 0
+ */
+
 //-Constructor--------------------------------------------------------------------------------------------------
 //Public:
+/*!
+ *  Constructs an empty bit array.
+ */
 BitArray::BitArray() : QBitArray() {}
+
+/*!
+ *  Constructs a bit array containing @a size bits. The bits are
+ *  initialized with @a value, which defaults to false (0).
+*/
 BitArray::BitArray(int size, bool value) : QBitArray(size, value) {}
 
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:
+/*!
+ *  @fn template<typename T> requires std::integral<T> T BitArray::toInteger()
+ *
+ *  Converts the contents of the bit array to an integer, with the contents interpreted as being in big-endian
+ *  if a multibyte integer type is specified.
+ *
+ *  If the specified integer type is not large enough to store the result, as many bits as possible will be
+ *  used in the conversion instead.
+ *
+ *  If the bit array's length is not evenly divisible by 8, the conversion is performed as if the end of
+ *  the array was padded with zeroes until it would be.
+ */
+
+/*!
+ *  Constructs and returns a QByteArray using the contents of the bit array and @a endianness.
+ *
+ *  Each group of 8 bits within the bit array are converted to the equivalent byte in order starting from index
+ *  position 0 and inserted into the returned byte array in the same order if @a endianness equals Endian::BE,
+ *  or the reverse order if @a endianness equals Endian::LE.
+ *
+ *  If the bit array's length is not evenly divisible by 8, the conversion is performed as if the end of
+ *  the array was padded with zeroes until it would be.
+ *
+ *  @warning The accuracy of the provided @a endianness relies on the contents of the bit array being in
+ *  big-endian order, since using Endian::LE simply reverses the resultant byte array's byte order.
+*/
 QByteArray BitArray::toByteArray(Endian::Endianness endianness)
 {
     // Byte array
@@ -36,12 +91,20 @@ QByteArray BitArray::toByteArray(Endian::Endianness endianness)
     return ba;
 }
 
+/*!
+ *  Appends a 0 or 1 onto the end of this bit array dependding on the value of @a bit.
+ */
 void BitArray::append(bool bit)
 {
     resize(count() + 1);
     setBit(count() - 1, bit);
 }
 
+/*!
+ *  Replace at most @a length bits beginning at index @a start with @a bits.
+ *
+ *  A value of -1 for @a length will result in the replacement only being limited by the size of the bit array.
+ */
 void BitArray::replace(const BitArray& bits, int start, int length)
 {
     if(start < 0 || start >= count())
@@ -52,6 +115,21 @@ void BitArray::replace(const BitArray& bits, int start, int length)
         setBit(i, bits.at(j));
 }
 
+/*!
+ *  @fn template<typename T> requires std::integral<T> void BitArray::replace(T integer, int start = 0, int length = -1)
+ *
+ *  Replace at most @a length bits at index @a start with the bits that make up @a integer.
+ *
+ *  A value of -1 for @a length will result in the replacement only being limited by the size of the bit array.
+ *
+ *  @sa fromInteger()
+ */
+
+/*!
+ *  Returns a new bit array that contains @a length bits from the original, beggining at @a start.
+ *
+ *  A value of -1 for @a length will result all bits from @a start to the end of the array being included.
+ */
 BitArray BitArray::extract(int start, int length)
 {
     if(start < 0 || start >= count())
@@ -69,6 +147,9 @@ BitArray BitArray::extract(int start, int length)
     return extracted;
 }
 
+/*!
+ *  Returns a new bit array with the contents of the original shifted left @a n times.
+ */
 BitArray BitArray::operator<<(int n)
 {
     BitArray shifted(count());
@@ -78,6 +159,10 @@ BitArray BitArray::operator<<(int n)
 
     return shifted;
 }
+
+/*!
+ *  Left shifts the contents of the bit array @a n times.
+ */
 void BitArray::operator<<=(int n)
 {
     for(int i = count() - 1; i > n - 1; i--)
@@ -86,6 +171,9 @@ void BitArray::operator<<=(int n)
     fill(false, 0, n);
 }
 
+/*!
+ *  Returns a new bit array with the contents of the original shifted right @a n times.
+ */
 BitArray BitArray::operator>>(int n)
 {
     BitArray shifted(count());
@@ -96,6 +184,9 @@ BitArray BitArray::operator>>(int n)
     return shifted;
 }
 
+/*!
+ *  Right shifts the contents of the bit array @a n times.
+ */
 void BitArray::operator>>=(int n)
 {
     for(int i = 0; i < count() - n; i++)
@@ -104,6 +195,9 @@ void BitArray::operator>>=(int n)
     fill(false, count() - n, count());
 }
 
+/*!
+ *  Returns a bit array which is the result of concatenating this bit array and @a rhs.
+ */
 BitArray BitArray::operator+(BitArray rhs)
 {
     BitArray sum(count() + rhs.count());
@@ -115,6 +209,9 @@ BitArray BitArray::operator+(BitArray rhs)
     return sum;
 }
 
+/*!
+ *  Appends @a rhs onto the end of the bit array.
+ */
 void BitArray::operator+=(const BitArray& rhs) { (*this) = (*this) + rhs; }
 	
 }
