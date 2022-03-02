@@ -18,19 +18,15 @@ BitArray::BitArray(int size, bool value) : QBitArray(size, value) {}
 //Public:
 QByteArray BitArray::toByteArray(Endian::Endianness endianness)
 {
-    // Pad to next whole byte if needed
-    BitArray padded = *this;
-    while(padded.count() % 8 != 0)
-        padded.append();
-
     // Byte array
-    QByteArray ba(padded.count()/8, Qt::Uninitialized);
+    QByteArray ba(std::ceil(count()/8.0), 0);
 
     // Convert
-    for(int byte = 0; byte < ba.count(); byte++)
+    int bitIdx = 0;
+    for(int byte = 0; byte < ba.count() && bitIdx < count(); byte++)
     {
         char val = 0;
-        for(int bit = 0; bit < 8; ++bit)
+        for(int bit = 0; bit < 8 && bitIdx < count(); ++bit, ++bitIdx)
             val |= ((testBit(bit + byte * 8) ? 0b1 : 0b0) << bit);
 
         int byteIdx = endianness == Endian::BE ? byte : (ba.count() - 1) - byte;
