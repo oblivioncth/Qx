@@ -1,13 +1,13 @@
-#================= Setup Module ==========================
+#================= Setup Component ==========================
 
-set(MODULE_TYPE STATIC)
+set(COMPONENT_LIB_TYPE STATIC)
 
 ################# Common Build #################
 
 #--------- Edition Common -----------------------
 
 # Headers
-set(MODULE_PUBLIC_HEADERS
+set(COMPONENT_PUBLIC_HEADERS
     qx-common-io.h
     qx-filestreamreader.h
     qx-filestreamwriter.h
@@ -18,12 +18,12 @@ set(MODULE_PUBLIC_HEADERS
     qx-textstreamwriter.h
 )
 
-set(MODULE_PRIVATE_HEADERS
+set(COMPONENT_PRIVATE_HEADERS
     qx-common-io_p.h
 )
 
 # Source Files
-set(MODULE_IMPL
+set(COMPONENT_IMPL
     qx-common-io.cpp
     qx-common-io_p.cpp
     qx-filestreamreader.cpp
@@ -36,7 +36,7 @@ set(MODULE_IMPL
 )
 
 # Links
-set(MODULE_PUBLIC_LINKS
+set(COMPONENT_PUBLIC_LINKS
     Qt::Core
 )
 
@@ -50,6 +50,6 @@ if(EDITION STREQUAL "widgets")
 
 endif()
 
-#=============== Module Handler =======================
-include(lib_module_rules)
+#=============== Component Handler =======================
+include(component_lib_rules)
 

@@ -1,27 +1,27 @@
-#================= Setup Module ==========================
+#================= Setup Component ==========================
 
-set(MODULE_TYPE STATIC)
+set(COMPONENT_LIB_TYPE STATIC)
 
 ################# Common Build #################
 
 #--------- Edition Common -----------------------
 
 # Headers
-set(MODULE_PUBLIC_HEADERS
+set(COMPONENT_PUBLIC_HEADERS
     qx-logindialog.h
     qx-standarditemmodel.h
     qx-treeinputdialog.h
 )
 
 # Source Files
-set(MODULE_IMPL
+set(COMPONENT_IMPL
     qx-logindialog.cpp
     qx-standarditemmodel.cpp
     qx-treeinputdialog.cpp
 )
 
 # Links
-set(MODULE_PUBLIC_LINKS
+set(COMPONENT_PUBLIC_LINKS
     Qt::Core
 )
 
@@ -33,12 +33,12 @@ endif()
 #--------- Edition Widgets -----------------------
 if(EDITION STREQUAL "widgets")
     # Links
-    set(MODULE_PUBLIC_LINKS ${MODULE_PUBLIC_LINKS}
+    set(COMPONENT_PUBLIC_LINKS ${COMPONENT_PUBLIC_LINKS}
         Qt6::Widgets
         Qt6::Gui
     )
 endif()
 
-#=============== Module Handler =======================
-include(lib_module_rules)
+#=============== Component Handler =======================
+include(component_lib_rules)
 

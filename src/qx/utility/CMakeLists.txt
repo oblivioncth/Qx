@@ -1,13 +1,13 @@
-#================= Setup Module ==========================
+#================= Setup Component ==========================
 
-set(MODULE_TYPE INTERFACE)
+set(COMPONENT_LIB_TYPE INTERFACE)
 
 ################# Common Build #################
 
 #--------- Edition Common -----------------------
 
 # Headers
-set(MODULE_PUBLIC_HEADERS
+set(COMPONENT_PUBLIC_HEADERS
     qx-concepts.h
     qx-helpers.h
     qx-macros.h
@@ -23,5 +23,5 @@ if(EDITION STREQUAL "widgets")
 
 endif()
 
-#=============== Module Handler =======================
-include(lib_module_rules)
+#=============== Component Handler =======================
+include(component_lib_rules)

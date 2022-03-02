@@ -10,12 +10,12 @@
 namespace Qx
 {
 
-//-Module Private Variables ---------------------------------------------------------------------------------------------
+//-Component Private Variables ---------------------------------------------------------------------------------------------
 extern const QHash<QFileDevice::FileError, IoOpResultType> FILE_DEV_ERR_MAP;
 extern const QHash<QTextStream::Status, IoOpResultType> TXT_STRM_STAT_MAP;
 extern const QHash<QDataStream::Status, IoOpResultType> DATA_STRM_STAT_MAP;
 
-//-Module Private Functions-----------------------------------------------------------------------------------------------------
+//-Component Private Functions-----------------------------------------------------------------------------------------------------
 IoOpResultType parsedOpen(QFile& file, QIODevice::OpenMode openMode);
 IoOpResultType fileCheck(const QFile& file);
 IoOpResultType directoryCheck(QDir& dir);

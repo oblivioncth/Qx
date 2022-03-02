@@ -42,12 +42,12 @@ set(CMAKE_UTIL_DIR "${CMAKE_SOURCE_DIR}/${CMAKE_UTIL_DIR_NAME}")
 set(CMAKE_MODULE_PATH "${CMAKE_UTIL_DIR}/${CMAKE_MODULE_DIR_NAME}")
 set(CONFIG_FILE_DIR "${CMAKE_UTIL_DIR}/${CONFIG_FILE_DIR_NAME}")
 set(SOURCE_DIR "${CMAKE_SOURCE_DIR}/${SOURCE_DIR_NAME}")
-set(MODULE_SOURCE_PREFIX "${SOURCE_DIR}/${PROJ_SHORT_NAME}")
+set(COMPONENT_SOURCE_PREFIX "${SOURCE_DIR}/${PROJ_SHORT_NAME}")
 set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/${INSTALL_DIR_NAME}/${EDITION}/${CMAKE_BUILD_TYPE}")
 set(HEADER_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/${HEADER_INSTALL_DIR_NAME}")
 
 # Includes
-include_directories(${MODULE_SOURCE_PREFIX})
+include_directories(${COMPONENT_SOURCE_PREFIX})
 
 # Clean install when clean target is ran
 set_directory_properties(PROPERTIES ADDITIONAL_CLEAN_FILES "${CMAKE_INSTALL_PREFIX}")
@@ -55,7 +55,7 @@ set_directory_properties(PROPERTIES ADDITIONAL_CLEAN_FILES "${CMAKE_INSTALL_PREF
 ################# Common Build #################
 
 #--------- Edition Common -----------------------
-set(LIB_MODULES
+set(LIB_COMPONENTS
 	core
 	io
         utility
@@ -79,13 +79,13 @@ if(EDITION STREQUAL "widgets")
             Gui
     )
 
-    list(APPEND LIB_MODULES widgets)
+    list(APPEND LIB_COMPONENTS widgets)
 endif()
 
 
 ################# Windows Build #################
 if(CMAKE_SYSTEM_NAME STREQUAL Windows)
-    list(APPEND LIB_MODULES windows)
+    list(APPEND LIB_COMPONENTS windows)
 endif()
 
 ################# Linux Build #################
@@ -93,13 +93,13 @@ if(CMAKE_SYSTEM_NAME STREQUAL Linux)
 
 endif()
 
-#================= Module Setup ==========================
+#================= Component Setup ==========================
 # Find Qt package
 find_package(Qt6 REQUIRED COMPONENTS ${QT_FIND_COMPONENTS})
 
-# Build modules
-foreach(module ${LIB_MODULES})
-    add_subdirectory(${MODULE_SOURCE_PREFIX}/${module})
+# Build components
+foreach(component ${LIB_COMPONENTS})
+    add_subdirectory(${COMPONENT_SOURCE_PREFIX}/${component})
 endforeach()
 
 #================= Install ===============================
@@ -122,19 +122,19 @@ install(CODE "set(PLATFORM \"${CMAKE_SYSTEM_NAME}\")")
 install(CODE "set(PROJ_SHORT_NAME \"${PROJ_SHORT_NAME}\")")
 install(CODE "set(MAIN_INCLUDE_NAME \"${PROJ_SHORT_NAME_UC}_H\")")
 install(CODE "set(MAIN_INCLUDE_PATH \"${HEADER_INSTALL_PREFIX}/${PROJ_SHORT_NAME}.h\")")
-install(CODE "set(MODULE_INCLUDE_DIR \"${HEADER_INSTALL_PREFIX}/${PROJ_SHORT_NAME}\")")
+install(CODE "set(COMPONENT_INCLUDE_DIR \"${HEADER_INSTALL_PREFIX}/${PROJ_SHORT_NAME}\")")
 
 # Generate main public include header
 install(CODE [[
     # Glob module include groups
-    file(GLOB MODULE_INCLUDE_GROUPS
-        RELATIVE "${MODULE_INCLUDE_DIR}"
-        "${MODULE_INCLUDE_DIR}/*.h"
+    file(GLOB COMPONENT_INCLUDE_GROUPS
+        RELATIVE "${COMPONENT_INCLUDE_DIR}"
+        "${COMPONENT_INCLUDE_DIR}/*.h"
     )
 
     # Generate include statements
-    foreach(modig ${MODULE_INCLUDE_GROUPS})
-        set(MODULE_INCLUDE_FILES "${MODULE_INCLUDE_FILES}#include \"${PROJ_SHORT_NAME}/${modig}\"\n")
+    foreach(comp_ig ${COMPONENT_INCLUDE_GROUPS})
+        set(COMPONENT_INCLUDE_FILES "${COMPONENT_INCLUDE_FILES}#include \"${PROJ_SHORT_NAME}/${comp_ig}\"\n")
     endforeach()
 
     # Get timestamp
@@ -148,7 +148,7 @@ install(CODE [[
     )
 
     # Unset variables in install context since they are global there and may reused
-    unset(MODULE_INCLUDE_FILES)
+    unset(COMPONENT_INCLUDE_FILES)
     unset(BUILD_DATE)
     unset(CONFIG_FILE_DIR)
     unset(LIB_NAME)
@@ -165,7 +165,7 @@ install(CODE [[
     unset(PROJ_SHORT_NAME)
     unset(MAIN_INCLUDE_NAME)
     unset(MAIN_INCLUDE_PATH)
-    unset(MODULE_INCLUDE_DIR)
+    unset(COMPONENT_INCLUDE_DIR)
 
     ]]
 )

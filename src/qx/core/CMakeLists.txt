@@ -1,13 +1,13 @@
-#================= Setup Module ==========================
+#================= Setup Component ==========================
 
-set(MODULE_TYPE STATIC)
+set(COMPONENT_LIB_TYPE STATIC)
 
 ################# Common Build #################
 
 #--------- Edition Common -----------------------
 
 # Headers
-set(MODULE_PUBLIC_HEADERS
+set(COMPONENT_PUBLIC_HEADERS
     qx-algorithm.h
     qx-array.h
     qx-bitarray.h
@@ -30,7 +30,7 @@ set(MODULE_PUBLIC_HEADERS
 )
 
 # Source Files
-set(MODULE_IMPL
+set(COMPONENT_IMPL
     qx-bitarray.cpp
     qx-char.cpp
     qx-datetime.cpp
@@ -43,7 +43,7 @@ set(MODULE_IMPL
 )
 
 # Links
-set(MODULE_PUBLIC_LINKS
+set(COMPONENT_PUBLIC_LINKS
     Qt::Core
 )
 
@@ -56,21 +56,21 @@ endif()
 if(EDITION STREQUAL "widgets")
 
     # Headers
-    set(MODULE_PUBLIC_HEADERS ${MODULE_PUBLIC_HEADERS}
+    set(COMPONENT_PUBLIC_HEADERS ${COMPONENT_PUBLIC_HEADERS}
         qx-color.h
     )
 
     # Source Files
-    set(MODULE_IMPL ${MODULE_IMPL}
+    set(COMPONENT_IMPL ${COMPONENT_IMPL}
         qx-color.cpp
     )
 
     # Links
-    set(MODULE_PUBLIC_LINKS ${MODULE_PUBLIC_LINKS}
+    set(COMPONENT_PUBLIC_LINKS ${COMPONENT_PUBLIC_LINKS}
         Qt6::Widgets
         Qt6::Gui
     )
 endif()
 
-#=============== Module Handler =======================
-include(lib_module_rules)
+#=============== Component Handler =======================
+include(component_lib_rules)

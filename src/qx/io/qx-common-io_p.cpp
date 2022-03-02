@@ -3,7 +3,7 @@
 namespace Qx
 {
 	
-//-Module Private Variables ---------------------------------------------------------------------------------------------
+//-Component Private Variables ---------------------------------------------------------------------------------------------
 const QHash<QFileDevice::FileError, IoOpResultType> FILE_DEV_ERR_MAP = {
 	{QFileDevice::NoError, IO_SUCCESS},
 	{QFileDevice::ReadError, IO_ERR_READ},
@@ -36,7 +36,7 @@ const QHash<QDataStream::Status, IoOpResultType> DATA_STRM_STAT_MAP = {
 	{QDataStream::WriteFailed, IO_ERR_WRITE}
 };
 
-//-Module Private Functions-------------------------------------------------------------------------------------------------
+//-Component Private Functions-------------------------------------------------------------------------------------------------
 IoOpResultType parsedOpen(QFile& file, QIODevice::OpenMode openMode)
 {
 	if(file.open(openMode))
