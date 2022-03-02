@@ -18,7 +18,6 @@ set(EDITION_LETTER $<IF:$<STREQUAL:${EDITION},widgets>,W,C>)
 # C++
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(LIB_)
 
 # Build augmentation
 set(CMAKE_AUTOMOC ON)
