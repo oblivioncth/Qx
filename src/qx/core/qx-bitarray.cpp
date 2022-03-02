@@ -30,11 +30,11 @@ QByteArray BitArray::toByteArray(Endian::Endianness endianness)
     for(int byte = 0; byte < ba.count(); byte++)
     {
         char val = 0;
-        for(int bit = byte; bit < byte + 8; bit++)
-            val |= ((testBit(bit) ? 0b1 : 0b0) << bit);
+        for(int bit = 0; bit < 8; ++bit)
+            val |= ((testBit(bit + byte * 8) ? 0b1 : 0b0) << bit);
 
         int byteIdx = endianness == Endian::BE ? byte : (ba.count() - 1) - byte;
-        ba.replace(byteIdx, 1, &val);
+        ba.replace(byteIdx, 1, &val, 1);
     }
 
     return ba;
