@@ -42,12 +42,12 @@ set(CMAKE_UTIL_DIR "${CMAKE_SOURCE_DIR}/${CMAKE_UTIL_DIR_NAME}")
 set(CMAKE_MODULE_PATH "${CMAKE_UTIL_DIR}/${CMAKE_MODULE_DIR_NAME}")
 set(CONFIG_FILE_DIR "${CMAKE_UTIL_DIR}/${CONFIG_FILE_DIR_NAME}")
 set(SOURCE_DIR "${CMAKE_SOURCE_DIR}/${SOURCE_DIR_NAME}")
-set(COMPONENT_SOURCE_PREFIX "${SOURCE_DIR}/${PROJ_SHORT_NAME}")
+set(COMPONENTS_SOURCE_PREFIX "${SOURCE_DIR}/${PROJ_SHORT_NAME}")
 set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/${INSTALL_DIR_NAME}/${EDITION}/${CMAKE_BUILD_TYPE}")
 set(HEADER_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/${HEADER_INSTALL_DIR_NAME}")
 
 # Includes
-include_directories(${COMPONENT_SOURCE_PREFIX})
+include_directories(${COMPONENTS_SOURCE_PREFIX})
 
 # Clean install when clean target is ran
 set_directory_properties(PROPERTIES ADDITIONAL_CLEAN_FILES "${CMAKE_INSTALL_PREFIX}")
@@ -99,7 +99,7 @@ find_package(Qt6 REQUIRED COMPONENTS ${QT_FIND_COMPONENTS})
 
 # Build components
 foreach(component ${LIB_COMPONENTS})
-    add_subdirectory(${COMPONENT_SOURCE_PREFIX}/${component})
+    add_subdirectory(${COMPONENTS_SOURCE_PREFIX}/${component})
 endforeach()
 
 #================= Install ===============================
