@@ -7,7 +7,7 @@ set(COMPONENT_LIB_TYPE STATIC)
 #--------- Edition Common -----------------------
 
 # Headers
-set(COMPONENT_PUBLIC_HEADERS
+set(COMPONENT_PUBLIC_API_HEADERS
     qx-algorithm.h
     qx-array.h
     qx-bitarray.h
@@ -56,7 +56,7 @@ endif()
 if(EDITION STREQUAL "widgets")
 
     # Headers
-    set(COMPONENT_PUBLIC_HEADERS ${COMPONENT_PUBLIC_HEADERS}
+    set(COMPONENT_PUBLIC_API_HEADERS ${COMPONENT_PUBLIC_API_HEADERS}
         qx-color.h
     )
 

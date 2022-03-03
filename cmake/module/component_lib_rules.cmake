@@ -15,8 +15,8 @@ qt_add_library(${COMPONENT_TARGET_NAME} ${COMPONENT_LIB_TYPE})
 #================= Build ==========================
 
 # Source Files
-if(COMPONENT_PUBLIC_HEADERS)
-        target_sources(${COMPONENT_TARGET_NAME} PUBLIC ${COMPONENT_PUBLIC_HEADERS})
+if(COMPONENT_PUBLIC_API_HEADERS)
+        target_sources(${COMPONENT_TARGET_NAME} PRIVATE ${COMPONENT_PUBLIC_API_HEADERS})
 endif()
 
 if(COMPONENT_PRIVATE_HEADERS)
@@ -40,7 +40,7 @@ endif()
 
 # Configure properties
 set_target_properties(${COMPONENT_TARGET_NAME} PROPERTIES
-    PUBLIC_HEADER "${COMPONENT_PUBLIC_HEADERS}"
+    PUBLIC_HEADER "${COMPONENT_PUBLIC_API_HEADERS}"
     VERSION ${CMAKE_PROJECT_VERSION}
     OUTPUT_NAME "${CMAKE_PROJECT_NAME}${EDITION_LETTER}-${COMPONENT_NAME_PROPER}"
     DEBUG_POSTFIX "d"
@@ -64,12 +64,12 @@ install(CODE "set(CONFIG_FILE_DIR \"${CONFIG_FILE_DIR}\")")
 install(CODE "set(COMPONENT_NAME \"${COMPONENT_NAME}\")")
 install(CODE "set(INCLUDE_GROUP_NAME \"${PROJ_SHORT_NAME_UC}_${COMPONENT_NAME_UC}_H\")")
 install(CODE "set(INCLUDE_GROUP_PATH \"${HEADER_INSTALL_PREFIX}/${PROJ_SHORT_NAME}/${COMPONENT_NAME}.h\")")
-install(CODE "set(COMPONENT_PUBLIC_HEADERS \"${COMPONENT_PUBLIC_HEADERS}\")")
+install(CODE "set(COMPONENT_PUBLIC_API_HEADERS \"${COMPONENT_PUBLIC_API_HEADERS}\")")
 
 # Generate install group header content and apply to template
 install(CODE [[
     # Generate include statements
-    foreach(apih ${COMPONENT_PUBLIC_HEADERS})
+    foreach(apih ${COMPONENT_PUBLIC_API_HEADERS})
         set(INCLUDE_GROUP_FILES "${INCLUDE_GROUP_FILES}#include \"${COMPONENT_NAME}/${apih}\"\n")
     endforeach()
 
@@ -86,6 +86,6 @@ install(CODE [[
     unset(COMPONENT_NAME)
     unset(INCLUDE_GROUP_NAME)
     unset(INCLUDE_GROUP_PATH)
-    unset(COMPONENT_PUBLIC_HEADERS)
+    unset(COMPONENT_PUBLIC_API_HEADERS)
     ]]
 )

@@ -7,7 +7,7 @@ set(COMPONENT_LIB_TYPE INTERFACE)
 #--------- Edition Common -----------------------
 
 # Headers
-set(COMPONENT_PUBLIC_HEADERS
+set(COMPONENT_PUBLIC_API_HEADERS
     qx-concepts.h
     qx-helpers.h
     qx-macros.h

@@ -7,7 +7,7 @@ set(COMPONENT_LIB_TYPE STATIC)
 #--------- Edition Common -----------------------
 
 # Headers
-set(COMPONENT_PUBLIC_HEADERS
+set(COMPONENT_PUBLIC_API_HEADERS
     qx-common-network.h
     qx-networkreplyerror.h
     qx-syncdownloadmanager.h
