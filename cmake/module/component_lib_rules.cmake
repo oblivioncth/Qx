@@ -51,10 +51,19 @@ file(RELATIVE_PATH COMPONENT_SUB_DIR ${SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Install lib/public headers
 install(TARGETS ${COMPONENT_TARGET_NAME}
+    EXPORT ${COMPONENT_NAME_PROPER}-targets
+    COMPONENT ${COMPONENT_NAME_PROPER}
     LIBRARY DESTINATION ${STATIC_LIB_INSTALL_DIR_NAME}
     ARCHIVE DESTINATION ${STATIC_LIB_INSTALL_DIR_NAME}
     RUNTIME DESTINATION ${SHARED_LIB_INSTALL_DIR_NAME} # For potential future shared version
     PUBLIC_HEADER DESTINATION "${HEADER_INSTALL_DIR_NAME}/${COMPONENT_SUB_DIR}"
+)
+
+install(EXPORT ${COMPONENT_NAME_PROPER}-targets
+    FILE "${CMAKE_PROJECT_NAME}-${COMPONENT_NAME_PROPER}-targets.cmake"
+    NAMESPACE ${CMAKE_PROJECT_NAME}::
+    DESTINATION lib/cmake/${CMAKE_PROJECT_NAME}
+    COMPONENT ${COMPONENT_NAME_PROPER}
 )
 
 #-----------Install include group headers------------
@@ -88,4 +97,24 @@ install(CODE [[
     unset(INCLUDE_GROUP_PATH)
     unset(COMPONENT_PUBLIC_API_HEADERS)
     ]]
+)
+
+#--------------------Package Config----------------
+configure_file("${CONFIG_FILE_DIR}/component-config.cmake.in"
+    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-${COMPONENT_NAME_PROPER}-config.cmake"
+    @ONLY
+)
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-${COMPONENT_NAME_PROPER}-config-version.cmake"
+    VERSION ${CMAKE_PROJECT_VERSION}
+    COMPATIBILITY ExactVersion
+)
+
+install(FILES
+    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-${COMPONENT_NAME_PROPER}-config.cmake"
+    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-${COMPONENT_NAME_PROPER}-config-version.cmake"
+    DESTINATION cmake/${CMAKE_PROJECT_NAME}
+    COMPONENT ${component}
 )

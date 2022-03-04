@@ -104,6 +104,8 @@ endforeach()
 
 #================= Install ===============================
 
+#-----------Install main include header------------
+
 # Set variables in install/code context
 install(CODE "set(CONFIG_FILE_DIR \"${CONFIG_FILE_DIR}\")")
 install(CODE "set(LIB_NAME \"${CMAKE_PROJECT_NAME}\")")
@@ -168,4 +170,22 @@ install(CODE [[
     unset(COMPONENT_INCLUDE_DIR)
 
     ]]
+)
+
+#--------------------Package Config----------------
+configure_file(${CMAKE_PROJECT_NAME}-config.cmake
+    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-config.cmake"
+    COPYONLY
+)
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-config-version.cmake"
+    VERSION ${CMAKE_PROJECT_VERSION}
+    COMPATIBILITY ExactVersion
+)
+
+install(FILES
+    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-config.cmake"
+    DESTINATION cmake/${CMAKE_PROJECT_NAME}
 )
