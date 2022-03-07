@@ -8,6 +8,7 @@ set(COMPONENT_LIB_TYPE STATIC)
 
 # Headers
 set(COMPONENT_INCLUDE_HEADERS
+    qx-common-widgets.h
     qx-logindialog.h
     qx-standarditemmodel.h
     qx-treeinputdialog.h
@@ -15,6 +16,7 @@ set(COMPONENT_INCLUDE_HEADERS
 
 # Source Files
 set(COMPONENT_IMPL
+    qx-common-widgets.cpp
     qx-logindialog.cpp
     qx-standarditemmodel.cpp
     qx-treeinputdialog.cpp
@@ -23,6 +25,7 @@ set(COMPONENT_IMPL
 # Links
 set(COMPONENT_PUBLIC_LINKS
     Qt6::Core
+    Qx::Core
 )
 
 #--------- Edition Console -----------------------

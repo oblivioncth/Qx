@@ -5,10 +5,7 @@
 #include <QHash>
 #include <QString>
 #include <QMetaType>
-
-#ifdef QT_WIDGETS_LIB // Only enabled for Widgets edition
-    #include <QMessageBox>
-#endif
+#include <QTextStream>
 
 namespace Qx
 {
@@ -56,19 +53,18 @@ public:
     QString secondaryInfo() const;
     QString detailedInfo() const;
 
-    Qx::GenericError& setErrorLevel(ErrorLevel errorLevel);
-    Qx::GenericError& setCaption(QString caption);
-    Qx::GenericError& setPrimaryInfo(QString primaryInfo);
-    Qx::GenericError& setSecondaryInfo(QString secondaryInfo);
-    Qx::GenericError& setDetailedInfo(QString detailedInfo);
+    GenericError& setErrorLevel(ErrorLevel errorLevel);
+    GenericError& setCaption(QString caption);
+    GenericError& setPrimaryInfo(QString primaryInfo);
+    GenericError& setSecondaryInfo(QString secondaryInfo);
+    GenericError& setDetailedInfo(QString detailedInfo);
 
-#ifdef QT_WIDGETS_LIB // Only enabled for Widgets edition
-    int exec(QMessageBox::StandardButtons choices, QMessageBox::StandardButton defChoice = QMessageBox::NoButton) const;
-#else
-    void print() const;
-#endif
-
+//-Friend Functions------------------------------------------------------------------------------------------------
+friend QTextStream& operator<<(QTextStream& ts, const GenericError& ge);
 };
+
+//-Non-member/Related Functions------------------------------------------------------------------------------------
+QTextStream& operator<<(QTextStream& ts, const GenericError& ge);
 
 }
 

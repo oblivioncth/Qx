@@ -74,7 +74,6 @@ set(QT_FIND_COMPONENTS
 #--------- Edition Widgets -----------------------
 if(EDITION STREQUAL "widgets")
     set(QT_FIND_COMPONENTS ${QT_FIND_COMPONENTS}
-            Widgets
     )
 
     list(APPEND LIB_COMPONENTS widgets)

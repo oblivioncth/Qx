@@ -1,11 +1,6 @@
 // Unit Includes
 #include "qx/core/qx-genericerror.h"
 
-// Intra-component Includes
-#ifndef QT_WIDGETS_LIB // Only enabled for Console edition
-    #include "qx/core/qx-iostream.h"
-#endif
-
 namespace Qx
 {
 	
@@ -50,67 +45,31 @@ GenericError& GenericError::setPrimaryInfo(QString primaryInfo) { mPrimaryInfo =
 GenericError& GenericError::setSecondaryInfo(QString secondaryInfo) { mSecondaryInfo = secondaryInfo; return *this; }
 GenericError& GenericError::setDetailedInfo(QString detailedInfo) { mDetailedInfo = detailedInfo; return *this; }
 
-#ifdef QT_WIDGETS_LIB // Only enabled for Widgets edition
-int GenericError::exec(QMessageBox::StandardButtons choices, QMessageBox::StandardButton defChoice) const
-{
-    // Determine icon
-    QMessageBox::Icon icon;
-
-    switch(mErrorLevel)
-    {
-        case Warning:
-            icon = QMessageBox::Warning;
-            break;
-
-        case Error:
-            icon = QMessageBox::Critical;
-            break;
-
-        case Critical:
-            icon = QMessageBox::Critical;
-            break;
-    }
-
-    // Prepare dialog
-    QMessageBox genericErrorMessage;
-    genericErrorMessage.setText(mPrimaryInfo);
-    genericErrorMessage.setStandardButtons(choices);
-    genericErrorMessage.setDefaultButton(defChoice);
-    genericErrorMessage.setIcon(icon);
-
-    if(!mCaption.isEmpty())
-        genericErrorMessage.setWindowTitle(mCaption);
-    if(!mSecondaryInfo.isEmpty())
-        genericErrorMessage.setInformativeText(mSecondaryInfo);
-    if(!mDetailedInfo.isEmpty())
-        genericErrorMessage.setDetailedText(mDetailedInfo);
-
-    // Show dialog and return user response
-    return genericErrorMessage.exec();
-}
-#else
-void GenericError::print() const
+//-Non-member/Related Functions------------------------------------------------------------------------------------
+QTextStream& operator<<(QTextStream& ts, const GenericError& ge)
 {
     // Primary heading
-    cerr << errorLevelString() << ": ";
-    if(!mCaption.isEmpty())
-        cerr << mCaption;
-    cerr << Qt::endl;
+    ts << ge.errorLevelString() << ": ";
+    if(!ge.mCaption.isEmpty())
+        ts << ge.mCaption;
+    ts << Qt::endl;
 
     // Primary info
-    cerr << mPrimaryInfo << Qt::endl;
+    ts << ge.mPrimaryInfo << Qt::endl;
 
     // Secondary info
-    if(!mSecondaryInfo.isEmpty())
-        cerr << mSecondaryInfo << Qt::endl;
+    if(!ge.mSecondaryInfo.isEmpty())
+        ts << ge.mSecondaryInfo << Qt::endl;
 
     // Detailed info
-    if(!mDetailedInfo.isEmpty())
-        cerr << Qt::endl << DETAILED_INFO_HEADING << Qt::endl << mDetailedInfo << Qt::endl;
+    if(!ge.mDetailedInfo.isEmpty())
+        ts << Qt::endl << GenericError::DETAILED_INFO_HEADING << Qt::endl << ge.mDetailedInfo << Qt::endl;
 
     // Pad
-    cerr << Qt::endl;
+    ts << Qt::endl;
+
+    // Forward stream
+    return ts;
 }
-#endif
 
 }
