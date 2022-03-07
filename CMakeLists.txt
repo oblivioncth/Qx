@@ -7,14 +7,6 @@ project(Qx VERSION 0.1.0.0 LANGUAGES CXX)
 string(TOLOWER ${CMAKE_PROJECT_NAME} PROJ_NAME_LC)
 string(TOUPPER ${CMAKE_PROJECT_NAME} PROJ_NAME_UC)
 
-# Default Edtion
-if(NOT EDITION)
-    set(EDITION "widgets") # Default to widgets ("console" is other valid option)
-endif()
-
-# Set Edition letter
-set(EDITION_LETTER $<IF:$<STREQUAL:${EDITION},widgets>,W,C>)
-
 # C++
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -42,15 +34,13 @@ set(CMAKE_UTIL_DIR "${CMAKE_SOURCE_DIR}/${CMAKE_UTIL_DIR_NAME}")
 set(CMAKE_MODULE_PATH "${CMAKE_UTIL_DIR}/${CMAKE_MODULE_DIR_NAME}")
 set(CONFIG_FILE_DIR "${CMAKE_UTIL_DIR}/${CONFIG_FILE_DIR_NAME}")
 set(COMPONENTS_DIR "${CMAKE_SOURCE_DIR}/${COMPONENT_DIR_NAME}")
-set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/${INSTALL_DIR_NAME}/${EDITION}/${CMAKE_BUILD_TYPE}")
+set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/${INSTALL_DIR_NAME}/${CMAKE_BUILD_TYPE}")
 set(HEADER_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/${HEADER_INSTALL_DIR_NAME}")
 
 # Clean install when clean target is ran
 set_directory_properties(PROPERTIES ADDITIONAL_CLEAN_FILES "${CMAKE_INSTALL_PREFIX}")
 
 ################# Common Build #################
-
-#--------- Edition Common -----------------------
 set(LIB_COMPONENTS
     core
     gui
@@ -68,17 +58,6 @@ set(QT_FIND_COMPONENTS
     Widgets
     Xml
 )
-
-#--------- Edition Console -----------------------
-
-#--------- Edition Widgets -----------------------
-if(EDITION STREQUAL "widgets")
-    set(QT_FIND_COMPONENTS ${QT_FIND_COMPONENTS}
-    )
-
-    list(APPEND LIB_COMPONENTS widgets)
-endif()
-
 
 ################# Windows Build #################
 if(CMAKE_SYSTEM_NAME STREQUAL Windows)
@@ -107,7 +86,6 @@ endforeach()
 install(CODE "set(CONFIG_FILE_DIR \"${CONFIG_FILE_DIR}\")")
 install(CODE "set(LIB_NAME \"${CMAKE_PROJECT_NAME}\")")
 install(CODE "set(LIB_NAME_UC \"${PROJ_NAME_UC}\")")
-install(CODE "set(LIB_EDITION \"${EDITION}\")")
 install(CODE "set(LIB_VER_MAJOR \"${CMAKE_PROJECT_VERSION_MAJOR}\")")
 install(CODE "set(LIB_VER_MINOR \"${CMAKE_PROJECT_VERSION_MINOR}\")")
 install(CODE "set(LIB_VER_REV \"${CMAKE_PROJECT_VERSION_PATCH}\")")
@@ -152,7 +130,6 @@ install(CODE [[
     unset(CONFIG_FILE_DIR)
     unset(LIB_NAME)
     unset(LIB_NAME_UC)
-    unset(LIB_EDITION)
     unset(LIB_VER)
     unset(LIB_VER_MAJOR)
     unset(LIB_VER_MINOR)

@@ -4,8 +4,6 @@ set(COMPONENT_LIB_TYPE STATIC)
 
 ################# Common Build #################
 
-#--------- Edition Common -----------------------
-
 # Headers
 set(COMPONENT_INCLUDE_HEADERS
     qx-common-io.h
@@ -40,16 +38,6 @@ set(COMPONENT_PUBLIC_LINKS
     Qt::Core
     Qx::Core
 )
-
-#--------- Edition Console -----------------------
-if(EDITION STREQUAL "console")
-
-endif()
-
-#--------- Edition Widgets -----------------------
-if(EDITION STREQUAL "widgets")
-
-endif()
 
 #=============== Component Handler =======================
 include(component_lib_rules)
