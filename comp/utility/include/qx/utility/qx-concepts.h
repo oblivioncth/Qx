@@ -482,6 +482,10 @@ template<class K>
 concept traverseable = std::bidirectional_iterator<typename K::const_iterator> &&
                        requires(K klass) {{ klass.size() } -> std::integral<>;};
 
+// Conversion
+template<class K, typename T>
+concept static_castable_to = requires(K klass) {{ static_cast<T>(klass) };};
+
 }
 
 #endif // QX_CONCEPTS_H
