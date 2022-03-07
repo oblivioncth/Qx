@@ -4,10 +4,8 @@
 // Qt Includes
 #include <QList>
 
-#ifdef QT_WIDGETS_LIB // Only enabled for Widgets edition
-    #include <QObjectList>
-    #include <QWidgetList>
-#endif
+// Extra-component Includes
+#include "qx/utility/qx-concepts.h"
 
 namespace Qx
 {
@@ -40,9 +38,17 @@ public:
         return differenceList;
     }
 
-#ifdef QT_WIDGETS_LIB // Only enabled for Widgets edition
-    static QWidgetList objectListToWidgetList(QObjectList list);
-#endif
+    template<typename T, typename F>
+        requires static_castable_to<F*, T*>
+    QList<T*> static_pointer_cast(const QList<F*> fromList)
+    {
+        QList<T*> toList;
+        for(F* item : qAsConst(fromList))
+            toList.append(static_cast<T*>(item));
+
+        return toList;
+    }
+
 };
 
 }

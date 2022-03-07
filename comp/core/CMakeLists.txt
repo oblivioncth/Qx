@@ -37,7 +37,6 @@ set(COMPONENT_IMPL
     qx-genericerror.cpp
     qx-integrity.cpp
     qx-json.cpp
-    qx-list.cpp
     qx-mmrb.cpp
     qx-string.cpp
 )
@@ -56,21 +55,6 @@ endif()
 #--------- Edition Widgets -----------------------
 if(EDITION STREQUAL "widgets")
 
-    # Headers
-    set(COMPONENT_INCLUDE_HEADERS ${COMPONENT_INCLUDE_HEADERS}
-        qx-color.h
-    )
-
-    # Source Files
-    set(COMPONENT_IMPL ${COMPONENT_IMPL}
-        qx-color.cpp
-    )
-
-    # Links
-    set(COMPONENT_PUBLIC_LINKS ${COMPONENT_PUBLIC_LINKS}
-        Qt6::Widgets
-        Qt6::Gui
-    )
 endif()
 
 #=============== Component Handler =======================
