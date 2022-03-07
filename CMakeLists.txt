@@ -53,6 +53,7 @@ set_directory_properties(PROPERTIES ADDITIONAL_CLEAN_FILES "${CMAKE_INSTALL_PREF
 #--------- Edition Common -----------------------
 set(LIB_COMPONENTS
     core
+    gui
     io
     utility
     network
@@ -62,7 +63,9 @@ set(LIB_COMPONENTS
 # Qt package components
 set(QT_FIND_COMPONENTS
     Core
+    Gui
     Network
+    Widgets
     Xml
 )
 
@@ -72,7 +75,6 @@ set(QT_FIND_COMPONENTS
 if(EDITION STREQUAL "widgets")
     set(QT_FIND_COMPONENTS ${QT_FIND_COMPONENTS}
             Widgets
-            Gui
     )
 
     list(APPEND LIB_COMPONENTS widgets)

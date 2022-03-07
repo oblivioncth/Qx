@@ -1,5 +1,5 @@
 // Unit Includes
-#include "qx/core/qx-color.h"
+#include "qx/gui/qx-color.h"
 
 namespace Qx
 {
