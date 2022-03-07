@@ -1,5 +1,7 @@
-#include "qx-filedetails.h"
+// Unit Includes
+#include "qx/windows/qx-filedetails.h"
 
+// Qt Includes
 #include <QFileInfo>
 
 namespace Qx

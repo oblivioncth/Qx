@@ -1,5 +1,7 @@
-#include "qx-logindialog.h"
-#
+// Unit Includes
+#include "qx/widgets/qx-logindialog.h"
+
+// Qt Includes
 #include <QGridLayout>
 
 namespace Qx

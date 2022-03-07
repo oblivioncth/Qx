@@ -1,12 +1,17 @@
 #ifndef QX_BYTEARRAY_H
 #define QX_BYTEARRAY_H
 
+// Standard Library Includes
 #include <concepts>
 
+// Qt Includes
 #include <QByteArray>
 
-#include "core/qx-endian.h"
-#include "utility/qx-concepts.h"
+// Intra-component Includes
+#include "qx/core/qx-endian.h"
+
+// Extra-component Includes
+#include "qx/utility/qx-concepts.h"
 
 namespace Qx
 {

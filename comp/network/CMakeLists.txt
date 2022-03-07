@@ -7,7 +7,7 @@ set(COMPONENT_LIB_TYPE STATIC)
 #--------- Edition Common -----------------------
 
 # Headers
-set(COMPONENT_PUBLIC_API_HEADERS
+set(COMPONENT_INCLUDE_HEADERS
     qx-common-network.h
     qx-networkreplyerror.h
     qx-syncdownloadmanager.h
@@ -24,6 +24,8 @@ set(COMPONENT_IMPL
 set(COMPONENT_PUBLIC_LINKS
     Qt6::Core
     Qt6::Network
+    Qx::Core
+    Qx::Io
 )
 
 #--------- Edition Console -----------------------

@@ -1,11 +1,13 @@
 #ifndef QX_TEXTSTREAMWRITER_H
 #define QX_TEXTSTREAMWRITER_H
 
+// Qt Includes
 #include <QTextStream>
 #include <QFile>
 
-#include "io/qx-common-io.h"
-#include "io/qx-ioopreport.h"
+// Intra-component Includes
+#include "qx/io/qx-common-io.h"
+#include "qx/io/qx-ioopreport.h"
 
 namespace Qx
 {

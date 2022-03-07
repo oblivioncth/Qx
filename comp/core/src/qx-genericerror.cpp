@@ -1,7 +1,9 @@
-#include "qx-genericerror.h"
+// Unit Includes
+#include "qx/core/qx-genericerror.h"
 
+// Intra-component Includes
 #ifndef QT_WIDGETS_LIB // Only enabled for Console edition
-    #include "core/qx-iostream.h"
+    #include "qx/core/qx-iostream.h"
 #endif
 
 namespace Qx

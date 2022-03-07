@@ -1,9 +1,11 @@
 #ifndef QX_STRINGTRAVERSER_H
 #define QX_STRINGTRAVERSER_H
 
+// Qt Includes
 #include <QString>
 
-#include <utility/qx-concepts.h>
+// Extra-component Includes
+#include "qx/utility/qx-concepts.h"
 
 namespace Qx
 {

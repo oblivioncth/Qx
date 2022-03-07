@@ -1,7 +1,9 @@
-#include "qx-treeinputdialog.h"
+// Unit Includes
+#include "qx/widgets/qx-treeinputdialog.h"
 
+// Qt Includes
 #include <QVBoxLayout>
-#include<QPushButton>
+#include <QPushButton>
 
 namespace Qx
 {

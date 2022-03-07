@@ -1,14 +1,19 @@
 #ifndef QX_WINDOWS_COMMON_H
 #define QX_WINDOWS_COMMON_H
 
+// Qt Includes
 #include <QString>
 
+// Windows Includes
 #define NOMINMAX
 #include "Windows.h"
 #undef NOMINMAX
 
-#include "windows/qx-filedetails.h"
-#include "core/qx-genericerror.h"
+// Intra-component Includes
+#include "qx/windows/qx-filedetails.h"
+
+// Extra-component Includes
+#include "qx/core/qx-genericerror.h"
 
 namespace Qx
 {

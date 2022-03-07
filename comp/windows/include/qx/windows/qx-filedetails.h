@@ -1,14 +1,17 @@
 #ifndef QX_FILEDETAILS_H
 #define QX_FILEDETAILS_H
 
+// Qt Includes
 #include <QString>
 #include <QHash>
 
+// Windows Includes
 #define NOMINMAX
 #include "Windows.h"
 #undef NOMINMAX
 
-#include <core/qx-mmrb.h>
+// Extra-component Includes
+#include "qx/core/qx-mmrb.h"
 
 
 namespace Qx

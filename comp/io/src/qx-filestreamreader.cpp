@@ -1,6 +1,8 @@
-#include "qx-filestreamreader.h"
+// Unit Includes
+#include "qx/io/qx-filestreamreader.h"
 
-#include "io/qx-common-io_p.h"
+// Intra-component Includes
+#include "qx-common-io_p.h"
 
 namespace Qx
 {

@@ -7,7 +7,7 @@ set(COMPONENT_LIB_TYPE STATIC)
 #--------- Edition Common -----------------------
 
 # Headers
-set(COMPONENT_PUBLIC_API_HEADERS
+set(COMPONENT_INCLUDE_HEADERS
     qx-common-windows.h
     qx-filedetails.h
 )
@@ -20,8 +20,10 @@ set(COMPONENT_IMPL
 
 # Links
 set(COMPONENT_PUBLIC_LINKS
-    Qt::Core
+    Qt6::Core
     Version.lib
+    Qx::Core
+    Qx::Io
 )
 
 #--------- Edition Console -----------------------

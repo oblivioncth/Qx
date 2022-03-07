@@ -1,6 +1,7 @@
 #ifndef QX_INTEGRITY_H
 #define QX_INTEGRITY_H
 
+// Qt Includes
 #include <QString>
 #include <QCryptographicHash>
 

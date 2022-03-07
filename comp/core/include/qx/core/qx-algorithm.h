@@ -1,9 +1,11 @@
 #ifndef QX_ALGORITHM_H
 #define QX_ALGORITHM_H
 
+// Standard Library Includes
 #include <stdexcept>
 
-#include "utility/qx-concepts.h"
+// Extra-component Includes
+#include "qx/utility/qx-concepts.h"
 
 namespace Qx
 {

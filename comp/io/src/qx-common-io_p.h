@@ -1,11 +1,13 @@
 #ifndef QX_IO_COMMON_P_H
 #define QX_IO_COMMON_P_H
 
+// Qt Includes
 #include <QFileDevice>
 #include <QTextStream>
 
-#include "io/qx-ioopreport.h"
-#include "io/qx-common-io.h"
+// Intra-component Includes
+#include "qx/io/qx-ioopreport.h"
+#include "qx/io/qx-common-io.h"
 
 namespace Qx
 {

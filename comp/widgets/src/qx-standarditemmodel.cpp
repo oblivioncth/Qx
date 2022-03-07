@@ -1,4 +1,5 @@
-#include "qx-standarditemmodel.h"
+// Unit Includes
+#include "qx/widgets/qx-standarditemmodel.h"
 
 namespace Qx
 {

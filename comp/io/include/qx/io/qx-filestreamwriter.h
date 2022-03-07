@@ -1,10 +1,12 @@
 #ifndef QX_FILESTREAMWRITER_H
 #define QX_FILESTREAMWRITER_H
 
+// Qt Includes
 #include <QDataStream>
 #include <QFile>
 
-#include "io/qx-common-io.h"
+// Intra-component Includes
+#include "qx/io/qx-common-io.h"
 
 namespace Qx
 {

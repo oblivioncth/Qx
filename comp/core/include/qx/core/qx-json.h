@@ -1,9 +1,11 @@
 #ifndef QX_JSON_H
 #define QX_JSON_H
 
+// Qt Includes
 #include <QString>
 
-#include "core/qx-genericerror.h"
+// Intra-component Includes
+#include "qx/core/qx-genericerror.h"
 
 namespace Qx
 {

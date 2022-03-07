@@ -1,5 +1,7 @@
-#include "qx-common-network.h"
+// Unit Includes
+#include "qx/network/qx-common-network.h"
 
+// Qt Includes
 #include <QHash>
 
 namespace Qx

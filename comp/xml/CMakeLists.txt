@@ -7,7 +7,7 @@ set(COMPONENT_LIB_TYPE STATIC)
 #--------- Edition Common -----------------------
 
 # Headers
-set(COMPONENT_PUBLIC_API_HEADERS
+set(COMPONENT_INCLUDE_HEADERS
     qx-common-xml.h
     qx-xmlstreamreadererror.h
     qx-xmlstreamwritererror.h

@@ -1,10 +1,13 @@
-#include "qx-syncdownloadmanager.h"
+// Unit Includes
+#include "qx/network/qx-syncdownloadmanager.h"
 
+// Qt Includes
 #include <QScopedValueRollback>
 #include <QAuthenticator>
 #include <QNetworkProxy>
 
-#include "core/qx-string.h"
+// Extra-component Includes
+#include "qx/core/qx-string.h"
 
 namespace Qx
 {

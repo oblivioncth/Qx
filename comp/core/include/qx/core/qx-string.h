@@ -1,10 +1,12 @@
 #ifndef QX_STRING_H
 #define QX_STRING_H
 
+// Qt Includes
 #include <QString>
 #include <QCryptographicHash>
 
-#include "core/qx-endian.h"
+// Intra-component Includes
+#include "qx/core/qx-endian.h"
 
 namespace Qx
 {

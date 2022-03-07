@@ -1,7 +1,8 @@
 #ifndef QX_TEXTPOS_H
 #define QX_TEXTPOS_H
 
-#include "core/qx-index.h"
+// Extra-component Includes
+#include "qx/core/qx-index.h"
 
 namespace Qx
 {

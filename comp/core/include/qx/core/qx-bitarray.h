@@ -1,9 +1,11 @@
 #ifndef QX_BITARRAY_H
 #define QX_BITARRAY_H
 
+// Qt Includes
 #include <QBitArray>
 
-#include "core/qx-endian.h"
+// Intra-component Includes
+#include "qx/core/qx-endian.h"
 
 namespace Qx
 {

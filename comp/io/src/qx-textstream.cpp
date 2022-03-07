@@ -1,6 +1,8 @@
-#include "qx-textstream.h"
+// Unit Includes
+#include "qx/io/qx-textstream.h"
 
-#include "qx-common-io.h"
+// Intra-component Includes
+#include "qx/io/qx-common-io.h"
 
 namespace Qx
 {

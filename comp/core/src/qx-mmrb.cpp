@@ -1,8 +1,11 @@
-#include "qx-mmrb.h"
+// Unit Includes
+#include "qx/core/qx-mmrb.h"
 
+// Qt Includes
 #include <QStringList>
 
-#include "core/qx-string.h"
+// Intra-component Includes
+#include "qx/core/qx-string.h"
 
 namespace Qx
 {

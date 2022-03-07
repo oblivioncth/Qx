@@ -1,6 +1,8 @@
-#include "qx-char.h"
+// Unit Includes
+#include "qx/core/qx-char.h"
 
-#include "core/qx-regularexpression.h"
+// Intra-component Includes
+#include "qx/core/qx-regularexpression.h"
 
 namespace Qx
 {

@@ -1,8 +1,12 @@
-#include "qx-common-io.h"
+// Unit Includes
+#include "qx/io/qx-common-io.h"
 #include "qx-common-io_p.h"
 
-#include "io/qx-textstream.h"
-#include "core/qx-char.h"
+// Intra-component Includes
+#include "qx/io/qx-textstream.h"
+
+// Extra-component Includes
+#include "qx/core/qx-char.h"
 
 namespace Qx
 {

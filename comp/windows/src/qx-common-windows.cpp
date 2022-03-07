@@ -1,15 +1,20 @@
-#include "qx-common-windows.h"
+// Unit Includes
+#include "qx/windows/qx-common-windows.h"
 
+// Qt Includes
 #include <QFile>
 #include <QCoreApplication>
 
+// Windows Includes
 #include "TlHelp32.h"
 #include "comdef.h"
 #include "ShObjIdl.h"
 #include "ShlGuid.h"
 #include "atlbase.h"
-#include "io/qx-common-io.h"
-#include "core/qx-bitarray.h"
+
+// Extra-component Includes
+#include "qx/io/qx-common-io.h"
+#include "qx/core/qx-bitarray.h"
 
 namespace Qx
 {

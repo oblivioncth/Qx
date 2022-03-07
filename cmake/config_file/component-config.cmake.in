@@ -1,2 +1,2 @@
-include(${CMAKE_CURRENT_LIST_DIR}/Qx-@COMPONENT_NAME_PROPER@-config-version.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/Qx-@COMPONENT_NAME_PROPER@-config-targets.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/Qx-@COMPONENT_NAME@-config-version.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/Qx-@COMPONENT_NAME@-config-targets.cmake)

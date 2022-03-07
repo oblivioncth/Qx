@@ -1,11 +1,15 @@
 #ifndef QX_FILESTREAMREADER_H
 #define QX_FILESTREAMREADER_H
 
+// Qt Includes
 #include <QDataStream>
 #include <QFile>
 
-#include "io/qx-ioopreport.h"
-#include "utility/qx-concepts.h"
+// Intra-component Includes
+#include "qx/io/qx-ioopreport.h"
+
+// Extra-component Includes
+#include "qx/utility/qx-concepts.h"
 
 namespace Qx
 {

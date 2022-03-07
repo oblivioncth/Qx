@@ -1,6 +1,7 @@
 #ifndef QX_GENERICERROR_H
 #define QX_GENERICERROR_H
 
+// Qt Includes
 #include <QHash>
 #include <QString>
 #include <QMetaType>

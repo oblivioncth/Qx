@@ -7,7 +7,7 @@ set(COMPONENT_LIB_TYPE STATIC)
 #--------- Edition Common -----------------------
 
 # Headers
-set(COMPONENT_PUBLIC_API_HEADERS
+set(COMPONENT_INCLUDE_HEADERS
     qx-common-io.h
     qx-filestreamreader.h
     qx-filestreamwriter.h
@@ -38,6 +38,7 @@ set(COMPONENT_IMPL
 # Links
 set(COMPONENT_PUBLIC_LINKS
     Qt::Core
+    Qx::Core
 )
 
 #--------- Edition Console -----------------------

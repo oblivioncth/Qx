@@ -1,14 +1,18 @@
 #ifndef QX_SYNCDOWNLOADMANAGER_H
 #define QX_SYNCDOWNLOADMANAGER_H
 
+// Qt Includes
 #include <QEventLoop>
 #include <QNetworkAccessManager>
 
-#include "network/qx-networkreplyerror.h"
-#include "network/qx-common-network.h"
-#include "core/qx-genericerror.h"
-#include "core/qx-cumulation.h"
-#include "io/qx-filestreamwriter.h"
+// Intra-component Includes
+#include "qx/network/qx-networkreplyerror.h"
+#include "qx/network/qx-common-network.h"
+
+// Extra-component Includes
+#include "qx/core/qx-genericerror.h"
+#include "qx/core/qx-cumulation.h"
+#include "qx/io/qx-filestreamwriter.h"
 
 namespace Qx
 {

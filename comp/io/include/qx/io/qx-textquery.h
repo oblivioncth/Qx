@@ -1,9 +1,11 @@
 #ifndef QX_TEXTQUERY_H
 #define QX_TEXTQUERY_H
 
+// Qt Includes
 #include <QString>
 
-#include "io/qx-textpos.h"
+// Intra-component Includes
+#include "qx/io/qx-textpos.h"
 
 namespace Qx
 {

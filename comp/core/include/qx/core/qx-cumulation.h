@@ -1,9 +1,11 @@
 #ifndef QX_CUMULATION_H
 #define QX_CUMULATION_H
 
+// Qt Includes
 #include <QHash>
 
-#include "utility/qx-concepts.h"
+// Extra-component Includes
+#include "qx/utility/qx-concepts.h"
 
 namespace Qx
 {

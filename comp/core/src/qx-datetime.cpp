@@ -1,6 +1,8 @@
-#include "qx-datetime.h"
+// Unit Includes
+#include "qx/core/qx-datetime.h"
 
-#include "qx-algorithm.h"
+// Intra-component Includes
+#include "qx/core/qx-algorithm.h"
 
 namespace Qx
 {

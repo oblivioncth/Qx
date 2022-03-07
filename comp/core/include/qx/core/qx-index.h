@@ -1,13 +1,16 @@
 #ifndef QX_INDEX_H
 #define QX_INDEX_H
 
+// Standard Library Includes
 #include <concepts>
 #include <numeric>
 #include <stdexcept>
 
+// Qt Includes
 #include <QtGlobal>
 
-#include "core/qx-algorithm.h"
+// Intra-component Includes
+#include "qx/core/qx-algorithm.h"
 
 namespace Qx
 {

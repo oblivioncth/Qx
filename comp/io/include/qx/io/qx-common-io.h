@@ -1,16 +1,20 @@
 #ifndef QX_IO_COMMON_H
 #define QX_IO_COMMON_H
 
+// Qt Includes
 #include <QFlags>
 #include <QChar>
 #include <QFile>
 #include <QDirIterator>
 #include <QCryptographicHash>
 
-#include "io/qx-ioopreport.h"
-#include "io/qx-textpos.h"
-#include "io/qx-textquery.h"
-#include "core/qx-index.h"
+//Intra-component Includes
+#include "qx/io/qx-ioopreport.h"
+#include "qx/io/qx-textpos.h"
+#include "qx/io/qx-textquery.h"
+
+// Extra-component Includes
+#include "qx/core/qx-index.h"
 
 namespace Qx
 {

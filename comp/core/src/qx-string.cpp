@@ -1,9 +1,12 @@
-#include "qx-string.h"
+// Unit Includes
+#include "qx/core/qx-string.h"
 
+// Qt Includes
 #include <QStringList>
 
-#include "core/qx-regularexpression.h"
-#include "core/qx-algorithm.h"
+// Intra-component Includes
+#include "qx/core/qx-regularexpression.h"
+#include "qx/core/qx-algorithm.h"
 
 namespace Qx
 {

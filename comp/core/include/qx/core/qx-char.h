@@ -1,6 +1,7 @@
 #ifndef QX_CHAR_H
 #define QX_CHAR_H
 
+// Qt Includes
 #include <QChar>
 
 namespace Qx
