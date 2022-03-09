@@ -17,6 +17,9 @@ add_library(${CMAKE_PROJECT_NAME}::${COMPONENT_NAME} ALIAS ${COMPONENT_TARGET_NA
 
 #================= Build ==========================
 
+# Get timestamp
+string(TIMESTAMP BUILD_DATE_TIME "%Y-%m-%d @ %H:%M:%S ")
+
 # Source Files
 if(COMPONENT_PRIVATE_HEADERS)
     foreach(p_header ${COMPONENT_PRIVATE_HEADERS})

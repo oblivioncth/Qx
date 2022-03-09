@@ -1,3 +1,11 @@
+/* [@CMAKE_PROJECT_NAME@]
+ * Version: @CMAKE_PROJECT_VERSION@
+ * Qt Version: @Qt6_VERSION@
+ * Platform: @CMAKE_SYSTEM_NAME@
+ * Build Date: @BUILD_DATE_TIME@
+ * Component: @COMPONENT_NAME@
+*/
+
 #ifndef @PRIM_COMP_HEADER_DEF@
 #define @PRIM_COMP_HEADER_DEF@
 
