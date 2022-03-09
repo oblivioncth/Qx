@@ -74,15 +74,15 @@ endif()
 #--------------------Package Config----------------
 
 # Create config file
-configure_file(${CMAKE_PROJECT_NAME}-config.cmake
-    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-config.cmake"
+configure_file(${CMAKE_PROJECT_NAME}Config.cmake
+    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}Config.cmake"
     COPYONLY
 )
 
 # Create version config file
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-config-version.cmake"
+    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}ConfigVersion.cmake"
     VERSION ${CMAKE_PROJECT_VERSION}
     COMPATIBILITY ExactVersion
 )
@@ -100,6 +100,6 @@ endforeach()
 
 # Install
 install(FILES
-    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-config.cmake"
+    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}Config.cmake"
     DESTINATION lib/cmake/${CMAKE_PROJECT_NAME}
 )

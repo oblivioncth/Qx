@@ -3,11 +3,11 @@ find_dependency(Qt6 6.2)
 
 file(GLOB AVAILABLE_COMPONENT_CONFIGS
 	RELATIVE "${CMAKE_CURRENT_LIST_DIR}"
-	"${CMAKE_CURRENT_LIST_DIR}/Qx-*-config.cmake"
+        "${CMAKE_CURRENT_LIST_DIR}/Qx*Config.cmake"
 )
 
 foreach(component ${Qx_FIND_COMPONENTS})
-	set(component_config Qx-${component}-config.cmake)
+        set(component_config Qx${component}Config.cmake)
 
 	if (";${AVAILABLE_COMPONENT_CONFIGS};" MATCHES ";${component_config};")
 		include("${CMAKE_CURRENT_LIST_DIR}/${component_config}")

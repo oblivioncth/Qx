@@ -92,14 +92,14 @@ configure_file(
 
 # Create config file
 configure_file("${FILE_TEMPLATES_DIR}/component-config.cmake.in"
-    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-${COMPONENT_NAME}-config.cmake"
+    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}${COMPONENT_NAME}Config.cmake"
     @ONLY
 )
 
 # Create version config file
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-${COMPONENT_NAME}-config-version.cmake"
+    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}${COMPONENT_NAME}ConfigVersion.cmake"
     VERSION ${CMAKE_PROJECT_VERSION}
     COMPATIBILITY ExactVersion
 )
@@ -115,7 +115,7 @@ set_target_properties(${COMPONENT_TARGET_NAME} PROPERTIES
 
 # Install lib
 install(TARGETS ${COMPONENT_TARGET_NAME}
-    EXPORT ${COMPONENT_NAME}-targets
+    EXPORT ${COMPONENT_NAME}Targets
     COMPONENT ${COMPONENT_NAME}
     LIBRARY DESTINATION ${STATIC_LIB_INSTALL_DIR_NAME}
     ARCHIVE DESTINATION ${STATIC_LIB_INSTALL_DIR_NAME}
@@ -131,8 +131,8 @@ install(FILES "${CMAKE_BINARY_DIR}/include/${COMPONENT_NAME_LC}.h"
 )
 
 # Configure package target export
-install(EXPORT ${COMPONENT_NAME}-targets
-    FILE "${CMAKE_PROJECT_NAME}-${COMPONENT_NAME}-targets.cmake"
+install(EXPORT ${COMPONENT_NAME}Targets
+    FILE "${CMAKE_PROJECT_NAME}${COMPONENT_NAME}Targets.cmake"
     NAMESPACE ${CMAKE_PROJECT_NAME}::
     DESTINATION lib/cmake/${CMAKE_PROJECT_NAME}
     COMPONENT ${COMPONENT_NAME}
@@ -140,8 +140,8 @@ install(EXPORT ${COMPONENT_NAME}-targets
 
 # Install package config files
 install(FILES
-    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-${COMPONENT_NAME}-config.cmake"
-    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-${COMPONENT_NAME}-config-version.cmake"
+    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}${COMPONENT_NAME}Config.cmake"
+    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}${COMPONENT_NAME}ConfigVersion.cmake"
     DESTINATION lib/cmake/${CMAKE_PROJECT_NAME}
     COMPONENT ${component}
 )
