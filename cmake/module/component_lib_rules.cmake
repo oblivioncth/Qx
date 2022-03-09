@@ -82,7 +82,7 @@ endforeach()
 
 # Copy template with modifications
 configure_file(
-    "${CONFIG_FILE_DIR}/primary_component_header.h.in"
+    "${FILE_TEMPLATES_DIR}/primary_component_header.h.in"
     "${CMAKE_BINARY_DIR}/include/${COMPONENT_NAME_LC}.h"
     @ONLY
     NEWLINE_STYLE UNIX
@@ -91,7 +91,7 @@ configure_file(
 #--------------------Package Config------------------------
 
 # Create config file
-configure_file("${CONFIG_FILE_DIR}/component-config.cmake.in"
+configure_file("${FILE_TEMPLATES_DIR}/component-config.cmake.in"
     "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-${COMPONENT_NAME}-config.cmake"
     @ONLY
 )
