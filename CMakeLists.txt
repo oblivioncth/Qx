@@ -35,10 +35,18 @@ set(CMAKE_MODULE_PATH "${CMAKE_UTIL_DIR}/${CMAKE_MODULE_DIR_NAME}")
 set(FILE_TEMPLATES_DIR "${CMAKE_UTIL_DIR}/${FILE_TEMPLATES_DIR_NAME}")
 set(COMPONENTS_DIR "${CMAKE_SOURCE_DIR}/${COMPONENT_DIR_NAME}")
 set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/${OUT_DIR_NAME}/install")
+set(PACKAGE_PREFIX "${CMAKE_SOURCE_DIR}/${OUT_DIR_NAME}/dist")
 set(HEADER_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/${HEADER_INSTALL_DIR_NAME}")
 
 # Clean install when clean target is ran
 set_directory_properties(PROPERTIES ADDITIONAL_CLEAN_FILES "${CMAKE_INSTALL_PREFIX}")
+
+# General Variables
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+  set(TARGET_ARCH x64)
+else()
+  set(TARGET_ARCH x86)
+endif()
 
 ################# Common Build #################
 set(LIB_COMPONENTS
@@ -98,9 +106,26 @@ endforeach()
 
 #================= Top Level Install =======================
 
-# Install
+# Install Package Config
 install(FILES
     "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}Config.cmake"
     "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}ConfigVersion.cmake"
     DESTINATION lib/cmake/${CMAKE_PROJECT_NAME}
 )
+
+# Install README and LICENSE
+install(FILES
+    "${CMAKE_SOURCE_DIR}/README.md"
+    "${CMAKE_SOURCE_DIR}/LICENSE"
+    DESTINATION .
+)
+
+#====================== CPack ==============================
+
+set(CPACK_PACKAGE_VENDOR "oblivioncth")
+set(CPACK_PACKAGE_DIRECTORY "${PACKAGE_PREFIX}")
+set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}_${PROJECT_VERSION}_(Qt${Qt6_VERSION})_${CMAKE_SYSTEM_NAME}_${TARGET_ARCH}")
+set(CPACK_GENERATOR "ZIP")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
+set(CPACK_RESOURCE_FILE_README "${CMAKE_SOURCE_DIR}/README.md")
+include(CPack)
