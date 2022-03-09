@@ -88,6 +88,22 @@ configure_file(
     NEWLINE_STYLE UNIX
 )
 
+#--------------------Package Config------------------------
+
+# Create config file
+configure_file("${CONFIG_FILE_DIR}/component-config.cmake.in"
+    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-${COMPONENT_NAME}-config.cmake"
+    @ONLY
+)
+
+# Create version config file
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-${COMPONENT_NAME}-config-version.cmake"
+    VERSION ${CMAKE_PROJECT_VERSION}
+    COMPATIBILITY ExactVersion
+)
+
 #================= Install ==========================
 
 # Configure properties
@@ -122,22 +138,10 @@ install(EXPORT ${COMPONENT_NAME}-targets
     COMPONENT ${COMPONENT_NAME}
 )
 
-#--------------------Package Config----------------
-configure_file("${CONFIG_FILE_DIR}/component-config.cmake.in"
-    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-${COMPONENT_NAME}-config.cmake"
-    @ONLY
-)
-
-include(CMakePackageConfigHelpers)
-write_basic_package_version_file(
-    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-${COMPONENT_NAME}-config-version.cmake"
-    VERSION ${CMAKE_PROJECT_VERSION}
-    COMPATIBILITY ExactVersion
-)
-
+# Install package config files
 install(FILES
     "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-${COMPONENT_NAME}-config.cmake"
     "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-${COMPONENT_NAME}-config-version.cmake"
-    DESTINATION cmake/${CMAKE_PROJECT_NAME}
+    DESTINATION lib/cmake/${CMAKE_PROJECT_NAME}
     COMPONENT ${component}
 )

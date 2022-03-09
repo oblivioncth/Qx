@@ -69,7 +69,25 @@ if(CMAKE_SYSTEM_NAME STREQUAL Linux)
 
 endif()
 
-#================= Component Setup ==========================
+#================= Top Level Build =========================
+
+#--------------------Package Config----------------
+
+# Create config file
+configure_file(${CMAKE_PROJECT_NAME}-config.cmake
+    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-config.cmake"
+    COPYONLY
+)
+
+# Create version config file
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-config-version.cmake"
+    VERSION ${CMAKE_PROJECT_VERSION}
+    COMPATIBILITY ExactVersion
+)
+
+#================= Process Componets =======================
 # Find Qt package
 find_package(Qt6 REQUIRED COMPONENTS ${QT_FIND_COMPONENTS})
 
@@ -78,22 +96,10 @@ foreach(component ${LIB_COMPONENTS})
     add_subdirectory(${COMPONENTS_DIR}/${component})
 endforeach()
 
-#================= Install ===============================
+#================= Top Level Install =======================
 
-#--------------------Package Config----------------
-configure_file(${CMAKE_PROJECT_NAME}-config.cmake
-    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-config.cmake"
-    COPYONLY
-)
-
-include(CMakePackageConfigHelpers)
-write_basic_package_version_file(
-    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-config-version.cmake"
-    VERSION ${CMAKE_PROJECT_VERSION}
-    COMPATIBILITY ExactVersion
-)
-
+# Install
 install(FILES
     "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-config.cmake"
-    DESTINATION cmake/${CMAKE_PROJECT_NAME}
+    DESTINATION lib/cmake/${CMAKE_PROJECT_NAME}
 )
