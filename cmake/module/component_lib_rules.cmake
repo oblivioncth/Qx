@@ -34,12 +34,12 @@ endif()
 if(${COMPONENT_LIB_TYPE} STREQUAL "INTERFACE")
     target_include_directories(${COMPONENT_TARGET_NAME} INTERFACE
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-            $<INSTALL_INTERFACE:include>
+            $<INSTALL_INTERFACE:include/${COMPONENT_NAME_LC}>
     )
 else()
     target_include_directories(${COMPONENT_TARGET_NAME} PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-            $<INSTALL_INTERFACE:include>
+            $<INSTALL_INTERFACE:include/${COMPONENT_NAME_LC}>
     )
 endif()
 
@@ -69,6 +69,22 @@ if(COMPONENT_PRIVATE_LINKS)
         target_link_libraries(${COMPONENT_TARGET_NAME} PRIVATE ${COMPONENT_PRIVATE_LINKS})
 endif()
 
+#-----------Generate Primary Component Header------------
+set(PRIM_COMP_HEADER_DEF "${PROJ_NAME_UC}_${COMPONENT_NAME_UC}_H")
+
+# Generate include statements
+foreach(api_header ${COMPONENT_INCLUDE_HEADERS})
+    set(PRIM_COMP_HEADER_INCLUDES "${PRIM_COMP_HEADER_INCLUDES}#include \"${COMPONENT_NAME_LC}/${api_header}\"\n")
+endforeach()
+
+# Copy template with modifications
+configure_file(
+    "${CONFIG_FILE_DIR}/primary_component_header.h.in"
+    "${CMAKE_BINARY_DIR}/include/${COMPONENT_NAME_LC}.h"
+    @ONLY
+    NEWLINE_STYLE UNIX
+)
+
 #================= Install ==========================
 
 # Configure properties
@@ -78,7 +94,7 @@ set_target_properties(${COMPONENT_TARGET_NAME} PROPERTIES
     DEBUG_POSTFIX "d"
 )
 
-# Install lib/public headers
+# Install lib
 install(TARGETS ${COMPONENT_TARGET_NAME}
     EXPORT ${COMPONENT_NAME}-targets
     COMPONENT ${COMPONENT_NAME}
@@ -87,44 +103,20 @@ install(TARGETS ${COMPONENT_TARGET_NAME}
     RUNTIME DESTINATION ${SHARED_LIB_INSTALL_DIR_NAME} # For potential future shared version
 )
 
+# Install public headers
+install(DIRECTORY ${HEADER_INSTALL_DIR_NAME}/${PROJ_NAME_LC}
+    DESTINATION "${HEADER_INSTALL_DIR_NAME}/${COMPONENT_NAME_LC}"
+)
+install(FILES "${CMAKE_BINARY_DIR}/include/${COMPONENT_NAME_LC}.h"
+    DESTINATION "${HEADER_INSTALL_PREFIX}/${COMPONENT_NAME_LC}/${PROJ_NAME_LC}"
+)
+
+# Configure package target export
 install(EXPORT ${COMPONENT_NAME}-targets
     FILE "${CMAKE_PROJECT_NAME}-${COMPONENT_NAME}-targets.cmake"
     NAMESPACE ${CMAKE_PROJECT_NAME}::
     DESTINATION lib/cmake/${CMAKE_PROJECT_NAME}
     COMPONENT ${COMPONENT_NAME}
-)
-
-#-----------Install include group headers------------
-
-# Set variables in install context
-install(CODE "set(CONFIG_FILE_DIR \"${CONFIG_FILE_DIR}\")")
-install(CODE "set(COMPONENT_NAME_LC \"${COMPONENT_NAME_LC}\")")
-install(CODE "set(INCLUDE_GROUP_NAME \"${PROJ_NAME_UC}_${COMPONENT_NAME_UC}_H\")")
-install(CODE "set(INCLUDE_GROUP_PATH \"${HEADER_INSTALL_PREFIX}/${PROJ_NAME_LC}/${COMPONENT_NAME_LC}.h\")")
-install(CODE "set(COMPONENT_INCLUDE_HEADERS \"${COMPONENT_INCLUDE_HEADERS}\")")
-
-# Generate install group header content and apply to template
-install(CODE [[
-    # Generate include statements
-    foreach(apih ${COMPONENT_INCLUDE_HEADERS})
-        set(INCLUDE_GROUP_FILES "${INCLUDE_GROUP_FILES}#include \"${COMPONENT_NAME_LC}/${apih}\"\n")
-    endforeach()
-
-    # Copy template with modifications
-    configure_file(
-        "${CONFIG_FILE_DIR}/include_group.h"
-        "${INCLUDE_GROUP_PATH}"
-        NEWLINE_STYLE UNIX
-    )
-
-    # Unset variables in install context since they are global there and may reused
-    unset(INCLUDE_GROUP_FILES)
-    unset(CONFIG_FILE_DIR)
-    unset(COMPONENT_NAME_LC)
-    unset(INCLUDE_GROUP_NAME)
-    unset(INCLUDE_GROUP_PATH)
-    unset(COMPONENT_INCLUDE_HEADERS)
-    ]]
 )
 
 #--------------------Package Config----------------
