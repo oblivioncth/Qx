@@ -101,5 +101,6 @@ endforeach()
 # Install
 install(FILES
     "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}Config.cmake"
+    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}ConfigVersion.cmake"
     DESTINATION lib/cmake/${CMAKE_PROJECT_NAME}
 )
