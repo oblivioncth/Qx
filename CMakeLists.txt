@@ -79,12 +79,15 @@ endif()
 
 #================= Top Level Build =========================
 
+# Find Qt package
+find_package(Qt6 REQUIRED COMPONENTS ${QT_FIND_COMPONENTS})
+
 #--------------------Package Config----------------
 
 # Create config file
-configure_file(${CMAKE_PROJECT_NAME}Config.cmake
+configure_file(${CMAKE_PROJECT_NAME}Config.cmake.in
     "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}Config.cmake"
-    COPYONLY
+    @ONLY
 )
 
 # Create version config file
@@ -96,8 +99,6 @@ write_basic_package_version_file(
 )
 
 #================= Process Componets =======================
-# Find Qt package
-find_package(Qt6 REQUIRED COMPONENTS ${QT_FIND_COMPONENTS})
 
 # Build components
 foreach(component ${LIB_COMPONENTS})
