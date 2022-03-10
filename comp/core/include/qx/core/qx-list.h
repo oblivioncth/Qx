@@ -43,6 +43,7 @@ public:
     QList<T*> static_pointer_cast(const QList<F*> fromList)
     {
         QList<T*> toList;
+        toList.reserve(fromList.size());
         for(F* item : qAsConst(fromList))
             toList.append(static_cast<T*>(item));
 
