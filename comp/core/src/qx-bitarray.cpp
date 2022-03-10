@@ -45,13 +45,22 @@ BitArray::BitArray() : QBitArray() {}
 */
 BitArray::BitArray(int size, bool value) : QBitArray(size, value) {}
 
+//-Class Functions----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn template<typename T> requires std::integral<T> T static BitArray::fromInteger(const T& integer)
+ *
+ *  Converts the primitive @a integer to a bit array, with the resultant contents encoded in big-endian
+ *  format if a multibyte integer type is provided.
+ */
+
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:
 /*!
  *  @fn template<typename T> requires std::integral<T> T BitArray::toInteger()
  *
  *  Converts the contents of the bit array to an integer, with the contents interpreted as being in big-endian
- *  if a multibyte integer type is specified.
+ *  format if a multibyte integer type is specified.
  *
  *  If the specified integer type is not large enough to store the result, as many bits as possible will be
  *  used in the conversion instead.
