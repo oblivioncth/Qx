@@ -12,7 +12,7 @@ class Char
 //-Class Functions----------------------------------------------------------------------------------------------
 public:
     static bool isHexNumber(QChar hexNum);
-    static bool compare(QChar cOne, QChar cTwo, Qt::CaseSensitivity cs = Qt::CaseSensitive);
+    static int compare(QChar cOne, QChar cTwo, Qt::CaseSensitivity cs = Qt::CaseSensitive);
 };
 
 }
