@@ -11,10 +11,30 @@ namespace Qx
 // Char
 //===============================================================================================================
 
+/*!
+ *  @class Char
+ *
+ *  @brief The Char class is a collection of static functions pertaining to character types
+ */
+
 //-Class Functions-----------------------------------------------------------------------------------------------
 //Public:
+
+/*!
+ *  Returns true if @a hexNum consists only of numbers and letters A through F (case-insensitive);
+ *  otherwise returns false.
+ */
 bool Char::isHexNumber(QChar hexNum) { return RegularExpression::hexOnly.match(hexNum).hasMatch(); }
 
+/*!
+ *  Compares cOne with cTwo and returns an integer less than, equal to, or greater than zero if cOne is less than, equal to,
+ *  or greater than cTwo.
+ *
+ *  If cs is Qt::CaseSensitive, the comparison is case sensitive; otherwise the comparison is case insensitive.
+ *
+ *  Case sensitive comparison is based exclusively on the numeric Unicode values of the characters and is very fast,
+ *  but is not always what a human would expect.
+ */
 int Char::compare(QChar cOne, QChar cTwo, Qt::CaseSensitivity cs)
 {
     // Equalize case if case-insensitive
