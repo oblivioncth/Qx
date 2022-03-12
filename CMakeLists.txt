@@ -55,6 +55,7 @@ set(LIB_COMPONENTS
     io
     utility
     network
+    widgets
     xml
 )
 
