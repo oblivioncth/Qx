@@ -19,22 +19,6 @@ namespace Qx
 //Public:
 bool String::isOnlyNumbers(QString checkStr) { return RegularExpression::numbersOnly.match(checkStr).hasMatch() && !checkStr.isEmpty(); }
 
-bool String::isValidMmrb(QString version)
-{
-    // MMRB: Major.Minor.Revision.Build
-
-    QStringList segments = version.split('.');
-
-    if(segments.size() > 4)
-        return false;
-
-    for(const QString& segment : qAsConst(segments))
-        if(!isOnlyNumbers(segment))
-            return false;
-
-    return true;
-}
-
 bool String::isHexNumber(QString hexNum) { return RegularExpression::hexOnly.match(hexNum).hasMatch() && !hexNum.isEmpty(); }
 
 bool String::isValidChecksum(QString checksum, QCryptographicHash::Algorithm hashAlgorithm)

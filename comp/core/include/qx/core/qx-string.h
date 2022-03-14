@@ -16,7 +16,6 @@ class String
 //-Class Functions----------------------------------------------------------------------------------------------
 public:
     static bool isOnlyNumbers(QString checkStr);
-    static bool isValidMmrb(QString version);
     static bool isHexNumber(QString hexNum);
     static bool isValidChecksum(QString checksum, QCryptographicHash::Algorithm hashAlgorithm);
     static QString fromByteArrayDirectly(QByteArray data);
