@@ -13,8 +13,31 @@ namespace Qx
 // Json
 //===============================================================================================================
 
+/*!
+ *  @class Json
+ *
+ *  @brief The Json class is a collection of static functions pertaining to parsing JSON data
+ */
+
 //-Class Functions---------------------------------------------------------------------------------------------
 //Public:
+
+/*!
+ *  Safely retrieves the value associated with the specified key from the given JSON Object.
+ *
+ *  Before the value data is accessed a check is performed to ensure that the key actually exists and that the
+ *  type of the value matches the expected type. This precludes the need to perform these two steps independently
+ *  for every key/value pair parsed from a JSON Object.
+ *
+ *  @param[out] valueBuffer The return buffer for the retrieved value.
+ *  @param[in] jObject The JSON Object to retrieve a value from.
+ *  @param[in] key The key associated with the desired value.
+ *
+ *  If the key doesn't exist, or the type of that key's value is not the same as the return value buffer's type,
+ *  the returned error object will specify such; otherwise, an invalid error is returned.
+ *
+ *  @a valueBuffer is set to @c false in the event of an error.
+ */
 GenericError Json::checkedKeyRetrieval(bool& valueBuffer, QJsonObject jObject, QString key)
 {
     // Reset buffer
@@ -33,6 +56,11 @@ GenericError Json::checkedKeyRetrieval(bool& valueBuffer, QJsonObject jObject, Q
     return GenericError();
 }
 
+/*!
+ *  @overload
+ *
+ *  @a valueBuffer is set to zero in the event of an error.
+ */
 GenericError Json::checkedKeyRetrieval(double& valueBuffer, QJsonObject jObject, QString key)
 {
     // Reset buffer
@@ -51,6 +79,11 @@ GenericError Json::checkedKeyRetrieval(double& valueBuffer, QJsonObject jObject,
     return GenericError();
 }
 
+/*!
+ *  @overload
+ *
+ *  @a valueBuffer is set to a null string in the event of an error.
+ */
 GenericError Json::checkedKeyRetrieval(QString& valueBuffer, QJsonObject jObject, QString key)
 {
     // Reset buffer
@@ -69,6 +102,11 @@ GenericError Json::checkedKeyRetrieval(QString& valueBuffer, QJsonObject jObject
     return GenericError();
 }
 
+/*!
+ *  @overload
+ *
+ *  @a valueBuffer is set to an empty JSON array in the event of an error.
+ */
 GenericError Json:: checkedKeyRetrieval(QJsonArray& valueBuffer, QJsonObject jObject, QString key)
 {
     // Reset buffer
@@ -87,6 +125,12 @@ GenericError Json:: checkedKeyRetrieval(QJsonArray& valueBuffer, QJsonObject jOb
     return GenericError();
 }
 
+
+/*!
+ *  @overload
+ *
+ *  @a valueBuffer is set to an empty JSON object in the event of an error.
+ */
 GenericError Json::checkedKeyRetrieval(QJsonObject& valueBuffer, QJsonObject jObject, QString key)
 {
     // Reset buffer
