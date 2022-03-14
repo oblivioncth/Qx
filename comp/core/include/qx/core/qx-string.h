@@ -18,7 +18,6 @@ public:
     static bool isOnlyNumbers(QString checkStr);
     static bool isHexNumber(QString hexNum);
     static bool isValidChecksum(QString checksum, QCryptographicHash::Algorithm hashAlgorithm);
-    static QString fromByteArrayDirectly(QByteArray data);
     static QString formattedHex(QByteArray data, QChar separator, Endian::Endianness endianness);
     static QString stripToHexOnly(QString string);
 

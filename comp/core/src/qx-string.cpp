@@ -26,17 +26,6 @@ bool String::isValidChecksum(QString checksum, QCryptographicHash::Algorithm has
     return (checksum.length() == QCryptographicHash::hashLength(hashAlgorithm) * 2) && isHexNumber(checksum);
 }
 
-QString String::fromByteArrayDirectly(QByteArray data)
-{
-    // This function circumvents the copy/cast operator for QString that tries to enforce encoding and
-    // stops at termination characters (0x00)
-    QString directCopyConversion("");
-    for(int i = 0; i < data.length(); i++)
-        directCopyConversion.append(QChar(data.at(i)));
-
-    return directCopyConversion;
-}
-
 QString String::formattedHex(QByteArray data, QChar separator, Endian::Endianness endianness)
 {
     QString unseparated = data.toHex();
