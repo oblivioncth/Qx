@@ -21,13 +21,13 @@ namespace Qx
 //Public:
 
 /*!
- *  Returns true if @a hexNum consists only of numbers and letters A through F (case-insensitive);
+ *  Returns true if @a hexNum is a numeric digit, or a letter A through F (case-insensitive);
  *  otherwise returns false.
  */
 bool Char::isHexNumber(QChar hexNum) { return RegularExpression::hexOnly.match(hexNum).hasMatch(); }
 
 /*!
- *  Compares cOne with cTwo and returns an integer less than, equal to, or greater than zero if cOne is less than, equal to,
+ *  Compares cOne with cTwo and dreturns an integer less than, equal to, or greater than zero if cOne is less than, equal to,
  *  or greater than cTwo.
  *
  *  If cs is Qt::CaseSensitive, the comparison is case sensitive; otherwise the comparison is case insensitive.
