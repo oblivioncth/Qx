@@ -11,8 +11,7 @@
 #undef NOMINMAX
 
 // Extra-component Includes
-#include "qx/core/qx-mmrb.h"
-
+#include "qx/core/qx-versionnumber.h"
 
 namespace Qx
 {
@@ -168,9 +167,9 @@ private:
 
 //-Instance Members-------------------------------------------------------------------------------------------------
 private:
-    Mmrb mMetaStructVersion;
-    Mmrb mFileVersion;
-    Mmrb mProductVersion;
+    VersionNumber mMetaStructVersion;
+    VersionNumber mFileVersion;
+    VersionNumber mProductVersion;
     FileFlags mFileFlags = FF_NONE;
     TargetSystems mTargetSystems = TS_NONE;
     FileType mFileType = FT_NONE;
@@ -192,10 +191,10 @@ public:
     int stringTableCount();
     QList<QPair<QString, QString>> availableLangCodePages();
     bool hasLangCodePage(QString lanuage, QString codePage);
-    Mmrb metaStructVersion();
+    VersionNumber metaStructVersion();
 
-    Mmrb fileVersion();
-    Mmrb productVersion();
+    VersionNumber fileVersion();
+    VersionNumber productVersion();
     FileFlags fileFlags();
     TargetSystems targetSystems();
     FileType fileType();

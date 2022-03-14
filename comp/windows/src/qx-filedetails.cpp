@@ -21,10 +21,10 @@ bool FileDetails::isNull() { return mFileVersion.isNull() && mProductVersion.isN
 int FileDetails::stringTableCount() { return mStringTables.count(); }
 QList<QPair<QString, QString>> FileDetails::availableLangCodePages() { return mLangCodePageMap.keys(); }
 bool FileDetails::hasLangCodePage(QString lanuage, QString codePage) { return mLangCodePageMap.contains(qMakePair(lanuage.toUpper(), codePage.toUpper())); }
-Mmrb FileDetails::metaStructVersion() { return mMetaStructVersion; }
+VersionNumber FileDetails::metaStructVersion() { return mMetaStructVersion; }
 
-Mmrb FileDetails::fileVersion() { return mFileVersion; }
-Mmrb FileDetails::productVersion() { return mProductVersion; }
+VersionNumber FileDetails::fileVersion() { return mFileVersion; }
+VersionNumber FileDetails::productVersion() { return mProductVersion; }
 FileDetails::FileFlags FileDetails::fileFlags() { return mFileFlags; }
 FileDetails::TargetSystems FileDetails::targetSystems() { return mTargetSystems; }
 FileDetails::FileType FileDetails::fileType() { return mFileType; }
@@ -83,21 +83,20 @@ FileDetails readFileDetails(QString filePath)
                         if (fixedFileInfo->dwSignature == 0xfeef04bd)
                         {
                             // Get struct version
-                            workingFileDetails.mMetaStructVersion = Mmrb(fixedFileInfo->dwStrucVersion >> 16,
-                                                                         fixedFileInfo->dwStrucVersion & 0xFFFF,
-                                                                         0, 0);
+                            workingFileDetails.mMetaStructVersion = VersionNumber(fixedFileInfo->dwStrucVersion >> 16,
+                                                                                  fixedFileInfo->dwStrucVersion & 0xFFFF);
 
                             // Get file version
-                            workingFileDetails.mFileVersion = Mmrb(fixedFileInfo->dwFileVersionMS >> 16,
-                                                                   fixedFileInfo->dwFileVersionMS & 0xFFFF,
-                                                                   fixedFileInfo->dwFileVersionLS >> 16,
-                                                                   fixedFileInfo->dwFileVersionLS & 0xFFFF);
+                            workingFileDetails.mFileVersion = VersionNumber(fixedFileInfo->dwFileVersionMS >> 16,
+                                                                            fixedFileInfo->dwFileVersionMS & 0xFFFF,
+                                                                            fixedFileInfo->dwFileVersionLS >> 16,
+                                                                            fixedFileInfo->dwFileVersionLS & 0xFFFF);
 
                             // Get product version
-                            workingFileDetails.mProductVersion = Mmrb(fixedFileInfo->dwProductVersionMS >> 16,
-                                                                      fixedFileInfo->dwProductVersionMS & 0xFFFF,
-                                                                      fixedFileInfo->dwProductVersionLS >> 16,
-                                                                      fixedFileInfo->dwProductVersionLS & 0xFFFF);
+                            workingFileDetails.mProductVersion = VersionNumber(fixedFileInfo->dwProductVersionMS >> 16,
+                                                                               fixedFileInfo->dwProductVersionMS & 0xFFFF,
+                                                                               fixedFileInfo->dwProductVersionLS >> 16,
+                                                                               fixedFileInfo->dwProductVersionLS & 0xFFFF);
 
                             // Get file flags
                             DWORD trueFlags = fixedFileInfo->dwFileFlags & fixedFileInfo->dwFileFlagsMask;
