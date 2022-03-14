@@ -33,7 +33,7 @@ public:
         return conjuction;
     }
 
-    static QString join(QList<QString> set, QString separator = "", QString prefix = ""); // Overload for T = QString
+    static QString join(QList<QString> list, QString separator = "", QString prefix = ""); // Overload for T = QString
 
     template<typename T, typename F>
     static QString join(QSet<T> set, F&& toStringFunc, QString separator = "", QString prefix = "")
