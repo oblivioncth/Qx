@@ -4,8 +4,6 @@ set(COMPONENT_LIB_TYPE STATIC)
 
 ################# Common Build #################
 
-#--------- Edition Common -----------------------
-
 # Headers
 set(COMPONENT_INCLUDE_HEADERS
     qx-common-widgets.h
@@ -25,22 +23,9 @@ set(COMPONENT_IMPL
 # Links
 set(COMPONENT_PUBLIC_LINKS
     Qt6::Core
+    Qt6::Widgets
     Qx::Core
 )
-
-#--------- Edition Console -----------------------
-if(EDITION STREQUAL "console")
-
-endif()
-
-#--------- Edition Widgets -----------------------
-if(EDITION STREQUAL "widgets")
-    # Links
-    set(COMPONENT_PUBLIC_LINKS ${COMPONENT_PUBLIC_LINKS}
-        Qt6::Widgets
-        Qt6::Gui
-    )
-endif()
 
 #=============== Component Handler =======================
 include(component_lib_rules)
