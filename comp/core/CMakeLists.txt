@@ -21,7 +21,7 @@ set(COMPONENT_INCLUDE_HEADERS
     qx-iostream.h
     qx-json.h
     qx-list.h
-    qx-mmrb.h
+    qx-versionnumber.h
     qx-regularexpression.h
     qx-string.h
     qx-traverser.h
@@ -35,7 +35,7 @@ set(COMPONENT_IMPL
     qx-genericerror.cpp
     qx-integrity.cpp
     qx-json.cpp
-    qx-mmrb.cpp
+    qx-versionnumber.cpp
     qx-string.cpp
 )
 
