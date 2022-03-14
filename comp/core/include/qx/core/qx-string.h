@@ -5,9 +5,6 @@
 #include <QString>
 #include <QCryptographicHash>
 
-// Intra-component Includes
-#include "qx/core/qx-endian.h"
-
 namespace Qx
 {
 
@@ -18,7 +15,6 @@ public:
     static bool isOnlyNumbers(QString checkStr);
     static bool isHexNumber(QString hexNum);
     static bool isValidChecksum(QString checksum, QCryptographicHash::Algorithm hashAlgorithm);
-    static QString formattedHex(QByteArray data, QChar separator, Endian::Endianness endianness);
     static QString stripToHexOnly(QString string);
 
     template<typename T, typename F>
