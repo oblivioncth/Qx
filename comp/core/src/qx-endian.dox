@@ -1,0 +1,30 @@
+namespace Qx
+{
+//===============================================================================================================
+// Endian
+//===============================================================================================================
+
+/*!
+ *  @class Endian
+ *
+ *  @brief The Endian class contains members related to byte ordering.
+ */
+
+//-Class Types----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @enum Endian::Endianess
+ *
+ *  This enum is used to distinguish between little-endian byte ordering and big-endian byte ordering
+ */
+
+/*! \var Endian::Endianness Endian::LE
+ *
+ *  Represents little-endian byte ordering.
+ */
+
+/*! \var Endian::Endianness Endian::BE
+ *
+ *  Represents big-endian byte ordering.
+ */
+}
