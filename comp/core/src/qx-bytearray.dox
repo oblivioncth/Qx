@@ -13,7 +13,7 @@ namespace Qx
 //-Class Functions----------------------------------------------------------------------------------------------
 //Public:
 /*!
- *  @fn template<typename T> requires std::integral<T> static QByteArray fromPrimitive(T primitive, Endian::Endianness endianness = Endian::LE)
+ *  @fn template<typename T> requires std::integral<T> static QByteArray ByteArray::fromPrimitive(T primitive, Endian::Endianness endianness = Endian::LE)
  *
  *  Creates a byte array from @a primitive, using @a endianness byte-ordering if @a T requires multiple bytes to
  *  store.
@@ -27,7 +27,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> requires std::fundamental<T> static T toPrimitive(QByteArray ba, Endian::Endianness endianness = Endian::LE)
+ *  @fn template<typename T> requires std::fundamental<T> static T ByteArraytoPrimitive(QByteArray ba, Endian::Endianness endianness = Endian::LE)
  *
  *  Returns the raw binary data in @a ba reinterpreted as fundamental type @a T, according to the byte-order
  *  specified by @a endianness for multi-byte values.
