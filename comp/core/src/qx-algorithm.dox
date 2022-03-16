@@ -1,0 +1,109 @@
+namespace Qx
+{
+/*!
+ *  @fn template<typename T> requires std::integral<T> T lengthOfRange(T start, T end)
+ *
+ *  Computes the length of, or alternatively the number of element in, a range.
+ *
+ *  This is equivalent to: <tt>(end - start) + 1</tt>.
+ */
+
+/*!
+ *  @fn template<typename T> requires arithmetic<T> static bool isOdd(T num)
+ *
+ *  Returns true if @a num is odd; otherwise returns false.
+ */
+
+/*!
+ *  @fn template<typename T> requires arithmetic<T> static bool isEven(T num)
+ *
+ *  Returns true if @a num is even; otherwise returns false.
+ */
+
+/*!
+ *  @fn template <typename T> requires std::signed_integral<T> static T constrainedAdd(T a, T b, T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max())
+ *
+ *  Returns the result of adding signed integers @a a and @a b, bounded between @a min and @a max inclusive.
+ *
+ *  The default arguments of this function make it useful for performing addition that is safe from underflow and overflow.
+ */
+
+/*!
+ *  @fn template <typename T> requires std::unsigned_integral<T> static T constrainedAdd(T a, T b, T max = std::numeric_limits<T>::max())
+ *  Returns the result of adding unsigned integers @a a and @a b, bounded between 0 and @a max inclusive.
+ *
+ *  The default arguments of this function make it useful for performing addition that is safe from overflow.
+ */
+
+/*!
+ *  @fn template <typename T> requires std::signed_integral<T> static T constrainedSub(T a, T b, T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max())
+ *
+ *  Returns the result of subtracting signed integers @a a and @a b, bounded between @a min and @a max inclusive.
+ *
+ *  The default arguments of this function make it useful for performing subtraction that is safe from underflow and overflow.
+ */
+
+/*!
+ *  @fn template <typename T> requires std::unsigned_integral<T>static T constrainedSub(T a, T b, T min = 0)
+ *
+ *  Returns the result of subtracting unsigned integers @a a and @a b, bounded between @a min and @c "std::numeric_limits<T>::max()" inclusive.
+ *
+ *  The default arguments of this function make it useful for performing subtraction that is safe from underflow.
+ */
+
+/*!
+ *  @fn template<typename T> requires std::signed_integral<T> static T constrainedMult(T a, T b, T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max())
+ *
+ *  Returns the result of multiplying signed integers @a a and @a b, bounded between @a min and @a max inclusive.
+ *
+ *  The default arguments of this function make it useful for performing multiplication that is safe from underflow and overflow.
+ */
+
+/*!
+ *  @fn template<typename T> requires std::unsigned_integral<T> static T constrainedMult(T a, T b, T max = std::numeric_limits<T>::max())
+ *
+ *  Returns the result of multiplying unsigned integers @a a and @a b, bounded between 0 and @a max inclusive.
+ *
+ *  The default arguments of this function make it useful for performing multiplication that is safe from overflow.
+ */
+
+/*!
+ *  @fn template<typename T> requires std::signed_integral<T> static T constrainedDiv(T a, T b, T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max())
+ *
+ *  Returns the result of dividing signed integer @a a by signed integer @a b, bounded between @a min and @a max inclusive.
+ *
+ *  The default arguments of this function make it useful for performing division that is safe from underflow and overflow.
+ */
+
+/*!
+ *  @fn template<typename T> requires std::unsigned_integral<T> static T constrainedDiv(T a, T b, T max = std::numeric_limits<T>::max())
+ *
+ *  Returns the result of dividing unsigned integer @a a by signed integer @a b, bounded between 0 and @a max inclusive.
+ */
+
+/*!
+ *  @fn template<typename T> requires std::integral<T> static T roundToNearestMultiple(T num, T mult)
+ *
+ *  Returns the multiple of @a mult that @a num is closest to.
+ *
+ *  Negative values for @a mult are treated as their positive equivalent.
+ */
+
+/*!
+ *  @fn template <typename T> requires std::integral<T> static T ceilPowOfTwo(T num)
+ *
+ *  Returns the next (i.e. higher) power of two after @a num.
+ */
+
+/*!
+ *  @fn template <typename T> requires std::integral<T> static T floorPowOfTwo(T num)
+ *
+ *  Returns the previous (i.e. lower) power of two before @a num.
+ */
+
+/*!
+ *  @fn template <typename T> requires std::integral<T> static T roundPowOfTwo(T num)
+ *
+ *  Returns the power of two that is closest to @a num.
+ */
+}
