@@ -56,8 +56,8 @@ GenericError::GenericError(ErrorLevel errorLevel, QString primaryInfo, QString s
 bool GenericError::isValid() const { return !mPrimaryInfo.isEmpty(); }
 
 /*!
- *  \property GenericError::errorLevel
- *  \brief the generic error's error level.
+ *  @property GenericError::errorLevel
+ *  @brief the generic error's error level.
  *
  *  The error level denotes the severity of the rest of contained error information.
  *
@@ -80,8 +80,8 @@ QString GenericError::errorLevelString(bool caps) const
 }
 
 /*!
- *  \property GenericError::caption
- *  \brief the generic error's caption.
+ *  @property GenericError::caption
+ *  @brief the generic error's caption.
  *
  *  The caption is the heading of an error, often used to show the type of an error.
  *
@@ -90,8 +90,8 @@ QString GenericError::errorLevelString(bool caps) const
 QString GenericError::caption() const { return mCaption; }
 
 /*!
- *  \property GenericError::primaryInfo
- *  \brief the generic error's primary info.
+ *  @property GenericError::primaryInfo
+ *  @brief the generic error's primary info.
  *
  *  The primary info of a generic error holds the core error message.
  *
@@ -100,8 +100,8 @@ QString GenericError::caption() const { return mCaption; }
 QString GenericError::primaryInfo() const { return mPrimaryInfo; }
 
 /*!
- *  \property GenericError::secondaryInfo
- *  \brief the generic error's secondary info.
+ *  @property GenericError::secondaryInfo
+ *  @brief the generic error's secondary info.
  *
  *  The secondary info of a generic error usually explains why an error occured, or notes more specific error information
  *  if the error is a variant of a more error type.
@@ -111,8 +111,8 @@ QString GenericError::primaryInfo() const { return mPrimaryInfo; }
 QString GenericError::secondaryInfo() const { return mSecondaryInfo; }
 
 /*!
- *  \property GenericError::detailedInfo
- *  \brief the generic error's detailed info.
+ *  @property GenericError::detailedInfo
+ *  @brief the generic error's detailed info.
  *
  *  The detailed info of a generic error usually contains any remaining error information not otherwise shown in the
  *  primary info and secondary info, or complete error details that generally are not of interest to an application's
