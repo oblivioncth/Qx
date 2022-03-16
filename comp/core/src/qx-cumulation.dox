@@ -1,0 +1,41 @@
+namespace Qx
+{
+//===============================================================================================================
+// Cumulation
+//===============================================================================================================
+
+/*!
+ *  @class Cumulation
+ *
+ *  @brief The Cumulation class tracks the sum of multiple key-value components that can be change independently.
+ *
+ *  A cummulation is a collection of key-value pairs (where V is any arithmetic type) with which the sum of all
+ *  contained values is always known, and any invidual value can added, removed, or updated through its
+ *  corresponding key.
+ *
+ *  This is generally useful for keeping a running total, but when a previously added value may need to be
+ *  revised later, such as when tracking the overall progress of multiple downloads from a server using their
+ *  individual progress as components.
+ */
+
+//-Constructor----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ * @fn Cumulation::Cumulation()
+ *
+ * Creates an empty cumulation.
+ */
+
+//-Class Functions----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn void Cumulation::clear()
+ *
+ *  Removes all keys/values from the cumulation,
+ *
+ *  @note The exact resulting representation for floating-point types depends on the underlying system, but at
+ *  the moment is always the IEEE-754 standard as this library currently cannot be compiled on systems with
+ *  different floating-point implementations.
+ */
+
+}
