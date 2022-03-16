@@ -63,6 +63,24 @@ if(COMPONENT_INCLUDE_HEADERS)
     target_sources(${COMPONENT_TARGET_NAME} PRIVATE ${pathed_api_headers})
 endif()
 
+# Doc
+if(COMPONENT_DOC_ONLY)
+    # Build pathed include file list
+    foreach(doc ${COMPONENT_DOC_ONLY})
+        set(pathed_docs ${pathed_docs} "src/${doc}")
+    endforeach()
+
+    # Group include files with their parent directories stripped
+    source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src"
+        PREFIX "Doc Files"
+        FILES ${pathed_docs}
+    )
+
+    # Add include files as private target source so that they aren't built nor marked as a dependency,
+    # but are shown with the target in the IDE
+    target_sources(${COMPONENT_TARGET_NAME} PRIVATE ${pathed_docs})
+endif()
+
 # Links
 if(COMPONENT_PUBLIC_LINKS)
         target_link_libraries(${COMPONENT_TARGET_NAME} PUBLIC ${COMPONENT_PUBLIC_LINKS})
