@@ -280,13 +280,15 @@ public:
 
     T& operator*() { return mValue; }
 };
+//-Outer Class Definitions----------------------------------------------------------------------------------
 template<typename T>
     requires std::signed_integral<T>
-const Index<T> Index<T>::FIRST = Index<T>();
+const Index<T> Index<T>::FIRST = Index<T>(0);
 template<typename T>
     requires std::signed_integral<T>
 const Index<T> Index<T>::LAST = Index<T>(LastKey{});
 
+//-Outer Class Types----------------------------------------------------------------------------------------
 typedef Index<qint8> Index8;
 typedef Index<qint16> Index16;
 typedef Index<qint32> Index32;
