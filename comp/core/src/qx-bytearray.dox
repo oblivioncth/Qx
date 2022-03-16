@@ -1,0 +1,44 @@
+namespace Qx
+{
+//===============================================================================================================
+// ByteArray
+//===============================================================================================================
+
+/*!
+ *  @class ByteArray
+ *
+ *  @brief The ByteArray class is a collection of static functions pertaining to QByteArray.
+ */
+
+//-Class Functions----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn template<typename T> requires std::integral<T> static QByteArray fromPrimitive(T primitive, Endian::Endianness endianness = Endian::LE)
+ *
+ *  Creates a byte array from @a primitive, using @a endianness byte-ordering if @a T requires multiple bytes to
+ *  store.
+ *
+ *  In the case of <tt>T == bool</tt>, the resultant byte array is a single byte containing @c 0x01 or @c 0x00
+ *  for true and false respectively.
+ *
+ *  @note The exact resulting representation for floating-point types depends on the underlying system, but at
+ *  the moment is always the IEEE-754 standard as this library currently cannot be compiled on systems with
+ *  different floating-point implementations.
+ */
+
+/*!
+ *  @fn template<typename T> requires std::fundamental<T> static T toPrimitive(QByteArray ba, Endian::Endianness endianness = Endian::LE)
+ *
+ *  Returns the raw binary data in @a ba reinterpreted as fundamental type @a T, according to the byte-order
+ *  specified by @a endianness for multi-byte values.
+ *
+ *  If the requested type is not large enough to store the reinterpreted contents of @a ba, the conversion will
+ *  be performed on the first n-bytes that will fit instead.
+ *
+ *  @note The exact interpretation for floating-point types depends on the underlying system, but at the moment
+ *  is always the IEEE-754 standard as this library currently cannot be compiled on systems with different
+ *  floating-point implementations.
+ *
+ *  @warning The length of @a ba must be exactly 1, 2, 4, or 8, or there will be an assertion failure!.
+ */
+}
