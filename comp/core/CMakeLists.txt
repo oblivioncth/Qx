@@ -39,6 +39,21 @@ set(COMPONENT_IMPL
     qx-string.cpp
 )
 
+# Doc Only Files
+set(COMPONENT_DOC_ONLY
+    qx-freeindextracker.dox
+    qx-endian.dox
+    qx-regularexpression.dox
+    qx-bytearray.dox
+    qx-index.dox
+    qx-algorithm.dox
+    qx-iostream.dox
+    qx-list.dox
+    qx-traverser.dox
+    qx-cumulation.dox
+    qx-array.dox
+)
+
 # Links
 set(COMPONENT_PUBLIC_LINKS
     Qt6::Core

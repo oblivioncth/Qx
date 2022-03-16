@@ -22,6 +22,8 @@ template<typename T>
     requires arithmetic<T>
 static bool isEven(T num) { return !isOdd(num); }
 
+// Thanks to the following for all constrained arithmetic functions:
+// https://wiki.sei.cmu.edu/confluence/pages/viewpage.action?pageId=87152052
 template <typename T>
 	requires std::signed_integral<T>
 static T constrainedAdd(T a, T b, T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max())
