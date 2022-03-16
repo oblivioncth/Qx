@@ -26,23 +26,25 @@ public:
     {
         QByteArray rawBytes;
 
-        if(typeid(T) == typeid(bool))
-            rawBytes.append(static_cast<char>(static_cast<int>(primitive))); // Ensures true -> 0x01 and false -> 0x00
-        else
+        for(int i = 0; i != sizeof(T); ++i)
         {
-            for(int i = 0; i != sizeof(T); ++i)
-            {
-                #pragma warning( push )          // Disable "Unsafe mix of type 'bool' and 'int' warning because the
-                #pragma warning( disable : 4805) // function will never reach this point when bool is used
-                if(endianness == Endian::LE)
-                    rawBytes.append(static_cast<char>(((primitive & (0xFF << (i*8))) >> (i*8))));
-                else
-                    rawBytes.prepend(static_cast<char>(((primitive & (0xFF << (i*8))) >> (i*8))));
-                #pragma warning( pop )
-            }
+            #pragma warning( push )          // Disable "Unsafe mix of type 'bool' and 'int' warning because the
+            #pragma warning( disable : 4805) // function will never reach this point when bool is used
+            if(endianness == Endian::LE)
+                rawBytes.append(static_cast<char>(((primitive & (0xFF << (i*8))) >> (i*8))));
+            else
+                rawBytes.prepend(static_cast<char>(((primitive & (0xFF << (i*8))) >> (i*8))));
+            #pragma warning( pop )
         }
 
         return rawBytes;
+    }
+
+    template<>
+    inline QByteArray fromPrimitive<bool>(bool primitive, Endian::Endianness endianness)
+    {
+        // Ensures true -> 0x01 and false -> 0x00
+        return primitive ? QByteArray(1, '\x01') : QByteArray(1, '\x00');
     }
 
     template<typename T>
