@@ -13,7 +13,6 @@ set(COMPONENT_INCLUDE_HEADERS
     qx-char.h
     qx-cumulation.h
     qx-datetime.h
-    qx-endian.h
     qx-freeindextracker.h
     qx-genericerror.h
     qx-index.h
@@ -42,7 +41,6 @@ set(COMPONENT_IMPL
 # Doc Only Files
 set(COMPONENT_DOC_ONLY
     qx-freeindextracker.dox
-    qx-endian.dox
     qx-regularexpression.dox
     qx-bytearray.dox
     qx-index.dox

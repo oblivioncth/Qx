@@ -7,9 +7,6 @@
 // Qt Includes
 #include <QByteArray>
 
-// Intra-component Includes
-#include "qx/core/qx-endian.h"
-
 // Extra-component Includes
 #include "qx/utility/qx-concepts.h"
 
@@ -22,7 +19,7 @@ class ByteArray
 public:
     template<typename T>
         requires std::integral<T>
-    static QByteArray fromPrimitive(T primitive, Endian::Endianness endianness = Endian::LE)
+    static QByteArray fromPrimitive(T primitive, QSysInfo::Endian endianness = QSysInfo::ByteOrder)
     {
         QByteArray rawBytes;
 
@@ -30,7 +27,7 @@ public:
         {
             #pragma warning( push )          // Disable "Unsafe mix of type 'bool' and 'int' warning because the
             #pragma warning( disable : 4805) // function will never reach this point when bool is used
-            if(endianness == Endian::LE)
+            if(endianness == QSysInfo::LittleEndian)
                 rawBytes.append(static_cast<char>(((primitive & (0xFF << (i*8))) >> (i*8))));
             else
                 rawBytes.prepend(static_cast<char>(((primitive & (0xFF << (i*8))) >> (i*8))));
@@ -41,7 +38,7 @@ public:
     }
 
     template<>
-    inline QByteArray fromPrimitive<bool>(bool primitive, Endian::Endianness endianness)
+    inline QByteArray fromPrimitive<bool>(bool primitive, QSysInfo::Endian endianness)
     {
         // Ensures true -> 0x01 and false -> 0x00
         return primitive ? QByteArray(1, '\x01') : QByteArray(1, '\x00');
@@ -49,7 +46,7 @@ public:
 
     template<typename T>
         requires std::floating_point<T>
-    static QByteArray fromPrimitive(T primitive, Endian::Endianness endianness = Endian::LE)
+    static QByteArray fromPrimitive(T primitive, QSysInfo::Endian endianness = QSysInfo::ByteOrder)
     {
         QByteArray rawBytes;
 
@@ -60,7 +57,7 @@ public:
 
             for(uint8_t i = 0; i != sizeof(float); ++i)
             {
-                if(endianness == Endian::LE)
+                if(endianness == QSysInfo::LittleEndian)
                     rawBytes.append(static_cast<char>(((intStandIn & (0xFF << (i*8))) >> (i*8))));
                 else
                     rawBytes.prepend(static_cast<char>(((intStandIn & (0xFF << (i*8))) >> (i*8))));
@@ -74,7 +71,7 @@ public:
 
             for(uint8_t i = 0; i != sizeof(double); ++i)
             {
-                if(endianness == Endian::LE)
+                if(endianness == QSysInfo::LittleEndian)
                     rawBytes.append(static_cast<char>(((intStandIn & (0xFF << (i*8))) >> (i*8))));
                 else
                     rawBytes.prepend(static_cast<char>(((intStandIn & (0xFF << (i*8))) >> (i*8))));
@@ -86,7 +83,7 @@ public:
 
     template<typename T>
         requires fundamental<T>
-    static T toPrimitive(QByteArray ba, Endian::Endianness endianness = Endian::LE)
+    static T toPrimitive(QByteArray ba, QSysInfo::Endian endianness = QSysInfo::ByteOrder)
     {
         static_assert(std::numeric_limits<float>::is_iec559, "Only supports IEC 559 (IEEE 754) float"); // For floats
         assert((ba.size() >= 2 && ba.size() <= 8 && isEven(ba.size())) || ba.size() == 1);
@@ -95,9 +92,9 @@ public:
         {
             quint8 temp;
 
-            if(endianness == Endian::BE)
+            if(endianness == QSysInfo::BigEndian)
                  temp = qFromBigEndian<quint8>(ba);
-            else if(endianness == Endian::LE)
+            else if(endianness == QSysInfo::LittleEndian)
                  temp = qFromLittleEndian<quint8>(ba);
 
             T* out = reinterpret_cast<T*>(&temp);
@@ -107,9 +104,9 @@ public:
         {
             quint16 temp;
 
-            if(endianness == Endian::BE)
+            if(endianness == QSysInfo::BigEndian)
                  temp = qFromBigEndian<quint16>(ba);
-            else if(endianness == Endian::LE)
+            else if(endianness == QSysInfo::LittleEndian)
                  temp = qFromLittleEndian<quint16>(ba);
 
             T* out = reinterpret_cast<T*>(&temp);
@@ -119,9 +116,9 @@ public:
         {
             quint32 temp;
 
-            if(endianness ==Endian::BE)
+            if(endianness ==QSysInfo::BigEndian)
                  temp = qFromBigEndian<quint32>(ba);
-            else if(endianness == Endian::LE)
+            else if(endianness == QSysInfo::LittleEndian)
                  temp = qFromLittleEndian<quint32>(ba);
 
             T* out = reinterpret_cast<T*>(&temp);
@@ -131,9 +128,9 @@ public:
         {
             quint64 temp;
 
-            if(endianness == Endian::BE)
+            if(endianness == QSysInfo::BigEndian)
                  temp = qFromBigEndian<quint64>(ba);
-            else if(endianness == Endian::LE)
+            else if(endianness == QSysInfo::LittleEndian)
                  temp = qFromLittleEndian<quint64>(ba);
 
             T* out = reinterpret_cast<T*>(&temp);

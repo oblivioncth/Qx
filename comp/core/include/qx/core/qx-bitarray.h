@@ -4,9 +4,6 @@
 // Qt Includes
 #include <QBitArray>
 
-// Intra-component Includes
-#include "qx/core/qx-endian.h"
-
 namespace Qx
 {
 	
@@ -49,7 +46,7 @@ public:
         return integer;
     }
 
-    QByteArray toByteArray(Endian::Endianness endianness = Endian::BE);
+    QByteArray toByteArray(QSysInfo::Endian endianness = QSysInfo::BigEndian);
 
     void append(bool bit = false);
     void replace(const BitArray& bits, int start = 0, int length = -1);

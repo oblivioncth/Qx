@@ -73,16 +73,16 @@ BitArray::BitArray(int size, bool value) : QBitArray(size, value) {}
  *  Constructs and returns a QByteArray using the contents of the bit array and @a endianness.
  *
  *  Each group of 8 bits within the bit array are converted to the equivalent byte in order starting from index
- *  position 0 and inserted into the returned byte array in the same order if @a endianness equals Endian::BE,
- *  or the reverse order if @a endianness equals Endian::LE.
+ *  position 0 and inserted into the returned byte array in the same order if @a endianness equals
+ *  QSysInfo::BigEndian, or the reverse order if @a endianness equals QSysInfo::LittleEndian.
  *
  *  If the bit array's length is not evenly divisible by 8, the conversion is performed as if the end of
  *  the array was padded with zeroes until it would be.
  *
  *  @warning The accuracy of the provided @a endianness relies on the contents of the bit array being in
- *  big-endian order, since using Endian::LE simply reverses the resultant byte array's byte order.
+ *  big-endian order, since using QSysInfo::LittleEndian simply reverses the resultant byte array's byte order.
 */
-QByteArray BitArray::toByteArray(Endian::Endianness endianness)
+QByteArray BitArray::toByteArray(QSysInfo::Endian endianness)
 {
     // Byte array
     QByteArray ba(std::ceil(count()/8.0), 0);
@@ -95,7 +95,7 @@ QByteArray BitArray::toByteArray(Endian::Endianness endianness)
         for(int bit = 0; bit < 8 && bitIdx < count(); ++bit, ++bitIdx)
             val |= ((testBit(bit + byte * 8) ? 0b1 : 0b0) << bit);
 
-        int byteIdx = endianness == Endian::BE ? byte : (ba.count() - 1) - byte;
+        int byteIdx = endianness == QSysInfo::BigEndian ? byte : (ba.count() - 1) - byte;
         ba.replace(byteIdx, 1, &val, 1);
     }
 
