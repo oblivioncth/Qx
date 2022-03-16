@@ -4,6 +4,9 @@
 // Qt Includes
 #include <QHash>
 
+// Extra-component Includes
+#include "qx/utility/qx-concepts.h"
+
 namespace Qx
 {
 	
@@ -25,6 +28,7 @@ public:
     }
 
     template<typename T, int N>
+        requires arithmetic<T>
     static T maxOf(T(&array) [N])
     {
        T max = array[0];
@@ -37,6 +41,7 @@ public:
     }
 
     template<typename T, int N>
+        requires arithmetic<T>
     static T minOf(T(&array) [N])
     {
         T min = array[0];
