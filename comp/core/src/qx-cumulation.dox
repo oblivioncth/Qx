@@ -7,7 +7,8 @@ namespace Qx
 /*!
  *  @class Cumulation
  *
- *  @brief The Cumulation class tracks the sum of multiple key-value components that can be change independently.
+ *  @brief The Cumulation template class tracks the sum of multiple key-value components that can be change
+ *  independently.
  *
  *  A cummulation is a collection of key-value pairs (where V is any arithmetic type) with which the sum of all
  *  contained values is always known, and any invidual value can added, removed, or updated through its
@@ -21,21 +22,49 @@ namespace Qx
 //-Constructor----------------------------------------------------------------------------------------------
 //Public:
 /*!
- * @fn Cumulation::Cumulation()
+ * @fn Cumulation<K, V>::Cumulation()
  *
- * Creates an empty cumulation.
+ *  Creates an empty cumulation with a total of zero.
  */
 
 //-Class Functions----------------------------------------------------------------------------------------------
 //Public:
 /*!
- *  @fn void Cumulation::clear()
+ *  @fn void Cumulation<K, V>::clear()
  *
- *  Removes all keys/values from the cumulation,
+ *  Removes all keys/values from the cumulation, resulting in a total of zero.
+ */
+
+/*!
+ *  @fn void Cumulation<K, V>::remove(K component)
  *
- *  @note The exact resulting representation for floating-point types depends on the underlying system, but at
- *  the moment is always the IEEE-754 standard as this library currently cannot be compiled on systems with
- *  different floating-point implementations.
+ *  Removes the value associated with the key @a component from the cumulation.
+ */
+
+/*!
+ *  @fn void Cumulation<K, V>::setValue(K component, V value)
+ *
+ *  Sets the value of @a component to @a value. The component will be added to the cumulation if it did not
+ *  already contain it.
+ */
+
+/*!
+ *  @fn bool Cumulation<K, V>::contains(K component)
+ *
+ *  Returns @c true if the cumulation contains a value associated with the key @a component; otherwise returns
+ *  @c false.
+ */
+
+/*!
+ *  @fn V Cumulation<K, V>::value(K component)
+ *
+ *  Returns the value of @a component.
+ */
+
+/*!
+ *  @fn V Cumulation<K, V>::total()
+ *
+ *  Returns the current total of the cumulation, which is the sum of all its component values.
  */
 
 }
