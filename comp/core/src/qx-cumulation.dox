@@ -10,8 +10,8 @@ namespace Qx
  *  @brief The Cumulation template class tracks the sum of multiple key-value components that can be change
  *  independently.
  *
- *  A cummulation is a collection of key-value pairs (where V is any arithmetic type) with which the sum of all
- *  contained values is always known, and any invidual value can added, removed, or updated through its
+ *  A cumulation is a collection of key-value pairs (where V is any arithmetic type) with which the sum of all
+ *  contained values is always known, and any individual value can added, removed, or updated through its
  *  corresponding key.
  *
  *  This is generally useful for keeping a running total, but when a previously added value may need to be
@@ -22,7 +22,7 @@ namespace Qx
 //-Constructor----------------------------------------------------------------------------------------------
 //Public:
 /*!
- * @fn Cumulation<K, V>::Cumulation()
+ * @fn template <typename K, typename V> Cumulation<K, V>::Cumulation()
  *
  *  Creates an empty cumulation with a total of zero.
  */
@@ -30,39 +30,39 @@ namespace Qx
 //-Class Functions----------------------------------------------------------------------------------------------
 //Public:
 /*!
- *  @fn void Cumulation<K, V>::clear()
+ *  @fn template <typename K, typename V> void Cumulation<K, V>::clear()
  *
  *  Removes all keys/values from the cumulation, resulting in a total of zero.
  */
 
 /*!
- *  @fn void Cumulation<K, V>::remove(K component)
+ *  @fn template <typename K, typename V> void Cumulation<K, V>::remove(K component)
  *
  *  Removes the value associated with the key @a component from the cumulation.
  */
 
 /*!
- *  @fn void Cumulation<K, V>::setValue(K component, V value)
+ *  @fn template <typename K, typename V> void Cumulation<K, V>::setValue(K component, V value)
  *
  *  Sets the value of @a component to @a value. The component will be added to the cumulation if it did not
  *  already contain it.
  */
 
 /*!
- *  @fn bool Cumulation<K, V>::contains(K component)
+ *  @fn template <typename K, typename V> bool Cumulation<K, V>::contains(K component)
  *
  *  Returns @c true if the cumulation contains a value associated with the key @a component; otherwise returns
  *  @c false.
  */
 
 /*!
- *  @fn V Cumulation<K, V>::value(K component)
+ *  @fn template <typename K, typename V> V Cumulation<K, V>::value(K component)
  *
  *  Returns the value of @a component.
  */
 
 /*!
- *  @fn V Cumulation<K, V>::total()
+ *  @fn template <typename K, typename V> V Cumulation<K, V>::total()
  *
  *  Returns the current total of the cumulation, which is the sum of all its component values.
  */
