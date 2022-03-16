@@ -48,9 +48,9 @@ public:
         mComponents[component] = value;
     }
 
-    bool contains(K component) { return mComponents.contains(component); }
-    V value(K component) { return mComponents.value(component); }
-    V total() { return mTotal; }
+    bool contains(K component) const { return mComponents.contains(component); }
+    V value(K component) const { return mComponents.value(component); }
+    V total() const { return mTotal; }
 };	
 
 }

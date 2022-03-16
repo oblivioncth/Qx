@@ -49,20 +49,20 @@ namespace Qx
  */
 
 /*!
- *  @fn template <typename K, typename V> bool Cumulation<K, V>::contains(K component)
+ *  @fn template <typename K, typename V> bool Cumulation<K, V>::contains(K component) const
  *
  *  Returns @c true if the cumulation contains a value associated with the key @a component; otherwise returns
  *  @c false.
  */
 
 /*!
- *  @fn template <typename K, typename V> V Cumulation<K, V>::value(K component)
+ *  @fn template <typename K, typename V> V Cumulation<K, V>::value(K component) const
  *
  *  Returns the value of @a component.
  */
 
 /*!
- *  @fn template <typename K, typename V> V Cumulation<K, V>::total()
+ *  @fn template <typename K, typename V> V Cumulation<K, V>::total() const
  *
  *  Returns the current total of the cumulation, which is the sum of all its component values.
  */
