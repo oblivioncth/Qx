@@ -29,7 +29,7 @@ namespace Qx
  *
  *  Creates a bit array from @a integer. Multibyte integers are stored in big-endian order.
  *
- *  @snippet qx/core/bitarray.cpp 0
+ *  @snippet qx/core/qx-bitarray.cpp 0
  */
 
 //-Constructor--------------------------------------------------------------------------------------------------

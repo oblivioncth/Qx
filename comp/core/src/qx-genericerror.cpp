@@ -16,7 +16,7 @@ namespace Qx
  *  This class holds no association with any particular procedure, operation, or state, instead being used to
  *  store and pass the status and/or outcome of any such task in a straightforward and generic way.
  *
- *  @snippet qx/core/genericerror.cpp 0
+ *  @snippet qx/core/qx-genericerror.cpp 0
  */
 
 //-Class Variables-----------------------------------------------------------------------------------------------
@@ -138,7 +138,7 @@ GenericError& GenericError::setDetailedInfo(QString detailedInfo) { mDetailedInf
  *
  *  @sa postError()
  *
- *  @snippet qx/core/genericerror.cpp 1
+ *  @snippet qx/core/qx-genericerror.cpp 1
  */
 QTextStream& operator<<(QTextStream& ts, const GenericError& ge)
 {
