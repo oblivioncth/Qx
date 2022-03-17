@@ -1,0 +1,22 @@
+namespace Qx
+{
+//===============================================================================================================
+// RegularExpression
+//===============================================================================================================
+
+/*!
+ *  @class RegularExpression
+ *
+ *  @brief The RegularExpression class is a collection of convenient regular expression statements.
+ */
+
+//-Class Functions----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @var QRegularExpression RegularExpression::HEX_ONLY
+ *
+ *  Matches text that only contains valid hexadecimal characters (case-insensitive).
+ */
+
+
+}

@@ -24,7 +24,7 @@ namespace Qx
  *  Returns @c true if @a hexNum is a numeric digit, or a letter A through F (case-insensitive);
  *  otherwise returns @c false.
  */
-bool Char::isHexNumber(QChar hexNum) { return RegularExpression::hexOnly.match(hexNum).hasMatch(); }
+bool Char::isHexNumber(QChar hexNum) { return RegularExpression::HEX_ONLY.match(hexNum).hasMatch(); }
 
 /*!
  *  Compares cOne with cTwo and dreturns an integer less than, equal to, or greater than zero if cOne is less than, equal to,

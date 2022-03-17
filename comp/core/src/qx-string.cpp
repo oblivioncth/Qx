@@ -26,13 +26,13 @@ namespace Qx
 /*!
  *  Returns @c true if @a checkStr consists only of numbers; otherwise returns @c false.
  */
-bool String::isOnlyNumbers(QString checkStr) { return RegularExpression::numbersOnly.match(checkStr).hasMatch() && !checkStr.isEmpty(); }
+bool String::isOnlyNumbers(QString checkStr) { return RegularExpression::NUMBERS_ONLY.match(checkStr).hasMatch() && !checkStr.isEmpty(); }
 
 /*!
  *  Returns @c true if @a hexNum consists only of numbers and letters A through F (case-insensitive);
  *  otherwise returns @c false.
  */
-bool String::isHexNumber(QString hexNum) { return RegularExpression::hexOnly.match(hexNum).hasMatch() && !hexNum.isEmpty(); }
+bool String::isHexNumber(QString hexNum) { return RegularExpression::HEX_ONLY.match(hexNum).hasMatch() && !hexNum.isEmpty(); }
 
 /*!
  *  Returns @c true if @a checksum consists only of valid hexadecimal characters and is the exact length required for a hexadecimal
@@ -46,7 +46,7 @@ bool String::isValidChecksum(QString checksum, QCryptographicHash::Algorithm has
 /*!
  *  Returns a copy of @a string with all non-hexadecimal characters removed.
  */
-QString String::stripToHexOnly(QString string) { return string.replace(RegularExpression::anyNonHex, ""); }
+QString String::stripToHexOnly(QString string) { return string.replace(RegularExpression::ANY_NON_HEX, ""); }
 
 /*!
  *  @fn template<typename T, typename F> static QString String::join(QList<T> list, F&& toStringFunc, QString separator = "", QString prefix = "")

@@ -11,11 +11,11 @@ class RegularExpression
 {
 //-Class Variables---------------------------------------------------------------------------------------------
 public:
-    static inline const QRegularExpression hexOnly =  QRegularExpression("^[0-9A-F]+$", QRegularExpression::CaseInsensitiveOption);
-    static inline const QRegularExpression anyNonHex = QRegularExpression("[^a-fA-F0-9 -]", QRegularExpression::CaseInsensitiveOption);
-    static inline const QRegularExpression numbersOnly = QRegularExpression("^[0-9]*$", QRegularExpression::CaseInsensitiveOption); // a digit (\d)
-    static inline const QRegularExpression alphanumericOnly = QRegularExpression("^[a-zA-Z0-9]*$", QRegularExpression::CaseInsensitiveOption);
-    static inline const QRegularExpression lettersOnly = QRegularExpression("^[a-zA-Z]+$", QRegularExpression::CaseInsensitiveOption);
+    static inline const QRegularExpression HEX_ONLY =  QRegularExpression("^[0-9A-F]+$", QRegularExpression::CaseInsensitiveOption);
+    static inline const QRegularExpression ANY_NON_HEX = QRegularExpression("[^a-fA-F0-9 -]", QRegularExpression::CaseInsensitiveOption);
+    static inline const QRegularExpression NUMBERS_ONLY = QRegularExpression("^[0-9]*$", QRegularExpression::CaseInsensitiveOption); // a digit (\d)
+    static inline const QRegularExpression ALPHANUMERIC_ONLY = QRegularExpression("^[a-zA-Z0-9]*$", QRegularExpression::CaseInsensitiveOption);
+    static inline const QRegularExpression LETTERS_ONLY = QRegularExpression("^[a-zA-Z]+$", QRegularExpression::CaseInsensitiveOption);
 };
 
 }
