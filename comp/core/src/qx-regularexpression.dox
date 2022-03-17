@@ -18,5 +18,27 @@ namespace Qx
  *  Matches text that only contains valid hexadecimal characters (case-insensitive).
  */
 
+/*!
+ *  @var QRegularExpression RegularExpression::ANY_NON_HEX
+ *
+ *  Matches text that contains at least a single non-hexadecimal character.
+ */
 
+/*!
+ *  @var QRegularExpression RegularExpression::NUMBERS_ONLY
+ *
+ *  Matches text that only contains numeric characters.
+ */
+
+/*!
+ *  @var QRegularExpression RegularExpression::ALPHANUMERIC_ONLY
+ *
+ *  Matches text that only contains Latin letters and numeric characters.
+ */
+
+/*!
+ *  @var QRegularExpression RegularExpression::LETTERS_ONLY
+ *
+ *  Matches text that only contains Latin letters.
+ */
 }
