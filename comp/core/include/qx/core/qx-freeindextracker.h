@@ -22,27 +22,27 @@ private:
 
 //-Constructor---------------------------------------------------------------------------------------------------
 public:
-    FreeIndexTracker(T minIndex = 0, T maxIndex = 0, QSet<T> reservedIndicies = QSet<T>()) :
+    FreeIndexTracker(T minIndex = 0, T maxIndex = 0, QSet<T> reservedIndices = QSet<T>()) :
         mMinIndex(minIndex),
         mMaxIndex(maxIndex),
-        mReservedIndicies(reservedIndicies)
+        mReservedIndicies(reservedIndices)
     {
         // Determine programmatic limit if "type max" (-1) is specified
         if(maxIndex < 0)
             mMaxIndex = std::numeric_limits<T>::max();
 
         // Insure initial values are valid
-        assert(mMinIndex >= 0 && mMinIndex <= mMaxIndex && (reservedIndicies.isEmpty() ||
-               (*std::min_element(reservedIndicies.begin(), reservedIndicies.end())) >= 0));
+        assert(mMinIndex >= 0 && mMinIndex <= mMaxIndex && (reservedIndices.isEmpty() ||
+               (*std::min_element(reservedIndices.begin(), reservedIndices.end())) >= 0));
 
         // Change bounds to match initial reserve list if they are mismatched
-        if(!reservedIndicies.isEmpty())
+        if(!reservedIndices.isEmpty())
         {
-            T minElement = *std::min_element(reservedIndicies.begin(), reservedIndicies.end());
+            T minElement = *std::min_element(reservedIndices.begin(), reservedIndices.end());
             if(minElement < minIndex)
                 mMinIndex = minElement;
 
-            T maxElement = *std::max_element(reservedIndicies.begin(), reservedIndicies.end());
+            T maxElement = *std::max_element(reservedIndices.begin(), reservedIndices.end());
             if(maxElement > mMaxIndex)
                 mMaxIndex = maxElement;
         }
@@ -85,11 +85,11 @@ private:
     }
 
 public:
-    bool isReserved(T index) { return mReservedIndicies.contains(index); }
-    T minimum() { return mMinIndex; }
-    T maximum() { return mMaxIndex; }
+    bool isReserved(T index) const { return mReservedIndicies.contains(index); }
+    T minimum() const { return mMinIndex; }
+    T maximum() const { return mMaxIndex; }
 
-    T firstReserved()
+    T firstReserved() const
     {
         if(!mReservedIndicies.isEmpty())
             return (*std::min_element(mReservedIndicies.begin(), mReservedIndicies.end()));
@@ -97,7 +97,7 @@ public:
             return -1;
     }
 
-    T lastReserved()
+    T lastReserved() const
     {
         if(!mReservedIndicies.isEmpty())
             return (*std::max_element(mReservedIndicies.begin(), mReservedIndicies.end()));
@@ -105,7 +105,7 @@ public:
             return -1;
     }
 
-    T firstFree()
+    T firstFree() const
     {
         // Quick check for all reserved
         if(mReservedIndicies.count() == lengthOfRange(mMinIndex, mMaxIndex))
@@ -120,7 +120,7 @@ public:
         return -1;
     }
 
-    T lastFree()
+    T lastFree() const
     {
         // Quick check for all reserved
         if(mReservedIndicies.count() == lengthOfRange(mMinIndex, mMaxIndex))
