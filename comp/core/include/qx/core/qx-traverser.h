@@ -58,18 +58,18 @@ public:
         }
     }
 
-    bool atEnd() { return mIterator == mEnd; }
+    bool atEnd() const { return mIterator == mEnd; }
 
-    std::iter_value_t<typename T::const_iterator> currentValue() { return *mIterator; }
-    quint32 currentIndex() { return mIndex; }
+    std::iter_value_t<typename T::const_iterator> currentValue() const { return *mIterator; }
+    quint32 currentIndex() const { return mIndex; }
 
-    std::iter_value_t<typename T::const_iterator> lookAhead(quint32 count = 1)
+    std::iter_value_t<typename T::const_iterator> lookAhead(quint32 count = 1) const
     {
         // Return default constructed object if over end, otherwise return target
         return (mIndex + count > mLastIndex) ? std::iter_value_t<T>() : *(mIterator + count);
     }
 
-    std::iter_value_t<typename T::const_iterator> lookBehind(quint32 count = 1)
+    std::iter_value_t<typename T::const_iterator> lookBehind(quint32 count = 1) const
     {
         // Return default constructed object if before start, otherwise return target
         return (mIndex - count < mLastIndex) ? std::iter_value_t<T>() : *(mIterator - count);
