@@ -14,11 +14,6 @@ template<typename T>
     requires std::integral<T>
 class FreeIndexTracker
 {
-//-Class Members-------------------------------------------------------------------------------------------------
-public:
-    static const int ABSOLUTE_MIN = 0;
-    static const int TYPE_MAX = -1;
-
 //-Instance Members----------------------------------------------------------------------------------------------
 private:
     T mMinIndex;
