@@ -65,7 +65,7 @@ public:
 
     /* Static casts in operators here make sure that in cases where the non-index operand is unsigned it is
      * always the value of the Index that is converted to an unsigned integer instead of the other operand
-     * being converted to a signed integer. This is safe to do since mValue is guarenteed to never be less
+     * being converted to a signed integer. This is safe to do since mValue is guaranteed to never be less
      * than zero. In cases where the other operand is already an unsigned int, the static_cast should
      * be optimized to a no-op, causing no overhead, with pretty much every compiler
      */
@@ -255,7 +255,7 @@ public:
 
     Index& operator++()
     {
-        if(mType != Type::End && mValue != std::numeric_limits<T>::max())
+        if(mType == Type::Value && mValue != std::numeric_limits<T>::max())
             ++mValue;
         return *this;
     }
@@ -267,7 +267,7 @@ public:
     }
     Index& operator--()
     {
-        if(!mType != Type::End && mValue != 0)
+        if(!mType == Type::Value && mValue != 0)
             --mValue;
         return *this;
     }
