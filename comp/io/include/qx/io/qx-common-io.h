@@ -42,7 +42,7 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(ReadOptions)
 
 //-Namespace Variables-------------------------------------------------------------------------------------------------
 const QChar ENDL = '\n'; //Auto cross platform thanks to QIODevice::OpenMode Text
-const QString LIST_ITM_PRFX = "- ";
+const QString LIST_ITEM_PREFIX = "- ";
 
 //-Namespace Functions-------------------------------------------------------------------------------------------------
 bool fileIsEmpty(const QFile& file);

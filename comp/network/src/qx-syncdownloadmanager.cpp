@@ -353,7 +353,7 @@ void SyncDownloadManager::sslErrorHandler(QNetworkReply* reply, const QList<QSsl
 {
     // Create error message
     GenericError errMsg(GenericError::Warning, SSL_ERR.arg(reply->url().toString()), CONTINUE_QUES,
-                        String::join(errors, [](const QSslError& err){ return err.errorString(); }, ENDL, LIST_ITM_PRFX));
+                        String::join(errors, [](const QSslError& err){ return err.errorString(); }, ENDL, LIST_ITEM_PREFIX));
 
     // Signal result
     bool abortDownload = true;
