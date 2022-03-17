@@ -4,6 +4,7 @@
 // Standard Library Includes
 #include <utility>
 #include <iterator>
+#include <type_traits>
 
 namespace Qx
 {
@@ -480,6 +481,7 @@ concept fundamental = std::is_fundamental_v<K>;
 
 template<class K>
 concept traverseable = std::bidirectional_iterator<typename K::const_iterator> &&
+                       std::is_default_constructible_v<K> &&
                        requires(K klass) {{ klass.size() } -> std::integral<>;};
 
 // Conversion
