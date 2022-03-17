@@ -1,0 +1,21 @@
+namespace Qx
+{
+//-Namespace Members--------------------------------------------------------------------------------------------
+/*!
+ *  @var QTextStream cout
+ *
+ *  QTextStream equivalent of std::cout.
+ */
+
+/*!
+ *  @var QTextStream cerr
+ *
+ *  QTextStream equivalent of std::cerr.
+ */
+
+/*!
+ *  @var QTextStream cin
+ *
+ *  QTextStream equivalent of std::cin.
+ */
+}
