@@ -11,7 +11,7 @@ class Color
 {
 //-Class Functions----------------------------------------------------------------------------------------------
 public:
-    static QColor textColorFromBackgroundColor(QColor bgColor);
+    static QColor textFromBackground(QColor bgColor);
 };
 
 }

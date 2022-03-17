@@ -10,7 +10,7 @@ namespace Qx
 
 //-Class Functions-----------------------------------------------------------------------------------------------
 //Public:
-QColor Color::textColorFromBackgroundColor(QColor bgColor)
+QColor Color::textFromBackground(QColor bgColor)
 {
     // Based on W3 recommendations, using black & white text
     // See: https://www.w3.org/TR/WCAG20/ and https://www.w3.org/TR/WCAG20/#relativeluminancedef
