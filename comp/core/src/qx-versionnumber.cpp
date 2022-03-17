@@ -88,7 +88,7 @@ int VersionNumber::nanoVersion() { return segmentAt(3); }
  *  If @a min is greater than 0, at least that many segments, up to segmentCount(), are kept in the resultant
  *  version number, even if some of them are trailing zeros.
  *
- *  @snippet qx/core/versionnumber.cpp 0
+ *  @snippet versionnumber.cpp 0
  */
 VersionNumber VersionNumber::normalized(int min)
 {
