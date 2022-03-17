@@ -10,7 +10,7 @@
 namespace Qx
 {
 
-class GenericError //TODO - Have Qx functions that use this class return "default" error levels instead of undefined ones (document them once documentation starts
+class GenericError
 {
 //-Class Enums-----------------------------------------------------------------------------------------------
 public:
