@@ -11,13 +11,13 @@ namespace Qx
 /*!
  *  @fn template<typename T> requires arithmetic<T> static bool isOdd(T num)
  *
- *  Returns true if @a num is odd; otherwise returns false.
+ *  Returns @c true if @a num is odd; otherwise returns @c false.
  */
 
 /*!
  *  @fn template<typename T> requires arithmetic<T> static bool isEven(T num)
  *
- *  Returns true if @a num is even; otherwise returns false.
+ *  Returns @c true if @a num is even; otherwise returns @c false.
  */
 
 /*!

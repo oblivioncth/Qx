@@ -24,19 +24,19 @@ namespace Qx
 //-Class Functions----------------------------------------------------------------------------------------------
 //Public:
 /*!
- *  Returns true if @a checkStr consists only of numbers; otherwise returns false.
+ *  Returns @c true if @a checkStr consists only of numbers; otherwise returns @c false.
  */
 bool String::isOnlyNumbers(QString checkStr) { return RegularExpression::numbersOnly.match(checkStr).hasMatch() && !checkStr.isEmpty(); }
 
 /*!
- *  Returns true if @a hexNum consists only of numbers and letters A through F (case-insensitive);
- *  otherwise returns false.
+ *  Returns @c true if @a hexNum consists only of numbers and letters A through F (case-insensitive);
+ *  otherwise returns @c false.
  */
 bool String::isHexNumber(QString hexNum) { return RegularExpression::hexOnly.match(hexNum).hasMatch() && !hexNum.isEmpty(); }
 
 /*!
- *  Returns true if @a checksum consists only of valid hexadecimal characters and is the exact length required for a hexadecimal
- *  string representation of @a hashAlgorithm; otherwise returns false.
+ *  Returns @c true if @a checksum consists only of valid hexadecimal characters and is the exact length required for a hexadecimal
+ *  string representation of @a hashAlgorithm; otherwise returns @c false.
  */
 bool String::isValidChecksum(QString checksum, QCryptographicHash::Algorithm hashAlgorithm)
 {

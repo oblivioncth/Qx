@@ -49,7 +49,7 @@ GenericError::GenericError(ErrorLevel errorLevel, QString primaryInfo, QString s
 //-Instance Functions----------------------------------------------------------------------------------------------
 //Public:
 /*!
- *  Returns true if the generic error is valid; otherwise returns false.
+ *  Returns @c true if the generic error is valid; otherwise returns @c false.
  *
  *  A generic error is considered valid if its primaryInfo is non-empty.
  */
@@ -71,7 +71,7 @@ GenericError::ErrorLevel GenericError::errorLevel() const { return mErrorLevel; 
 /*!
  *  Returns the string representation of the generic error's errorLevel.
  *
- *  If @a caps is set to true, the returned string is entirely in uppercase.
+ *  If @a caps is set to @c true, the returned string is entirely in uppercase.
  */
 QString GenericError::errorLevelString(bool caps) const
 {

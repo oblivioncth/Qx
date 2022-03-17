@@ -19,7 +19,7 @@ namespace Qx
  *  store.
  *
  *  In the case of <tt>T == bool</tt>, the resultant byte array is a single byte containing @c 0x01 or @c 0x00
- *  for true and false respectively.
+ *  for @c true and @c false respectively.
  *
  *  @note The exact resulting representation for floating-point types depends on the underlying system, but at
  *  the moment is always the IEEE-754 standard as this library currently cannot be compiled on systems with

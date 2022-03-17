@@ -81,13 +81,13 @@ namespace Qx
 /*!
  * @fn template<typename T> bool Index<T>::isNull() const
  *
- *  Returns true if the index is null; otherwise returns false.
+ *  Returns @c true if the index is null; otherwise returns @c false.
  */
 
 /*!
  * @fn template<typename T> bool Index<T>::isLast() const
  *
- *  Returns true if the index represents the last index of an arbitrary dataset; otherwise returns false.
+ *  Returns @c true if the index represents the last index of an arbitrary dataset; otherwise returns @c false.
  *
  *  This is equivalent to <tt>*this == Index<T>::LAST</tt>.
  */
@@ -95,7 +95,7 @@ namespace Qx
 /*!
  * @fn template<typename T> bool Index<T>::isLast() const
  *
- *  Returns true if the index represents the last index of an arbitrary dataset; otherwise returns false.
+ *  Returns @c true if the index represents the last index of an arbitrary dataset; otherwise returns @c false.
  *
  *  This is equivalent to <tt>*this == Index<T>::LAST</tt>.
  */
@@ -103,26 +103,26 @@ namespace Qx
 /*!
  * @fn template<typename T> bool Index<T>::operator==(const Index<T>& other)
  *
- *  Returns true if this index and @a other are both null, 'last', or have the same underlying value; otherwise
- *  returns false.
+ *  Returns @c true if this index and @a other are both null, 'last', or have the same underlying value; otherwise
+ *  returns @c false.
  */
 
 /*!
  * @fn template<typename T> bool Index<T>::operator!=(const Index<T>& other)
  *
- *  Returns true if this index and @a other are not equivalent; otherwise returns false.
+ *  Returns @c true if this index and @a other are not equivalent; otherwise returns @c false.
  */
 
 /*!
  * @fn template<typename T> bool Index<T>::operator<(const Index<T>& other)
  *
- *  Returns true if one of the following is true:
+ *  Returns @c true if one of the following is true:
  *
  *  1) This index is null and @a other is not.
  *  2) This index is not 'last' and @a other is.
  *  3) This index's underlying value is less than @a other's underlying value.
  *
- *  Otherwise returns false.
+ *  Otherwise returns @c false.
  */
 
 /*!
@@ -134,13 +134,13 @@ namespace Qx
 /*!
  * @fn template<typename T> bool Index<T>::operator>(const Index<T>& other)
  *
- *  Returns true if one of the following is true:
+ *  Returns @c true if one of the following is true:
  *
  *  1) @a other is null and this index is not.
  *  2) @a other is not 'last' and this index is.
  *  3) This index's underlying value is greater than @a other's underlying value.
  *
- *  Otherwise returns false.
+ *  Otherwise returns @c false.
  */
 
 /*!
