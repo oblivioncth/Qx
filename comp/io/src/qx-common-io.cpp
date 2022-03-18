@@ -8,11 +8,181 @@
 // Extra-component Includes
 #include "qx/core/qx-char.h"
 
+/*!
+ *  @file qx-common-io.h
+ *
+ *  @brief The qx-common-io header file provides various types, variables, and functions related to file IO.
+ *
+ *  Most functions in this class return an IoOpReport that details the success or failure of their actions.
+ */
+
 namespace Qx
 {
+//-Namespace Enums-----------------------------------------------------------------------------------------------------
+/*!
+ *  @enum WriteMode
+ *
+ *  This enum is used to describe mode with which data is written to a file.
+ *
+ *  The exact effects of its values can vary depending on the context in which they are used.
+ */
+
+/*!
+ *  @var WriteMode::Insert
+ *
+ *  Specifies that content is to be inserted into an existing file, if it already exists, preserving
+ *  the file's original content, though not necessarily its location.
+ */
+
+/*!
+ *  @var WriteMode::Overwrite
+ *
+ *  Specifies that content is to be written on top of a file's existing content, if it already exists, replacing as much
+ *  as is necessary.
+ */
+
+/*!
+ *  @var WriteMode::Append
+ *
+ *  Specifies that content is to be written to the end of an existing file, if it already exists, leaving the original
+ *  content untouched.
+ */
+
+/*!
+ *  @var WriteMode::Truncate
+ *
+ *  Specifies that the destination file is to be emptied before writing, if it already exists, so that the new content
+ *  entirely replaces the old.
+ */
+
+/*!
+ *  @enum WriteOption
+ *
+ *  This enum is used to specify various options that affect how data is written to a file.
+ *
+ *  The exact effects of each value can vary depending on the context in which they are used, with some options being
+ *  completely useless in some contexts.
+ */
+
+/*!
+ *  @var WriteOption::NoWriteOptions
+ *
+ *  The default.
+ */
+
+/*!
+ *  @var WriteOption::CreatePath
+ *
+ *  Create all directories required to write a file according to its full path.
+ */
+
+/*!
+ *  @var WriteOption::ExistingOnly
+ *
+ *  Only write to the target file if it already exists.
+ */
+
+/*!
+ *  @var WriteOption::NewOnly
+ *
+ *  Only write to the target file if doesn't already exist.
+ */
+
+/*!
+ *  @var WriteOption::EnsureBreak
+ *
+ *  Ensure that a contextually appropriate break is present before the position where data is to be written.
+ *
+ *  This is generally an end-of-line character when working with text, and a null byte ('\0') when working with raw data.
+ */
+
+/*!
+ *  @var WriteOption::Pad
+ *
+ *  Pad the target file before writing to the middle of a file if required.
+ *
+ *  This is generally done an end-of-line character and spaces when working with text, and a null bytes ('\0') when
+ *  working with raw data.
+ */
+
+/*!
+ *  @var WriteOption::Unbuffered
+ *
+ *  Bypass any buffers involved with writing.
+ *
+ *  Generally only applies to streams.
+ */
+
+/*!
+ *  @typedef Q_DECLARE_FLAGS(WriteOptions, WriteOption)
+ *
+ *  @qflag{WriteOptions, WriteOption}
+ */
+
+/*!
+ *  @enum ReadOption
+ *
+ *  This enum is used to specify various options that affect how data is read from a file.
+ *
+ *  The exact effects of each value can vary depending on the context in which they are used, with some options being
+ *  completely useless in some contexts.
+ */
+
+/*!
+ *  @var ReadOption::NoReadOptions
+ *
+ *  The default.
+ */
+
+/*!
+ *  @var ReadOption::IgnoreTrailingBreak
+ *
+ *  When file positions are considered, do not count a trailing break as being part of the file.
+ *
+ *  For example, when requesting the last line of a text document, the second to last line will be returned instead if
+ *  this option is set and the text file ends with a line break.
+ */
+
+/*!
+ *  @typedef Q_DECLARE_FLAGS(ReadOptions, ReadOption)
+ *
+ *  @qflag{ReadOptions, ReadOption}
+ */
+
+//-Namespace Variables-------------------------------------------------------------------------------------------------
+/*!
+ * @var QChar ENDL
+ *
+ * An alias for the line break character, @c '@\n'.
+ *
+ * @note This is distinct from std::endl and Qt::endl as this value actually contains the character for line feed,
+ * instead of acting as a macro that instructs a stream to insert a line break and then flush its buffer.
+ */
+
+/*!
+ * @var QString LIST_ITEM_PREFIX
+ *
+ * Equivalent to <tt>"- "</tt>
+ *
+ * Perhaps you want to use this as a marker for a list item, perhaps you don't.
+ */
+
 //-Namespace Functions-------------------------------------------------------------------------------------------------
+
+/*!
+ *  Returns @c true if @a file is empty; otherwise returns @c false.
+ *
+ *  @warning This also returns true if the file doesn't exist.
+ */
 bool fileIsEmpty(const QFile& file) { return file.size() == 0; }
 
+/*! @overload
+ *
+ *  Sets @a returnBuffer to @c true if the file is empty; otherwise sets it to @c false.
+ *
+ *  If the file doesn't exist, @a returnBuffer will be set to true and an operation report noting the file's absence
+ *  is returned.
+ */
 IoOpReport fileIsEmpty(bool& returnBuffer, const QFile& file)
 {
     // Check file
@@ -30,6 +200,11 @@ IoOpReport fileIsEmpty(bool& returnBuffer, const QFile& file)
     }
 }
 
+/*!
+ *  Returns a version of @a fileName with all illegal filename characters removed.
+ *
+ *  @warning It is possible to two very similarly named files to map to the same kosher name if you aren't careful.
+ */
 QString kosherizeFileName(QString fileName) // Can return empty name if all characters are invalid
 {
     // Handle illegal characters
@@ -48,12 +223,20 @@ QString kosherizeFileName(QString fileName) // Can return empty name if all char
         fileName.chop(1);
 
     // Prevent name from starting or ending with space (this isn't disallowed by various filesystem,
-    // but is generaly enforced by the OS
+    // but is generally enforced by the OS
     fileName = fileName.trimmed();
 
     return fileName;
 }
 
+/*!
+ *  Tests if @a textFile has a trailing end-of-line character
+ *
+ *  @param[out] returnBuffer Set to @c true if the file's last character(s) are @c "\\n"
+ *  or @c"\\r\\n"; otherwise set to @c false.
+ *  @param[in] textFile The file to test.
+ *  @return A report containing details of operation success or failure.
+ */
 IoOpReport textFileEndsWithNewline(bool& returnBuffer, QFile& textFile)
 {
     // Default to false
@@ -97,6 +280,16 @@ IoOpReport textFileEndsWithNewline(bool& returnBuffer, QFile& textFile)
     }
 }
 
+/*!
+ *  Inspects the structure of @a textFile in terms of lines and characters.
+ *
+ *  @param[out] returnBuffer A list containing the character count of all lines in the file, with its
+ *  size also conveying the line count of the file.
+ *  @param[in] textFile The file to inspect.
+ *  @param[in] ignoreTrailingEmpty Whether or not to include the last line of the file in the list if
+ *  it is empty.
+ *  @return A report containing details of operation success or failure.
+ */
 IoOpReport textFileLayout(QList<int>& returnBuffer, QFile& textFile, bool ignoreTrailingEmpty)
 {
     // Clear return buffer
@@ -134,6 +327,14 @@ IoOpReport textFileLayout(QList<int>& returnBuffer, QFile& textFile, bool ignore
     return IoOpReport(IO_OP_ENUMERATE, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
 }
 
+/*!
+ *  Determines the number of lines in @a textFile, equivalent to the number of line breaks plus one.
+ *
+ *  @param[out] returnBuffer The line count of the file.
+ *  @param[in] textFile The file to inspect.
+ *  @param[in] ignoreTrailingEmpty Whether or not to count the last line of the file if it is empty.
+ *  @return A report containing details of operation success or failure.
+ */
 IoOpReport textFileLineCount(int& returnBuffer, QFile& textFile, bool ignoreTrailingEmpty)
 {
     // Reset return buffer
@@ -171,6 +372,18 @@ IoOpReport textFileLineCount(int& returnBuffer, QFile& textFile, bool ignoreTrai
     return IoOpReport(IO_OP_ENUMERATE, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
 }
 
+/*!
+ *  Converts any relative component of @a textPos to an absolute one. I.e. determines the actual line
+ *  and or/character that Index32::LAST references for the given @a textFile, if present.
+ *
+ *  If neither the line or character component of @a textPos contain the value Index32::LAST,
+ *  @a textPos is left unchanged.
+ *
+ *  @param[in,out] textPos The text position to translate into an absolute position.
+ *  @param[in] textFile The file to evaluate the text position on.
+ *  @param[in] ignoreTrailingEmpty Whether or not to count the last line of the file if it is empty.
+ *  @return A report containing details of operation success or failure.
+ */
 IoOpReport textFileAbsolutePosition(TextPos& textPos, QFile& textFile, bool ignoreTrailingEmpty)
 {
     // Do nothing if position is null
@@ -208,6 +421,15 @@ IoOpReport textFileAbsolutePosition(TextPos& textPos, QFile& textFile, bool igno
     return IoOpReport(IO_OP_ENUMERATE, IO_SUCCESS, textFile);
 }
 
+/*!
+ *  Searches for the given @a query within @a textFile and returns the result(s) if found.
+ *
+ *  @param[out] textPos A List of positions where the query was found.
+ *  @param[in] textFile The file search.
+ *  @param[in] query The text to search for.
+ *  @param[in] readOptions Options modifying how the file is parsed.
+ *  @return A report containing details of operation success or failure.
+ */
 IoOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const TextQuery& query, ReadOptions readOptions)
 {
     // Empty buffer
@@ -317,6 +539,15 @@ IoOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const
     return IoOpReport(IO_OP_INSPECT, TXT_STRM_STAT_MAP.value(fileTextStream.status()), textFile);
 }
 
+/*!
+ *  Checks if @a textFile contains the given @a query.
+ *
+ *  @param[out] returnBuffer Set to @c true if the file contains the query text; otherwise set to @c false.
+ *  @param[in] textFile The file search.
+ *  @param[in] query The text to search for.
+ *  @param[in] allowSplit Whether or not the query text is matched if it's split across a line break.
+ *  @return A report containing details of operation success or failure.
+ */
 IoOpReport fileContainsString(bool& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity cs, bool allowSplit)
 {
     // Prepare query
@@ -331,6 +562,16 @@ IoOpReport fileContainsString(bool& returnBuffer, QFile& textFile, const QString
     return searchReport;
 }
 
+/*!
+ *  Reads the given range of text from @a textFile.
+ *
+ *  @param[out] returnBuffer The text read from the file.
+ *  @param[in] textFile The file to read from.
+ *  @param[in] startPos The position to begin reading from.
+ *  @param[in] count The number of characters to read.
+ *  @param[in] readOptions Options modifying how the file is parsed.
+ *  @return A report containing details of operation success or failure.
+ */
 IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos, int count, ReadOptions readOptions)
 {
     // Ensure start position is valid
@@ -429,6 +670,18 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
     }
 }
 
+/*!
+ *  @overload
+ *
+ *  Reads the given range of text from @a textFile.
+ *
+ *  @param[out] returnBuffer The text read from the file.
+ *  @param[in] textFile The file to read from.
+ *  @param[in] startPos The position to begin reading from.
+ *  @param[in] endPos The position to read until.
+ *  @param[in] readOptions Options modifying how the file is parsed.
+ *  @return A report containing details of operation success or failure.
+ */
 IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos, TextPos endPos, ReadOptions readOptions)
 {
     // Returns a string of a portion of the passed file [startPos, endPos] (inclusive for both)
@@ -549,6 +802,20 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
     }
 }
 
+/*!
+ *  @overload
+ *
+ *  Reads the given range of text from @a textFile.
+ *
+ *  @param[out] returnBuffer The text read from the file, separated by line.
+ *  @param[in] textFile The file to read from.
+ *  @param[in] startLine The line to begin reading from.
+ *  @param[in] endLine The line to read until.
+ *  @param[in] readOptions Options modifying how the file is parsed.
+ *  @return A report containing details of operation success or failure.
+ *
+ *  @note The output list will not contain any end-of-line characters.
+ */
 IoOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, Index32 startLine, Index32 endLine, ReadOptions readOptions)
 {
     // Ensure positions are valid
@@ -619,6 +886,18 @@ IoOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, Index32 
      }
 }
 
+/*!
+ *  Writes the given text to @a textFile.
+ *
+ *  @param[in] textFile The file to write to.
+ *  @param[in] text The text to be written.
+ *  @param[in] writeMode The mode to use for writing.
+ *  @param[in] startPos The position from which to begin writing. This argument is ignored if writeMode is WriteMode::Append.
+ *  @param[in] writeOptions Options modifying how the file is written.
+ *  @return A report containing details of operation success or failure.
+ *
+ *  @note The output list will not contain any end-of-line characters.
+ */
 IoOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode writeMode, TextPos startPos, WriteOptions writeOptions)
 {
     /* TODO: Memory usage can be improved for inserts/overwrites by reading lines until at target lines, then reading characters
@@ -797,6 +1076,14 @@ IoOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode wri
     return IoOpReport(IO_OP_WRITE, TXT_STRM_STAT_MAP.value(textStream.status()), textFile);
 }
 
+/*!
+ *  Removes the given range of text from @a textFile.
+ *
+ *  @param[in] textFile The file from which text is to be removed.
+ *  @param[in] startPos The first character to be removed.
+ *  @param[in] endPos The last character to be removed.
+ *  @return A report containing details of operation success or failure.
+ */
 IoOpReport deleteTextFromFile(QFile& textFile, TextPos startPos, TextPos endPos)
 {
     // Removes a string of a portion of the passed file [startPos, endPos] (inclusive for both)
@@ -870,6 +1157,11 @@ IoOpReport deleteTextFromFile(QFile& textFile, TextPos startPos, TextPos endPos)
     return IoOpReport(IO_OP_WRITE, TXT_STRM_STAT_MAP.value(textStream.status()), textFile);
 }
 
+/*!
+ *  Returns @c true if @a directory contains files in accordance with @a iteratorFlags; otherwise returns @c false.
+ *
+ *  @warning This also returns false if the directory doesn't exist.
+ */
 bool dirContainsFiles(QDir directory, QDirIterator::IteratorFlags iteratorFlags)
 {
     // Construct directory iterator
@@ -878,6 +1170,15 @@ bool dirContainsFiles(QDir directory, QDirIterator::IteratorFlags iteratorFlags)
     return listIterator.hasNext();
 }
 
+/*!
+ *  @overload
+ *
+ *  Sets @a returnBuffer to @c true if @a directory contains files in accordance with @a iteratorFlags; otherwise sets it to
+ *  @c false.
+ *
+ *  If the directory doesn't exist, @a returnBuffer will be set to false and an operation report noting the directory's absence
+ *  is returned.
+ */
 IoOpReport dirContainsFiles(bool& returnBuffer, QDir directory, QDirIterator::IteratorFlags iteratorFlags)
 {
     // Assume false
@@ -894,6 +1195,14 @@ IoOpReport dirContainsFiles(bool& returnBuffer, QDir directory, QDirIterator::It
     }
 }
 
+/*!
+ *  Computes a file's checksum.
+ *
+ *  @param[out] returnBuffer Set to the hexadecimal string representation of the file's checksum.
+ *  @param[in] file The file to hash.
+ *  @param[in] hashAlgorithm The hash algorithm to calculate the checksum with.
+ *  @return A report detailing operation success or failure.
+ */
 IoOpReport calculateFileChecksum(QString& returnBuffer, QFile& file, QCryptographicHash::Algorithm hashAlgorithm)
 {
     // Empty buffer
@@ -922,6 +1231,15 @@ IoOpReport calculateFileChecksum(QString& returnBuffer, QFile& file, QCryptograp
         return IoOpReport(IO_OP_READ, IO_ERR_READ, file);
 }
 
+/*!
+ *  Checks if a file's checksum matches a known value.
+ *
+ *  @param[out] returnBuffer Set to @c true if the file's checksum matches; otherwise returns @c false.
+ *  @param[in] file The file to hash.
+ *  @param[in] hashAlgorithm The hash algorithm used to calculate the known checksum.
+ *  @param[in] checksum The known checksum to compare against.
+ *  @return A report detailing operation success or failure.
+ */
 IoOpReport fileMatchesChecksum(bool& returnBuffer, QFile& file, QString checksum, QCryptographicHash::Algorithm hashAlgorithm)
 {
     // Reset return buffer
@@ -942,6 +1260,15 @@ IoOpReport fileMatchesChecksum(bool& returnBuffer, QFile& file, QString checksum
     return IoOpReport(IoOpType::IO_OP_INSPECT, IO_SUCCESS, file);
 }
 
+/*!
+ *  Reads the given range of bytes from @a file.
+ *
+ *  @param[out] returnBuffer The bytes read from the file.
+ *  @param[in] file The file to read from.
+ *  @param[in] startPos The position to begin reading from.
+ *  @param[in] endPos The position to read until.
+ *  @return A report containing details of operation success or failure.
+ */
 IoOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, Index64 startPos, Index64 endPos)
 {
     // Ensure positions are valid
@@ -1004,6 +1331,16 @@ IoOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, Index64 star
     return IoOpReport(IO_OP_READ, IO_SUCCESS, file);
 }
 
+/*!
+ *  Writes the given bytes to @a file.
+ *
+ *  @param[in] file The file to write to.
+ *  @param[in] bytes The bytes to be written.
+ *  @param[in] writeMode The mode to use for writing.
+ *  @param[in] startPos The position from which to begin writing. This argument is ignored if writeMode is WriteMode::Append.
+ *  @param[in] writeOptions Options modifying how the file is written.
+ *  @return A report containing details of operation success or failure.
+ */
 IoOpReport writeBytesToFile(QFile& file, const QByteArray& bytes, WriteMode writeMode, Index64 startPos, WriteOptions writeOptions)
 {
     // Ensure start position is valid
