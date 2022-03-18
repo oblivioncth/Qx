@@ -77,7 +77,7 @@ VersionNumber::VersionNumber() : QVersionNumber() {}
  *  Returns the nano version number, that is, the fourth segment. This function is equivalent to segmentAt(3).
  *  If this VersionNumber object is null, this function returns 0.
  *
- *  @sa isNull(), segmentAt()
+ *  @sa isNull(), segmentAt().
  */
 int VersionNumber::nanoVersion() { return segmentAt(3); }
 
@@ -126,7 +126,7 @@ VersionNumber VersionNumber::commonPrefix(const VersionNumber &v1, const Version
  *  Once the numerical segments have been parsed, the remainder of the string is considered to be the suffix string.
  *  The start index of that string will be stored in @a suffixIndex if it is not null.
  *
- *  @sa isNull()
+ *  @sa isNull().
  */
 VersionNumber VersionNumber::fromString(const QString &string, int *suffixIndex)
 {

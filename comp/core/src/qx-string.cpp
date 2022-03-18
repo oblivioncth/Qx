@@ -64,7 +64,7 @@ QString String::stripToHexOnly(QString string) { return string.replace(RegularEx
  *
  *  Joins all the strings in @a list with an optional @a separator and @a prefix for each element into a single string.
  *
- *  @sa QStringList::join()
+ *  @sa QStringList::join().
  */
 QString String::join(QList<QString> list, QString separator, QString prefix) // Overload for T = QString
 {

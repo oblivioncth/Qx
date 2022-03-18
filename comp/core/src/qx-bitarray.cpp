@@ -133,7 +133,7 @@ void BitArray::replace(const BitArray& bits, int start, int length)
  *
  *  A value of -1 for @a length will result in the replacement only being limited by the size of the bit array.
  *
- *  @sa fromInteger()
+ *  @sa fromInteger().
  */
 
 /*!

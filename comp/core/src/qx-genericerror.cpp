@@ -136,7 +136,7 @@ GenericError& GenericError::setDetailedInfo(QString detailedInfo) { mDetailedInf
  *  The error is writen in a human-readable format, structured by its properties. A new line is always started
  *  after the error is writen.
  *
- *  @sa postError()
+ *  @sa postError().
  *
  *  @snippet qx-genericerror.cpp 1
  */
