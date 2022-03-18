@@ -33,7 +33,7 @@ public:
     void setByteOrder(QDataStream::ByteOrder bo);
     void setFloatingPointPrecision(QDataStream::FloatingPointPrecision precision);
     IoOpReport status();
-    FileStreamWriter& writeRawData(const QByteArray& data);
+    IoOpReport writeRawData(const QByteArray& data);
 
     template<typename T>
         requires defines_left_shift_for<QDataStream, T>

@@ -41,16 +41,54 @@ IoOpReport FileStreamWriter::status()
     return IoOpReport(IoOpType::IO_OP_WRITE, DATA_STRM_STAT_MAP.value(mStreamWriter.status()), *mTargetFile);
 }
 
-FileStreamWriter& FileStreamWriter::writeRawData(const QByteArray& data)
+/*!
+ *  Writes @a data to the stream and returns an operation report.
+ *
+ *  The data is @e not encoded.
+ *
+ *  @note Unlike with a raw QDataStream, if the number of bytes actually written is less than data.size() it is treated as a
+ *  IoOpResultType::IO_ERR_FILE_SIZE_MISMATCH error since data is not forced to be written in chunks for that type.
+ */
+IoOpReport FileStreamWriter::writeRawData(const QByteArray& data)
 {
-    if(mStreamWriter.writeRawData(data, data.size()) != data.size())
-        mStreamWriter.setStatus(QDataStream::Status::WriteFailed);
+    // Write data
+    int bytesWritten = mStreamWriter.writeRawData(data, data.size());
 
-    return *this;
+    // Check for error, treat size mismatch as error since all bytes should go through for a file device.
+    if(bytesWritten == -1)
+    {
+        mStreamWriter.setStatus(QDataStream::Status::WriteFailed);
+        return IoOpReport(IO_OP_WRITE, IoOpResultType::IO_ERR_WRITE, *mTargetFile);
+    }
+    else if(bytesWritten != data.size())
+    {
+        mStreamWriter.setStatus(QDataStream::Status::WriteFailed);
+        return IoOpReport(IO_OP_WRITE, IoOpResultType::IO_ERR_FILE_SIZE_MISMATCH, *mTargetFile);
+    }
+    else
+        return IoOpReport(IO_OP_WRITE, IO_SUCCESS, *mTargetFile);
 }
 
+/*!
+ *  @fn template<typename T> requires defines_left_shift_for<QDataStream, T> FileStreamWriter::FileStreamWriter& operator<<(T d)
+ *
+ *  Writes @a d of type @c T to the stream. Returns a reference to the stream.
+ *
+ *  This template is constrained such that effectively, the insertion operator for this class is available
+ *  for all data types that QDataStream defines an insertion operator for.
+ */
+
+/*!
+ *  Returns the file associated with the file stream reader.
+ */
 QFile* FileStreamWriter::file() { return mTargetFile; }
 
+/*!
+ *  Opens the file associated with the file stream writer and returns an operation report.
+ *
+ *  This function must be called before any data is written, unless the file already open
+ *  in a mode that supports writing before the stream was constructed.
+ */
 IoOpReport FileStreamWriter::openFile()
 {
     // Perform write preparations
@@ -76,6 +114,12 @@ IoOpReport FileStreamWriter::openFile()
     return IoOpReport(IO_OP_WRITE, IO_SUCCESS, *mTargetFile);
 }
 
+/*!
+ *  Closes the file associated with the file stream writer.
+ *
+ *  This function should be called when the stream is no longer needed, unless the file should
+ *  remain open for use elsewhere.
+ */
 void FileStreamWriter::closeFile() { mTargetFile->close(); }
 
 }
