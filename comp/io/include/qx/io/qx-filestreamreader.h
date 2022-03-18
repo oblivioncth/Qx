@@ -35,7 +35,7 @@ public:
     void resetStatus();
     void setByteOrder(QDataStream::ByteOrder bo);
     void setFloatingPointPrecision(QDataStream::FloatingPointPrecision precision);
-    void skipRawData(int len);
+    IoOpReport skipRawData(int len);
     IoOpReport status();
 
     template<typename T>

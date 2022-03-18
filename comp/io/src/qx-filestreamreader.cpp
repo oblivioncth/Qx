@@ -47,7 +47,26 @@ IoOpReport FileStreamReader::readRawData(QByteArray& data, int len)
 void FileStreamReader::resetStatus() { mStreamReader.resetStatus(); }
 void FileStreamReader::setByteOrder(QDataStream::ByteOrder bo) { mStreamReader.setByteOrder(bo); }
 void FileStreamReader::setFloatingPointPrecision(QDataStream::FloatingPointPrecision precision) { mStreamReader.setFloatingPointPrecision(precision); }
-void FileStreamReader::skipRawData(int len) { mStreamReader.skipRawData(len); }
+
+IoOpReport FileStreamReader::skipRawData(int len)
+{
+    // Skip data,
+    int bytesSkipped = mStreamReader.skipRawData(len);
+
+    // Check for error, treat size mismatch as error since it data length should be known for a file device.
+    if(bytesSkipped == -1)
+    {
+        mStreamReader.setStatus(QDataStream::Status::ReadCorruptData);
+        return IoOpReport(IO_OP_READ, IoOpResultType::IO_ERR_READ, *mSourceFile);
+    }
+    else if(bytesSkipped != len)
+    {
+        mStreamReader.setStatus(QDataStream::Status::ReadPastEnd);
+        return IoOpReport(IO_OP_READ, DATA_STRM_STAT_MAP.value(mStreamReader.status()), *mSourceFile);
+    }
+    else
+        return IoOpReport(IO_OP_READ, IO_SUCCESS, *mSourceFile);
+}
 
 IoOpReport FileStreamReader::status()
 {
