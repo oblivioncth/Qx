@@ -150,6 +150,15 @@ IoOpReport FileStreamReader::status()
 }
 
 /*!
+*  @fn template<typename T> requires defines_right_shift_for<QDataStream, T&> FileStreamReader& FileStreamReader::operator>>(T& d)
+*
+*  Reads the data type @c T into @a d, and returns a reference to the stream.
+*
+*  This template is constrained such that effectively, the extraction operator for this class is available
+*  for all data types that QDataStream defines an extraction operator for.
+*/
+
+/*!
  *  Returns the file associated with the file stream reader.
  */
 QFile* FileStreamReader::file() { return mSourceFile; }
