@@ -21,13 +21,27 @@ bool FileStreamReader::atEnd() const { return mStreamReader.atEnd(); }
 QDataStream::ByteOrder FileStreamReader::byteOrder() const { return mStreamReader.byteOrder(); }
 QDataStream::FloatingPointPrecision FileStreamReader::floatingPointPrecision() const { return mStreamReader.floatingPointPrecision(); }
 
-FileStreamReader& FileStreamReader::readRawData(QByteArray& data, int len)
+IoOpReport FileStreamReader::readRawData(QByteArray& data, int len)
 {
+    // Allocate buffer
     data.resize(len);
-    if(mStreamReader.readRawData(data.data(), len) != len)
-        mStreamReader.setStatus(QDataStream::Status::ReadPastEnd);
 
-    return *this;
+    // Read data,
+    int bytesRead = mStreamReader.readRawData(data.data(), len);
+
+    // Check for error, treat size mismatch as error since it data length should be known for a file device.
+    if(bytesRead == -1)
+    {
+        mStreamReader.setStatus(QDataStream::Status::ReadCorruptData);
+        return IoOpReport(IO_OP_READ, IoOpResultType::IO_ERR_READ, *mSourceFile);
+    }
+    else if(bytesRead != len)
+    {
+        mStreamReader.setStatus(QDataStream::Status::ReadPastEnd);
+        return IoOpReport(IO_OP_READ, DATA_STRM_STAT_MAP.value(mStreamReader.status()), *mSourceFile);
+    }
+    else
+        return IoOpReport(IO_OP_READ, IO_SUCCESS, *mSourceFile);
 }
 
 void FileStreamReader::resetStatus() { mStreamReader.resetStatus(); }

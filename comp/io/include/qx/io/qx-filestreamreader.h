@@ -31,7 +31,7 @@ public:
     bool atEnd() const;
     QDataStream::ByteOrder byteOrder() const;
     QDataStream::FloatingPointPrecision floatingPointPrecision() const;
-    FileStreamReader& readRawData(QByteArray& data, int len);
+    IoOpReport readRawData(QByteArray& data, int len);
     void resetStatus();
     void setByteOrder(QDataStream::ByteOrder bo);
     void setFloatingPointPrecision(QDataStream::FloatingPointPrecision precision);
