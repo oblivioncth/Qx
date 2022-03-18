@@ -107,9 +107,6 @@ void FileStreamReader::setByteOrder(QDataStream::ByteOrder bo) { mStreamReader.s
  *  The @a bo parameter can be QDataStream::BigEndian or QDataStream::LittleEndian.
  *
  *  @note This property does not affect the deserialization of qfloat16 instances.
- *  The default setting is big endian.
- *
- *  @sa byteOrder().
  */
 void FileStreamReader::setFloatingPointPrecision(QDataStream::FloatingPointPrecision precision) { mStreamReader.setFloatingPointPrecision(precision); }
 
