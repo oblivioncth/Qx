@@ -183,6 +183,14 @@ void SyncDownloadManager::appendTask(DownloadTask task)
         mPendingDownloads.append(task);
 }
 
+int SyncDownloadManager::maxSimultaneous() const { return mMaxSimultaneous; }
+QNetworkRequest::RedirectPolicy SyncDownloadManager::redirectPolicy() const { return mDownloadAccessMan.redirectPolicy(); }
+bool SyncDownloadManager::isOverwrite() const { return mOverwrite; }
+bool SyncDownloadManager::isAutoAbort() const { return mAutoAbort; }
+
+int SyncDownloadManager::taskCount() const { return mPendingDownloads.count() + mActiveDownloads.count(); }
+bool SyncDownloadManager::hasTasks() const { return taskCount() > 0; }
+
 void SyncDownloadManager::setMaxSimultaneous(int maxSimultaneous) { mMaxSimultaneous = maxSimultaneous; }
 void SyncDownloadManager::setRedirectPolicy(QNetworkRequest::RedirectPolicy redirectPolicy)
 {
@@ -193,8 +201,6 @@ void SyncDownloadManager::setRedirectPolicy(QNetworkRequest::RedirectPolicy redi
 
 void SyncDownloadManager::setOverwrite(bool overwrite) { mOverwrite = overwrite; }
 void SyncDownloadManager::setAutoAbort(bool autoAbort) { mAutoAbort = autoAbort; }
-int SyncDownloadManager::taskCount() { return mPendingDownloads.count() + mActiveDownloads.count(); }
-bool SyncDownloadManager::hasTasks() { return taskCount() > 0; }
 
 SyncDownloadManager::Report SyncDownloadManager::processQueue()
 {

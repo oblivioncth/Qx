@@ -120,12 +120,19 @@ private:
 
 public:
     void appendTask(DownloadTask task);
+
+    int maxSimultaneous() const;
+    QNetworkRequest::RedirectPolicy redirectPolicy() const;
+    bool isOverwrite() const;
+    bool isAutoAbort() const;
+    int taskCount() const;
+    bool hasTasks() const;
+
     void setMaxSimultaneous(int maxSimultaneous);
     void setRedirectPolicy(QNetworkRequest::RedirectPolicy redirectPolicy);
     void setOverwrite(bool overwrite);
     void setAutoAbort(bool autoAbort);
-    int taskCount();
-    bool hasTasks();
+
     Report processQueue();
 
 //-Slots------------------------------------------------------------------------------------------------------------
