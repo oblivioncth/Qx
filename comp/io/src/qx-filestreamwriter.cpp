@@ -11,8 +11,24 @@ namespace Qx
 // FileStreamWriter
 //===============================================================================================================
 
+/*!
+ *  @class FileStreamWriter
+ *
+ *  @brief The FileStreamWriter class is a specialized wrapper for QDataStream that narrows and simplifies its
+ *  usage for writing files.
+ *
+ *  Most member functions are the same or slightly modified versions of those from QDataStream.
+ */
+
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
+/*!
+ *  Constructs a file stream writer that is linked to @a file, configured with @a writeMode and @a writeOptions.
+ *
+ *  @note The following WriteMode values are not supported with this class and will be remapped as shown:
+ *  @li @c WriteMode::Insert -> @c WriteMode::Append
+ *  @li @c WriteMode::Overwrite -> @c WriteMode::Truncate
+ */
 FileStreamWriter::FileStreamWriter(QFile* file, WriteMode writeMode, WriteOptions writeOptions) :
     mTargetFile(file),
     mWriteMode(writeMode),
@@ -30,12 +46,55 @@ FileStreamWriter::FileStreamWriter(QFile* file, WriteMode writeMode, WriteOption
 
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:
+/*!
+ *  Returns the current byte order setting.
+ *
+ *  @sa setByteOrder().
+ */
 QDataStream::ByteOrder FileStreamWriter::byteOrder() const { return mStreamWriter.byteOrder(); }
+
+/*!
+ *  Returns the floating point precision of the file stream reader.
+ *
+ *  @sa setFloatingPointPrecision().
+ */
 QDataStream::FloatingPointPrecision FileStreamWriter::floatingPointPrecision() const { return mStreamWriter.floatingPointPrecision(); }
+
+/*!
+ *  Resets the status of the file stream writer.
+ *
+ *  @sa QDataStream::Status, and status().
+ */
 void FileStreamWriter::resetStatus() { mStreamWriter.resetStatus(); }
+
+/*!
+ *  Sets the serialization byte order to @a bo.
+ *
+ *  The @a bo parameter can be QDataStream::BigEndian or QDataStream::LittleEndian.
+ *
+ *  The default setting is big endian.
+ *
+ *  @sa byteOrder().
+ */
 void FileStreamWriter::setByteOrder(QDataStream::ByteOrder bo) { mStreamWriter.setByteOrder(bo); }
+
+/*!
+ *  Sets the floating point precision of the file stream reader to @a precision.
+ *
+ *  All floating point numbers will be written using the stream's precision regardless of the stream
+ *  operator called.
+ *
+ *  The @a bo parameter can be QDataStream::BigEndian or QDataStream::LittleEndian.
+ *
+ *  @note This property does not affect the serialization of qfloat16 instances.
+ */
 void FileStreamWriter::setFloatingPointPrecision(QDataStream::FloatingPointPrecision precision) { mStreamWriter.setFloatingPointPrecision(precision); }
 
+/*!
+ *  Returns the status of the file stream writer.
+ *
+ *  @sa QDataStream::Status
+ */
 IoOpReport FileStreamWriter::status()
 {
     return IoOpReport(IoOpType::IO_OP_WRITE, DATA_STRM_STAT_MAP.value(mStreamWriter.status()), *mTargetFile);
