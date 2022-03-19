@@ -596,7 +596,7 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
             while(!fileTextStream.atEnd())
                 lastLine = fileTextStream.readLine();
 
-            // If there was a trailing linebreak that isn't to be ignored, last line is actually blank
+            // If there was a trailing line break that isn't to be ignored, last line is actually blank
             if(!readOptions.testFlag(IgnoreTrailingBreak) && fileTextStream.precedingBreak())
                 returnBuffer = "";
             else if(startPos.character().isLast()) // Last char is desired
@@ -710,7 +710,7 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
         {
             returnBuffer = fileTextStream.readAll();
 
-            // Remove trailing linebreak if present and undesired
+            // Remove trailing line break if present and undesired
             if(readOptions.testFlag(IgnoreTrailingBreak) && returnBuffer.back() == ENDL)
                returnBuffer.chop(1);
         }
@@ -720,7 +720,7 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
             while(!fileTextStream.atEnd())
                 lastLine = fileTextStream.readLine();
 
-            // If there was a trailing linebreak that isn't to be ignored, last line is actually blank
+            // If there was a trailing line break that isn't to be ignored, last line is actually blank
             if(!readOptions.testFlag(IgnoreTrailingBreak) && fileTextStream.precedingBreak())
                 returnBuffer = "";
             else if(startPos.character().isLast()) // Last char is desired
@@ -770,7 +770,7 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
                         returnBuffer += ENDL + fileTextStream.readLine().left(*endPos.character() + 1);
                     else
                     {
-                        // If there was a trailing linebreak that isn't to be ignored, last line is actually blank
+                        // If there was a trailing line break that isn't to be ignored, last line is actually blank
                         if(!readOptions.testFlag(IgnoreTrailingBreak) && fileTextStream.precedingBreak())
                             returnBuffer += ENDL; // Blank line regardless of end target overshoot or desired char on last line
                         else if(endPos.line().isLast() && !endPos.character().isLast()) // Non-last character of last line desired
@@ -842,7 +842,7 @@ IoOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, Index32 
              while(!fileTextStream.atEnd())
                  lastLine = fileTextStream.readLine();
 
-             // If there was a trailing linebreak that isn't to be ignored, last line is actually blank
+             // If there was a trailing line break that isn't to be ignored, last line is actually blank
              if(!readOptions.testFlag(IgnoreTrailingBreak) && fileTextStream.precedingBreak())
                  lastLine = "";
 
@@ -862,7 +862,7 @@ IoOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, Index32 
                  for(; (endLine.isLast() || currentLine != endLine + 1) && !fileTextStream.atEnd(); currentLine++)
                      returnBuffer.append(fileTextStream.readLine());
 
-                 // If end was reached and there was a trailing linebreak that isn't to be ignored, there is one more blank line
+                 // If end was reached and there was a trailing line break that isn't to be ignored, there is one more blank line
                  if(fileTextStream.atEnd() && !readOptions.testFlag(IgnoreTrailingBreak) && fileTextStream.precedingBreak())
                      returnBuffer.append("");
              }
@@ -934,7 +934,7 @@ IoOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode wri
         if(openResult != IO_SUCCESS)
             return IoOpReport(IO_OP_WRITE, openResult, textFile);
 
-        // Write linebreak if needed
+        // Write line break if needed
         if(needsNewLine)
             textStream << ENDL;
 
@@ -999,7 +999,7 @@ IoOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode wri
             }
         }
 
-        // Ensure linebreak if required
+        // Ensure line break if required
         if(!padded && writeOptions.testFlag(EnsureBreak))
             if(*beforeNew.rbegin() != ENDL)
                 beforeNew += ENDL;

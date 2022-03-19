@@ -60,7 +60,7 @@ IoOpReport TextStreamWriter::openFile()
     // Set data stream IO device
     mStreamWriter.setDevice(mTargetFile);
 
-    // Write linebreak if needed
+    // Write line break if needed
     if(!mAtLineStart && mWriteOptions.testFlag(EnsureBreak))
     {
         mStreamWriter << ENDL;
