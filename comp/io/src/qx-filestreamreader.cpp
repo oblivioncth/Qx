@@ -18,6 +18,8 @@ namespace Qx
  *  usage for reading files.
  *
  *  Most member functions are the same or slightly modified versions of those from QDataStream.
+ *
+ *  @sa FileStreamWriter
  */
 
 //-Constructor---------------------------------------------------------------------------------------------------
