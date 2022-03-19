@@ -11,8 +11,26 @@ namespace Qx
 // TextStreamWriter
 //===============================================================================================================
 
+/*!
+ *  @class TextStreamWriter
+ *
+ *  @brief The TextStreamWriter class is a specialized wrapper for QTextStream that narrows and simplifies its
+ *  usage for writing text files.
+ *
+ *  Most member functions are the same or slightly modified versions of those from QTextStream.
+ *
+ *  @sa FileStreamWriter
+ */
+
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
+/*!
+ *  Constructs a text stream writer that is linked to @a file, configured with @a writeMode and @a writeOptions.
+ *
+ *  @note The following WriteMode values are not supported with this class and will be remapped as shown:
+ *  @li @c WriteMode::Insert -> @c WriteMode::Append
+ *  @li @c WriteMode::Overwrite -> @c WriteMode::Truncate
+ */
 TextStreamWriter::TextStreamWriter(QFile* file, WriteMode writeMode, WriteOptions writeOptions) :
     mTargetFile(file),
     mWriteMode(writeMode),
@@ -31,6 +49,12 @@ TextStreamWriter::TextStreamWriter(QFile* file, WriteMode writeMode, WriteOption
 
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:
+/*!
+ *  Opens the text file associated with the text stream writer and returns an operation report.
+ *
+ *  This function must be called before any data is written, unless the file already open
+ *  in a mode that supports writing before the stream was constructed.
+ */
 IoOpReport TextStreamWriter::openFile()
 {
     // Perform write preparations
@@ -71,6 +95,12 @@ IoOpReport TextStreamWriter::openFile()
     return IoOpReport(IO_OP_WRITE, IO_SUCCESS, *mTargetFile);
 }
 
+/*!
+ *  Writes @a line to the stream, followed by a line break.
+ *
+ *  If @a ensureLineStart is true, a line break will be written before writing @a line if the stream wasn't
+ *  already positioned at the start of a new line.
+ */
 IoOpReport TextStreamWriter::writeLine(QString line, bool ensureLineStart)
 {
     if(mTargetFile->isOpen())
@@ -94,6 +124,9 @@ IoOpReport TextStreamWriter::writeLine(QString line, bool ensureLineStart)
         return IoOpReport(IO_OP_WRITE, IO_ERR_FILE_NOT_OPEN, *mTargetFile);
 }
 
+/*!
+ *  Writes @a text to the stream. No line break is written afterwards.
+ */
 IoOpReport TextStreamWriter::writeText(QString text)
 {
     if(mTargetFile->isOpen())
@@ -113,6 +146,12 @@ IoOpReport TextStreamWriter::writeText(QString text)
         return IoOpReport(IO_OP_WRITE, IO_ERR_FILE_NOT_OPEN, *mTargetFile);
 }
 
+/*!
+ *  Closes the text file associated with the text stream writer.
+ *
+ *  This function should be called when the stream is no longer needed, unless the file should
+ *  remain open for use elsewhere.
+ */
 void TextStreamWriter::closeFile() { mTargetFile->close(); }
 
 }
