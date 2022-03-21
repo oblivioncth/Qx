@@ -1,0 +1,26 @@
+/*!
+ *  @file qx-helpers.h
+ *
+ *  @brief The qx-concepts header file provides a set of various convenience functions that are
+ *  are designed to facilitate common fundamental tasks with as brief syntax as possible.
+ */
+
+//Non-namespace Functions----------------------------------------------------------
+/*!
+ *  @fn template <typename T> const T qxAsConst(T&& t)
+ *
+ *  Serves the same purpose as qAsConst() (preventing implicitly-shared Qt containers from
+ *  detaching), but this version works for rvalues, albeit with some efficiency concerns
+ *  depending on the nature of @a t.
+ */
+
+/*!
+ *  @fn template <typename T> typename std::add_const<T>::type qxAsConst(T& t)
+ *  @overload
+ *
+ *  Equivalent to qAsConst(T& t).
+ *
+ *  This overload exists so that qxAsConst can consistently be used everywhere for both
+ *  lvalues and rvalues, instead of having to employ mixed usage of qxAsConst() and
+ *  qAsConst().
+ */
