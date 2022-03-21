@@ -437,28 +437,28 @@ template<class K>
 concept defines_greater_than = defines_greater_than_for<K, K>;
 
 template<class K, typename T>
-concept defines_less_equal_than_for_s = requires(K klass, T type) {{ klass <= type } -> std::same_as<bool>;};
+concept defines_less_than_equal_for_s = requires(K klass, T type) {{ klass <= type } -> std::same_as<bool>;};
 
 template<class K, typename T>
-concept defines_less_equal_than_for = requires(K klass, T type) {{ klass <= type };};
+concept defines_less_than_equal_for = requires(K klass, T type) {{ klass <= type };};
 
 template<class K>
-concept defines_less_equal_than_s = defines_less_equal_than_for_s<K, K>;
+concept defines_less_than_equal_s = defines_less_than_equal_for_s<K, K>;
 
 template<class K>
-concept defines_less_equal_than = defines_less_equal_than_for<K, K>;
+concept defines_less_than_equal = defines_less_than_equal_for<K, K>;
 
 template<class K, typename T>
-concept defines_greater_equal_than_for_s = requires(K klass, T type) {{ klass >= type } -> std::same_as<bool>;};
+concept defines_greater_than_equal_for_s = requires(K klass, T type) {{ klass >= type } -> std::same_as<bool>;};
 
 template<class K, typename T>
-concept defines_greater_equal_than_for = requires(K klass, T type) {{ klass >= type };};
+concept defines_greater_than_equal_for = requires(K klass, T type) {{ klass >= type };};
 
 template<class K>
-concept defines_greater_equal_than_s = defines_greater_equal_than_for_s<K, K>;
+concept defines_greater_than_equal_s = defines_greater_than_equal_for_s<K, K>;
 
 template<class K>
-concept defines_greater_equal_than = defines_greater_equal_than_for<K, K>;
+concept defines_greater_than_equal = defines_greater_than_equal_for<K, K>;
 
 template<class K, typename T>
 concept defines_three_way_comp_for_s = requires(K klass, T type) {{ klass <=> type } -> std::signed_integral<>;};
