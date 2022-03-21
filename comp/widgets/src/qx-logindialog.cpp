@@ -11,8 +11,20 @@ namespace Qx
 // LoginDialog
 //===============================================================================================================
 
+/*!
+ * @class LoginDialog
+ *
+ * @brief The LoginDialog class provides a modal dialog that prompts a user for a username and password.
+ *
+ * @todo Provide a picture of the dialog. May allow for setting default field content and getting the
+ * existing prompt.
+ */
+
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
+/*!
+ *  Constructs a login dialog with parent @a parent that displays the given @a prompt.
+ */
 LoginDialog::LoginDialog(QWidget* parent, QString prompt) : QDialog(parent)
 {
     // Setup LineEdits
@@ -51,8 +63,19 @@ LoginDialog::LoginDialog(QWidget* parent, QString prompt) : QDialog(parent)
 
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:
+/*!
+ *  Sets the login dialog's prompt.
+ */
 void LoginDialog::setPrompt(QString prompt) { mPromptLabel->setText(prompt); }
+
+/*!
+ *  Returns the string entered into the dialog's username field.
+ */
 QString LoginDialog::username() { return mUsernameLineEdit->text(); }
+
+/*!
+ *  Returns the string entered into the dialog's password field.
+ */
 QString LoginDialog::password() { return mPasswordLineEdit->text(); }
 
 //-Slots--------------------------------------------------------------------------------------------------------
