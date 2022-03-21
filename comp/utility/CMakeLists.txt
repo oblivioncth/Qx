@@ -11,5 +11,12 @@ set(COMPONENT_INCLUDE_HEADERS
     qx-macros.h
 )
 
+# Doc Only Files
+set(COMPONENT_DOC_ONLY
+    qx-concepts.dox
+    qx-helpers.dox
+    qx-macros.dox
+)
+
 #=============== Component Handler =======================
 include(component_lib_rules)
