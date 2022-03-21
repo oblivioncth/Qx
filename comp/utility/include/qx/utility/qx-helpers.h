@@ -6,9 +6,9 @@
 
 //Non-namespace Functions----------------------------------------------------------
 template <typename T>
-typename std::add_const<T>::type qxAsConst(T& t) { return qAsConst(t); }
+const T qxAsConst(T&& t) { return std::move(t); }
 
 template <typename T>
-const T qxAsConst(T&& t) { return std::move(t); }
+typename std::add_const<T>::type qxAsConst(T& t) { return qAsConst(t); }
 
 #endif // QX_HELPERS_H
