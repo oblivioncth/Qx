@@ -10,7 +10,8 @@ namespace Qx
 
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
-StandardItemModel::StandardItemModel() {}
+StandardItemModel::StandardItemModel(int rows, int columns, QObject* parent) : QStandardItemModel(rows, columns, parent) {}
+StandardItemModel::StandardItemModel(QObject* parent) : QStandardItemModel(parent) {}
 
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Private:

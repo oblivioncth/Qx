@@ -16,9 +16,10 @@ private:
 
 //-Constructor-------------------------------------------------------------------------------------------------------
 public:
-    StandardItemModel();
+    StandardItemModel(int rows, int columns, QObject *parent = nullptr);
+    StandardItemModel(QObject *parent = nullptr);
 
-//-Instance Functions----------------------------------------------------------------------------------------------
+//-Instance Functions-----------------------------------------------------------------------------------------------
 public:
     void autoTristateChildren(QStandardItem* changingItem, const QVariant&  value, int role);
     void autoTristateParents(QStandardItem* changingItem, const QVariant&  changingValue);
