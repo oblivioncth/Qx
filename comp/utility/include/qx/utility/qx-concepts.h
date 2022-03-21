@@ -461,7 +461,7 @@ template<class K>
 concept defines_greater_than_equal = defines_greater_than_equal_for<K, K>;
 
 template<class K, typename T>
-concept defines_three_way_comp_for_s = requires(K klass, T type) {{ klass <=> type } -> std::signed_integral<>;};
+concept defines_three_way_comp_for_s = requires(K klass, T type) {{ klass <=> type } -> std::convertible_to<std::partial_ordering>;};
 
 template<class K, typename T>
 concept defines_three_way_comp_for = requires(K klass, T type) {{ klass <=> type };};
