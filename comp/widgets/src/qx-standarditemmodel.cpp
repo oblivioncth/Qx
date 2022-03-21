@@ -8,9 +8,30 @@ namespace Qx
 // StandardItemModel
 //===============================================================================================================
 
+/*!
+ *  @class StandardItemModel
+ *
+ *  @brief The StandardItemModel class is a more robust variant of QStandardItemModel, which is a generic model
+ *  for storing custom data.
+ *
+ *  StandardItemModel derives from QStandardItemModel and therefore shares all of its functionality, but this
+ *  Qx variant provides additional functionality and mechanisms that are missing from its base class.
+ *
+ *  @note One significant functional difference from the base class version to be aware of is that the
+ *  Qt::ItemIsAutoTristate flag of any item managed by this model will always be respected, regardless of which
+ *  view it is attached to. In base Qt the auto tristate flag only functions for items behind a QTreeWidget.
+ */
+
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
+/*!
+ *  Constructs a new item model that initially has @a rows rows and @a columns columns, and that has the given @a parent.
+ */
 StandardItemModel::StandardItemModel(int rows, int columns, QObject* parent) : QStandardItemModel(rows, columns, parent) {}
+
+/*!
+ *  Constructs a new item model with the given @a parent.
+ */
 StandardItemModel::StandardItemModel(QObject* parent) : QStandardItemModel(parent) {}
 
 //-Instance Functions--------------------------------------------------------------------------------------------
@@ -66,7 +87,10 @@ void StandardItemModel::autoTristateParents(QStandardItem* changingItem, const Q
 }
 
 //Public:
-bool StandardItemModel::setData(const QModelIndex&  index, const QVariant&  value, int role)
+/*!
+ *  Reimplements: QStandardItemModel::setData(const QModelIndex& index, const QVariant& value, int role).
+ */
+bool StandardItemModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
     if(role == Qt::CheckStateRole)
     {
@@ -85,9 +109,33 @@ bool StandardItemModel::setData(const QModelIndex&  index, const QVariant&  valu
     return QStandardItemModel::setData(index, value, role);
 }
 
+/*!
+ *  Returns @c true if the item model is set to auto tristate mode; otherwise returns @c false.
+ *
+ *  @sa setAutoTristate().
+ */
 bool StandardItemModel::isAutoTristate() { return mAutoTristate; }
+
+/*!
+ *  Enables treatment of all checkable child items as tristate if @a autoTristate is @c true
+ *
+ *  This enables model-wide automatic management of the state of parent items in the model (checked if all
+ *  children are checked, unchecked if all children are unchecked, or partially checked if only some
+ *  children are checked).
+ *
+ *  @note Even if this option is @c false, items handled by the model that have the flag
+ *  Qt::ItemIsAutoTristate will still be treated as such.
+ */
 void StandardItemModel::setAutoTristate(bool autoTristate) { mAutoTristate = autoTristate; }
 
+/*!
+ *  Calls a user-defined routine on multiple items within the model.
+ *
+ *  @param func The function to call on each item. It must take a single argument of type
+ *  QStandardItem* and return @c void.
+ *  @param parent A model index pointing to the item for processing to start at. A null index causes
+ *  processing to start at the root item of the model, thereby calling the routine on all items.
+ */
 void StandardItemModel::forEachItem(const std::function<void (QStandardItem*)>& func, QModelIndex parent)
 {
     for(int r = 0; r < rowCount(parent); ++r)
@@ -100,7 +148,18 @@ void StandardItemModel::forEachItem(const std::function<void (QStandardItem*)>& 
     }
 }
 
+/*!
+ *  Sets the check state of all checkable items that are managed by the model to Qt::Checked.
+ *
+ *  @sa setAutoTristate().
+ */
 void StandardItemModel::selectAll() { forEachItem([](QStandardItem* item){ item->setCheckState(Qt::Checked); }); }
+
+/*!
+ *  Sets the check state of all checkable items that are managed by the model to Qt::Unchecked.
+ *
+ *  @sa setAutoTristate().
+ */
 void StandardItemModel::selectNone() { forEachItem([](QStandardItem* item){ item->setCheckState(Qt::Unchecked); }); }
 
 
