@@ -19,6 +19,29 @@ namespace Qx
  *  @snippet qx-genericerror.cpp 0
  */
 
+//-Class Enums-----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @enum GenericError::ErrorLevel
+ *
+ *  This enum represents the error level of a generic error.
+ */
+
+/*!
+ *  @var GenericError::ErrorLevel GenericError::ErrorLevel::Warning
+ *  A warning.
+ */
+
+/*!
+ *  @var GenericError::ErrorLevel GenericError::ErrorLevel::Error
+ *  An error.
+ */
+
+/*!
+ *  @var GenericError::ErrorLevel GenericError::ErrorLevel::Critical
+ *  A critical/fatal error.
+ */
+
 //-Class Variables-----------------------------------------------------------------------------------------------
 //Public:
 /*!
