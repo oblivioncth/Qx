@@ -16,8 +16,96 @@
 #include "qx/io/qx-common-io.h"
 #include "qx/core/qx-bitarray.h"
 
+/*!
+ *  @file qx-common-windows.h
+ *
+ *  @brief The qx-common-windows header file provides various types, variables, and functions related to windows
+ *  specific programming.
+ */
+
 namespace Qx
 {
+
+//-Namespace Structs---------------------------------------------------------------------------------------------
+
+//===============================================================================================================
+// ShortcutProperties
+//===============================================================================================================
+
+/*!
+ *  @struct ShortcutProperties
+ *
+ *  @brief The ShortcutProperties struct acts as a more user-friendly container for holding IShellLink data,
+ *  which are the varies properties of a Windows @c .lnk shortcut.
+ */
+
+// Inner enum
+/*!
+ *  @enum ShortcutProperties::ShowMode
+ *
+ *  This enum represents how the window of the target program is first shown when opened.
+ */
+
+/*!
+ *  @var ShortcutProperties::ShowMode ShortcutProperties::ShowMode::NORMAL
+ *  Shows the program window in its original form.
+ */
+
+/*!
+ *  @var ShortcutProperties::ShowMode ShortcutProperties::ShowMode::MAXIMIZED
+ *  Shows the program as a maximized window.
+ */
+
+/*!
+ *  @var ShortcutProperties::ShowMode ShortcutProperties::ShowMode::MINIMIZED
+ *  Shows the program as a minimized window.
+ */
+
+// Struct members
+/*!
+ *  @var QString ShortcutProperties::target
+ *
+ *  The shortcut's target.
+ */
+
+/*!
+ *  @var QString ShortcutProperties::targetArgs
+ *
+ *  The arguments to pass the shortcut's target.
+ */
+
+/*!
+ *  @var QString ShortcutProperties::startIn
+ *
+ *  The "Start in" directory from which to launch the target.
+ */
+
+/*!
+ *  @var QString ShortcutProperties::comment
+ *
+ *  A comment viewable within the shortcut properties.
+ */
+
+/*!
+ *  @var QString ShortcutProperties::iconFilePath
+ *
+ *  A full path to the file that contains shortcut's icon.
+ */
+
+/*!
+ *  @var int ShortcutProperties::iconIndex
+ *
+ *  The index of the icon within the shortcut's icon file.
+ *
+ *  This should be a zero or positive value for files that contain multiple icons (e.g. DLL, EXE,
+ *  multi-image ICO, etc.), or simply zero if iconFilePath points to a single image.
+ */
+
+/*!
+ *  @var ShortcutProperties::ShowMode ShortcutProperties::showMode
+ *
+ *  The show mode to use for the target application.
+ */
 
 namespace  // Anonymous namespace for effectively private (to this cpp) functions
 {
@@ -43,7 +131,13 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
     }
 }
 
-DWORD processIDByName(QString processName)
+/*!
+ *  Returns the PID (process ID) of a running process with the image (executable) name @a processName,
+ *  or zero if the process could not be found.
+ *
+ *  @sa processNameById().
+ */
+DWORD processIdByName(QString processName)
 {
     // Find process ID by name
     DWORD processID = 0;
@@ -70,7 +164,13 @@ DWORD processIDByName(QString processName)
     return processID;
 }
 
-QString processNameByID(DWORD processID)
+/*!
+ *  Returns the image (executable) name of a running process with the PID @a processID,
+ *  or a null string if the process could not be found.
+ *
+ *  @sa processIdByName().
+ */
+QString processNameById(DWORD processID)
 {
     // Find process name by ID
     QString processName = QString();
@@ -97,9 +197,31 @@ QString processNameByID(DWORD processID)
     return processName;
 }
 
-bool processIsRunning(QString processName) { return processIDByName(processName); }
-bool processIsRunning(DWORD processID) { return processNameByID(processID).isNull(); }
+/*!
+ *  Returns @c true if the process with the image (executable) @a processName is currently running;
+ *  otherwise returns @c false.
+ */
+bool processIsRunning(QString processName) { return processIdByName(processName); }
 
+/*!
+ *  @overload
+ *
+ *  Returns @c true if the process with the PID @a processID is currently running;
+ *  otherwise returns @c false.
+ */
+bool processIsRunning(DWORD processID) { return processNameById(processID).isNull(); }
+
+/*!
+ *  This function is used to limit a particular application such that only one running instance is
+ *  allowed at one time. Call this function early in your program, at the point at which you want
+ *  additional instances to terminate, and check the result:
+ *
+ *  If the calling instance is the only one running, the function will return @c true; otherwise
+ *  it returns false.
+ *
+ *  @note This function uses the SHA256 based hash of the program's executable to uniquely
+ *  identify its instances and detect the existence of them via a mutex.
+ */
 bool enforceSingleInstance()
 {
     // Persistent handle instance
@@ -124,6 +246,9 @@ bool enforceSingleInstance()
     return true;
 }
 
+/*!
+ *  Returns the HRESULT value @a res as a generic error.
+ */
 Qx::GenericError translateHresult(HRESULT res)
 {
     BitArray resBits = BitArray::fromInteger(res);
@@ -143,6 +268,9 @@ Qx::GenericError translateHresult(HRESULT res)
     return Qx::GenericError(GenericError::Error, QString::fromWCharArray(comError.ErrorMessage()));
 }
 
+/*!
+ *  Returns the NTSTATUS value @a stat as a generic error.
+ */
 Qx::GenericError translateNtstatus(NTSTATUS stat)
 {
     BitArray statBits = BitArray::fromInteger(stat);
@@ -179,6 +307,10 @@ Qx::GenericError translateNtstatus(NTSTATUS stat)
     return Qx::GenericError(severity == 0x03 ? GenericError::Error : GenericError::Warning, QString::fromWCharArray(formatedBuffer));
 }
 
+/*!
+ *  Creates a shortcut on the user's filesystem at the path @a shortcutPath, with the given
+ *  shortcut properties @a sp.
+ */
 Qx::GenericError createShortcut(QString shortcutPath, ShortcutProperties sp)
 {
     // Check for basic argument validity

@@ -42,8 +42,8 @@ struct ShortcutProperties
 FileDetails readFileDetails(QString filePath);
 
 // Processes
-DWORD processIDByName(QString processName);
-QString processNameByID(DWORD processID);
+DWORD processIdByName(QString processName);
+QString processNameById(DWORD processID);
 bool processIsRunning(QString processName);
 bool processIsRunning(DWORD processID);
 bool enforceSingleInstance();
