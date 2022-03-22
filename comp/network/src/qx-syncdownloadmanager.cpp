@@ -410,7 +410,8 @@ SyncDownloadManager::Report SyncDownloadManager::processQueue()
     return report;
 }
 
-//Private Slots:
+//-Slots----------------------------------------------------------------------------------------------------------
+//Private:
 void SyncDownloadManager::downloadProgressHandler(qint64 bytesCurrent, qint64 bytesTotal)
 {
     // Get the object that called this slot
@@ -568,7 +569,7 @@ void SyncDownloadManager::proxyAuthHandler(const QNetworkProxy& proxy, QAuthenti
     }
 }
 
-//Public Slots:
+//Public:
 /*!
  *  Aborts all in-progress and remaining downloads immediately.
  *
@@ -583,7 +584,7 @@ void SyncDownloadManager::abort()
     }
 }
 
-// Public Signals:
+//-Signals------------------------------------------------------------------------------------------------
 /*!
  *  @fn void SyncDownloadManager::downloadProgress(qint64 bytesCurrent)
  *
