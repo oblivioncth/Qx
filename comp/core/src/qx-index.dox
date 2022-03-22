@@ -23,25 +23,32 @@ namespace Qx
  *  both operands instances of the class and the underlying raw value must otherwise be accessed explicitly with
  *  Index<T>::operator*().
  *
- *  @b Arithmetic:
+ *  @par Arithmetic:
  *
+ *  @par
  *  Arithmetic with indices mirrors standard integer arithmetic with the following two exceptions:
  *
+ *  @par
  *  1) 'last' indices are treated as pseudo-infinite values
  *
+ *  @par
  *  @snippet qx-index.cpp 0
  *
+ *  @par
  *  2) Null indices are equivalent to 0.
  *
+ *  @par
  *  All arithmetic for this class is constrained such that an instance's value can never be negative, nor can
  *  it underflow or overflow.
  *
- *  @b Comparison:
+ *  @par Comparison:
  *
+ *  @par
  *  Comparison between indices mirrors standard integer comparison with the following two exceptions:
  *
- *  1) Null indices are less than everything except other null indices (lowest possible value)
- *  2) 'last' indices are greater than everything except other 'last' indices (highest possible value)
+ *  @par
+ *  @li 1) Null indices are less than everything except other null indices (lowest possible value)
+ *  @li 2) 'last' indices are greater than everything except other 'last' indices (highest possible value)
  */
 
 //-Class Members----------------------------------------------------------------------------------------------------
