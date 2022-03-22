@@ -28,25 +28,25 @@ namespace Qx
  */
 
 /*!
- *  @var WriteMode::Insert
+ *  @var WriteMode WriteMode::Insert
  *  Specifies that content is to be inserted into an existing file, if it already exists, preserving
  *  the file's original content, though not necessarily its location.
  */
 
 /*!
- *  @var WriteMode::Overwrite
+ *  @var WriteMode WriteMode::Overwrite
  *  Specifies that content is to be written on top of a file's existing content, if it already exists, replacing as much
  *  as is necessary.
  */
 
 /*!
- *  @var WriteMode::Append
+ *  @var WriteMode WriteMode::Append
  *  Specifies that content is to be written to the end of an existing file, if it already exists, leaving the original
  *  content untouched.
  */
 
 /*!
- *  @var WriteMode::Truncate
+ *  @var WriteMode WriteMode::Truncate
  *  Specifies that the destination file is to be emptied before writing, if it already exists, so that the new content
  *  entirely replaces the old.
  */
@@ -61,34 +61,34 @@ namespace Qx
  */
 
 /*!
- *  @var WriteOption::NoWriteOptions
+ *  @var WriteOption WriteOption::NoWriteOptions
  *  The default.
  */
 
 /*!
- *  @var WriteOption::CreatePath
+ *  @var WriteOption WriteOption::CreatePath
  *  Create all directories required to write a file according to its full path.
  */
 
 /*!
- *  @var WriteOption::ExistingOnly
+ *  @var WriteOption WriteOption::ExistingOnly
  *  Only write to the target file if it already exists.
  */
 
 /*!
- *  @var WriteOption::NewOnly
+ *  @var WriteOption WriteOption::NewOnly
  *  Only write to the target file if doesn't already exist.
  */
 
 /*!
- *  @var WriteOption::EnsureBreak
+ *  @var WriteOption WriteOption::EnsureBreak
  *  Ensure that a contextually appropriate break is present before the position where data is to be written.
  *
  *  This is generally an end-of-line character when working with text, and a null byte ('\0') when working with raw data.
  */
 
 /*!
- *  @var WriteOption::Pad
+ *  @var WriteOption WriteOption::Pad
  *  Pad the target file before writing to the middle of a file if required.
  *
  *  This is generally done an end-of-line character and spaces when working with text, and a null bytes ('\0') when
@@ -96,7 +96,7 @@ namespace Qx
  */
 
 /*!
- *  @var WriteOption::Unbuffered
+ *  @var WriteOption WriteOption::Unbuffered
  *  Bypass any buffers involved with writing.
  *
  *  Generally only applies to streams.
@@ -118,12 +118,12 @@ namespace Qx
  */
 
 /*!
- *  @var ReadOption::NoReadOptions
+ *  @var ReadOption ReadOption::NoReadOptions
  *  The default.
  */
 
 /*!
- *  @var ReadOption::IgnoreTrailingBreak
+ *  @var ReadOption ReadOption::IgnoreTrailingBreak
  *  When file positions are considered, do not count a trailing break as being part of the file.
  *
  *  For example, when requesting the last line of a text document, the second to last line will be returned instead if
