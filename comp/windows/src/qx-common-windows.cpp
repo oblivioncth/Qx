@@ -37,6 +37,8 @@ namespace Qx
  *
  *  @brief The ShortcutProperties struct acts as a more user-friendly container for holding IShellLink data,
  *  which are the varies properties of a Windows @c .lnk shortcut.
+ *
+ *  @sa <a href="https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nn-shobjidl_core-ishelllinka">IShellLink Interface</a>
  */
 
 // Inner enum
