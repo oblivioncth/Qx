@@ -13,49 +13,16 @@ namespace Qx
 
 //-Constructor-------------------------------------------------------------------------------------------------------
 //Public:
-FileDetails::FileDetails() {}
+FileDetails::FileDetails() :
+    mFileFlags(0),
+    mFileOs(0),
+    mFileType(0),
+    mFileSubtype(0)
+{}
 
-//-Instance Functions------------------------------------------------------------------------------------------------
-//Private:
-bool FileDetails::isNull() { return mFileVersion.isNull() && mProductVersion.isNull() && mStringTables.isEmpty(); }
-int FileDetails::stringTableCount() { return mStringTables.count(); }
-QList<QPair<QString, QString>> FileDetails::availableLangCodePages() { return mLangCodePageMap.keys(); }
-bool FileDetails::hasLangCodePage(QString lanuage, QString codePage) { return mLangCodePageMap.contains(qMakePair(lanuage.toUpper(), codePage.toUpper())); }
-VersionNumber FileDetails::metaStructVersion() { return mMetaStructVersion; }
-
-VersionNumber FileDetails::fileVersion() { return mFileVersion; }
-VersionNumber FileDetails::productVersion() { return mProductVersion; }
-FileDetails::FileFlags FileDetails::fileFlags() { return mFileFlags; }
-FileDetails::TargetSystems FileDetails::targetSystems() { return mTargetSystems; }
-FileDetails::FileType FileDetails::fileType() { return mFileType; }
-FileDetails::FileSubType FileDetails::fileSubType() { return mFileSubType; }
-int FileDetails::virtualDeviceID() { return mVirtualDeviceID; }
-
-const FileDetails::StringTable FileDetails::stringTable(int index)
-{
-    if(index >= 0 && index < mStringTables.count())
-        return mStringTables.at(index);
-    else
-        return FileDetails::StringTable();
-}
-
-const FileDetails::StringTable FileDetails::stringTable(QString language, QString codePage)
-{
-    if(hasLangCodePage(language.toUpper(), codePage.toUpper()))
-        return mStringTables.at(mLangCodePageMap.value(qMakePair(language.toUpper(), codePage.toUpper())));
-    else
-        return StringTable();
-}
-
+//-Class Functions----------------------------------------------------------------------------------------------------
 //Public:
-void FileDetails::addStringTable(StringTable stringTable)
-{
-    mStringTables.append(stringTable);
-    mLangCodePageMap[qMakePair(stringTable.metaLanguageID, stringTable.metaCodePageID)] = mStringTables.count() - 1;
-}
-
-//-Functions-------------------------------------------------------------------------------------------------------------
-FileDetails readFileDetails(QString filePath)
+FileDetails FileDetails::readFileDetails(QString filePath)
 {
     // File details to fill
     FileDetails workingFileDetails;
@@ -98,29 +65,19 @@ FileDetails readFileDetails(QString filePath)
                                                                                fixedFileInfo->dwProductVersionLS >> 16,
                                                                                fixedFileInfo->dwProductVersionLS & 0xFFFF);
 
-                            // Get file flags
-                            DWORD trueFlags = fixedFileInfo->dwFileFlags & fixedFileInfo->dwFileFlagsMask;
-                            QHash<DWORD, FileDetails::FileFlag>::const_iterator i;
-                            for (i = FileDetails::FILE_FLAG_MAP.constBegin(); i != FileDetails::FILE_FLAG_MAP.constEnd(); i++)
-                                if(trueFlags & i.key())
-                                    workingFileDetails.mFileFlags = workingFileDetails.mFileFlags | i.value();
+                            // Get file flags (use mask to validate bit fields)
+                            workingFileDetails.mFileFlags = fixedFileInfo->dwFileFlags & fixedFileInfo->dwFileFlagsMask;
 
                             // Get target OSes
-                            QHash<DWORD, FileDetails::TargetSystem>::const_iterator j;
-                            for (j = FileDetails::TARGET_SYSTEM_MAP.constBegin(); j != FileDetails::TARGET_SYSTEM_MAP.constEnd(); j++)
-                                if(fixedFileInfo->dwFileOS & j.key())
-                                    workingFileDetails.mTargetSystems = workingFileDetails.mTargetSystems | j.value();
+                            workingFileDetails.mFileOs = fixedFileInfo->dwFileOS;
 
                             // Get file type
-                            workingFileDetails.mFileType = fixedFileInfo->dwFileType == 0 ? FileDetails::FT_NONE :
-                                                           FileDetails::FILE_TYPE_MAP.value(fixedFileInfo->dwFileType, FileDetails::FT_UNK);
+                            workingFileDetails.mFileType = fixedFileInfo->dwFileType;
 
                             // Get file sub-type
-                            workingFileDetails.mFileSubType = fixedFileInfo->dwFileSubtype == 0 ? FileDetails::FST_NONE :
-                                                              FileDetails::FILE_SUB_TYPE_MAP.value(qMakePair(workingFileDetails.mFileType,
-                                                                                                             fixedFileInfo->dwFileSubtype),
-                                                                                                   FileDetails::FST_UNK);
-                            // DWORD dwFileDateMS and DWORD dwFileDateLS a currently unused
+                            workingFileDetails.mFileSubtype = fixedFileInfo->dwFileSubtype;
+
+                            // TODO: DWORD dwFileDateMS and DWORD dwFileDateLS a currently unused
                         }
                     }
                 }
@@ -131,7 +88,7 @@ FileDetails readFileDetails(QString filePath)
                     WORD wCodePage;
                 } *langCodePage;
 
-                // Lambda for repetative string table queries
+                // Lambda for repetitive string table queries
                 std::function<QString(QString)> getStringTableVal = [&verInfo](QString query)->QString
                 {
                     LPVOID lpPointer;
@@ -184,6 +141,46 @@ FileDetails readFileDetails(QString filePath)
 
     // Return null or populated file details
     return workingFileDetails;
-}	
+}
+
+//-Instance Functions------------------------------------------------------------------------------------------------
+//Private:
+void FileDetails::addStringTable(StringTable stringTable)
+{
+    mStringTables.append(stringTable);
+    mLangCodePageMap[Translation{stringTable.metaLanguageID, stringTable.metaCodePageID}] = mStringTables.count() - 1;
+}
+
+//Public:
+bool FileDetails::isNull() { return mFileVersion.isNull() && mProductVersion.isNull() && mStringTables.isEmpty(); }
+int FileDetails::stringTableCount() { return mStringTables.count(); }
+QList<FileDetails::Translation> FileDetails::availableTranslations() { return mLangCodePageMap.keys(); }
+bool FileDetails::hasTranslation(Translation translation) { return mLangCodePageMap.contains(translation); }
+VersionNumber FileDetails::metaStructVersion() { return mMetaStructVersion; }
+
+VersionNumber FileDetails::fileVersion() { return mFileVersion; }
+VersionNumber FileDetails::productVersion() { return mProductVersion; }
+DWORD FileDetails::fileFlags() { return mFileFlags; }
+DWORD FileDetails::targetSystems() { return mFileOs; }
+DWORD FileDetails::fileType() { return mFileType; }
+DWORD FileDetails::fileSubType() { return mFileSubtype; }
+
+const FileDetails::StringTable FileDetails::stringTable(int index)
+{
+    if(index >= 0 && index < mStringTables.count())
+        return mStringTables.at(index);
+    else
+        return FileDetails::StringTable();
+}
+
+const FileDetails::StringTable FileDetails::stringTable(Translation translation)
+{
+    if(hasTranslation(translation))
+        return mStringTables.at(mLangCodePageMap.value(translation));
+    else
+        return StringTable();
+}
+
+
 
 }
