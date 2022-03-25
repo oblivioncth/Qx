@@ -11,8 +11,154 @@ namespace Qx
 // FileDetails
 //===============================================================================================================
 
+/*!
+ *  @class FileDetails
+ *
+ *  @brief The FileDetails class acts as a user-friendly container for holding a file's @e Version Info as
+ *  defined by the Windows API, which largely consists of the fields within a given file's @e Details pane.
+ *
+ *  File details are composed of two major sections:
+ *  @li Fixed File Info - A fixed number of fields that are translation independent
+ *  @li String Table - A set of optional fields that are translation dependent
+ *
+ *  The fixed portion of a file's details are accessible via the various named accessor functions of this class,
+ *  while the string table portion is accessible via stringTable(). As the arguments for said function suggest,
+ *  a file can contain multiple string tables, each representative of a specific translation, though most often
+ *  files only contain one.
+ *
+ *  This class also features the static member function readFileDetails() that can be used to acquire the details
+ *  of a given file.
+ *
+ *  @sa , <a href="https://docs.microsoft.com/en-us/windows/win32/menurc/versioninfo-resource">VERSIONINFO resource</a>
+ *  <a href="https://docs.microsoft.com/en-us/windows/win32/api/winver/nf-winver-getfileversioninfow">GetFileVersionInfoW</a>,
+ *  <a href="https://docs.microsoft.com/en-us/windows/win32/api/winver/nf-winver-verqueryvaluew">VerQueryValue</a>.
+ */
+
+//-Class Structs-----------------------------------------------------------------------------------------------------
+/*!
+ *  @struct FileDetails::Translation
+ *
+ *  A structure used to represent a particular translation of the string table section of a file's details. It
+ *  encapsulates a language and code page identifier pair.
+ *
+ *  @note Handling translations via code pages is deprecated and discouraged when created new Windows applications;
+ *  however, file details are still encoded using this method for backwards compatibility, and therefore must be
+ *  parsed the same way.
+ */
+
+/*!
+ *  @var QString FileDetails::Translation::language
+ *
+ *  The language ID of the translation as a hexadecimal string.
+ *
+ *  @sa <a href="https://docs.microsoft.com/en-us/windows/win32/intl/language-identifiers">Language Identifiers</a>,
+ *  <a href="https://docs.microsoft.com/en-us/windows/win32/menurc/versioninfo-resource#langIDs">VersionInfo Resource Language ID</a>.
+ */
+
+/*!
+ *  @var QString FileDetails::Translation::codePage
+ *
+ *  The code page ID of the translation as a hexadecimal string.
+ *
+ *  @sa <a href="https://docs.microsoft.com/en-us/windows/win32/intl/code-page-identifiers">Code Page Identifiers</a>,
+ *  <a href="https://docs.microsoft.com/en-us/windows/win32/menurc/versioninfo-resource#charsetID">VersionInfo Resource Code Page ID</a>.
+ */
+
+/*!
+ *  @struct FileDetails::StringTable
+ *
+ *  A structure that contains all of the translation dependent optional fields of a file's details
+ *
+ *  @sa <a href="https://docs.microsoft.com/en-us/windows/win32/menurc/stringtable">StringTable structure</a>.
+ */
+
+/*!
+ *  @var QString FileDetails::StringTable::metaLanguageID
+ *  The language identifier of the translation this string table is associated with.
+ */
+
+/*!
+ *  @var QString FileDetails::StringTable::metaCodePageID
+ *  The code page identifier of the translation this string table is associated with.
+ */
+
+/*!
+ *  @var QString FileDetails::StringTable::comments
+ *  Comments left by the file's author.
+ */
+
+/*!
+ *  @var QString FileDetails::StringTable::companyName
+ *  The company that authored the file.
+ */
+
+/*!
+ *  @var QString FileDetails::StringTable::fileDescription
+ *  A basic description of the file.
+ */
+
+/*!
+ *  @var QString FileDetails::StringTable::fileVersion
+ *  A string representation of the file's version.
+ *
+ *  Generally this is equivalent to:
+ *  \code{.cpp}
+ *  fileDetails.fileVersion().toString();
+ *  \endcode
+ */
+
+/*!
+ *  @var QString FileDetails::StringTable::internalName
+ *  The internal name used to refer to the file by its author.
+ */
+
+/*!
+ *  @var QString FileDetails::StringTable::legalCopyright
+ *  Copyright information for the file.
+ */
+
+/*!
+ *  @var QString FileDetails::StringTable::legalTrademarks
+ *  Trademark information for the file.
+ */
+
+/*!
+ *  @var QString FileDetails::StringTable::originalFilename
+ *  The name of the file when it was authored.
+ */
+
+/*!
+ *  @var QString FileDetails::StringTable::productName
+ *  The name of the product this file is associated with.
+ */
+
+/*!
+ *  @var QString FileDetails::StringTable::productVersion
+ *  A string representation of the version of the product the file is associated with.
+ *
+ *  Generally this is equivalent to:
+ *  \code{.cpp}
+ *  fileDetails.productVersion().toString();
+ *  \endcode
+ */
+
+/*!
+ *  @var QString FileDetails::StringTable::privateBuild
+ *  Information about the private version nature of the file. Only present if VS_FF_PRIVATEBUILD is set
+ *  on this file.
+ */
+
+/*!
+ *  @var QString FileDetails::StringTable::specialBuild
+ *  Information about the special version nature of the file. Only present if VS_FF_SPECIALBUILD is set
+ *  on this file.
+ */
+
 //-Constructor-------------------------------------------------------------------------------------------------------
 //Public:
+/*!
+ *  Creates a null FileDetails object.
+ */
 FileDetails::FileDetails() :
     mFileFlags(0),
     mFileOs(0),
@@ -22,6 +168,10 @@ FileDetails::FileDetails() :
 
 //-Class Functions----------------------------------------------------------------------------------------------------
 //Public:
+/*!
+ *  Returns the file details of the file pointed to by @a filePath, or a null FileDetails object if
+ *  the file doesn't exist.
+ */
 FileDetails FileDetails::readFileDetails(QString filePath)
 {
     // File details to fill
@@ -152,19 +302,83 @@ void FileDetails::addStringTable(StringTable stringTable)
 }
 
 //Public:
+/*!
+ *  Returns @c true if the file details are null; otherwise returns @c false.
+ */
 bool FileDetails::isNull() { return mFileVersion.isNull() && mProductVersion.isNull() && mStringTables.isEmpty(); }
+
+/*!
+ *  Returns the number of string tables present within the file details.
+ */
 int FileDetails::stringTableCount() { return mStringTables.count(); }
+
+/*!
+ *  Returns the translations for which there are string tables available.
+ */
 QList<FileDetails::Translation> FileDetails::availableTranslations() { return mLangCodePageMap.keys(); }
+
+/*!
+ *  Returns @c true if a string table with the given @a translation is available; otherwise returns @c false.
+ */
 bool FileDetails::hasTranslation(Translation translation) { return mLangCodePageMap.contains(translation); }
+
+/*!
+ *  Returns the internal version of the VS_FIXEDFILEINFO structure that was read from the file.
+ */
 VersionNumber FileDetails::metaStructVersion() { return mMetaStructVersion; }
 
+/*!
+ *  Returns the version of the file.
+ */
 VersionNumber FileDetails::fileVersion() { return mFileVersion; }
+
+/*!
+ *  Returns the version of the product the file is associated with.
+ */
 VersionNumber FileDetails::productVersion() { return mProductVersion; }
+
+/*!
+ *  Returns the flags set on the file.
+ *
+ *  See the @e dwFileFlags section of the
+ *  <a href="https://docs.microsoft.com/en-us/windows/win32/api/verrsrc/ns-verrsrc-vs_fixedfileinfo#members">
+ *  VS_FIXEDFILEINFO</a> documentation for this values associated macros and their descriptions.
+ */
 DWORD FileDetails::fileFlags() { return mFileFlags; }
-DWORD FileDetails::targetSystems() { return mFileOs; }
+
+/*!
+ *  Returns the target operating system for the file.
+ *
+ *  See the @e dwFileOS section of the
+ *  <a href="https://docs.microsoft.com/en-us/windows/win32/api/verrsrc/ns-verrsrc-vs_fixedfileinfo#members">
+ *  VS_FIXEDFILEINFO</a> documentation for this values associated macros and their descriptions.
+ */
+DWORD FileDetails::fileOs() { return mFileOs; }
+
+/*!
+ *  Returns the type of file.
+ *
+ *  See the @e dwFileType section of the
+ *  <a href="https://docs.microsoft.com/en-us/windows/win32/api/verrsrc/ns-verrsrc-vs_fixedfileinfo#members">
+ *  VS_FIXEDFILEINFO</a> documentation for this values associated macros and their descriptions.
+ */
 DWORD FileDetails::fileType() { return mFileType; }
+
+/*!
+ *  Returns the subtype of file.
+ *
+ *  See the @e dwFileSubtype section of the
+ *  <a href="https://docs.microsoft.com/en-us/windows/win32/api/verrsrc/ns-verrsrc-vs_fixedfileinfo#members">
+ *  VS_FIXEDFILEINFO</a> documentation for this values associated macros and their descriptions.
+ */
 DWORD FileDetails::fileSubType() { return mFileSubtype; }
 
+/*!
+ *  Returns the string table at index @a index.
+ *
+ *  The order of string tables within a file's version info is simply the order in which they were added when
+ *  the file was authored.
+ */
 const FileDetails::StringTable FileDetails::stringTable(int index)
 {
     if(index >= 0 && index < mStringTables.count())
@@ -173,6 +387,10 @@ const FileDetails::StringTable FileDetails::stringTable(int index)
         return FileDetails::StringTable();
 }
 
+/*!
+ *  Returns the string table associated with the given @a translation, or a string table with all null
+ *  fields if one with that translation is not available.
+ */
 const FileDetails::StringTable FileDetails::stringTable(Translation translation)
 {
     if(hasTranslation(translation))
@@ -180,7 +398,5 @@ const FileDetails::StringTable FileDetails::stringTable(Translation translation)
     else
         return StringTable();
 }
-
-
 
 }

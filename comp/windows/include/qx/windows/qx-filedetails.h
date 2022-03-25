@@ -95,7 +95,7 @@ public:
     VersionNumber fileVersion();
     VersionNumber productVersion();
     DWORD fileFlags();
-    DWORD targetSystems();
+    DWORD fileOs();
     DWORD fileType();
     DWORD fileSubType();
     const StringTable stringTable(int index = 0);
