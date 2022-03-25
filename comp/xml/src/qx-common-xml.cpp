@@ -4,6 +4,15 @@
 // Qt Includes
 #include <QRegularExpression>
 
+/*!
+ *  @file qx-common-xml.h
+ *
+ *  @brief The qx-common-xml header file provides various types, variables, and functions related to
+ *  manipulating XML data.
+ *
+ *  @todo Well, the brief description is at least partially true.
+ */
+
 namespace Qx
 {
 
@@ -14,6 +23,9 @@ namespace  // Anonymous namespace for effectively private (to this cpp)
 }
 
 //-Namespace Functions----------------------------------------------------------------------------------------------------
+/*!
+ *  Returns a copy of @a string with all non-legal XML characters removed
+ */
 QString xmlSanitized(QString string) { return string.replace(illegalXmlChar, ""); }	
 
 }
