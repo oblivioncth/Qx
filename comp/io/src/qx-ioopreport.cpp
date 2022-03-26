@@ -6,6 +6,7 @@ namespace Qx
 
 /*!
  *  @enum IoOpType
+ *  @ingroup qx-io
  *
  *  This defines the type of an IO operation.
  */
@@ -32,6 +33,7 @@ namespace Qx
 
 /*!
  *  @enum IoOpResultType
+ *  @ingroup qx-io
  *
  *  This defines type of an IO operation result.
  */
@@ -158,6 +160,7 @@ namespace Qx
 
 /*!
  *  @enum IoOpTargetType
+ *  @ingroup qx-io
  *
  *  This defines the type of an IO operation target.
  */
@@ -178,6 +181,7 @@ namespace Qx
 
 /*!
  *  @class IoOpReport
+ *  @ingroup qx-io
  *
  *  @brief The IoOpReport class is a container for details regarding the outcome of an IO operation.
  */

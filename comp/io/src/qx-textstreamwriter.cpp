@@ -13,6 +13,7 @@ namespace Qx
 
 /*!
  *  @class TextStreamWriter
+ *  @ingroup qx-io
  *
  *  @brief The TextStreamWriter class is a specialized wrapper for QTextStream that narrows and simplifies its
  *  usage for writing text files.

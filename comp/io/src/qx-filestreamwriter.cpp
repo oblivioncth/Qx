@@ -13,6 +13,7 @@ namespace Qx
 
 /*!
  *  @class FileStreamWriter
+ *  @ingroup qx-io
  *
  *  @brief The FileStreamWriter class is a specialized wrapper for QDataStream that narrows and simplifies its
  *  usage for writing files.

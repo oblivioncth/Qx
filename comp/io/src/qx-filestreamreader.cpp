@@ -13,6 +13,7 @@ namespace Qx
 
 /*!
  *  @class FileStreamReader
+ *  @ingroup qx-io
  *
  *  @brief The FileStreamReader class is a specialized wrapper for QDataStream that narrows and simplifies its
  *  usage for reading files.

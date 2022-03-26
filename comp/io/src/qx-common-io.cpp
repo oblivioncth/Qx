@@ -10,10 +10,11 @@
 
 /*!
  *  @file qx-common-io.h
+ *  @ingroup qx-io
  *
  *  @brief The qx-common-io header file provides various types, variables, and functions related to file IO.
  *
- *  Most functions in this class return an IoOpReport that details the success or failure of their actions.
+ *  Most functions in this file return an IoOpReport that details the success or failure of their actions.
  */
 
 namespace Qx
