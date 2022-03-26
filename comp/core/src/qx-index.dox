@@ -6,6 +6,7 @@ namespace Qx
 
 /*!
  *  @class Index
+ *  @ingroup qx-core
  *
  *  @brief The Index template class provides a wrapper for integers with the notion of 'first', 'last' and 'null'.
  *
@@ -253,24 +254,28 @@ namespace Qx
 //-Outer Class Types----------------------------------------------------------------------------------------
 /*!
  * @typedef Index8
+ * @ingroup qx-core
  *
  * A convenience synonym for Index<qint8>
  */
 
 /*!
  * @typedef Index16
+ * @ingroup qx-core
  *
  * A convenience synonym for Index<qint16>
  */
 
 /*!
  * @typedef Index32
+ * @ingroup qx-core
  *
  * A convenience synonym for Index<qint32>
  */
 
 /*!
  * @typedef Index64
+ * @ingroup qx-core
  *
  * A convenience synonym for Index<qint64>
  */

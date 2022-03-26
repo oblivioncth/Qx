@@ -15,6 +15,7 @@ namespace Qx
 
 /*!
  *  @class Json
+ *  @ingroup qx-core
  *
  *  @brief The Json class is a collection of static functions pertaining to parsing JSON data
  */

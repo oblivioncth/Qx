@@ -6,6 +6,7 @@ namespace Qx
 
 /*!
  *  @class RegularExpression
+ *  @ingroup qx-core
  *
  *  @brief The RegularExpression class is a collection of convenient regular expression statements.
  */

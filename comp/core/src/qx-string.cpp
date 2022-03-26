@@ -17,6 +17,7 @@ namespace Qx
 
 /*!
  *  @class String
+ *  @ingroup qx-core
  *
  *  @brief The String class is a collection of static functions pertaining to string types
  */

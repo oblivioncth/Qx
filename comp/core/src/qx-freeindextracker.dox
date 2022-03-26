@@ -6,6 +6,7 @@ namespace Qx
 
 /*!
  *  @class FreeIndexTracker
+ *  @ingroup qx-core
  *
  *  @brief The FreeIndexTracker template class tracks which slots from a given range of indices are in use and
  *  which are available.

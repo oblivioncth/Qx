@@ -1,5 +1,9 @@
 namespace Qx
 {
+/*! @addtogroup qx-core
+ *  @{
+ */
+
 //-Namespace Members--------------------------------------------------------------------------------------------
 /*!
  *  @var QTextStream cout
@@ -18,4 +22,6 @@ namespace Qx
  *
  *  QTextStream equivalent of std::cin.
  */
+
+/*! @}*/
 }

@@ -6,6 +6,7 @@ namespace Qx
 
 /*!
  *  @class Traverser
+ *  @ingroup qx-core
  *
  *  @brief The Traverser template class provides a const_iterator wrapper for an alternate approach to
  *  iterating over a type.

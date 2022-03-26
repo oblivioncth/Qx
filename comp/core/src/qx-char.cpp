@@ -10,16 +10,15 @@ namespace Qx
 //===============================================================================================================
 // Char
 //===============================================================================================================
-
 /*!
  *  @class Char
+ *  @ingroup qx-core
  *
  *  @brief The Char class is a collection of static functions pertaining to character types
  */
 
 //-Class Functions-----------------------------------------------------------------------------------------------
 //Public:
-
 /*!
  *  Returns @c true if @a hexNum is a numeric digit, or a letter A through F (case-insensitive);
  *  otherwise returns @c false.

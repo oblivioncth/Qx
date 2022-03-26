@@ -1,5 +1,9 @@
 namespace Qx
 {
+/*! @addtogroup qx-core
+ *  @{
+ */
+
 /*!
  *  @fn template<typename T> requires std::integral<T> T lengthOfRange(T start, T end)
  *
@@ -106,4 +110,6 @@ namespace Qx
  *
  *  Returns the power of two that is closest to @a num.
  */
+
+/*! @}*/
 }

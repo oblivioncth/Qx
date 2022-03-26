@@ -17,6 +17,7 @@ namespace Qx
 
 /*!
  *  @class VersionNumber
+ *  @ingroup qx-core
  *
  *  @brief The VersionNumber class extends QVersionNumber to include a dedicated constructor and getter for the
  *  fourth version segment.

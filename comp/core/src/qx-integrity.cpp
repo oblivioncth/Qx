@@ -10,6 +10,7 @@ namespace Qx
 
 /*!
  *  @class Integrity
+ *  @ingroup qx-core
  *
  *  @brief The Integrity class is a collection of static functions pertaining to data completeness
  */

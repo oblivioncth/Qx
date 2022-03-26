@@ -6,6 +6,7 @@ namespace Qx
 
 /*!
  *  @class Array
+ *  @ingroup qx-core
  *
  *  @brief The Array class is a collection of static functions pertaining to C-style arrays.
  */

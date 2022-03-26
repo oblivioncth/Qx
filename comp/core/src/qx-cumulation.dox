@@ -6,6 +6,7 @@ namespace Qx
 
 /*!
  *  @class Cumulation
+ *  @ingroup qx-core
  *
  *  @brief The Cumulation template class tracks the sum of multiple key-value components that can be change
  *  independently.

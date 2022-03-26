@@ -6,6 +6,7 @@ namespace Qx
 
 /*!
  *  @class ByteArray
+ *  @ingroup qx-core
  *
  *  @brief The ByteArray class is a collection of static functions pertaining to QByteArray.
  */

@@ -6,6 +6,7 @@ namespace Qx
 
 /*!
  *  @class List
+ *  @ingroup qx-core
  *
  *  @brief The List class is a collection of static functions pertaining to lists.
  */
