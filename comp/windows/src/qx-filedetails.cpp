@@ -13,6 +13,7 @@ namespace Qx
 
 /*!
  *  @class FileDetails
+ *  @ingroup qx-windows
  *
  *  @brief The FileDetails class acts as a user-friendly container for holding a file's @e Version Info as
  *  defined by the Windows API, which largely consists of the fields within a given file's @e Details pane.

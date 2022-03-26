@@ -18,6 +18,7 @@
 
 /*!
  *  @file qx-common-windows.h
+ *  @ingroup qx-windows
  *
  *  @brief The qx-common-windows header file provides various types, variables, and functions related to windows
  *  specific programming.
