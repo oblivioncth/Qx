@@ -1,0 +1,9 @@
+/*!
+ *  @namespace Qx
+ *
+ *  @brief The @c Qx namespace is the main namespace through which all non-global functionality of the Qx
+ *  library is accessed.
+ *
+ *  Nearly all library features are nested within this namespace in a similar vein as @c std with the
+ *  C++ Standard Library.
+ */
