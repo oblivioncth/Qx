@@ -10,6 +10,7 @@ namespace Qx
 
 /*!
  *  @class Color
+ *  @ingroup qx-gui
  *
  *  @brief The Color class is a collection of static functions pertaining to colors.
  */
