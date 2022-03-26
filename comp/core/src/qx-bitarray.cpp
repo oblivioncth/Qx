@@ -103,7 +103,7 @@ QByteArray BitArray::toByteArray(QSysInfo::Endian endianness)
 }
 
 /*!
- *  Appends a 0 or 1 onto the end of this bit array dependding on the value of @a bit.
+ *  Appends a 0 or 1 onto the end of this bit array depending on the value of @a bit.
  */
 void BitArray::append(bool bit)
 {
@@ -137,7 +137,7 @@ void BitArray::replace(const BitArray& bits, int start, int length)
  */
 
 /*!
- *  Returns a new bit array that contains @a length bits from the original, beggining at @a start.
+ *  Returns a new bit array that contains @a length bits from the original, begging at @a start.
  *
  *  A value of -1 for @a length will result all bits from @a start to the end of the array being included.
  */

@@ -678,7 +678,7 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
         throw std::invalid_argument("Error: The start and end positions cannot be null!");
     else if(startPos > endPos)
         throw std::invalid_argument("Error: endPos must be greater than or equal to startPos for Qx::readTextFromFile()");
-    //TODO: create excpetion class that prints error and stashes the expection properly
+    //TODO: create exception class that prints error and stashes the exception properly
 
     // Empty buffer
     returnBuffer = QString();
@@ -765,7 +765,7 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
                     for(; currentLine != endPos.line() && !fileTextStream.atEnd(); currentLine++)
                         returnBuffer += ENDL + fileTextStream.readLine();
 
-                    // Process last line if it is within range, handle lastline or do nothing if end target was past EOF
+                    // Process last line if it is within range, handle last line or do nothing if end target was past EOF
                     if(!fileTextStream.atEnd())
                         returnBuffer += ENDL + fileTextStream.readLine().left(*endPos.character() + 1);
                     else
@@ -901,7 +901,7 @@ IoOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode wri
     // Match append condition parameters
     matchAppendConditionParams(writeMode, startPos);
 
-    // Perform write preperations
+    // Perform write preparations
     bool existingFile;
     IoOpReport prepResult = writePrep(existingFile, textFile, writeOptions);
     if(!prepResult.wasSuccessful())
@@ -1280,7 +1280,7 @@ IoOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, Index64 star
     // Ensure file is closed upon return
     QScopeGuard fileGuard([&file](){ file.close(); });
 
-    // Adjust input indicies to true positions
+    // Adjust input indices to true positions
     qint64 fileIndexMax = file.size() - 1;
 
     if(startPos > fileIndexMax)
@@ -1337,7 +1337,7 @@ IoOpReport writeBytesToFile(QFile& file, const QByteArray& bytes, WriteMode writ
     // Match append condition parameters
     matchAppendConditionParams(writeMode, startPos);
 
-    // Perform write preperations
+    // Perform write preparations
     bool existingFile;
     IoOpReport prepResult = writePrep(existingFile, file, writeOptions);
     if(!prepResult.wasSuccessful())

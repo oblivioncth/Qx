@@ -67,10 +67,10 @@ private:
     static inline const QString ERR_GEN_FAIL = "[%1] %2";
 
     // Errors - Messages
-    static inline const QString SSL_ERR = "The following SSL issues occured while attempting to download %1";
+    static inline const QString SSL_ERR = "The following SSL issues occurred while attempting to download %1";
     static inline const QString CONTINUE_QUES = "Continue downloading?";
     static inline const QString AUTH_REQUIRED = "Authentication is required to connect to %1";
-    static inline const QString PROXY_AUTH_REQUIRED = "Authentication is required to conenct to the proxy %1";
+    static inline const QString PROXY_AUTH_REQUIRED = "Authentication is required to connect to the proxy %1";
 
     // Prompts
     static inline const QString PROMPT_AUTH = "Authentication is required for %1";
@@ -148,7 +148,7 @@ private slots:
 public slots:
     void abort();
 
-    // TODO: Add preshared key auth support
+    // TODO: Add pre-shared key auth support
 
 //-Signals------------------------------------------------------------------------------------------------------------
 signals:

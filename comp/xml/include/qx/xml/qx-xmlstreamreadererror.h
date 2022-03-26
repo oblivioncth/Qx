@@ -13,7 +13,7 @@ class XmlStreamReaderError
 //-Class Members--------------------------------------------------------------------------------------------------
 private:
     static inline const QHash<QXmlStreamReader::Error, QString> STD_ERR_TXT = {
-        {QXmlStreamReader::NoError, "No error has occured."},
+        {QXmlStreamReader::NoError, "No error has occurred."},
         {QXmlStreamReader::CustomError, "A custom error has been raised with raiseError()."},
         {QXmlStreamReader::NotWellFormedError, "The parser internally raised an error due to the read XML not being well-formed."},
         {QXmlStreamReader::PrematureEndOfDocumentError, "The input stream ended before a well-formed XML document was parsed."},

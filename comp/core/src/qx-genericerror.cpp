@@ -126,7 +126,7 @@ QString GenericError::primaryInfo() const { return mPrimaryInfo; }
  *  @property GenericError::secondaryInfo
  *  @brief the generic error's secondary info.
  *
- *  The secondary info of a generic error usually explains why an error occured, or notes more specific error information
+ *  The secondary info of a generic error usually explains why an error occurred, or notes more specific error information
  *  if the error is a variant of a more error type.
  *
  *  The default value is an empty string.
@@ -156,8 +156,8 @@ GenericError& GenericError::setDetailedInfo(QString detailedInfo) { mDetailedInf
 /*!
  *  Writes the generic error @a ge to the stream @a ts.
  *
- *  The error is writen in a human-readable format, structured by its properties. A new line is always started
- *  after the error is writen.
+ *  The error is written in a human-readable format, structured by its properties. A new line is always started
+ *  after the error is written.
  *
  *  @sa postError().
  *

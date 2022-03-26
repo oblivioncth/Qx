@@ -29,7 +29,7 @@ namespace Qx
  *  meaningful action.
  *
  *  @par Dialog Buttons:
- *  @li <b>Ok</b> - Hides and accepts the dialog.
+ *  @li <b>OK</b> - Hides and accepts the dialog.
  *  @li <b>Cancel</b> - Hides and rejects the dialog.
  *  @li <b>Select All</b> - Emits the selectAllClicked() signal.
  *  @li <b>Select None</b> - Emits the selectNoneClicked() signal.

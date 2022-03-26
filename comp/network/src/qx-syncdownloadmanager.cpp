@@ -417,7 +417,7 @@ void SyncDownloadManager::downloadProgressHandler(qint64 bytesCurrent, qint64 by
     // Get the object that called this slot
     QNetworkReply* senderNetworkReply = qobject_cast<QNetworkReply*>(sender());
 
-    // Ensure the signal that trigged this slot belongs to the above class by checking for null pointer
+    // Ensure the signal that triggered this slot belongs to the above class by checking for null pointer
     if(senderNetworkReply == nullptr)
         throw std::runtime_error("Pointer conversion to network reply failed");
 
@@ -477,7 +477,7 @@ void SyncDownloadManager::readyRead()
     // Get the object that called this slot
     QNetworkReply* senderNetworkReply = qobject_cast<QNetworkReply*>(sender());
 
-    // Ensure the signal that trigged this slot belongs to the above class by checking for null pointer
+    // Ensure the signal that triggered this slot belongs to the above class by checking for null pointer
     if(senderNetworkReply == nullptr)
         throw std::runtime_error("Pointer conversion to network reply failed");
 
