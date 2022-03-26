@@ -40,6 +40,6 @@ namespace Qx
 /*!
  *  @fn template<typename T, int N> Array::mostFrequent(T(&array) [N])
  *
- *  Returns the most frequently occuring value of @a array.
+ *  Returns the most frequently occurring value of @a array.
  */
 }

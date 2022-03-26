@@ -21,8 +21,8 @@ namespace Qx
  *  @brief The VersionNumber class extends QVersionNumber to include a dedicated constructor and getter for the
  *  fourth version segment.
  *
- *  While there are many terms used to describe each segment in a typical four part version number, the foruth
- *  segment in this class is dubbed "Nano Version" to stay consistant with the naming scheme of QVersionNumber.
+ *  While there are many terms used to describe each segment in a typical four part version number, the fourth
+ *  segment in this class is dubbed "Nano Version" to stay consistent with the naming scheme of QVersionNumber.
  */
 
 //-Constructor-------------------------------------------------------------------------------------------------

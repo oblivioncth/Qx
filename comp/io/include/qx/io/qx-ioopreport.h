@@ -27,7 +27,7 @@ class IoOpReport
 //-Class Members----------------------------------------------------------------------------------------------------
 public:
     static const inline QStringList TARGET_TYPES  = {"file", "directory"};
-    static const inline QString SUCCESS_TEMPLATE = R"(Succesfully %1 %2 "%3")";
+    static const inline QString SUCCESS_TEMPLATE = R"(Successfully %1 %2 "%3")";
     static const inline QString ERROR_TEMPLATE = R"(Error while %1 %2 "%3")";
     static const inline QHash<IoOpType, QString> SUCCESS_VERBS = {
         {IO_OP_READ, "read"},
@@ -42,16 +42,16 @@ public:
         {IO_OP_INSPECT, "inspecting"}
     };
     static const inline QHash<IoOpResultType, QString> ERROR_INFO = {
-        {IO_ERR_UNKNOWN, "An unknown error has occured."},
+        {IO_ERR_UNKNOWN, "An unknown error has occurred."},
         {IO_ERR_ACCESS_DENIED, "Access denied."},
         {IO_ERR_NOT_A_FILE, "Target is not a file."},
         {IO_ERR_NOT_A_DIR, "Target is not a directory."},
         {IO_ERR_OUT_OF_RES, "Out of resources."},
         {IO_ERR_READ, "General read error."},
         {IO_ERR_WRITE, "General write error."},
-        {IO_ERR_FATAL, "A fatal error has occured."},
+        {IO_ERR_FATAL, "A fatal error has occurred."},
         {IO_ERR_OPEN, "Could not open file."},
-        {IO_ERR_ABORT, "The opperation was aborted."},
+        {IO_ERR_ABORT, "The operation was aborted."},
         {IO_ERR_TIMEOUT, "Request timed out."},
         {IO_ERR_REMOVE, "The file could not be removed."},
         {IO_ERR_RENAME, "The file could not be renamed."},

@@ -248,7 +248,7 @@ template<class K, typename T>
 concept defines_comma_for = requires(K klass, T type) {{ klass, type };};
 
 
-// Aritmetic Operators
+// Arithmetic Operators
 template<class K>
 concept defines_unary_plus_s = requires(K klass) {{ +klass } -> std::same_as<K>;};
 

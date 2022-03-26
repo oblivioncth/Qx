@@ -19,11 +19,11 @@ namespace Qx
 //-Class Functions----------------------------------------------------------------------------------------------
 //Public:
 /*!
- *  Returns a datetime by convereting the given Microsoft
+ *  Returns a datetime by converting the given Microsoft
  *  <a href="https://docs.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-filetime">FILETIME</a>,
  *  @a fileTime.
  *
- *  The first and last datetimes officially representable by a FILETIME stucture are January 1 1970 0:00:00
+ *  The first and last datetimes officially representable by a FILETIME structure are January 1 1970 0:00:00
  *  and Dec 31 30827 23:59:59 respectively, as it was designed to be compatible with Microsoft SYSTEMTIME.
  *
  *  The timezone of the resultant QDateTime is Qt::LocalTime.
@@ -49,7 +49,7 @@ namespace Qx
  */
 QDateTime DateTime::fromMSFileTime(qint64 fileTime)
 {
-    /* The first and last datetimes representable by a FILETIME stucture are January 1 1970 0:00:00 and Dec 31 30827 23:59:59
+    /* The first and last datetimes representable by a FILETIME structure are January 1 1970 0:00:00 and Dec 31 30827 23:59:59
      * respectively (sort of, see https://stackoverflow.com/questions/9999393/latest-possible-filetime/18188484), which are
      * well within the range of QDateTime so no bounds checking is required here.
      */
@@ -60,7 +60,7 @@ QDateTime DateTime::fromMSFileTime(qint64 fileTime)
     // Convert FILETIME 100ns count to ms (incurs tolerable precision loss)
     qint64 msFileTime = fileTime/10000;
 
-    // Offset to unix epoch time, if underflow would occur use min
+    // Offset to Unix epoch time, if underflow would occur use min
     qint64 msEpochTime = constrainedSub(msFileTime, FILETIME_EPOCH_OFFSET_MS);
 
     // Convert to QDateTime and return

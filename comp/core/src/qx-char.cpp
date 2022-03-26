@@ -27,7 +27,7 @@ namespace Qx
 bool Char::isHexNumber(QChar hexNum) { return RegularExpression::HEX_ONLY.match(hexNum).hasMatch(); }
 
 /*!
- *  Compares cOne with cTwo and dreturns an integer less than, equal to, or greater than zero if cOne is less than, equal to,
+ *  Compares cOne with cTwo and returns an integer less than, equal to, or greater than zero if cOne is less than, equal to,
  *  or greater than cTwo.
  *
  *  If cs is Qt::CaseSensitive, the comparison is case sensitive; otherwise the comparison is case insensitive.
