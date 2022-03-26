@@ -10,6 +10,7 @@ namespace Qx
 
 /*!
  *  @class XmlStreamReaderError
+ *  @ingroup qx-xml
  *
  *  @brief The XmlStreamReaderError class provides a full error object for QXmlStreamReader, similar to other Qt
  *  classes, that can be more convenient for processing errors than just QXmlStreamReader::Error.

@@ -6,6 +6,7 @@
 
 /*!
  *  @file qx-common-xml.h
+ *  @ingroup qx-xml
  *
  *  @brief The qx-common-xml header file provides various types, variables, and functions related to
  *  manipulating XML data.

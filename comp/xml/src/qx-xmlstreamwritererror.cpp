@@ -10,6 +10,7 @@ namespace Qx
 
 /*!
  *  @class XmlStreamWriterError
+ *  @ingroup qx-xml
  *
  *  @brief The XmlStreamWriterError class provides a full error object for QXmlStreamWriterError, similar to other
  *  Qt classes. QXmlStreamWriter doesn't have an intrinsic error type, but this class can be useful for passing
