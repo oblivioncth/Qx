@@ -86,7 +86,7 @@ find_package(Qt6 REQUIRED COMPONENTS ${QT_FIND_COMPONENTS})
 #--------------------Package Config----------------
 
 # Create config file
-configure_file(${CMAKE_PROJECT_NAME}Config.cmake.in
+configure_file("${FILE_TEMPLATES_DIR}/${CMAKE_PROJECT_NAME}Config.cmake.in"
     "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}Config.cmake"
     @ONLY
 )
