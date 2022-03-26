@@ -1,0 +1,8 @@
+/*!
+ *  @defgroup qx-io Qx IO
+ *
+ *  @brief The IO component implements functionality centered around reading and writing files in many capacities.
+ *
+ *  Qx IO presents a multitude of functions and classes that are designed to simplify file IO in various contexts,
+ *  while also providing a standard operation feedback interface to improve ease of error handling.
+ */

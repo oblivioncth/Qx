@@ -1,0 +1,11 @@
+/*!
+ *  @defgroup qx-gui Qx GUI
+ *
+ *  @brief The GUI component contains implementation pertaining to OS UI integration, 2D graphics, basic imaging,
+ *  fonts, and text.
+ *
+ *  This component roughly mirrors Qt GUI in terms of scope and organization.
+ *
+ *  @todo This component is quite bare and for now exists solely to keep dependents of Qt GUI in a separate
+ *  component so that console applications don't end up with a UI dependency when using Qx Core.
+ */

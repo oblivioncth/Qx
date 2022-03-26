@@ -1,0 +1,9 @@
+/*!
+ *  @defgroup qx-windows Qx Windows
+ *
+ *  @brief The Windows component provides functionality centered around Windows specific programming.
+ *
+ *  Qx Windows contains classes and functions that generally either wrap existing Win32 API functionality
+ *  into a more user friendly interface, other otherwise make various programming tasks on Windows more
+ *  convenient.
+ */
