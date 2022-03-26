@@ -3,6 +3,7 @@
 
 /*!
  *  @file qx-common-widgets.h
+ *  @ingroup qx-widgets
  *
  *  @brief The qx-common-widgets header file provides various types, variables, and functions related to
  *  Qt widgets.

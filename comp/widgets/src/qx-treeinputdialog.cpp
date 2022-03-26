@@ -14,6 +14,7 @@ namespace Qx
 
 /*!
  *  @class TreeInputDialog
+ *  @ingroup qx-widgets
  *
  *  @brief The TreeInputDialog class provides a simple tree-based dialog from which the user can select one or
  *  more items.

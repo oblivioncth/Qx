@@ -13,6 +13,7 @@ namespace Qx
 
 /*!
  * @class LoginDialog
+ * @ingroup qx-widgets
  *
  * @brief The LoginDialog class provides a modal dialog that prompts a user for a username and password.
  *
