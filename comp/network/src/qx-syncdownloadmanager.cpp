@@ -18,6 +18,7 @@ namespace Qx
 
 /*!
  *  @class SyncDownloadManager::Report
+ *  @ingroup qx-network
  *
  *  @brief The SyncDownloadManager::Report class details the outcome of processing a SyncDownloadManager queue.
  *

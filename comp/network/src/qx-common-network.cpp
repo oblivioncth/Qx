@@ -6,6 +6,7 @@
 
 /*!
  *  @file qx-common-network.h
+ *  @ingroup qx-network
  *
  *  @brief The qx-common-network header file provides various types, variables, and functions related to network operations.
  *

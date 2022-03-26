@@ -10,6 +10,7 @@ namespace Qx
 
 /*!
  *  @class NetworkReplyError
+ *  @ingroup qx-network
  *
  *  @brief The NetworkReplyError class provides a full error object for QNetworkReply, similar to other Qt
  *  classes, that can be more convenient for processing errors than just QNetworkReply::NetworkError.
