@@ -1,11 +1,16 @@
 /*!
  *  @file qx-helpers.h
+ *  @ingroup qx-utility
  *
  *  @brief The qx-concepts header file provides a set of various convenience functions that are
  *  are designed to facilitate common fundamental tasks with as brief syntax as possible.
  */
 
 //Non-namespace Functions----------------------------------------------------------
+/*! @addtogroup qx-global
+ *  @{
+ */
+
 /*!
  *  @fn template <typename T> const T qxAsConst(T&& t)
  *
@@ -24,3 +29,5 @@
  *  lvalues and rvalues, instead of having to employ mixed usage of qxAsConst() and
  *  qAsConst().
  */
+
+/*! @}*/

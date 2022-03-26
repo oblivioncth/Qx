@@ -1,5 +1,6 @@
 /*!
  *  @file qx-concepts.h
+ *  @ingroup qx-utility
  *
  *  @brief The qx-concepts header file provides a library of general purpose concepts as an extension of
  *  the standard concepts library.
