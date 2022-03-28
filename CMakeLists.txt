@@ -33,13 +33,21 @@ endif()
 set(PROJ_SCRIPTS_PATH "${CMAKE_SOURCE_DIR}/cmake")
 set(CMAKE_MODULE_PATH "${PROJ_SCRIPTS_PATH}/module")
 set(FILE_TEMPLATES_PATH "${PROJ_SCRIPTS_PATH}/file_templates")
+set(DOC_SCRIPTS_PATH "${PROJ_SCRIPTS_PATH}/doc")
+
+# Source
+set(DOC_SOURCE_PATH "${CMAKE_SOURCE_DIR}/doc")
 
 # Sub projects
 set(COMPONENTS_PATH "${CMAKE_SOURCE_DIR}/comp")
 
+# Build
+set(DOC_BUILD_PATH "${CMAKE_BINARY_DIR}/doc")
+
 # Install
 set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/out/install")
 set(HEADER_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/include")
+set(DOC_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/doc")
 
 # Package
 set(PACKAGE_PREFIX "${CMAKE_SOURCE_DIR}/out/dist")
@@ -84,7 +92,13 @@ endif()
 # Find Qt package
 find_package(Qt6 REQUIRED COMPONENTS ${QT_FIND_COMPONENTS})
 
-#--------------------Package Config----------------
+# Find Doxygen package
+find_package(Doxygen
+             REQUIRED dot
+             OPTIONAL_COMPONENTS mscgen dia
+)
+
+#--------------------Package Config-----------------------
 
 # Create config file
 configure_file("${FILE_TEMPLATES_PATH}/${CMAKE_PROJECT_NAME}Config.cmake.in"
@@ -107,6 +121,46 @@ foreach(component ${LIB_COMPONENTS})
     add_subdirectory(${COMPONENTS_PATH}/${component})
 endforeach()
 
+#================ Build Documentation ======================
+if(NOT DOXYGEN_FOUND)
+    message(WARNING "Doxygen not available, documentation cannot not be built.")
+elseif(NOT DEFINED QT_DOCS_DIR)
+    message(WARNING "QT_DOCS_DIR is not defined, documentation will not be built.")
+else()
+
+    # Top level input
+    set(DOC_INPUT_LIST
+        "${DOC_SOURCE_PATH}/global.dox"
+        "${DOC_SOURCE_PATH}/mainpage.dox"
+        "${DOC_SOURCE_PATH}/namespace.dox"
+    )
+
+    # Component level input
+    foreach(component ${LIB_COMPONENTS})
+        set(DOC_INPUT_LIST ${DOC_INPUT_LIST}
+            "${COMPONENTS_PATH}/${component}/doc/${component}.dox"
+            "${COMPONENTS_PATH}/${component}/src"
+            "${COMPONENTS_PATH}/${component}/include"
+        )
+
+        if(EXISTS "${COMPONENTS_PATH}/${component}/doc/snippets")
+            set(DOC_EXAMPLE_LIST ${DOC_EXAMPLE_LIST}
+                "${COMPONENTS_PATH}/${component}/doc/snippets"
+            )
+        endif()
+    endforeach()
+
+    # Set Doxygen parameters
+    include(${DOC_SCRIPTS_PATH}/doxyconf.cmake)
+
+    # Add Doxygen target
+    doxygen_add_docs(docs
+        ${DOC_INPUT_LIST}
+    )
+
+    message(STATUS "Doxygen configured. Build target 'docs' to build documentation.")
+endif()
+
 #================= Top Level Install =======================
 
 # Install Package Config
@@ -122,6 +176,9 @@ install(FILES
     "${CMAKE_SOURCE_DIR}/LICENSE"
     DESTINATION .
 )
+
+# Install Docs if available
+install(DIRECTORY ${DOC_BUILD_PATH} DESTINATION ${DOC_INSTALL_PATH} OPTIONAL)
 
 #====================== CPack ==============================
 
