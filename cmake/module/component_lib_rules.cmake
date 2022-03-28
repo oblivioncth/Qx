@@ -100,7 +100,7 @@ endforeach()
 
 # Copy template with modifications
 configure_file(
-    "${FILE_TEMPLATES_DIR}/primary_component_header.h.in"
+    "${FILE_TEMPLATES_PATH}/primary_component_header.h.in"
     "${CMAKE_BINARY_DIR}/include/${COMPONENT_NAME_LC}.h"
     @ONLY
     NEWLINE_STYLE UNIX
@@ -119,14 +119,14 @@ set_target_properties(${COMPONENT_TARGET_NAME} PROPERTIES
 install(TARGETS ${COMPONENT_TARGET_NAME}
     EXPORT ${COMPONENT_NAME}Targets
     COMPONENT ${COMPONENT_NAME}
-    LIBRARY DESTINATION ${STATIC_LIB_INSTALL_DIR_NAME}
-    ARCHIVE DESTINATION ${STATIC_LIB_INSTALL_DIR_NAME}
-    RUNTIME DESTINATION ${SHARED_LIB_INSTALL_DIR_NAME} # For potential future shared version
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION bin # For potential future shared version
 )
 
 # Install public headers
-install(DIRECTORY ${HEADER_INSTALL_DIR_NAME}/${PROJ_NAME_LC}
-    DESTINATION "${HEADER_INSTALL_DIR_NAME}/${COMPONENT_NAME_LC}"
+install(DIRECTORY include/${PROJ_NAME_LC}
+    DESTINATION "include/${COMPONENT_NAME_LC}"
 )
 install(FILES "${CMAKE_BINARY_DIR}/include/${COMPONENT_NAME_LC}.h"
     DESTINATION "${HEADER_INSTALL_PREFIX}/${COMPONENT_NAME_LC}/${PROJ_NAME_LC}"

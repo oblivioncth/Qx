@@ -19,34 +19,35 @@ set(CMAKE_AUTOUIC ON)
 # Disable deprecated code
 add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060000)
 
-# Directory Names
-set(CMAKE_UTIL_DIR_NAME cmake)
-set(CMAKE_MODULE_DIR_NAME module)
-set(FILE_TEMPLATES_DIR_NAME file_templates)
-set(COMPONENT_DIR_NAME comp)
-set(OUT_DIR_NAME out)
-set(STATIC_LIB_INSTALL_DIR_NAME lib)
-set(SHARED_LIB_INSTALL_DIR_NAME bin)
-set(HEADER_INSTALL_DIR_NAME include)
-
-# Paths
-set(CMAKE_UTIL_DIR "${CMAKE_SOURCE_DIR}/${CMAKE_UTIL_DIR_NAME}")
-set(CMAKE_MODULE_PATH "${CMAKE_UTIL_DIR}/${CMAKE_MODULE_DIR_NAME}")
-set(FILE_TEMPLATES_DIR "${CMAKE_UTIL_DIR}/${FILE_TEMPLATES_DIR_NAME}")
-set(COMPONENTS_DIR "${CMAKE_SOURCE_DIR}/${COMPONENT_DIR_NAME}")
-set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/${OUT_DIR_NAME}/install")
-set(PACKAGE_PREFIX "${CMAKE_SOURCE_DIR}/${OUT_DIR_NAME}/dist")
-set(HEADER_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/${HEADER_INSTALL_DIR_NAME}")
-
-# Clean install when clean target is ran
-set_directory_properties(PROPERTIES ADDITIONAL_CLEAN_FILES "${CMAKE_INSTALL_PREFIX}")
-
 # General Variables
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
   set(TARGET_ARCH x64)
 else()
   set(TARGET_ARCH x86)
 endif()
+
+
+#--------------------Setup Paths-------------------
+
+# Cmake scripts
+set(PROJ_SCRIPTS_PATH "${CMAKE_SOURCE_DIR}/cmake")
+set(CMAKE_MODULE_PATH "${PROJ_SCRIPTS_PATH}/module")
+set(FILE_TEMPLATES_PATH "${PROJ_SCRIPTS_PATH}/file_templates")
+
+# Sub projects
+set(COMPONENTS_PATH "${CMAKE_SOURCE_DIR}/comp")
+
+# Install
+set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/out/install")
+set(HEADER_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/include")
+
+# Package
+set(PACKAGE_PREFIX "${CMAKE_SOURCE_DIR}/out/dist")
+
+#------------Set Global Build Rules----------------
+
+# Clean install when clean target is ran
+set_directory_properties(PROPERTIES ADDITIONAL_CLEAN_FILES "${CMAKE_INSTALL_PREFIX}")
 
 ################# Common Build #################
 set(LIB_COMPONENTS
@@ -86,7 +87,7 @@ find_package(Qt6 REQUIRED COMPONENTS ${QT_FIND_COMPONENTS})
 #--------------------Package Config----------------
 
 # Create config file
-configure_file("${FILE_TEMPLATES_DIR}/${CMAKE_PROJECT_NAME}Config.cmake.in"
+configure_file("${FILE_TEMPLATES_PATH}/${CMAKE_PROJECT_NAME}Config.cmake.in"
     "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}Config.cmake"
     @ONLY
 )
@@ -103,7 +104,7 @@ write_basic_package_version_file(
 
 # Build components
 foreach(component ${LIB_COMPONENTS})
-    add_subdirectory(${COMPONENTS_DIR}/${component})
+    add_subdirectory(${COMPONENTS_PATH}/${component})
 endforeach()
 
 #================= Top Level Install =======================
