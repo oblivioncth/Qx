@@ -24,6 +24,9 @@ public:
     {
         QString language;
         QString codePage;
+
+        friend bool operator== (const Translation& lhs, const Translation& rhs) noexcept;
+        friend size_t qHash(const Translation& key, size_t seed) noexcept;
     };
 
     struct StringTable

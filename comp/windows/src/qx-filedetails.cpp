@@ -36,6 +36,10 @@ namespace Qx
  */
 
 //-Class Structs-----------------------------------------------------------------------------------------------------
+
+//===============================================================================================================
+// FileDetails::Translation
+//===============================================================================================================
 /*!
  *  @struct FileDetails::Translation
  *
@@ -64,6 +68,33 @@ namespace Qx
  *  @sa <a href="https://docs.microsoft.com/en-us/windows/win32/intl/code-page-identifiers">Code Page Identifiers</a>,
  *  <a href="https://docs.microsoft.com/en-us/windows/win32/menurc/versioninfo-resource#charsetID">VersionInfo Resource Code Page ID</a>.
  */
+
+//-Operators----------------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  Returns @c true if the target and destination of @a lhs are the same as in @a rhs; otherwise returns @c false
+ */
+bool operator==(const FileDetails::Translation& lhs, const FileDetails::Translation& rhs) noexcept
+{
+    return lhs.language == rhs.language && lhs.codePage == rhs.codePage;
+}
+
+//-Hashing------------------------------------------------------------------------------------------------------
+/*!
+ *  Hashes the download task @a key with the initial @a seed.
+ */
+size_t qHash(const FileDetails::Translation& key, size_t seed) noexcept
+{
+    QtPrivate::QHashCombine hash;
+    seed = hash(seed, key.language);
+    seed = hash(seed, key.codePage);
+
+    return seed;
+}
+
+//===============================================================================================================
+// FileDetails::StringTable
+//===============================================================================================================
 
 /*!
  *  @struct FileDetails::StringTable
