@@ -11,6 +11,7 @@
 
 namespace Qx
 {
+/*! @cond */
 
 //-Component Private Variables ---------------------------------------------------------------------------------------------
 extern const QHash<QFileDevice::FileError, IoOpResultType> FILE_DEV_ERR_MAP;
@@ -28,6 +29,7 @@ void matchAppendConditionParams(WriteMode& writeMode, TextPos& startPos);
 template<typename T>
 void matchAppendConditionParams(WriteMode& writeMode, Index<T>& startPos);
 	
+/*! @endcond */
 }
 
 #endif // QX_IO_COMMON_P_H

@@ -3,7 +3,8 @@
 
 namespace Qx
 {
-	
+/*! @cond */
+
 //-Component Private Variables ---------------------------------------------------------------------------------------------
 const QHash<QFileDevice::FileError, IoOpResultType> FILE_DEV_ERR_MAP = {
 	{QFileDevice::NoError, IO_SUCCESS},
@@ -134,4 +135,5 @@ void matchAppendConditionParams(WriteMode& writeMode, Index<T>& startPos)
 		startPos = Index<T>::LAST;
 }
 
+/*! @endcond */
 }
