@@ -20,7 +20,7 @@ public:
     StandardItemModel(QObject *parent = nullptr);
 
 //-Instance Functions-----------------------------------------------------------------------------------------------
-public:
+private:
     void autoTristateChildren(QStandardItem* changingItem, const QVariant&  value, int role);
     void autoTristateParents(QStandardItem* changingItem, const QVariant&  changingValue);
 

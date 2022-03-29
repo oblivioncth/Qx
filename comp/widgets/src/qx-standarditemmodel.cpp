@@ -39,7 +39,7 @@ StandardItemModel::StandardItemModel(QObject* parent) : QStandardItemModel(paren
 //Private:
 void StandardItemModel::autoTristateChildren(QStandardItem* changingItem, const QVariant&  value, int role)
 {
-    for( int i = 0; i < changingItem->rowCount() ; i++ )
+    for(int i = 0; i < changingItem->rowCount() ; i++)
     {
         QStandardItem* childItem = changingItem->child(i);
         if((childItem->isAutoTristate() || mAutoTristate) && data(childItem->index(), Qt::CheckStateRole).isValid())
