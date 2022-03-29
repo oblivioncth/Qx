@@ -25,7 +25,7 @@ enum IoOpTargetType { IO_FILE, IO_DIR };
 class IoOpReport
 {
 //-Class Members----------------------------------------------------------------------------------------------------
-public:
+private:
     static const inline QStringList TARGET_TYPES  = {"file", "directory"};
     static const inline QString SUCCESS_TEMPLATE = R"(Successfully %1 %2 "%3")";
     static const inline QString ERROR_TEMPLATE = R"(Error while %1 %2 "%3")";
