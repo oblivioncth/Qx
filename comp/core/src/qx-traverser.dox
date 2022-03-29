@@ -66,4 +66,13 @@ namespace Qx
  *  valid; otherwise returns a default-constructed value.
  */
 
+//-Outer Class Types----------------------------------------------------------------------------------------
+/*!
+ * @typedef StringTraverser
+ * @ingroup qx-core
+ *
+ * A convenience synonym for Traverser<QString>
+ */
 }
+
+
