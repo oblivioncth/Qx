@@ -38,9 +38,6 @@ struct ShortcutProperties
 
 //-Namespace Functions-------------------------------------------------------------------------------------------------------------
 
-// Files
-FileDetails readFileDetails(QString filePath);
-
 // Processes
 DWORD processIdByName(QString processName);
 QString processNameById(DWORD processID);
