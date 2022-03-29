@@ -14,7 +14,7 @@ class GenericError
 {
 //-Class Enums-----------------------------------------------------------------------------------------------
 public:
-    enum ErrorLevel {Warning, Error, Critical };
+    enum ErrorLevel { Warning, Error, Critical };
 
 //-Class Members---------------------------------------------------------------------------------------------
 private:
