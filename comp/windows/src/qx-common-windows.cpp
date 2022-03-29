@@ -50,17 +50,17 @@ namespace Qx
  */
 
 /*!
- *  @var ShortcutProperties::ShowMode ShortcutProperties::ShowMode::NORMAL
+ *  @var ShortcutProperties::ShowMode ShortcutProperties::NORMAL
  *  Shows the program window in its original form.
  */
 
 /*!
- *  @var ShortcutProperties::ShowMode ShortcutProperties::ShowMode::MAXIMIZED
+ *  @var ShortcutProperties::ShowMode ShortcutProperties::MAXIMIZED
  *  Shows the program as a maximized window.
  */
 
 /*!
- *  @var ShortcutProperties::ShowMode ShortcutProperties::ShowMode::MINIMIZED
+ *  @var ShortcutProperties::ShowMode ShortcutProperties::MINIMIZED
  *  Shows the program as a minimized window.
  */
 

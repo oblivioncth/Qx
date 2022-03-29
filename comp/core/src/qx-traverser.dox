@@ -53,14 +53,14 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> std::iter_value_t<typename T::const_iterator> lookAhead(quint32 count = 1) const
+ *  @fn template<typename T> std::iter_value_t<typename T::const_iterator> Traverser<T>::lookAhead(quint32 count = 1) const
  *
  *  Returns the value at the position @a count ahead of the traverser's current position if that position is
  *  valid; otherwise returns a default-constructed value.
  */
 
 /*!
- *  @fn template<typename T> std::iter_value_t<typename T::const_iterator> lookBehind(quint32 count = 1) const
+ *  @fn template<typename T> std::iter_value_t<typename T::const_iterator> Traverser<T>::lookBehind(quint32 count = 1) const
  *
  *  Returns the value at the position @a count behind of the traverser's current position if that position is
  *  valid; otherwise returns a default-constructed value.

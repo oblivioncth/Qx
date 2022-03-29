@@ -28,7 +28,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> requires std::fundamental<T> static T ByteArraytoPrimitive(QByteArray ba, QSysInfo::Endian endianness = QSysInfo::ByteOrder)
+ *  @fn template<typename T> requires std::fundamental<T> static T ByteArray::toPrimitive(QByteArray ba, QSysInfo::Endian endianness = QSysInfo::ByteOrder)
  *
  *  Returns the raw binary data in @a ba reinterpreted as fundamental type @a T, according to the byte-order
  *  specified by @a endianness for multi-byte values.

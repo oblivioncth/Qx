@@ -29,17 +29,17 @@ namespace Qx
  */
 
 /*!
- *  @var GenericError::ErrorLevel GenericError::ErrorLevel::Warning
+ *  @var GenericError::ErrorLevel GenericError::Warning
  *  A warning.
  */
 
 /*!
- *  @var GenericError::ErrorLevel GenericError::ErrorLevel::Error
+ *  @var GenericError::ErrorLevel GenericError::Error
  *  An error.
  */
 
 /*!
- *  @var GenericError::ErrorLevel GenericError::ErrorLevel::Critical
+ *  @var GenericError::ErrorLevel GenericError::Critical
  *  A critical/fatal error.
  */
 
