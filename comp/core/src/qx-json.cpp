@@ -47,10 +47,10 @@ GenericError Json::checkedKeyRetrieval(bool& valueBuffer, QJsonObject jObject, Q
     QJsonValue potentialBool;
 
     if((potentialBool = jObject.value(key)).isUndefined())
-        return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_BOOL, key), ERR_KEY_DOESNT_EXIST.arg(key));
+        return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(TYPE_STR_BOOL, key), ERR_KEY_DOESNT_EXIST.arg(key));
 
     if(!potentialBool.isBool())
-        return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_BOOL, key), ERR_KEY_TYPE_MISMATCH.arg(key, JSON_TYPE_BOOL));
+        return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(TYPE_STR_BOOL, key), ERR_KEY_TYPE_MISMATCH.arg(key, TYPE_STR_BOOL));
     else
         valueBuffer = potentialBool.toBool();
 
@@ -70,10 +70,10 @@ GenericError Json::checkedKeyRetrieval(double& valueBuffer, QJsonObject jObject,
     QJsonValue potentialDouble;
 
     if((potentialDouble = jObject.value(key)).isUndefined())
-        return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_DOUBLE, key), ERR_KEY_DOESNT_EXIST.arg(key));
+        return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(TYPE_STR_DOUBLE, key), ERR_KEY_DOESNT_EXIST.arg(key));
 
     if(!potentialDouble.isDouble())
-        return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_DOUBLE, key), ERR_KEY_TYPE_MISMATCH.arg(key, JSON_TYPE_DOUBLE));
+        return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(TYPE_STR_DOUBLE, key), ERR_KEY_TYPE_MISMATCH.arg(key, TYPE_STR_DOUBLE));
     else
         valueBuffer = potentialDouble.toDouble();
 
@@ -93,10 +93,10 @@ GenericError Json::checkedKeyRetrieval(QString& valueBuffer, QJsonObject jObject
     QJsonValue potentialString;
 
     if((potentialString = jObject.value(key)).isUndefined())
-        return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_STRING, key), ERR_KEY_DOESNT_EXIST.arg(key));
+        return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(TYPE_STR_STRING, key), ERR_KEY_DOESNT_EXIST.arg(key));
 
     if(!potentialString.isString())
-        return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_STRING, key), ERR_KEY_TYPE_MISMATCH.arg(key, JSON_TYPE_STRING));
+        return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(TYPE_STR_STRING, key), ERR_KEY_TYPE_MISMATCH.arg(key, TYPE_STR_STRING));
     else
         valueBuffer = potentialString.toString();
 
@@ -116,10 +116,10 @@ GenericError Json:: checkedKeyRetrieval(QJsonArray& valueBuffer, QJsonObject jOb
     QJsonValue potentialArray;
 
     if((potentialArray = jObject.value(key)).isUndefined())
-        return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_ARRAY, key), ERR_KEY_DOESNT_EXIST.arg(key));
+        return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(TYPE_STR_ARRAY, key), ERR_KEY_DOESNT_EXIST.arg(key));
 
     if(!potentialArray.isArray())
-        return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_ARRAY, key), ERR_KEY_TYPE_MISMATCH.arg(key, JSON_TYPE_ARRAY));
+        return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(TYPE_STR_ARRAY, key), ERR_KEY_TYPE_MISMATCH.arg(key, TYPE_STR_ARRAY));
     else
         valueBuffer = potentialArray.toArray();
 
@@ -140,10 +140,10 @@ GenericError Json::checkedKeyRetrieval(QJsonObject& valueBuffer, QJsonObject jOb
     QJsonValue potentialObject;
 
     if((potentialObject = jObject.value(key)).isUndefined())
-        return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_OBJECT, key), ERR_KEY_DOESNT_EXIST.arg(key));
+        return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(TYPE_STR_OBJECT, key), ERR_KEY_DOESNT_EXIST.arg(key));
 
     if(!potentialObject.isObject())
-        return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(JSON_TYPE_OBJECT, key), ERR_KEY_TYPE_MISMATCH.arg(key, JSON_TYPE_OBJECT));
+        return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(TYPE_STR_OBJECT, key), ERR_KEY_TYPE_MISMATCH.arg(key, TYPE_STR_OBJECT));
     else
         valueBuffer = potentialObject.toObject();
 

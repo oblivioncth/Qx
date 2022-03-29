@@ -13,16 +13,15 @@ namespace Qx
 class Json
 {
 //-Class Members-------------------------------------------------------------------------------------------------
-public:
-    // Type names
-    static inline const QString JSON_TYPE_BOOL = "bool";
-    static inline const QString JSON_TYPE_DOUBLE = "double";
-    static inline const QString JSON_TYPE_STRING = "string";
-    static inline const QString JSON_TYPE_ARRAY = "array";
-    static inline const QString JSON_TYPE_OBJECT = "object";
-    static inline const QString JSON_TYPE_NULL = "null";
-
 private:
+    // Type names
+    static inline const QString TYPE_STR_BOOL = "bool";
+    static inline const QString TYPE_STR_DOUBLE = "double";
+    static inline const QString TYPE_STR_STRING = "string";
+    static inline const QString TYPE_STR_ARRAY = "array";
+    static inline const QString TYPE_STR_OBJECT = "object";
+    static inline const QString TYPE_STR_NULL = "null";
+
     // Errors
     static inline const QString ERR_RETRIEVING_VALUE = "JSON Error: Could not retrieve the %1 value from key '%2'.";
     static inline const QString ERR_KEY_DOESNT_EXIST = "The key '%1' does not exist.";
