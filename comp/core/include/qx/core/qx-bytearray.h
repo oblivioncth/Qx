@@ -18,23 +18,17 @@ class ByteArray
 //-Class Functions----------------------------------------------------------------------------------------------
 public:
     template<typename T>
-        requires std::integral<T>
+        requires arithmetic<T>
     static QByteArray fromPrimitive(T primitive, QSysInfo::Endian endianness = QSysInfo::ByteOrder)
     {
-        QByteArray rawBytes;
+        // Ensure correct byte order
+        if(endianness == QSysInfo::LittleEndian)
+            primitive = qToLittleEndian(primitive);
+        else
+            primitive = qToBigEndian(primitive);
 
-        for(int i = 0; i != sizeof(T); ++i)
-        {
-            #pragma warning( push )          // Disable "Unsafe mix of type 'bool' and 'int' warning because the
-            #pragma warning( disable : 4805) // function will never reach this point when bool is used
-            if(endianness == QSysInfo::LittleEndian)
-                rawBytes.append(static_cast<char>(((primitive & (0xFF << (i*8))) >> (i*8))));
-            else
-                rawBytes.prepend(static_cast<char>(((primitive & (0xFF << (i*8))) >> (i*8))));
-            #pragma warning( pop )
-        }
-
-        return rawBytes;
+        // Return QByteArray constucted from primitive viewed as a char array
+        return QByteArray(reinterpret_cast<const char*>(&primitive), sizeof(T));
     }
 
     template<>
@@ -42,43 +36,6 @@ public:
     {
         // Ensures true -> 0x01 and false -> 0x00
         return primitive ? QByteArray(1, '\x01') : QByteArray(1, '\x00');
-    }
-
-    template<typename T>
-        requires std::floating_point<T>
-    static QByteArray fromPrimitive(T primitive, QSysInfo::Endian endianness = QSysInfo::ByteOrder)
-    {
-        QByteArray rawBytes;
-
-        if(typeid(T) == typeid(float))
-        {
-            int* temp = reinterpret_cast<int*>(&primitive);
-            int intStandIn = (*temp);
-
-            for(uint8_t i = 0; i != sizeof(float); ++i)
-            {
-                if(endianness == QSysInfo::LittleEndian)
-                    rawBytes.append(static_cast<char>(((intStandIn & (0xFF << (i*8))) >> (i*8))));
-                else
-                    rawBytes.prepend(static_cast<char>(((intStandIn & (0xFF << (i*8))) >> (i*8))));
-            }
-        }
-
-        if(typeid(T) == typeid(double))
-        {
-            long* temp = reinterpret_cast<long*>(&primitive);
-            long intStandIn = (*temp);
-
-            for(uint8_t i = 0; i != sizeof(double); ++i)
-            {
-                if(endianness == QSysInfo::LittleEndian)
-                    rawBytes.append(static_cast<char>(((intStandIn & (0xFF << (i*8))) >> (i*8))));
-                else
-                    rawBytes.prepend(static_cast<char>(((intStandIn & (0xFF << (i*8))) >> (i*8))));
-            }
-        }
-
-        return rawBytes;
     }
 
     template<typename T>
