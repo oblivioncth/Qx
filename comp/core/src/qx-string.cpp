@@ -78,7 +78,7 @@ QString String::join(QList<QString> list, QString separator, QString prefix) // 
  *
  *  Joins all arbitrarily typed elements from a set into a single string with optional formatting.
  *
- *  @param[in] list The set of elements to join
+ *  @param[in] set The set of elements to join
  *  @param[in] toStringFunc A function that takes a single element of type T and returns a QString
  *  @param[in] separator An optional character to place between each element
  *  @param[in] prefix An optional string to place before each element

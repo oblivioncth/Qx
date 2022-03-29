@@ -89,7 +89,7 @@ int VersionNumber::nanoVersion() { return segmentAt(3); }
  *  If @a min is greater than 0, at least that many segments, up to segmentCount(), are kept in the resultant
  *  version number, even if some of them are trailing zeros.
  *
- *  @snippet versionnumber.cpp 0
+ *  @snippet qx-versionnumber.cpp 0
  */
 VersionNumber VersionNumber::normalized(int min)
 {
@@ -122,7 +122,7 @@ VersionNumber VersionNumber::commonPrefix(const VersionNumber &v1, const Version
 
 /*!
  *  Constructs a VersionNumber from a specially formatted @a string of non-negative decimal delimited by a
- *  period (@c{.}).
+ *  period (@c {.}).
  *
  *  Once the numerical segments have been parsed, the remainder of the string is considered to be the suffix string.
  *  The start index of that string will be stored in @a suffixIndex if it is not null.

@@ -217,7 +217,7 @@ QString kosherizeFileName(QString fileName) // Can return empty name if all char
  *  Tests if @a textFile has a trailing end-of-line character
  *
  *  @param[out] returnBuffer Set to @c true if the file's last character(s) are @c "\\n"
- *  or @c"\\r\\n"; otherwise set to @c false.
+ *  or @c "\\r\\n"; otherwise set to @c false.
  *  @param[in] textFile The file to test.
  *  @return A report containing details of operation success or failure.
  */
@@ -408,7 +408,7 @@ IoOpReport textFileAbsolutePosition(TextPos& textPos, QFile& textFile, bool igno
 /*!
  *  Searches for the given @a query within @a textFile and returns the result(s) if found.
  *
- *  @param[out] textPos A List of positions where the query was found.
+ *  @param[out] returnBuffer A List of positions where the query was found.
  *  @param[in] textFile The file search.
  *  @param[in] query The text to search for.
  *  @param[in] readOptions Options modifying how the file is parsed.
@@ -529,6 +529,7 @@ IoOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const
  *  @param[out] returnBuffer Set to @c true if the file contains the query text; otherwise set to @c false.
  *  @param[in] textFile The file search.
  *  @param[in] query The text to search for.
+ *  @param[in] cs Whether or not the search is case sensitive.
  *  @param[in] allowSplit Whether or not the query text is matched if it's split across a line break.
  *  @return A report containing details of operation success or failure.
  */

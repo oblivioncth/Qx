@@ -132,7 +132,7 @@ IoOpReport FileStreamWriter::writeRawData(const QByteArray& data)
 }
 
 /*!
- *  @fn template<typename T> requires defines_left_shift_for<QDataStream, T> FileStreamWriter::FileStreamWriter& operator<<(T d)
+ *  @fn template<typename T> requires defines_left_shift_for<QDataStream, T> FileStreamWriter& FileStreamWriter::operator<<(T d)
  *
  *  Writes @a d of type @c T to the stream. Returns a reference to the stream.
  *
