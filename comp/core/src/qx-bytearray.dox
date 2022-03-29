@@ -14,21 +14,28 @@ namespace Qx
 //-Class Functions----------------------------------------------------------------------------------------------
 //Public:
 /*!
- *  @fn template<typename T> requires std::integral<T> static QByteArray ByteArray::fromPrimitive(T primitive, QSysInfo::Endian endianness = QSysInfo::ByteOrder)
+ *  @fn template<typename T> requires arithmetic<T> static QByteArray ByteArray::fromPrimitive(T primitive, QSysInfo::Endian endianness = QSysInfo::ByteOrder)
  *
- *  Creates a byte array from @a primitive, using @a endianness byte-ordering if @a T requires multiple bytes to
- *  store.
+ *  Creates a byte array from the integer value @a primitive, using @a endianness byte-ordering if @a T requires
+ *  multiple bytes to store, and returns it.
  *
- *  In the case of <tt>T == bool</tt>, the resultant byte array is a single byte containing @c 0x01 or @c 0x00
- *  for @c true and @c false respectively.
- *
- *  @note The exact resulting representation for floating-point types depends on the underlying system, but at
- *  the moment is always the IEEE-754 standard as this library currently cannot be compiled on systems with
- *  different floating-point implementations.
+ *  @note The exact representation for floating-point types depends on the underlying system, but most often
+ *  the IEEE-754 standard is used.
  */
 
 /*!
- *  @fn template<typename T> requires std::fundamental<T> static T ByteArray::toPrimitive(QByteArray ba, QSysInfo::Endian endianness = QSysInfo::ByteOrder)
+ *  @fn template<> inline QByteArray ByteArray::fromPrimitive<bool>(bool primitive, QSysInfo::Endian endianness)
+ *  @overload
+ *
+ *  Template specialization of the above for <tt>T == bool</tt>.
+ *
+ *  Returns a byte array consisting of the single byte @c 0x01 or @c 0x00 for @c true and @c false respectively.
+ *
+ *  @a endianness is ignored.
+ */
+
+/*!
+ *  @fn template<typename T> requires arithmetic<T> static T ByteArray::toPrimitive(QByteArray ba, QSysInfo::Endian endianness = QSysInfo::ByteOrder)
  *
  *  Returns the raw binary data in @a ba reinterpreted as fundamental type @a T, according to the byte-order
  *  specified by @a endianness for multi-byte values.
@@ -36,10 +43,13 @@ namespace Qx
  *  If the requested type is not large enough to store the reinterpreted contents of @a ba, the conversion will
  *  be performed on the first n-bytes that will fit instead.
  *
- *  @note The exact interpretation for floating-point types depends on the underlying system, but at the moment
- *  is always the IEEE-754 standard as this library currently cannot be compiled on systems with different
- *  floating-point implementations.
+ *  If the requested type is stored using more bytes than are present within @a ba, the conversion will be
+ *  performed as if @a ba was padded with zeros to reach that size, in accordance with @a endianness,
  *
- *  @warning The length of @a ba must be exactly 1, 2, 4, or 8, or there will be an assertion failure!.
+ *  @note When <tt>T == bool</tt>, this function will return @c false if the first byte of @a ba is zero, or
+ *  @c true if it is any other value.
+ *
+ *  @note The exact interpretation for floating-point types depends on the underlying system, but most often
+ *  the IEEE-754 standard is used.
  */
 }
