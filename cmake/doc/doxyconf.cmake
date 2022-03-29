@@ -2,20 +2,23 @@
 set(DOXYGEN_REPEAT_BRIEF NO)
 set(DOXYGEN_WARN_AS_ERROR YES)
 set(DOXYGEN_GENERATE_TREEVIEW YES)
+set(DOXYGEN_ENABLE_PREPROCESSING YES)
 set(DOXYGEN_MACRO_EXPANSION YES)
+set(DOXYGEN_EXPAND_ONLY_PREDEF YES)
 set(DOXYGEN_CALL_GRAPH YES)
 set(DOXYGEN_CALLER_GRAPH YES)
 
 # Set extra input paths
+set(DOXYGEN_INCLUDE_PATH ${DOC_INCLUDE_LIST})
 set(DOXYGEN_EXAMPLE_PATH ${DOC_EXAMPLE_LIST})
 
 # Configure custom command/macro processing
 set(DOXYGEN_ALIASES
-	[[qflag{2}="<p>The \1 type is a typedef for QFlags\<\2\>. It stores an OR combination of \2 values.</p>"]]
+	[[qflag{2}="@typedef \1^^<p>The \1 type is a typedef for QFlags\<\2\>. It stores an OR combination of \2 values.</p>"]]
 )
 
 set(DOXYGEN_PREDEFINED
-	[[Q_DECLARE_FLAGS(flagsType,enumType)=typedef QFlags<enumType> flagsType;]]
+	"Q_DECLARE_FLAGS(flagsType,enumType)=typedef QFlags<enumType> flagsType\;"
 )
 
 # Prevent unwanted quoting
