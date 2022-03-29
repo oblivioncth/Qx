@@ -53,6 +53,12 @@ namespace Qx
  */
 
 /*!
+ *  @fn template<typename T> quint32 Traverser<T>::currentIndex() const
+ *
+ *  Returns the traverser's current position as an index.
+ */
+
+/*!
  *  @fn template<typename T> std::iter_value_t<typename T::const_iterator> Traverser<T>::lookAhead(quint32 count = 1) const
  *
  *  Returns the value at the position @a count ahead of the traverser's current position if that position is
