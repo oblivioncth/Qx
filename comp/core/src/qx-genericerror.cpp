@@ -80,8 +80,7 @@ GenericError::GenericError(ErrorLevel errorLevel, QString primaryInfo, QString s
 bool GenericError::isValid() const { return !mPrimaryInfo.isEmpty(); }
 
 /*!
- *  @property GenericError::errorLevel
- *  @brief the generic error's error level.
+ *  Returns the generic error's error level.
  *
  *  The error level denotes the severity of the rest of contained error information.
  *
@@ -89,6 +88,8 @@ bool GenericError::isValid() const { return !mPrimaryInfo.isEmpty(); }
  *  in the event of a Critical error.
  *
  *  The most common setting is Error.
+ *
+ *  @sa setErrorLevel().
  */
 GenericError::ErrorLevel GenericError::errorLevel() const { return mErrorLevel; }
 
@@ -104,18 +105,18 @@ QString GenericError::errorLevelString(bool caps) const
 }
 
 /*!
- *  @property GenericError::caption
- *  @brief the generic error's caption.
+ *  Returns the generic error's caption.
  *
  *  The caption is the heading of an error, often used to show the type of an error.
  *
  *  By default this value is an empty string.
+ *
+ *  @sa setCaption().
  */
 QString GenericError::caption() const { return mCaption; }
 
 /*!
- *  @property GenericError::primaryInfo
- *  @brief the generic error's primary info.
+ *  Returns the generic error's primary info.
  *
  *  The primary info of a generic error holds the core error message.
  *
@@ -124,32 +125,64 @@ QString GenericError::caption() const { return mCaption; }
 QString GenericError::primaryInfo() const { return mPrimaryInfo; }
 
 /*!
- *  @property GenericError::secondaryInfo
- *  @brief the generic error's secondary info.
+ *  Returns the generic error's secondary info.
  *
  *  The secondary info of a generic error usually explains why an error occurred, or notes more specific error information
  *  if the error is a variant of a more error type.
  *
  *  The default value is an empty string.
+ *
+ *  @sa setPrimaryInfo().
  */
 QString GenericError::secondaryInfo() const { return mSecondaryInfo; }
 
 /*!
- *  @property GenericError::detailedInfo
- *  @brief the generic error's detailed info.
+ *  Returns the generic error's detailed info.
  *
  *  The detailed info of a generic error usually contains any remaining error information not otherwise shown in the
  *  primary info and secondary info, or complete error details that generally are not of interest to an application's
  *  end user, but are useful for error reports and debugging.
  *
  *  The default value is an empty string.
+ *
+ *  @sa setDetailedInfo().
  */
 QString GenericError::detailedInfo() const { return mDetailedInfo; }
 
+
+/*!
+ *  Sets the generic error's error level.
+ *
+ *  @sa errorLevel().
+ */
 GenericError& GenericError::setErrorLevel(ErrorLevel errorLevel) { mErrorLevel = errorLevel; return *this; }
+
+/*!
+ *  Sets the generic error's caption.
+ *
+ *  @sa caption().
+ */
 GenericError& GenericError::setCaption(QString caption) { mCaption = caption; return *this; }
+
+/*!
+ *  Sets the generic error's primary info.
+ *
+ *  @sa primaryInfo().
+ */
 GenericError& GenericError::setPrimaryInfo(QString primaryInfo) { mPrimaryInfo = primaryInfo; return *this; }
+
+/*!
+ *  Sets the generic error's secondary info.
+ *
+ *  @sa secondaryInfo().
+ */
 GenericError& GenericError::setSecondaryInfo(QString secondaryInfo) { mSecondaryInfo = secondaryInfo; return *this; }
+
+/*!
+ *  Sets the generic error's detailed info.
+ *
+ *  @sa detailedInfo().
+ */
 GenericError& GenericError::setDetailedInfo(QString detailedInfo) { mDetailedInfo = detailedInfo; return *this; }
 
 //-Non-member/Related Functions------------------------------------------------------------------------------------
