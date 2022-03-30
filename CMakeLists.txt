@@ -143,10 +143,6 @@ else()
             "${COMPONENTS_PATH}/${component}/include"
         )
 
-        set(DOC_INCLUDE_LIST ${DOC_INCLUDE_LIST}
-            "${COMPONENTS_PATH}/${component}/include"
-        )
-
         if(EXISTS "${COMPONENTS_PATH}/${component}/doc/snippets")
             set(DOC_EXAMPLE_LIST ${DOC_EXAMPLE_LIST}
                 "${COMPONENTS_PATH}/${component}/doc/snippets"

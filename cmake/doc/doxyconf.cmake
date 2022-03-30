@@ -9,7 +9,6 @@ set(DOXYGEN_CALL_GRAPH YES)
 set(DOXYGEN_CALLER_GRAPH YES)
 
 # Set extra input paths
-set(DOXYGEN_INCLUDE_PATH ${DOC_INCLUDE_LIST})
 set(DOXYGEN_EXAMPLE_PATH ${DOC_EXAMPLE_LIST})
 
 # Configure custom command/macro processing
