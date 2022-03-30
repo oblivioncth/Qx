@@ -59,12 +59,12 @@ VersionNumber::VersionNumber(std::initializer_list<int> args) : QVersionNumber(a
 /*!
  *  Move-constructs a version number from the list of numbers contained in @a seg.
  */
-VersionNumber::VersionNumber(QList<int> &&seg) : QVersionNumber(seg) {}
+VersionNumber::VersionNumber(QList<int>&& seg) : QVersionNumber(seg) {}
 
 /*!
  *  Construct a version number from the std::initializer_list specified by @a args.
  */
-VersionNumber::VersionNumber(const QList<int> &seg) : QVersionNumber(seg) {}
+VersionNumber::VersionNumber(const QList<int>& seg) : QVersionNumber(seg) {}
 
 /*!
  *  Produces a null version.
@@ -114,7 +114,7 @@ VersionNumber VersionNumber::normalized(int min)
  *
  *  \sa isPrefixOf()
  */
-VersionNumber VersionNumber::commonPrefix(const VersionNumber &v1, const VersionNumber &v2)
+VersionNumber VersionNumber::commonPrefix(const VersionNumber& v1, const VersionNumber& v2)
 {
     QVersionNumber temp = QVersionNumber::commonPrefix(v1, v2);
     return *((VersionNumber*)&temp);
@@ -129,7 +129,7 @@ VersionNumber VersionNumber::commonPrefix(const VersionNumber &v1, const Version
  *
  *  @sa isNull().
  */
-VersionNumber VersionNumber::fromString(const QString &string, int *suffixIndex)
+VersionNumber VersionNumber::fromString(const QString& string, int* suffixIndex)
 {
     QVersionNumber temp = QVersionNumber::fromString(string, suffixIndex);
     return *((VersionNumber*)&temp);
@@ -138,7 +138,7 @@ VersionNumber VersionNumber::fromString(const QString &string, int *suffixIndex)
 /*!
  *  @overload
  */
-VersionNumber VersionNumber::fromString(QLatin1String string, int *suffixIndex)
+VersionNumber VersionNumber::fromString(QLatin1String string, int* suffixIndex)
 {
     QVersionNumber temp = QVersionNumber::fromString(string, suffixIndex);
     return *((VersionNumber*)&temp);
@@ -147,7 +147,7 @@ VersionNumber VersionNumber::fromString(QLatin1String string, int *suffixIndex)
 /*!
  *  @overload
  */
-VersionNumber VersionNumber::fromString(QStringView string, int *suffixIndex)
+VersionNumber VersionNumber::fromString(QStringView string, int* suffixIndex)
 {
     QVersionNumber temp = QVersionNumber::fromString(string, suffixIndex);
     return *((VersionNumber*)&temp);

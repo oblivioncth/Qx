@@ -16,8 +16,8 @@ public:
     VersionNumber(int maj, int min);
     VersionNumber(int maj);
     VersionNumber(std::initializer_list<int> args);
-    VersionNumber(QList<int> &&seg);
-    VersionNumber(const QList<int> &seg);
+    VersionNumber(QList<int>&& seg);
+    VersionNumber(const QList<int>& seg);
     VersionNumber();
 
 //-Member Functions--------------------------------------------------------------------------------------------
@@ -27,10 +27,10 @@ public:
 
 //-Class Functions---------------------------------------------------------------------------------------------
 public:
-    VersionNumber commonPrefix(const VersionNumber &v1, const VersionNumber &v2);
-    VersionNumber fromString(const QString &string, int *suffixIndex = nullptr);
-    VersionNumber fromString(QLatin1String string, int *suffixIndex = nullptr);
-    VersionNumber fromString(QStringView string, int *suffixIndex = nullptr);
+    VersionNumber commonPrefix(const VersionNumber& v1, const VersionNumber& v2);
+    VersionNumber fromString(const QString& string, int* suffixIndex = nullptr);
+    VersionNumber fromString(QLatin1String string, int* suffixIndex = nullptr);
+    VersionNumber fromString(QStringView string, int* suffixIndex = nullptr);
 };	
 
 }
