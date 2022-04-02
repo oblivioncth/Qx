@@ -3,6 +3,8 @@
  *
  *  @brief The Windows component provides functionality centered around Windows specific programming.
  *
+ *  @component{Windows}
+ *
  *	@note This component is only available when Qx is built to target Windows
  *
  *  Qx Windows contains classes and functions that generally either wrap existing Win32 API functionality

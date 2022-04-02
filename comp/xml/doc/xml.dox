@@ -4,5 +4,7 @@
  *  @brief The XML component provides classes and mechanisms that enhance and compliment the XML interfaces
  *  provided by Qt XML.
  *
+ *  @component{Xml}
+ *
  *  This component roughly mirrors Qt XML in terms of scope and organization.
  */

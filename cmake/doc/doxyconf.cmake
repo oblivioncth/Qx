@@ -14,6 +14,7 @@ set(DOXYGEN_EXAMPLE_PATH ${DOC_EXAMPLE_LIST})
 # Configure custom command/macro processing
 set(DOXYGEN_ALIASES
 	[[qflag{2}="@typedef \1^^<p>The \1 type is a typedef for QFlags\<\2\>. It stores an OR combination of \2 values.</p>"]]
+	"component{1}=\"@par Import:^^@code find_package(${CMAKE_PROJECT_NAME} REQUIRED COMPONENTS \\1)@endcode ^^@par Link:^^@code target_link_libraries(target_name ${CMAKE_PROJECT_NAME}::\\1)@endcode\""
 )
 
 set(DOXYGEN_PREDEFINED

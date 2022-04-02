@@ -3,6 +3,8 @@
  *
  *  @brief The Core component is the main module of the Qx library.
  *
+ *  @component{Core}
+ *
  *  Qx Core provides the most commonly used and general purpose functionality of the library, while also acting as
  *  a base from which most other components are derived from.
  *
