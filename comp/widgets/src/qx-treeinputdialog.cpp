@@ -20,7 +20,7 @@ namespace Qx
  *  more items.
  *
  *  The tree input dialog doesn't handle any selection logic itself, but instead provides a simple interface to
- *  facilitate user input, this being the
+ *  facilitate user input.
  *
  *  At its core, the dialog consists of a QTreeView and four buttons:
 
@@ -37,9 +37,7 @@ namespace Qx
  *
  *  @sa StandardItemModel.
  *
- *  @todo
- *  @li Include an image of the tree input dialog.
- *  @li Expand the modes, options, and use cases of this dialog.
+ *  @todo Include an image of the tree input dialog, expand the modes, options, and use cases of this dialog.
  */
 
 
