@@ -131,7 +131,7 @@ else()
     # Top level input
     set(DOC_INPUT_LIST
         "${DOC_SOURCE_PATH}/global.dox"
-        "${DOC_SOURCE_PATH}/mainpage.dox"
+        "${DOC_SOURCE_PATH}/mainpage.md"
         "${DOC_SOURCE_PATH}/namespace.dox"
     )
 
