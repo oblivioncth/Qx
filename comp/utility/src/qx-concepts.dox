@@ -1087,7 +1087,7 @@ namespace Qx
 
 /*!
  *  @concept traverseable
- *  @brief Specifies that a type is a valid type for Traverser.
+ *  @brief Specifies that a type is a valid type for Qx::Traverser.
  *
  *  Satisfied if @c K contains the type 'const_iterator' that satisfies @c std::bidirectional_iterator,
  *  is default constructable, and defines a member function 'size' that returns an integral type.
