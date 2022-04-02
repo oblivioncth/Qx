@@ -13,767 +13,1091 @@ namespace Qx
 // Assignment Operators
 /*!
  *  @concept defines_assign_for_s
- *  @brief Satisfied if @c K has a simple assignment operator defined for @c T that returns @c K&.
+ *  @brief Specifies that a type defines a simple assignment operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has a simple assignment operator defined for @c T that returns @c K&.
  */
 
 /*!
  *  @concept defines_assign_for
- *  @brief Satisfied if @c K has a simple assignment operator defined for @c T.
+ *  @brief Specifies that a type defines a simple assignment operator for another type.
+ *
+ *  Satisfied if @c K has a simple assignment operator defined for @c T.
  */
 
 /*!
  *  @concept defines_assign_s
- *  @brief Satisfied if @c K has a simple assignment operator defined for itself that returns @c K&.
+ *  @brief Specifies that a type defines a simple assignment operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has a simple assignment operator defined for itself that returns @c K&.
  */
 
 /*!
  *  @concept defines_assign
- *  @brief Satisfied if @c K has a simple assignment operator defined for itself.
+ *  @brief Specifies that a type defines a simple assignment operator for itself.
+ *
+ *  Satisfied if @c K has a simple assignment operator defined for itself.
  */
 
 /*!
  *  @concept defines_add_assign_for_s
- *  @brief Satisfied if @c K has an addition assignment operator defined for @c T that returns @c K&.
+ *  @brief Specifies that a type defines an addition assignment operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has an addition assignment operator defined for @c T that returns @c K&.
  */
 
 /*!
  *  @concept defines_add_assign_for
- *  @brief Satisfied if @c K has an addition assignment operator defined for @c T.
+ *  @brief Specifies that a type defines an addition assignment operator for another type.
+ *
+ *  Satisfied if @c K has an addition assignment operator defined for @c T.
  */
 
 /*!
  *  @concept defines_add_assign_s
- *  @brief Satisfied if @c K has an addition assignment operator defined for itself that returns @c K&.
+ *  @brief Specifies that a type defines an addition assignment operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has an addition assignment operator defined for itself that returns @c K&.
  */
 
 /*!
  *  @concept defines_add_assign
- *  @brief Satisfied if @c K has an addition assignment operator defined for itself.
+ *  @brief Specifies that a type defines an addition assignment operator for itself.
+ *
+ *  Satisfied if @c K has an addition assignment operator defined for itself.
  */
 
 /*!
  *  @concept defines_sub_assign_for_s
- *  @brief Satisfied if @c K has a subtraction assignment operator defined for @c T that returns @c K&.
+ *  @brief Specifies that a type defines a subtraction assignment operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has a subtraction assignment operator defined for @c T that returns @c K&.
  */
 
 /*!
  *  @concept defines_sub_assign_for
- *  @brief Satisfied if @c K has a subtraction assignment operator defined for @c T.
+ *  @brief Specifies that a type defines a subtraction assignment operator for another type.
+ *
+ *  Satisfied if @c K has a subtraction assignment operator defined for @c T.
  */
 
 /*!
  *  @concept defines_sub_assign_s
- *  @brief Satisfied if @c K has a subtraction assignment operator defined for itself that returns @c K&.
+ *  @brief Specifies that a type defines a subtraction assignment operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has a subtraction assignment operator defined for itself that returns @c K&.
  */
 
 /*!
  *  @concept defines_sub_assign
- *  @brief Satisfied if @c K has a subtraction assignment operator defined for itself.
+ *  @brief Specifies that a type defines a subtraction assignment operator for itself.
+ *
+ *  Satisfied if @c K has a subtraction assignment operator defined for itself.
  */
 
 /*!
  *  @concept defines_mult_assign_for_s
- *  @brief Satisfied if @c K has a multiplication assignment operator defined for @c T that returns @c K&.
+ *  @brief Specifies that a type defines a multiplication assignment operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has a multiplication assignment operator defined for @c T that returns @c K&.
  */
 
 /*!
  *  @concept defines_mult_assign_for
- *  @brief Satisfied if @c K has a multiplication assignment operator defined for @c T.
+ *  @brief Specifies that a type defines a multiplication assignment operator for another type.
+ *
+ *  Satisfied if @c K has a multiplication assignment operator defined for @c T.
  */
 
 /*!
  *  @concept defines_mult_assign_s
- *  @brief Satisfied if @c K has a multiplication assignment operator defined for itself that returns @c K&.
+ *  @brief Specifies that a type defines a multiplication assignment operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has a multiplication assignment operator defined for itself that returns @c K&.
  */
 
 /*!
  *  @concept defines_mult_assign
- *  @brief Satisfied if @c K has a multiplication assignment operator defined for itself.
+ *  @brief Specifies that a type defines a multiplication assignment operator for itself.
+ *
+ *  Satisfied if @c K has a multiplication assignment operator defined for itself.
  */
 
 /*!
  *  @concept defines_div_assign_for_s
- *  @brief Satisfied if @c K has a division assignment operator defined for @c T that returns @c K&.
+ *  @brief Specifies that a type defines a division assignment operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has a division assignment operator defined for @c T that returns @c K&.
  */
 
 /*!
  *  @concept defines_div_assign_for
- *  @brief Satisfied if @c K has a division assignment operator defined for @c T.
+ *  @brief Specifies that a type defines a division assignment operator for another type.
+ *
+ *  Satisfied if @c K has a division assignment operator defined for @c T.
  */
 
 /*!
  *  @concept defines_div_assign_s
- *  @brief Satisfied if @c K has a division assignment operator defined for itself that returns @c K&.
+ *  @brief Specifies that a type defines a division assignment operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has a division assignment operator defined for itself that returns @c K&.
  */
 
 /*!
  *  @concept defines_div_assign
- *  @brief Satisfied if @c K has a division assignment operator defined for itself.
+ *  @brief Specifies that a type defines a division assignment operator for itself.
+ *
+ *  Satisfied if @c K has a division assignment operator defined for itself.
  */
 
 /*!
  *  @concept defines_mod_assign_for_s
- *  @brief Satisfied if @c K has a modulo assignment operator defined for @c T that returns @c K&.
+ *  @brief Specifies that a type defines a modulo assignment operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has a modulo assignment operator defined for @c T that returns @c K&.
  */
 
 /*!
  *  @concept defines_mod_assign_for
- *  @brief Satisfied if @c K has a modulo assignment operator defined for @c T.
+ *  @brief Specifies that a type defines a modulo assignment operator for another type.
+ *
+ *  Satisfied if @c K has a modulo assignment operator defined for @c T.
  */
 
 /*!
  *  @concept defines_mod_assign_s
- *  @brief Satisfied if @c K has a modulo assignment operator defined for itself that returns @c K&.
+ *  @brief Specifies that a type defines a modulo assignment operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has a modulo assignment operator defined for itself that returns @c K&.
  */
 
 /*!
  *  @concept defines_mod_assign
- *  @brief Satisfied if @c K has a modulo assignment operator defined for itself.
+ *  @brief Specifies that a type defines a modulo assignment operator for itself.
+ *
+ *  Satisfied if @c K has a modulo assignment operator defined for itself.
  */
 
 /*!
  *  @concept defines_bit_and_assign_for_s
- *  @brief Satisfied if @c K has a bitwise AND assignment operator defined for @c T that returns @c K&.
+ *  @brief Specifies that a type defines a bitwise AND assignment operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has a bitwise AND assignment operator defined for @c T that returns @c K&.
  */
 
 /*!
  *  @concept defines_bit_and_assign_for
- *  @brief Satisfied if @c K has a bitwise AND assignment operator defined for @c T.
+ *  @brief Specifies that a type defines a bitwise AND assignment operator for another type.
+ *
+ *  Satisfied if @c K has a bitwise AND assignment operator defined for @c T.
  */
 
 /*!
  *  @concept defines_bit_and_assign_s
- *  @brief Satisfied if @c K has a bitwise AND assignment operator defined for itself that returns @c K&.
+ *  @brief Specifies that a type defines a bitwise AND assignment operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has a bitwise AND assignment operator defined for itself that returns @c K&.
  */
 
 /*!
  *  @concept defines_bit_and_assign
- *  @brief Satisfied if @c K has a bitwise AND assignment operator defined for itself.
+ *  @brief Specifies that a type defines a bitwise AND assignment operator for itself.
+ *
+ *  Satisfied if @c K has a bitwise AND assignment operator defined for itself.
  */
 
 /*!
  *  @concept defines_bit_or_assign_for_s
- *  @brief Satisfied if @c K has a bitwise OR assignment operator defined for @c T that returns @c K&.
+ *  @brief Specifies that a type defines a bitwise OR assignment operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has a bitwise OR assignment operator defined for @c T that returns @c K&.
  */
 
 /*!
  *  @concept defines_bit_or_assign_for
- *  @brief Satisfied if @c K has a bitwise OR assignment operator defined for @c T.
+ *  @brief Specifies that a type defines a bitwise OR assignment operator for another type.
+ *
+ *  Satisfied if @c K has a bitwise OR assignment operator defined for @c T.
  */
 
 /*!
  *  @concept defines_bit_or_assign_s
- *  @brief Satisfied if @c K has a bitwise OR assignment operator defined for itself that returns @c K&.
+ *  @brief Specifies that a type defines a bitwise OR assignment operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has a bitwise OR assignment operator defined for itself that returns @c K&.
  */
 
 /*!
  *  @concept defines_bit_or_assign
- *  @brief Satisfied if @c K has a bitwise OR assignment operator defined for itself.
+ *  @brief Specifies that a type defines a bitwise OR assignment operator for itself.
+ *
+ *  Satisfied if @c K has a bitwise OR assignment operator defined for itself.
  */
 
 /*!
  *  @concept defines_bit_xor_assign_for_s
- *  @brief Satisfied if @c K has a bitwise XOR assignment operator defined for @c T that returns @c K&.
+ *  @brief Specifies that a type defines a bitwise XOR assignment operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has a bitwise XOR assignment operator defined for @c T that returns @c K&.
  */
 
 /*!
  *  @concept defines_bit_xor_assign_for
- *  @brief Satisfied if @c K has a bitwise XOR assignment operator defined for @c T.
+ *  @brief Specifies that a type defines a bitwise XOR assignment operator for another type.
+ *
+ *  Satisfied if @c K has a bitwise XOR assignment operator defined for @c T.
  */
 
 /*!
  *  @concept defines_bit_xor_assign_s
- *  @brief Satisfied if @c K has a bitwise XOR assignment operator defined for itself that returns @c K&.
+ *  @brief Specifies that a type defines a bitwise XOR assignment operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has a bitwise XOR assignment operator defined for itself that returns @c K&.
  */
 
 /*!
  *  @concept defines_bit_xor_assign
- *  @brief Satisfied if @c K has a bitwise XOR assignment operator defined for itself.
+ *  @brief Specifies that a type defines a bitwise XOR assignment operator for itself.
+ *
+ *  Satisfied if @c K has a bitwise XOR assignment operator defined for itself.
  */
 
 /*!
  *  @concept defines_left_shift_assign_for_s
- *  @brief Satisfied if @c K has a left shift assignment operator defined for @c T that returns @c K&.
+ *  @brief Specifies that a type defines a left shift assignment operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has a left shift assignment operator defined for @c T that returns @c K&.
  */
 
 /*!
  *  @concept defines_left_shift_assign_for
- *  @brief Satisfied if @c K has a left shift assignment operator defined for @c T.
+ *  @brief Specifies that a type defines a left shift assignment operator for another type.
+ *
+ *  Satisfied if @c K has a left shift assignment operator defined for @c T.
  */
 
 /*!
  *  @concept defines_left_shift_assign_s
- *  @brief Satisfied if @c K has a left shift assignment operator defined for itself that returns @c K&.
+ *  @brief Specifies that a type defines a left shift assignment operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has a left shift assignment operator defined for itself that returns @c K&.
  */
 
 /*!
  *  @concept defines_left_shift_assign
- *  @brief Satisfied if @c K has a left shift assignment operator defined for itself.
+ *  @brief Specifies that a type defines a left shift assignment operator for itself.
+ *
+ *  Satisfied if @c K has a left shift assignment operator defined for itself.
  */
 
 /*!
  *  @concept defines_right_shift_assign_for_s
- *  @brief Satisfied if @c K has a right shift assignment operator defined for @c T that returns @c K&.
+ *  @brief Specifies that a type defines a right shift assignment operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has a right shift assignment operator defined for @c T that returns @c K&.
  */
 
 /*!
  *  @concept defines_right_shift_assign_for
- *  @brief Satisfied if @c K has a right shift assignment operator defined for @c T.
+ *  @brief Specifies that a type defines a right shift assignment operator for another type.
+ *
+ *  Satisfied if @c K has a right shift assignment operator defined for @c T.
  */
 
 /*!
  *  @concept defines_right_shift_assign_s
- *  @brief Satisfied if @c K has a right shift assignment operator defined for itself that returns @c K&.
+ *  @brief Specifies that a type defines a right shift assignment operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has a right shift assignment operator defined for itself that returns @c K&.
  */
 
 /*!
  *  @concept defines_right_shift_assign
- *  @brief Satisfied if @c K has a right shift assignment operator defined for itself.
+ *  @brief Specifies that a type defines a right shift assignment operator for itself.
+ *
+ *  Satisfied if @c K has a right shift assignment operator defined for itself.
  */
 
 // Increment Decrement Operators
 /*!
  *  @concept defines_pre_increment_s
- *  @brief Satisfied if @c K has a pre-increment operator defined that returns @c K&.
+ *  @brief Specifies that a type defines a pre-increment operator (with strict return).
+ *
+ *  Satisfied if @c K has a pre-increment operator defined that returns @c K&.
  */
 
 /*!
  *  @concept defines_pre_increment
- *  @brief Satisfied if @c K has a pre-increment operator defined.
+ *  @brief Specifies that a type defines a pre-increment operator.
+ *
+ *  Satisfied if @c K has a pre-increment operator defined.
  */
 
 /*!
  *  @concept defines_pre_decrement_s
- *  @brief Satisfied if @c K has a pre-decrement operator defined that returns @c K&.
+ *  @brief Specifies that a type defines a pre-decrement operator (with strict return).
+ *
+ *  Satisfied if @c K has a pre-decrement operator defined that returns @c K&.
  */
 
 /*!
  *  @concept defines_pre_decrement
- *  @brief Satisfied if @c K has a pre-decrement operator defined.
+ *  @brief Specifies that a type defines a pre-decrement operator.
+ *
+ *  Satisfied if @c K has a pre-decrement operator defined.
  */
 
 /*!
  *  @concept defines_post_increment_s
- *  @brief Satisfied if @c K has a post-increment operator defined that returns @c K.
+ *  @brief Specifies that a type defines a post-increment operator (with strict return).
+ *
+ *  Satisfied if @c K has a post-increment operator defined that returns @c K.
  */
 
 /*!
  *  @concept defines_post_increment
- *  @brief Satisfied if @c K has a post-increment operator defined.
+ *  @brief Specifies that a type defines a post-increment operator.
+ *
+ *  Satisfied if @c K has a post-increment operator defined.
  */
 
 /*!
  *  @concept defines_post_decrement_s
- *  @brief Satisfied if @c K has a post-decrement operator defined that returns @c K.
+ *  @brief Specifies that a type defines a post-decrement operator (with strict return).
+ *
+ *  Satisfied if @c K has a post-decrement operator defined that returns @c K.
  */
 
 /*!
  *  @concept defines_post_decrement
- *  @brief Satisfied if @c K has a post-decrement operator defined.
+ *  @brief Specifies that a type defines a post-decrement operator.
+ *
+ *  Satisfied if @c K has a post-decrement operator defined.
  */
 
 // Logical Operators
 /*!
  *  @concept defines_negation_s
- *  @brief Satisfied if @c K has a negation operator defined that returns @c bool.
+ *  @brief Specifies that a type defines a negation operator (with strict return).
+ *
+ *  Satisfied if @c K has a negation operator defined that returns @c bool.
  */
 
 /*!
  *  @concept defines_negation
- *  @brief Satisfied if @c K has a negation operator defined.
+ *  @brief Specifies that a type defines a negation operator.
+ *
+ *  Satisfied if @c K has a negation operator defined.
  */
 
 /*!
  *  @concept defines_and_for_s
- *  @brief Satisfied if @c K has a logical AND operator defined for @c T that returns @c bool.
+ *  @brief Specifies that a type defines a logical AND operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has a logical AND operator defined for @c T that returns @c bool.
  */
 
 /*!
  *  @concept defines_and_for
- *  @brief Satisfied if @c K has a logical AND operator defined for @c T.
+ *  @brief Specifies that a type defines a logical AND operator for another type.
+ *
+ *  Satisfied if @c K has a logical AND operator defined for @c T.
  */
 
 /*!
  *  @concept defines_and_s
- *  @brief Satisfied if @c K has a logical AND operator defined for itself that returns @c bool.
+ *  @brief Specifies that a type defines a logical AND operator for itself (with strict return).
+ *  Satisfied if @c K has a logical AND operator defined for itself that returns @c bool.
  */
 
 /*!
  *  @concept defines_and
- *  @brief Satisfied if @c K has a logical AND operator defined for itself.
+ *  @brief Specifies that a type defines a logical AND operator for itself.
+ *
+ *  Satisfied if @c K has a logical AND operator defined for itself.
  */
 
 /*!
  *  @concept defines_or_for_s
- *  @brief Satisfied if @c K has a logical OR operator defined for @c T that returns @c bool.
+ *  @brief Specifies that a type defines a logical OR operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has a logical OR operator defined for @c T that returns @c bool.
  */
 
 /*!
  *  @concept defines_or_for
- *  @brief Satisfied if @c K has a logical OR operator defined for @c T.
+ *  @brief Specifies that a type defines a logical OR operator for another type.
+ *
+ *  Satisfied if @c K has a logical OR operator defined for @c T.
  */
 
 /*!
  *  @concept defines_or_s
- *  @brief Satisfied if @c K has a logical OR operator defined for itself that returns @c bool.
+ *  @brief Specifies that a type defines a logical OR operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has a logical OR operator defined for itself that returns @c bool.
  */
 
 /*!
  *  @concept defines_or
- *  @brief Satisfied if @c K has a logical OR operator defined for itself.
+ *  @brief Specifies that a type defines a logical OR operator for itself.
+ *
+ *  Satisfied if @c K has a logical OR operator defined for itself.
  */
 
 // Member Access Operators
 /*!
  *  @concept defines_subscript_for_s
- *  @brief Satisfied if @c K has a subscript operator defined for @c T that returns @c R&.
+ *  @brief Specifies that a type defines a subscript operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has a subscript operator defined for @c T that returns @c R&.
  */
 
 /*!
  *  @concept defines_subscript_for
- *  @brief Satisfied if @c K has a subscript operator defined for @c T.
+ *  @brief Specifies that a type defines a subscript operator for another type.
+ *
+ *  Satisfied if @c K has a subscript operator defined for @c T.
  */
 
 /*!
- *  @concept defines_indirection_for_s
- *  @brief Satisfied if @c K has an indirection operator defined that returns @c R&.
+ *  @concept defines_indirection_s
+ *  @brief Specifies that a type defines an indirection operator (with strict return).
+ *
+ *  Satisfied if @c K has an indirection operator defined that returns @c R&.
  */
 
 /*!
- *  @concept defines_indirection_for
- *  @brief Satisfied if @c K has an indirection operator defined.
+ *  @concept defines_indirection
+ *  @brief Specifies that a type defines an indirection operator.
+ *
+ *  Satisfied if @c K has an indirection operator defined.
  */
 
 /*!
  *  @concept defines_address_of_s
- *  @brief Satisfied if @c K has an address-of operator defined that returns @c R*.
+ *  @brief Specifies that a type defines an address-of operator (with strict return).
+ *
+ *  Satisfied if @c K has an address-of operator defined that returns @c R*.
+ */
+
+/*!
+ *  @concept defines_address_of
+ *  @brief Specifies that a type defines an address-of operator.
+ *
+ *  Satisfied if @c K has an address-of operator defined*.
  */
 
 /*!
  *  @concept defines_ptr_to_member_ptr_for_s
- *  @brief Satisfied if @c K has pointer to member of pointer operator defined that returns @c R&.
+ *  @brief Specifies that a type defines a pointer to member of pointer operator (with strict return).
+ *
+ *  Satisfied if @c K has pointer to member of pointer operator defined that returns @c R&.
  */
 
 /*!
  *  @concept defines_ptr_to_member_ptr_for
- *  @brief Satisfied if @c K has pointer to member of pointer operator defined.
+ *  @brief Specifies that a type defines a pointer to member of pointer operator.
+ *
+ *  Satisfied if @c K has pointer to member of pointer operator defined.
  */
 
 // Other Operators
 /*!
  *  @concept defines_call_for_s
- *  @brief Satisfied if @c K has a call operator defined for the specified types that returns @c R.
+ *  @brief Specifies that a type defines a call operator for the specified argument types (with strict return).
+ *
+ *  Satisfied if @c K has a call operator defined for the specified types that returns @c R.
  */
 
 /*!
  *  @concept defines_call_for
- *  @brief Satisfied if @c K has a call operator defined for the specified types.
+ *  @brief Specifies that a type defines a call operator for the specified argument types.
+ *
+ *  Satisfied if @c K has a call operator defined for the specified types.
  */
 
 /*!
  *  @concept defines_call_s
- *  @brief Satisfied if @c K has a 0 parameter call operator defined that returns @c R.
+ *  @brief Specifies that a type defines a argumentless call operator (with strict return).
+ *
+ *  Satisfied if @c K has a 0 parameter call operator defined that returns @c R.
  */
 
 /*!
  *  @concept defines_call
- *  @brief Satisfied if @c K has a 0 parameter call operator defined.
+ *  @brief Specifies that a type defines a argumentless call operator.
+ *
+ *  Satisfied if @c K has a 0 parameter call operator defined.
  */
 
 /*!
  *  @concept defines_comma_for_s
- *  @brief Satisfied if @c K has a comma operator defined for @c T that returns @c T&.
+ *  @brief Specifies that a type defines a comma operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has a comma operator defined for @c T that returns @c T&.
  */
 
 /*!
  *  @concept defines_comma_for
- *  @brief Satisfied if @c K has a comma operator defined for @c T.
+ *  @brief Specifies that a type defines a comma operator for another type.
+ *
+ *  Satisfied if @c K has a comma operator defined for @c T.
  */
 
 // Arithmetic Operators
 /*!
  *  @concept defines_unary_plus_s
- *  @brief Satisfied if @c K has a unary plus operator defined that returns @c K.
+ *  @brief Specifies that a type defines a unary plus operator (with strict return).
+ *
+ *  Satisfied if @c K has a unary plus operator defined that returns @c K.
  */
 
 /*!
  *  @concept defines_unary_plus
- *  @brief Satisfied if @c K has a unary plus operator defined.
+ *  @brief Specifies that a type defines a unary plus operator.
+ *
+ *  Satisfied if @c K has a unary plus operator defined.
  */
 
 /*!
  *  @concept defines_unary_minus_s
- *  @brief Satisfied if @c K has a unary minus operator defined that returns @c K.
+ *  @brief Specifies that a type defines a unary minus operator (with strict return).
+ *
+ *  Satisfied if @c K has a unary minus operator defined that returns @c K.
  */
 
 /*!
  *  @concept defines_unary_minus
- *  @brief Satisfied if @c K has a unary minus operator defined.
+ *  @brief Specifies that a type defines a unary minus operator.
+ *
+ *  Satisfied if @c K has a unary minus operator defined.
  */
 
 /*!
  *  @concept defines_add_for_s
- *  @brief Satisfied if @c K has an addition operator defined for @c T that returns @c K.
+ *  @brief Specifies that a type defines an addition operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has an addition operator defined for @c T that returns @c K.
  */
 
 /*!
  *  @concept defines_add_for
- *  @brief Satisfied if @c K has an addition operator defined for @c T.
+ *  @brief Specifies that a type defines an addition operator for another type.
+ *
+ *  Satisfied if @c K has an addition operator defined for @c T.
  */
 
 /*!
  *  @concept defines_add_s
- *  @brief Satisfied if @c K has an addition operator defined for itself that returns @c K.
+ *  @brief Specifies that a type defines an addition operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has an addition operator defined for itself that returns @c K.
  */
 
 /*!
  *  @concept defines_add
- *  @brief Satisfied if @c K has an addition operator defined for itself.
+ *  @brief Specifies that a type defines an addition operator for itself.
+ *
+ *  Satisfied if @c K has an addition operator defined for itself.
  */
 
 /*!
  *  @concept defines_sub_for_s
- *  @brief Satisfied if @c K has a subtraction operator defined for @c T that returns @c K.
+ *  @brief Specifies that a type defines a subtraction operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has a subtraction operator defined for @c T that returns @c K.
  */
 
 /*!
  *  @concept defines_sub_for
- *  @brief Satisfied if @c K has a subtraction operator defined for @c T.
+ *  @brief Specifies that a type defines a subtraction operator for another type.
+ *
+ *  Satisfied if @c K has a subtraction operator defined for @c T.
  */
 
 /*!
  *  @concept defines_sub_s
- *  @brief Satisfied if @c K has a subtraction operator defined for itself that returns @c K.
+ *  @brief Specifies that a type defines a subtraction operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has a subtraction operator defined for itself that returns @c K.
  */
 
 /*!
  *  @concept defines_sub
- *  @brief Satisfied if @c K has a subtraction operator defined for itself.
+ *  @brief Specifies that a type defines a subtraction operator for itself.
+ *
+ *  Satisfied if @c K has a subtraction operator defined for itself.
  */
 
 /*!
  *  @concept defines_mult_for_s
- *  @brief Satisfied if @c K has a multiplication operator defined for @c T that returns @c K.
+ *  @brief Specifies that a type defines a multiplication operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has a multiplication operator defined for @c T that returns @c K.
  */
 
 /*!
  *  @concept defines_mult_for
- *  @brief Satisfied if @c K has a multiplication operator defined for @c T.
+ *  @brief Specifies that a type defines a multiplication operator for another type.
+ *
+ *  Satisfied if @c K has a multiplication operator defined for @c T.
  */
 
 /*!
  *  @concept defines_mult_s
- *  @brief Satisfied if @c K has a multiplication operator defined for itself that returns @c K.
+ *  @brief Specifies that a type defines a multiplication operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has a multiplication operator defined for itself that returns @c K.
  */
 
 /*!
  *  @concept defines_mult
- *  @brief Satisfied if @c K has a multiplication operator defined for itself.
+ *  @brief Specifies that a type defines a multiplication operator for itself.
+ *
+ *  Satisfied if @c K has a multiplication operator defined for itself.
  */
 
 /*!
  *  @concept defines_div_for_s
- *  @brief Satisfied if @c K has a division operator defined for @c T that returns @c K.
+ *  @brief Specifies that a type defines a division operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has a division operator defined for @c T that returns @c K.
  */
 
 /*!
  *  @concept defines_div_for
- *  @brief Satisfied if @c K has a division operator defined for @c T.
+ *  @brief Specifies that a type defines a division operator for another type.
+ *
+ *  Satisfied if @c K has a division operator defined for @c T.
  */
 
 /*!
  *  @concept defines_div_s
- *  @brief Satisfied if @c K has a division operator defined for itself that returns @c K.
+ *  @brief Specifies that a type defines a division operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has a division operator defined for itself that returns @c K.
  */
 
 /*!
  *  @concept defines_div
- *  @brief Satisfied if @c K has a division operator defined for itself.
+ *  @brief Specifies that a type defines a division operator for itself.
+ *
+ *  Satisfied if @c K has a division operator defined for itself.
  */
 
 /*!
  *  @concept defines_mod_for_s
- *  @brief Satisfied if @c K has a modulo operator defined for @c T that returns @c K.
+ *  @brief Specifies that a type defines a modulo operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has a modulo operator defined for @c T that returns @c K.
  */
 
 /*!
  *  @concept defines_mod_for
- *  @brief Satisfied if @c K has a modulo operator defined for @c T.
+ *  @brief Specifies that a type defines a modulo operator for another type.
+ *
+ *  Satisfied if @c K has a modulo operator defined for @c T.
  */
 
 /*!
  *  @concept defines_mod_s
- *  @brief Satisfied if @c K has a modulo operator defined for itself that returns @c K.
+ *  @brief Specifies that a type defines a modulo operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has a modulo operator defined for itself that returns @c K.
+ */
+
+/*!
+ *  @concept defines_mod
+ *  @brief Specifies that a type defines a modulo operator for itself.
+ *
+ *  Satisfied if @c K has a modulo operator defined for itself.
  */
 
 /*!
  *  @concept defines_bit_not_s
- *  @brief Satisfied if @c K has a bitwise NOT operator defined that returns @c K.
+ *  @brief Specifies that a type defines a bitwise NOT operator (with strict return).
+ *
+ *
+ *  Satisfied if @c K has a bitwise NOT operator defined that returns @c K.
+ */
+
+/*!
+ *  @concept defines_bit_not
+ *  @brief Specifies that a type defines a bitwise NOT operator.
+ *
+ *
+ *  Satisfied if @c K has a bitwise NOT operator defined.
  */
 
 /*!
  *  @concept defines_bit_and_for_s
- *  @brief Satisfied if @c K has a bitwise AND operator defined for @c T that returns @c K.
+ *  @brief Specifies that a type defines a bitwise AND operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has a bitwise AND operator defined for @c T that returns @c K.
  */
 
 /*!
  *  @concept defines_bit_and_for
- *  @brief Satisfied if @c K has a bitwise AND operator defined for @c T.
+ *  @brief Specifies that a type defines a bitwise AND operator for another type.
+ *
+ *  Satisfied if @c K has a bitwise AND operator defined for @c T.
  */
 
 /*!
  *  @concept defines_bit_and_s
- *  @brief Satisfied if @c K has a bitwise AND operator defined for itself that returns @c K.
+ *  @brief Specifies that a type defines a bitwise AND operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has a bitwise AND operator defined for itself that returns @c K.
  */
 
 /*!
  *  @concept defines_bit_and
- *  @brief Satisfied if @c K has a bitwise AND operator defined for itself.
+ *  @brief Specifies that a type defines a bitwise AND operator for itself.
+ *
+ *  Satisfied if @c K has a bitwise AND operator defined for itself.
  */
 
 /*!
  *  @concept defines_bit_or_for_s
- *  @brief Satisfied if @c K has a bitwise OR operator defined for @c T that returns @c K.
+ *  @brief Specifies that a type defines a bitwise OR operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has a bitwise OR operator defined for @c T that returns @c K.
  */
 
 /*!
  *  @concept defines_bit_or_for
- *  @brief Satisfied if @c K has a bitwise OR operator defined for @c T.
+ *  @brief Specifies that a type defines a bitwise OR operator for another type.
+ *
+ *  Satisfied if @c K has a bitwise OR operator defined for @c T.
  */
 
 /*!
  *  @concept defines_bit_or_s
- *  @brief Satisfied if @c K has a bitwise OR operator defined for itself that returns @c K.
+ *  @brief Specifies that a type defines a bitwise OR operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has a bitwise OR operator defined for itself that returns @c K.
  */
 
 /*!
  *  @concept defines_bit_or
- *  @brief Satisfied if @c K has a bitwise OR operator defined for itself.
+ *  @brief Specifies that a type defines a bitwise OR operator for itself.
+ *
+ *  Satisfied if @c K has a bitwise OR operator defined for itself.
  */
 
 /*!
  *  @concept defines_bit_xor_for_s
- *  @brief Satisfied if @c K has a bitwise XOR operator defined for @c T that returns @c K.
+ *  @brief Specifies that a type defines a bitwise XOR operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has a bitwise XOR operator defined for @c T that returns @c K.
  */
 
 /*!
  *  @concept defines_bit_xor_for
- *  @brief Satisfied if @c K has a bitwise XOR operator defined for @c T.
+ *  @brief Specifies that a type defines a bitwise XOR operator for another type.
+ *
+ *  Satisfied if @c K has a bitwise XOR operator defined for @c T.
  */
 
 /*!
  *  @concept defines_bit_xor_s
- *  @brief Satisfied if @c K has a bitwise XOR operator defined for itself that returns @c K.
+ *  @brief Specifies that a type defines a bitwise XOR operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has a bitwise XOR operator defined for itself that returns @c K.
  */
 
 /*!
  *  @concept defines_bit_xor
- *  @brief Satisfied if @c K has a bitwise XOR operator defined for itself.
+ *  @brief Specifies that a type defines a bitwise XOR operator for itself.
+ *
+ *  Satisfied if @c K has a bitwise XOR operator defined for itself.
  */
 
 /*!
  *  @concept defines_left_shift_for_s
- *  @brief Satisfied if @c K has a left shift operator defined for @c T that returns @c K.
+ *  @brief Specifies that a type defines a left shift operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has a left shift operator defined for @c T that returns @c K.
  */
 
 /*!
  *  @concept defines_left_shift_for
- *  @brief Satisfied if @c K has a left shift operator defined for @c T.
+ *  @brief Specifies that a type defines a left shift operator for another type.
+ *
+ *  Satisfied if @c K has a left shift operator defined for @c T.
  */
 
 /*!
  *  @concept defines_left_shift_s
- *  @brief Satisfied if @c K has a left shift operator defined for itself that returns @c K.
+ *  @brief Specifies that a type defines a left shift operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has a left shift operator defined for itself that returns @c K.
  */
 
 /*!
  *  @concept defines_left_shift
- *  @brief Satisfied if @c K has a left shift operator defined for itself.
+ *  @brief Specifies that a type defines a left shift operator for itself.
+ *
+ *  Satisfied if @c K has a left shift operator defined for itself.
  */
 
 /*!
  *  @concept defines_right_shift_for_s
- *  @brief Satisfied if @c K has a right shift operator defined for @c T that returns @c K.
+ *  @brief Specifies that a type defines a right shift operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has a right shift operator defined for @c T that returns @c K.
  */
 
 /*!
  *  @concept defines_right_shift_for
- *  @brief Satisfied if @c K has a right shift operator defined for @c T.
+ *  @brief Specifies that a type defines a right shift operator for another type.
+ *
+ *  Satisfied if @c K has a right shift operator defined for @c T.
  */
 
 /*!
  *  @concept defines_right_shift_s
- *  @brief Satisfied if @c K has a right shift operator defined for itself that returns @c K.
+ *  @brief Specifies that a type defines a right shift operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has a right shift operator defined for itself that returns @c K.
  */
 
 /*!
  *  @concept defines_right_shift
- *  @brief Satisfied if @c K has a right shift operator defined for itself.
+ *  @brief Specifies that a type defines a right shift operator for itself.
+ *
+ *  Satisfied if @c K has a right shift operator defined for itself.
  */
 
 // Comparison operators
 /*!
  *  @concept defines_equality_for_s
- *  @brief Satisfied if @c K has an equal to operator defined for @c T that returns @c bool.
+ *  @brief Specifies that a type defines an equal to operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has an equal to operator defined for @c T that returns @c bool.
  */
 
 /*!
  *  @concept defines_equality_for
- *  @brief Satisfied if @c K has an equal to operator defined for @c T.
+ *  @brief Specifies that a type defines an equal to operator for another type.
+ *
+ *  Satisfied if @c K has an equal to operator defined for @c T.
  */
 
 /*!
  *  @concept defines_equality_s
- *  @brief Satisfied if @c K has an equal to operator defined for itself that returns @c bool.
+ *  @brief Specifies that a type defines an equal to operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has an equal to operator defined for itself that returns @c bool.
  */
 
 /*!
  *  @concept defines_equality
- *  @brief Satisfied if @c K has an equal to operator defined for itself.
+ *  @brief Specifies that a type defines an equal to operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has an equal to operator defined for itself.
  */
 
 /*!
  *  @concept defines_inequality_for_s
- *  @brief Satisfied if @c K has a not equal to operator defined for @c T that returns @c bool.
+ *  @brief Specifies that a type defines a not equal to operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has a not equal to operator defined for @c T that returns @c bool.
  */
 
 /*!
  *  @concept defines_inequality_for
- *  @brief Satisfied if @c K has a not equal to operator defined for @c T.
+ *  @brief Specifies that a type defines a not equal to operator for another type.
+ *
+ *  Satisfied if @c K has a not equal to operator defined for @c T.
  */
 
 /*!
  *  @concept defines_inequality_s
- *  @brief Satisfied if @c K has a not equal to operator defined for itself that returns @c bool.
+ *  @brief Specifies that a type defines a not equal to operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has a not equal to operator defined for itself that returns @c bool.
  */
 
 /*!
  *  @concept defines_inequality
- *  @brief Satisfied if @c K has a not equal to operator defined for itself.
+ *  @brief Specifies that a type defines a not equal to operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has a not equal to operator defined for itself.
  */
 
 /*!
  *  @concept defines_less_than_for_s
- *  @brief Satisfied if @c K has a less than operator defined for @c T that returns @c bool.
+ *  @brief Specifies that a type defines a less than operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has a less than operator defined for @c T that returns @c bool.
  */
 
 /*!
  *  @concept defines_less_than_for
- *  @brief Satisfied if @c K has a less than to operator defined for @c T.
+ *  @brief Specifies that a type defines a less than operator for another type.
+ *
+ *  Satisfied if @c K has a less than to operator defined for @c T.
  */
 
 /*!
  *  @concept defines_less_than_s
- *  @brief Satisfied if @c K has a less than to operator defined for itself that returns @c bool.
+ *  @brief Specifies that a type defines a less than operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has a less than to operator defined for itself that returns @c bool.
  */
 
 /*!
  *  @concept defines_less_than
- *  @brief Satisfied if @c K has a less than to operator defined for itself.
+ *  @brief Specifies that a type defines a less than operator for itself.
+ *
+ *  Satisfied if @c K has a less than to operator defined for itself.
  */
 
 /*!
  *  @concept defines_greater_than_for_s
- *  @brief Satisfied if @c K has a greater than operator defined for @c T that returns @c bool.
+ *  @brief Specifies that a type defines a greater than operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has a greater than operator defined for @c T that returns @c bool.
  */
 
 /*!
  *  @concept defines_greater_than_for
- *  @brief Satisfied if @c K has a greater than to operator defined for @c T.
+ *  @brief Specifies that a type defines a greater than operator for another type.
+ *
+ *  Satisfied if @c K has a greater than to operator defined for @c T.
  */
 
 /*!
  *  @concept defines_greater_than_s
- *  @brief Satisfied if @c K has a greater than to operator defined for itself that returns @c bool.
+ *  @brief Specifies that a type defines a greater than operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has a greater than to operator defined for itself that returns @c bool.
  */
 
 /*!
  *  @concept defines_greater_than
- *  @brief Satisfied if @c K has a greater than to operator defined for itself.
+ *  @brief Specifies that a type defines a greater than operator for itself.
+ *
+ *  Satisfied if @c K has a greater than to operator defined for itself.
  */
 
 /*!
  *  @concept defines_less_than_equal_for_s
- *  @brief Satisfied if @c K has a less than or equal to operator defined for @c T that returns @c bool.
+ *  @brief Specifies that a type defines a less than or equal to operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has a less than or equal to operator defined for @c T that returns @c bool.
  */
 
 /*!
  *  @concept defines_less_than_equal_for
- *  @brief Satisfied if @c K has a less than or equal to operator defined for @c T.
+ *  @brief Specifies that a type defines a less than or equal to operator for another type.
+ *
+ *  Satisfied if @c K has a less than or equal to operator defined for @c T.
  */
 
 /*!
  *  @concept defines_less_than_equal_s
- *  @brief Satisfied if @c K has a less than or equal to operator defined for itself that returns @c bool.
+ *  @brief Specifies that a type defines a less than or equal to operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has a less than or equal to operator defined for itself that returns @c bool.
  */
 
 /*!
  *  @concept defines_less_than_equal
- *  @brief Satisfied if @c K has a less than or equal to operator defined for itself.
+ *  @brief Specifies that a type defines a less than or equal to operator for itself.
+ *
+ *  Satisfied if @c K has a less than or equal to operator defined for itself.
  */
 
 /*!
  *  @concept defines_greater_than_equal_for_s
- *  @brief Satisfied if @c K has a greater than or equal to operator defined for @c T that returns @c bool.
+ *  @brief Specifies that a type defines a greater than or equal to operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has a greater than or equal to operator defined for @c T that returns @c bool.
  */
 
 /*!
  *  @concept defines_greater_than_equal_for
- *  @brief Satisfied if @c K has a greater than or equal to operator defined for @c T.
+ *  @brief Specifies that a type defines a greater than or equal to operator for another type.
+ *
+ *  Satisfied if @c K has a greater than or equal to operator defined for @c T.
  */
 
 /*!
  *  @concept defines_greater_than_equal_s
- *  @brief Satisfied if @c K has a greater than or equal to operator defined for itself that returns @c bool.
+ *  @brief Specifies that a type defines a greater than or equal to operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has a greater than or equal to operator defined for itself that returns @c bool.
  */
 
 /*!
  *  @concept defines_greater_than_equal
- *  @brief Satisfied if @c K has a greater than or equal to operator defined for itself.
+ *  @brief Specifies that a type defines a greater than or equal to operator for itself.
+ *
+ *  Satisfied if @c K has a greater than or equal to operator defined for itself.
  */
 
 /*!
  *  @concept defines_three_way_comp_for_s
- *  @brief Satisfied if @c K has a three-way comparison operator defined for @c T that returns a type that is
+ *  @brief Specifies that a type defines a three-way comparison operator for another type (with strict return).
+ *
+ *  Satisfied if @c K has a three-way comparison operator defined for @c T that returns a type that is
  *  implicitly convertible to @c std::partial_ordering.
  */
 
 /*!
  *  @concept defines_three_way_comp_for
- *  @brief Satisfied if @c K has a three-way comparison operator defined for @c T.
+ *  @brief Specifies that a type defines a three-way comparison operator for another type.
+ *
+ *  Satisfied if @c K has a three-way comparison operator defined for @c T.
  */
 
 /*!
  *  @concept defines_three_way_comp_s
- *  @brief Satisfied if @c K has a three-way comparison operator defined for itself that returns a type that is
+ *  @brief Specifies that a type defines a three-way comparison operator for itself (with strict return).
+ *
+ *  Satisfied if @c K has a three-way comparison operator defined for itself that returns a type that is
  *  implicitly convertible to @c std::partial_ordering.
  */
 
 /*!
  *  @concept defines_three_way_comp
- *  @brief Satisfied if @c K has a three-way comparison operator defined for itself.
+ *  @brief Specifies that a type defines a three-way comparison operator for itself.
+ *
+ *  Satisfied if @c K has a three-way comparison operator defined for itself.
  */
 
 // Trait
 /*!
  *  @concept arithmetic
- *  @brief Satisfied if @c K is an arithmetic type.
+ *  @brief Specifies that a type is an arithmetic type.
+ *
+ *  Satisfied if @c K is an arithmetic type.
  */
 
 /*!
  *  @concept fundamental
- *  @brief Satisfied if @c K is a fundamental type.
+ *  @brief Specifies that a type is a fundamental type.
+ *
+ *  Satisfied if @c K is a fundamental type.
  */
 
 /*!
  *  @concept traverseable
- *  @brief Satisfied if @c K contains the type 'const_iterator' that satisfies @c std::bidirectional_iterator,
+ *  @brief Specifies that a type is a valid type for Traverser.
+ *
+ *  Satisfied if @c K contains the type 'const_iterator' that satisfies @c std::bidirectional_iterator,
  *  is default constructable, and defines a member function 'size' that returns an integral type.
  */
 
 // Conversion
 /*!
  *  @concept static_castable_to
- *  @brief Satisfied if @c K can be converted to @c T using static_cast<>().
+ *  @brief Specifies that a type can be statically cast to another type.
+ *
+ *  Satisfied if @c K can be converted to @c T using static_cast<>().
  */
 }
