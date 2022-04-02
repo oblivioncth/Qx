@@ -28,7 +28,8 @@ namespace Qx
 /*!
  *  @fn template<typename T> requires std::integral<T> static BitArray BitArray::fromInteger(const T& integer)
  *
- *  Creates a bit array from @a integer. Multibyte integers are stored in big-endian order.
+ *  Converts the primitive @a integer to a bit array, with the resultant contents encoded in big-endian
+ *  format if a multibyte integer type is provided.
  *
  *  @snippet qx-bitarray.cpp 0
  */
@@ -45,15 +46,6 @@ BitArray::BitArray() : QBitArray() {}
  *  initialized with @a value, which defaults to false (0).
 */
 BitArray::BitArray(int size, bool value) : QBitArray(size, value) {}
-
-//-Class Functions----------------------------------------------------------------------------------------------
-//Public:
-/*!
- *  @fn template<typename T> requires std::integral<T> T static BitArray::fromInteger(const T& integer)
- *
- *  Converts the primitive @a integer to a bit array, with the resultant contents encoded in big-endian
- *  format if a multibyte integer type is provided.
- */
 
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:
