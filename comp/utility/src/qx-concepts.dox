@@ -17,7 +17,7 @@ namespace Qx
  */
 
 /*!
- *  @concept defines_assign_for_s
+ *  @concept defines_assign_for
  *  @brief Satisfied if @c K has a simple assignment operator defined for @c T.
  */
 
