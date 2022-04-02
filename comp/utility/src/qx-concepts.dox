@@ -8,7 +8,7 @@
  *  @todo Figure out how to make a concept that uses the member of pointer (arrow) operator.
  */
 
-namespace
+namespace Qx
 {
 // Assignment Operators
 /*!
