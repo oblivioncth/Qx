@@ -58,8 +58,8 @@ TreeInputDialog::TreeInputDialog(QWidget* parent) : QDialog(parent)
     QPushButton* selectNoneButton = mButtonBox->addButton("Select None", QDialogButtonBox::ResetRole);
     connect(mButtonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
     connect(mButtonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
-    connect(selectAllButton, &QPushButton::clicked, this, [&](){ emit selectAllClicked(); });
-    connect(selectNoneButton, &QPushButton::clicked, this, [&](){ emit selectNoneClicked(); });
+    connect(selectAllButton, &QPushButton::clicked, this, &TreeInputDialog::selectAllClicked);
+    connect(selectNoneButton, &QPushButton::clicked, this, &TreeInputDialog::selectNoneClicked);
 
     // Setup dialog layout
     QVBoxLayout* mainLayout = new QVBoxLayout();
