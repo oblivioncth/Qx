@@ -43,8 +43,8 @@ namespace Qx
 /*!
  *  @struct FileDetails::Translation
  *
- *  A structure used to represent a particular translation of the string table section of a file's details. It
- *  encapsulates a language and code page identifier pair.
+ *  @brief A structure used to represent a particular translation of the string table section of a file's details.
+ *  It encapsulates a language and code page identifier pair.
  *
  *  @note Handling translations via code pages is deprecated and discouraged when created new Windows applications;
  *  however, file details are still encoded using this method for backwards compatibility, and therefore must be
@@ -99,7 +99,7 @@ size_t qHash(const FileDetails::Translation& key, size_t seed) noexcept
 /*!
  *  @struct FileDetails::StringTable
  *
- *  A structure that contains all of the translation dependent optional fields of a file's details
+ *  @brief A structure that contains all of the translation dependent optional fields of a file's details
  *
  *  @sa <a href="https://docs.microsoft.com/en-us/windows/win32/menurc/stringtable">StringTable structure</a>.
  */
