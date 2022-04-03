@@ -8,6 +8,9 @@ set(DOXYGEN_EXPAND_ONLY_PREDEF YES)
 set(DOXYGEN_CALL_GRAPH YES)
 set(DOXYGEN_CALLER_GRAPH YES)
 
+# Set layout file
+set(DOXYGEN_LAYOUT_FILE "${DOC_SOURCE_PATH}/DoxygenLayout.xml")
+
 # Set extra input paths
 set(DOXYGEN_EXAMPLE_PATH ${DOC_EXAMPLE_LIST})
 
