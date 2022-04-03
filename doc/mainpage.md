@@ -29,6 +29,7 @@ An imported component that depends on other Qx components will always cause said
 Getting Started
 ---------------
 1) Download the latest [Release](https://github.com/oblivioncth/Qx/releases).
+
 2) Place the package somewhere CMake can find it
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Add to a default search path or...
@@ -63,7 +64,37 @@ The latest source is available in the Master branch of https://github.com/oblivi
 
 The requirements for building from Git are the same as for using Qx, with the obvious exception that Doxygen is also needed to build the documentation.
 
-If newer to working with Qt, it is easiest to build from within Qt creator as it handles a large portion of environment setup, including adding Qt to CMake's package search list, automatically. Simply make sure that a kit is configured in Qt Creator that uses a compatible version of Qt, open the CMakeLists.txt file as a project, and build.
+If newer to working with Qt, it is easiest to build from within Qt creator as it handles a large portion of environment setup, including adding Qt to CMake's package search list, automatically. Simply make sure that a kit is configured in Qt Creator that uses a compatible version of Qt, open the CMakeLists.txt file as a project, and build with the desired configuration.
+
+The CMake project is designed to be used with multi-configuration generators such as Visual Studio or Ninja Multi-Config, and may require some tweaking to work with single configuration generators.
+
+#### CMake Targets:
+
+ - all - Builds all Qx components (the entire library)
+ - install - Installs the build output of the provided configuration (--config X) into the *out* directory
+ - docs - Builds the Qx documentation
+
+#### Package
+By default, the CMakeLists project configures CPack to create an artifact ZIP containing the binaries for Debug and Release configurations, as well as documentation.
+
+To properly create the full package, perform the following steps inside the source directory:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Build the Debug libraries
+cmake.exe --build <path/to/build/dir> --target all --config Debug
+
+# Build the Release libraries
+cmake.exe --build <path/to/build/dir> --target all --config Release
+
+# Build the documentation
+cmake.exe --build <path/to/build/dir> --target docs --config Release
+
+# Install Debug/Release libraries and documentation
+cmake.exe --build <path/to/build/dir> --target install --config Debug
+cmake.exe --build <path/to/build/dir> --target install --config Release
+
+# Create the output package
+cpack.exe -C Debug;Release
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **NOTE:**
 For the time being, Qx is only configured to be built as a static library, which means that the Qt binaries you use to make Qx must have also been built using static linking. No pre-built distributions of Qt are provided that use this configuration and so you must built Qt yourself in this manner.
