@@ -6,4 +6,6 @@
  *
  *  Nearly all library features are nested within this namespace in a similar vein as @c std with the
  *  C++ Standard Library.
+ *
+ *  See the <a href="globals.html">File Member's Index</a> for all global library elements.
  */

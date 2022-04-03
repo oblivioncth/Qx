@@ -1,8 +1,0 @@
-/*!
- *  @defgroup qx-global Globals
- *
- *  @brief Most Qx functionality is provided via the @c Qx namespace, but a select portion of the interface is
- *  defined globally.
- *
- *  The global portion of the Qx library roughly mirrors QtGlobal in terms of scope and organization.
- */

@@ -6,14 +6,8 @@
  *  macros that are designed to minimize the syntactic footprint of common tasks.
  */
 
-/*! @addtogroup qx-global
- *  @{
- */
-
 /*!
  *  @def QX_SCOPED_ENUM_HASH_FUNC(T)
  *
  *  This function-like macro defines a qHash() overload for the provided scoped-enum type @a T.
  */
-
-/*! @}*/

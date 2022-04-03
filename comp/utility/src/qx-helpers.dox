@@ -7,10 +7,6 @@
  */
 
 //Non-namespace Functions----------------------------------------------------------
-/*! @addtogroup qx-global
- *  @{
- */
-
 /*!
  *  @fn template <typename T> const T qxAsConst(T&& t)
  *
@@ -29,5 +25,3 @@
  *  lvalues and rvalues, instead of having to employ mixed usage of qxAsConst() and
  *  qAsConst().
  */
-
-/*! @}*/
