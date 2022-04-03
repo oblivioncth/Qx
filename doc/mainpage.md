@@ -1,3 +1,5 @@
+
+
 Qx {#mainpage}
 ==============
 Qx is a basic C++ library built on top of the ubiquitous Qt framework, created with the intention of extending its existing functionality while following the same paradigm of its design.
@@ -74,6 +76,17 @@ The CMake project is designed to be used with multi-configuration generators suc
  - install - Installs the build output of the provided configuration (--config X) into the *out* directory
  - docs - Builds the Qx documentation
 
+#### Documentation:
+In order to build the documentation the CMake variable **QT_DOCS_DIR** must be set to the path that contains documentation for all Qt versions on the local system. By default this is:
+
+    # Windows
+    C:\Program Files\Qt\Docs
+
+    # Linux (some distros)
+    /usr/local/Qt/Docs
+
+Regardless of the exact path, the variable must point to the root Docs folder and not the folder specific to the version of Qt you plan to build with. The appropriate documentation version will selected automatically based on the supplied Qt binaries.
+
 #### Package
 By default, the CMakeLists project configures CPack to create an artifact ZIP containing the binaries for Debug and Release configurations, as well as documentation.
 
@@ -86,7 +99,7 @@ cmake.exe --build <path/to/build/dir> --target all --config Debug
 cmake.exe --build <path/to/build/dir> --target all --config Release
 
 # Build the documentation
-cmake.exe --build <path/to/build/dir> --target docs --config Release
+cmake.exe -D QT_DOCS_DIR=<path/to/qt/docs> --build <path/to/build/dir> --target docs --config Release
 
 # Install Debug/Release libraries and documentation
 cmake.exe --build <path/to/build/dir> --target install --config Debug
