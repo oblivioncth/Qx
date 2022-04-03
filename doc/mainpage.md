@@ -1,20 +1,20 @@
 Qx {#mainpage}
-============
+==============
 Qx is a basic C++ library built on top of the ubiquitous Qt framework, created with the intention of extending its existing functionality while following the same paradigm of its design.
 
 The library primarily consists data structures and routines that facilitate a variety of common, or otherwise reoccurring programmatic tasks, largely providing convenience, flexibility, and syntactic efficiency to developers when writing applications.
 
 Requirements
------------------
+------------
 
  - A C++20 capable compiler
  - Qt 6.2.x
  - CMake 3.21.1 or greater
  - A Qt compatible platform (only tested on Windows and Debian Linux!)
 
-Components
-----------------
-Qx is packaged as several component libraries that roughly follow the scope and grouping of Qt modules, with Core being the primary component.
+Packaging
+----------
+Qx is provided as a CMake package containing several component libraries that roughly follow the scope and grouping of Qt modules, with Core being the primary component.
 
 See the [Components Index](modules.html) for a list of available components (**NOTE**: Some of these are platform dependent).
 
@@ -27,24 +27,24 @@ find_package(Qx REQUIRED COMPONENTS Core Network)
 An imported component that depends on other Qx components will always cause said components to automatically be imported, even if they are not explicitly specified. Likewise, targets that link to interdependent components will automatically be linked to dependency components as necessary.
 
 Getting Started
--------------------
+---------------
 1) Download the latest [Release](https://github.com/oblivioncth/Qx/releases).
 2) Place the package somewhere CMake can find it
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Add to a default search path or...
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} path\to\Qx_package)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 3) Import the package
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # When no components are specified, all available components will be imported
 find_package(Qx 0.1) # Or whichever version
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 4)	Link to the required components where necessary
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 target_link_libraries(example_ui_app PUBLIC Qx::Core Qx::Widgets)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 5) Include the corresponding headers in your code
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -58,7 +58,7 @@ target_link_libraries(example_ui_app PUBLIC Qx::Core Qx::Widgets)
 It is possible to include portions of the Qx API with finer granularity by only referencing the exact headers you need in accordance with the include structure shown in the [File Index](files.html), but it is generally recommended to simply include the main header for each component you use as shown above.
 
 Building From Source
---------------------------
+--------------------
 The latest source is available in the Master branch of https://github.com/oblivioncth/Qx.
 
 The requirements for building from Git are the same as for using Qx, with the obvious exception that Doxygen is also needed to build the documentation.
@@ -70,4 +70,4 @@ For the time being, Qx is only configured to be built as a static library, which
 
 See https://doc.qt.io/qt-6/windows-building.html for general information and be sure to pass the **-static** option to the *configure* script.
 
-If you get stuck building Qt statically (as there can be some gotchyas), feel free to open an issue under the Qx repository for assistance.
+If you get stuck building Qt statically (as there can be some gotchyas), feel free to open an issue under the project's Github repository for assistance.
