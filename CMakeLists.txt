@@ -47,7 +47,6 @@ set(DOC_BUILD_PATH "${CMAKE_BINARY_DIR}/doc")
 # Install
 set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/out/install")
 set(HEADER_INSTALL_SUFFIX "include")
-set(DOC_INSTALL_SUFFIX "doc")
 
 # Package
 set(PACKAGE_PREFIX "${CMAKE_SOURCE_DIR}/out/dist")
@@ -177,7 +176,7 @@ install(FILES
 )
 
 # Install Docs if available
-install(DIRECTORY ${DOC_BUILD_PATH} DESTINATION ${DOC_INSTALL_SUFFIX} OPTIONAL)
+install(DIRECTORY ${DOC_BUILD_PATH} DESTINATION . OPTIONAL)
 
 #====================== CPack ==============================
 
