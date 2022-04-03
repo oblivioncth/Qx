@@ -46,7 +46,7 @@ namespace Qx
 //-Class Variables-----------------------------------------------------------------------------------------------
 //Public:
 /*!
- *  A default, or fallback error value that can be used when not all possible error paths have been handled and so
+ *  A default, or fallback error value that can be used when not all possible error paths have been handled and
  *  the cause of an error may be unknown
  */
 const GenericError GenericError::UNKNOWN_ERROR = GenericError(GenericError::Error, "An unknown error occurred."); // Initialization of static error
