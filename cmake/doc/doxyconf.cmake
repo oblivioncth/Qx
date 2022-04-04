@@ -1,4 +1,6 @@
-# Customize Gengeral Doxygen options
+#-----------Main Doxygen Options-----------------------------
+
+# General
 set(DOXYGEN_REPEAT_BRIEF NO)
 set(DOXYGEN_WARN_AS_ERROR YES)
 set(DOXYGEN_GENERATE_TREEVIEW YES)
@@ -48,3 +50,33 @@ endif()
 # Set output paths
 set(DOXYGEN_OUTPUT_DIRECTORY ${DOC_BUILD_PATH})
 
+
+#-------------Doxygen Awsome Options--------------
+
+# Base Theme
+set(DOXYGEN_GENERATE_TREEVIEW YES)
+set(DOXYGEN_HTML_EXTRA_STYLESHEET ${DOXYGEN_HTML_EXTRA_STYLESHEET}
+    "${DOC_SOURCE_PATH}/theme/doxygen-awesome/doxygen-awesome.css"
+)
+
+# Extensions - General
+set(DOXYGEN_HTML_HEADER "${DOC_SOURCE_PATH}/header.html")
+
+# Extensions - Dark Mode Toggle
+set(DOXYGEN_HTML_EXTRA_FILES ${DOXYGEN_HTML_EXTRA_FILES}
+    "${DOC_SOURCE_PATH}/theme/doxygen-awesome/doxygen-awesome-darkmode-toggle.js"
+)
+
+# Extensions - Fragment Copy Button
+set(DOXYGEN_HTML_EXTRA_FILES ${DOXYGEN_HTML_EXTRA_FILES}
+    "${DOC_SOURCE_PATH}/theme/doxygen-awesome/doxygen-awesome-fragment-copy-button.js"
+)
+
+# Extensions - Paragraph Linking
+set(DOXYGEN_HTML_EXTRA_FILES ${DOXYGEN_HTML_EXTRA_FILES}
+    "${DOC_SOURCE_PATH}/theme/doxygen-awesome/doxygen-awesome-paragraph-link.js"
+)
+
+# Best matching class diagram options
+set(DOXYGEN_DOT_IMAGE_FORMAT svg)
+set(DOXYGEN_DOT_TRANSPARENT svg)
