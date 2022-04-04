@@ -15,6 +15,7 @@
 // Extra-component Includes
 #include "qx/io/qx-common-io.h"
 #include "qx/core/qx-bitarray.h"
+#include "qx/core/qx-integrity.h"
 
 /*!
  *  @file qx-common-windows.h
@@ -132,6 +133,23 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
             SetLastError(oldError);
             return result;
     }
+
+    bool createMutex(QString mutexName)
+    {
+        // Persistent handle instance
+        static HANDLE uniqueAppMutex = NULL;
+
+        // Attempt to create unique mutex
+        uniqueAppMutex = CreateMutex(NULL, FALSE, (const wchar_t*)mutexName.utf16());
+        if(GetLastError() == ERROR_ALREADY_EXISTS)
+        {
+            CloseHandle(uniqueAppMutex);
+            return false; // Name isn't unique
+        }
+
+        // Name is unique
+        return true;
+    }
 }
 
 /*!
@@ -216,20 +234,19 @@ bool processIsRunning(DWORD processID) { return processNameById(processID).isNul
 
 /*!
  *  This function is used to limit a particular application such that only one running instance is
- *  allowed at one time. Call this function early in your program, at the point at which you want
- *  additional instances to terminate, and check the result:
+ *  allowed at one time via a mutex. Call this function early in your program, at the point at which
+ *  you want additional instances to terminate, and check the result:
  *
  *  If the calling instance is the only one running, the function will return @c true; otherwise
  *  it returns false.
  *
- *  @note This function uses the SHA256 based hash of the program's executable to uniquely
- *  identify its instances and detect the existence of them via a mutex.
+ *  @note This function uses the SHA256 based hash of the application's executable as the name of the
+ *  mutex, so it will only limit instances of the exact same build. If you need to prevent additional
+ *  instances across multiple builds of your application, use the overload of this function that
+ *  accepts a name argument.
  */
 bool enforceSingleInstance()
 {
-    // Persistent handle instance
-    static HANDLE uniqueAppMutex = NULL;
-
     // Get self hash
     QFile selfEXE(QCoreApplication::applicationFilePath());
     QString selfHash;
@@ -238,15 +255,25 @@ bool enforceSingleInstance()
         return false;
 
     // Attempt to create unique mutex
-    uniqueAppMutex = CreateMutex(NULL, FALSE, (const wchar_t*)selfHash.utf16());
-    if(GetLastError() == ERROR_ALREADY_EXISTS)
-    {
-        CloseHandle(uniqueAppMutex);
-        return false;
-    }
+    return createMutex(selfHash);
+}
 
-    // Instance is only one
-    return true;
+/*!
+ *  @overload
+ *
+ *  Limits the application to a single instance using the SHA256 based hash of @a uniqueAppId as the
+ *  mutex name.
+ *
+ *  @note The mutex is created at the OS level so the contents of @a uniqueAppId should be reasonably
+ *  unique!
+ */
+bool enforceSingleInstance(QString uniqueAppId)
+{
+    // Attempt to create unique mutex
+    QByteArray idData = uniqueAppId.toUtf8();
+    QString hashId = Integrity::generateChecksum(idData, QCryptographicHash::Sha256);
+
+    return createMutex(hashId);
 }
 
 /*!

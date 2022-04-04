@@ -43,7 +43,9 @@ DWORD processIdByName(QString processName);
 QString processNameById(DWORD processID);
 bool processIsRunning(QString processName);
 bool processIsRunning(DWORD processID);
+
 bool enforceSingleInstance();
+bool enforceSingleInstance(QString uniqueAppId);
 
 // Error codes
 Qx::GenericError translateHresult(HRESULT res);
