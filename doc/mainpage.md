@@ -77,7 +77,7 @@ The CMake project is designed to be used with multi-configuration generators suc
  - docs - Builds the Qx documentation
 
 #### Documentation:
-In order to build the documentation the CMake variable **QT_DOCS_DIR** must be set to the path that contains documentation for all Qt versions on the local system. By default this is:
+In order to link the documentation to Qt documentation the CMake variable **QT_DOCS_DIR** must be set to the path that contains documentation for all Qt versions on the local system. By default this is:
 
     # Windows
     C:\Program Files\Qt\Docs
@@ -86,6 +86,8 @@ In order to build the documentation the CMake variable **QT_DOCS_DIR** must be s
     /usr/local/Qt/Docs
 
 Regardless of the exact path, the variable must point to the root Docs folder and not the folder specific to the version of Qt you plan to build with. The appropriate documentation version will selected automatically based on the supplied Qt binaries.
+
+In order to create a Qt Compressed Help (.qch) file of the documentation for use with Qt Creator the CMake variable **QT_HELP_GEN_PATH** must be set to the path of the *qhelpgenerator* tool that is part of a Qt installation.
 
 #### Package
 By default, the CMakeLists project configures CPack to create an artifact ZIP containing the binaries for Debug and Release configurations, as well as documentation.

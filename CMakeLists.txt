@@ -121,12 +121,8 @@ foreach(component ${LIB_COMPONENTS})
 endforeach()
 
 #================ Build Documentation ======================
-if(NOT DOXYGEN_FOUND)
-    message(WARNING "Doxygen not available, documentation cannot not be built.")
-elseif(NOT DEFINED QT_DOCS_DIR)
-    message(WARNING "QT_DOCS_DIR is not defined, documentation will not be built.")
-else()
 
+if(DOXYGEN_FOUND)
     # Top level input
     set(DOC_INPUT_LIST
         "${DOC_SOURCE_PATH}/mainpage.md"
@@ -156,7 +152,9 @@ else()
         ${DOC_INPUT_LIST}
     )
 
-    message(STATUS "Doxygen configured. Build target 'docs' to build documentation.")
+    message(STATUS "Doxygen configured. Build target 'docs' to build the documentation.")
+else()
+    message(WARNING "Doxygen not available, documentation cannot not be built.")
 endif()
 
 #================= Top Level Install =======================

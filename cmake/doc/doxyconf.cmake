@@ -1,12 +1,12 @@
-# Customize Doxygen options
+# Customize Gengeral Doxygen options
 set(DOXYGEN_REPEAT_BRIEF NO)
 set(DOXYGEN_WARN_AS_ERROR YES)
 set(DOXYGEN_GENERATE_TREEVIEW YES)
 set(DOXYGEN_ENABLE_PREPROCESSING YES)
 set(DOXYGEN_MACRO_EXPANSION YES)
 set(DOXYGEN_EXPAND_ONLY_PREDEF YES)
-set(DOXYGEN_CALL_GRAPH YES)
-set(DOXYGEN_CALLER_GRAPH YES)
+set(DOXYGEN_BUILTIN_STL_SUPPORT YES)
+set(DOXYGEN_GROUP_NESTED_COMPOUND YES)
 
 # Set layout file
 set(DOXYGEN_LAYOUT_FILE "${DOC_SOURCE_PATH}/DoxygenLayout.xml")
@@ -28,7 +28,20 @@ set(DOXYGEN_PREDEFINED
 set(DOXYGEN_VERBATIM_VARS DOXYGEN_ALIASES)
 
 # Link to Qt docs
-include(${DOC_SCRIPTS_PATH}/qttags.cmake)
+if(DEFINED QT_DOCS_DIR)
+    include(${DOC_SCRIPTS_PATH}/qttags.cmake)
+else()
+    message(WARNING "QT_DOCS_DIR is not defined, Qt Documentation will not be linked to.")
+endif()
+
+# Setup Qt Creator Help File
+if(DEFINED QT_HELP_GEN_PATH)
+    set(DOXYGEN_GENERATE_QHP YES)
+    set(DOXYGEN_QCH_FILE "../${CMAKE_PROJECT_NAME}.qch")
+    set(DOXYGEN_QHG_LOCATION ${QT_HELP_GEN_PATH})
+else()
+    message(WARNING "QT_HELP_GEN_PATH is not defined, a .qch file will not be generated.")
+endif()
 
 # Set output paths
 set(DOXYGEN_OUTPUT_DIRECTORY ${DOC_BUILD_PATH})
