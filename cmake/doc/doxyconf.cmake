@@ -59,6 +59,14 @@ set(DOXYGEN_HTML_EXTRA_STYLESHEET ${DOXYGEN_HTML_EXTRA_STYLESHEET}
     "${DOC_SOURCE_PATH}/theme/doxygen-awesome/doxygen-awesome.css"
 )
 
+# Customization
+set(DOXYGEN_HTML_EXTRA_STYLESHEET ${DOXYGEN_HTML_EXTRA_STYLESHEET}
+    "${DOC_SOURCE_PATH}/theme/doxygen-awesome/doxygen-awesome-customize.css"
+)
+set(DOXYGEN_HTML_COLORSTYLE_HUE 0)
+set(DOXYGEN_HTML_COLORSTYLE_SAT 255)
+set(DOXYGEN_HTML_COLORSTYLE_GAMMA 80)
+
 # Extensions - General
 set(DOXYGEN_HTML_HEADER "${DOC_SOURCE_PATH}/header.html")
 
