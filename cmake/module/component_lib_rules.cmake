@@ -37,11 +37,13 @@ endif()
 if(${COMPONENT_LIB_TYPE} STREQUAL "INTERFACE")
     target_include_directories(${COMPONENT_TARGET_NAME} INTERFACE
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+            $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
             $<INSTALL_INTERFACE:include/${COMPONENT_NAME_LC}>
     )
 else()
     target_include_directories(${COMPONENT_TARGET_NAME} PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+            $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
             $<INSTALL_INTERFACE:include/${COMPONENT_NAME_LC}>
     )
 endif()
@@ -101,21 +103,21 @@ endforeach()
 # Copy template with modifications
 configure_file(
     "${FILE_TEMPLATES_PATH}/primary_component_header.h.in"
-    "${CMAKE_BINARY_DIR}/include/${COMPONENT_NAME_LC}.h"
+    "${CMAKE_BINARY_DIR}/include/${COMPONENT_NAME_LC}/${PROJ_NAME_LC}/${COMPONENT_NAME_LC}.h"
     @ONLY
     NEWLINE_STYLE UNIX
 )
 
-#================= Install ==========================
-
-# Configure properties
+#---------- Configure Target Properties------------------
 set_target_properties(${COMPONENT_TARGET_NAME} PROPERTIES
     VERSION ${CMAKE_PROJECT_VERSION}
     OUTPUT_NAME "${CMAKE_PROJECT_NAME}-${COMPONENT_NAME}"
     DEBUG_POSTFIX "d"
 )
 
-# Install lib
+#================= Install ==========================
+
+# Install component lib
 install(TARGETS ${COMPONENT_TARGET_NAME}
     EXPORT ${COMPONENT_NAME}Targets
     COMPONENT ${COMPONENT_NAME}
@@ -128,7 +130,7 @@ install(TARGETS ${COMPONENT_TARGET_NAME}
 install(DIRECTORY include/${PROJ_NAME_LC}
     DESTINATION "include/${COMPONENT_NAME_LC}"
 )
-install(FILES "${CMAKE_BINARY_DIR}/include/${COMPONENT_NAME_LC}.h"
+install(FILES "${CMAKE_BINARY_DIR}/include/${COMPONENT_NAME_LC}/${PROJ_NAME_LC}/${COMPONENT_NAME_LC}.h"
     DESTINATION "${HEADER_INSTALL_SUFFIX}/${COMPONENT_NAME_LC}/${PROJ_NAME_LC}"
 )
 
@@ -139,3 +141,26 @@ install(EXPORT ${COMPONENT_NAME}Targets
     DESTINATION lib/cmake/${CMAKE_PROJECT_NAME}
     COMPONENT ${COMPONENT_NAME}
 )
+
+#========Export For In-tree Builds =================
+# For in source builds
+export(EXPORT ${COMPONENT_NAME}Targets
+    FILE "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}${COMPONENT_NAME}Targets.cmake"
+    NAMESPACE ${CMAKE_PROJECT_NAME}::
+)
+
+# TODO: For install and export, consider using CMAKE_CURRENT_BINARY_DIR and organizing
+# the build directory setup so that the cmake config files (and maybe the .lib) end up
+# under subfolders for each component. i.e.
+#
+# Instead of:
+# lib/cmake/Qx/QxConfig.cmake
+# lib/cmake/Qx/QxConfigVersion.cmake
+# lib/cmake/Qx/QxCoreTargets.cmake
+# lib/cmake/Qx/QxCoreTargets-debug.cmake
+#
+# Have (with maybe simpler names for files in subfolders):
+# lib/cmake/Qx/QxConfig.cmake
+# lib/cmake/Qx/QxConfigVersion.cmake
+# lib/cmake/Qx/core/QxCoreTargets.cmake
+# lib/cmake/Qx/core/QxCoreTargets-debug.cmake
