@@ -187,7 +187,7 @@ IoOpReport fileIsEmpty(bool& returnBuffer, const QFile& file)
 /*!
  *  Returns a version of @a fileName with all illegal filename characters removed.
  *
- *  @warning It is possible to two very similarly named files to map to the same kosher name if you aren't careful.
+ *  @warning It is possible for two very similarly named files to map to the same kosher name if you aren't careful.
  */
 QString kosherizeFileName(QString fileName) // Can return empty name if all characters are invalid
 {
