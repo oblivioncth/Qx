@@ -4,7 +4,7 @@
  *  @brief The Network component further specializes and refines the TCP/IP programming APIs provided
  *  by Qt Network.
  *
- *  @component{Network}
+ *  @component{Network,network.h}
  *
  *  This component roughly mirrors Qt Network in terms of scope and organization.
  */

@@ -4,7 +4,7 @@
  *  @brief The GUI component contains implementation pertaining to OS UI integration, 2D graphics, basic imaging,
  *  fonts, and text.
  *
- *  @component{Gui}
+ *  @component{Gui,gui.h}
  *
  *  This component roughly mirrors Qt GUI in terms of scope and organization.
  *

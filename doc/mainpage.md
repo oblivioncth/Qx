@@ -51,8 +51,8 @@ target_link_libraries(example_ui_app PUBLIC Qx::Core Qx::Widgets)
 
 5) Include the corresponding headers in your code
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#include "qx/core.h"
-#include "qx/widgets.h"
+#include <qx/core.h>
+#include <qx/widgets.h>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 6) Review the rest of the documentation. A good place to start is the [Core](#qx-core) component.

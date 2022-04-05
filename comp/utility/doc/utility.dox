@@ -4,7 +4,7 @@
  *  @brief The Utility component provides functionality centered around language support and simplifying the syntax
  *  of common programming tasks.
  *
- *  @component{Utility}
+ *  @component{Utility,utility.h}
  *
  *  Qx Utility largely consists of convenience functions, macros, and instances of languages features that simplify
  *  or improve the usability of C++ or Qt themselves, such as C++20 Concepts & Constraints.

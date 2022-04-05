@@ -4,7 +4,7 @@
  *  @brief The Widgets component provides additional UI elements and supporting functionality on top of
  *  the set already provided by Qt Widgets.
  *
- *  @component{Widgets}
+ *  @component{Widgets,widgets.h}
  *
  *  This component roughly mirrors Qt Widgets in terms of scope and organization.
  */
