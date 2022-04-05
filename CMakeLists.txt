@@ -3,7 +3,11 @@
 cmake_minimum_required(VERSION 3.21.1)
 
 # Project
-project(Qx VERSION 0.1.0.0 LANGUAGES CXX)
+project(Qx
+    VERSION 0.1.0.0
+    LANGUAGES CXX
+    DESCRIPTION "Qt Extensions Library"
+)
 string(TOLOWER ${CMAKE_PROJECT_NAME} PROJ_NAME_LC)
 string(TOUPPER ${CMAKE_PROJECT_NAME} PROJ_NAME_UC)
 
