@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.21.1)
 
 # Project
 project(Qx
-    VERSION 0.1.0.0
+    VERSION 0.1.0
     LANGUAGES CXX
     DESCRIPTION "Qt Extensions Library"
 )
@@ -114,7 +114,7 @@ include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
     "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}ConfigVersion.cmake"
     VERSION ${CMAKE_PROJECT_VERSION}
-    COMPATIBILITY ExactVersion
+    COMPATIBILITY SameMinorVersion
 )
 
 #================= Process Componets =======================
