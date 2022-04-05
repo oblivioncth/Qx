@@ -105,14 +105,14 @@ find_package(Doxygen
 
 # Create config file
 configure_file("${FILE_TEMPLATES_PATH}/${CMAKE_PROJECT_NAME}Config.cmake.in"
-    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}Config.cmake"
+    "${CMAKE_BINARY_DIR}/cmake/${CMAKE_PROJECT_NAME}Config.cmake"
     @ONLY
 )
 
 # Create version config file
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}ConfigVersion.cmake"
+    "${CMAKE_BINARY_DIR}/cmake/${CMAKE_PROJECT_NAME}ConfigVersion.cmake"
     VERSION ${CMAKE_PROJECT_VERSION}
     COMPATIBILITY SameMinorVersion
 )
@@ -165,9 +165,9 @@ endif()
 
 # Install Package Config
 install(FILES
-    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}Config.cmake"
-    "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}ConfigVersion.cmake"
-    DESTINATION lib/cmake/${CMAKE_PROJECT_NAME}
+    "${CMAKE_BINARY_DIR}/cmake/${CMAKE_PROJECT_NAME}Config.cmake"
+    "${CMAKE_BINARY_DIR}/cmake/${CMAKE_PROJECT_NAME}ConfigVersion.cmake"
+    DESTINATION cmake
 )
 
 # Install README and LICENSE

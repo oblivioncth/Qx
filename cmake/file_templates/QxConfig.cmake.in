@@ -1,21 +1,21 @@
 include(CMakeFindDependencyMacro)
 find_dependency(Qt6 @Qt6_VERSION_MAJOR@.@Qt6_VERSION_MINOR@)
 
-file(GLOB __@PROJ_NAME_UC@_PKG_CMAKE_FILES
+file(GLOB __@PROJ_NAME_UC@_AVAILABLE_COMPONENT_TARGETS
     RELATIVE "${CMAKE_CURRENT_LIST_DIR}"
-    "${CMAKE_CURRENT_LIST_DIR}/*.cmake"
+    "${CMAKE_CURRENT_LIST_DIR}/*/@CMAKE_PROJECT_NAME@*Targets.cmake"
 )
 
-list(FILTER __@PROJ_NAME_UC@_PKG_CMAKE_FILES __@PROJ_NAME_UC@_AVAILABLE_COMPONENT_TARGETS
-    INCLUDE
-    REGEX "/@CMAKE_PROJECT_NAME@[A-Z]\w+Targets\.cmake"
-)
+message(STATUS "[@CMAKE_PROJECT_NAME@] Available Components:")
+foreach(component_target ${__@PROJ_NAME_UC@_AVAILABLE_COMPONENT_TARGETS})
+    message(STATUS "- ${component_target}")
+endforeach()
 
 # Components were requested
 if(DEFINED ${@CMAKE_PROJECT_NAME@_FIND_COMPONENTS})
     # Check for and add each request
     foreach(component ${@CMAKE_PROJECT_NAME@_FIND_COMPONENTS})
-            set(component_target @CMAKE_PROJECT_NAME@${component}Targets.cmake)
+            set(component_target ${component}/@CMAKE_PROJECT_NAME@${component}Targets.cmake)
 
             if (";${__@PROJ_NAME_UC@_AVAILABLE_COMPONENT_TARGETS};" MATCHES ";${component_target};")
                     include("${CMAKE_CURRENT_LIST_DIR}/${component_target}")
