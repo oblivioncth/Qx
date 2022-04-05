@@ -19,6 +19,10 @@ html.dark-mode {
     height: 72px;
 }
 
+#projectnumber {
+	margin-right: 22px;
+}
+
 @media screen and (max-width: 767px) {
     .github-corner svg {
         width: 50px;
@@ -27,4 +31,8 @@ html.dark-mode {
     #projectnumber {
         margin-right: 22px;
     }
+}
+
+#projectnumber {
+        margin-left: 5%;
 }

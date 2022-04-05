@@ -12,6 +12,12 @@ set(DOXYGEN_GROUP_NESTED_COMPOUND YES)
 set(DOXYGEN_ENUM_VALUES_PER_LINE 1)
 set(DOXYGEN_EXT_LINKS_IN_WINDOW YES)
 
+# Set logo
+set(DOXYGEN_PROJECT_LOGO "${DOC_SOURCE_PATH}/logo.svg")
+
+# Add 'v' prefix to version number
+set(DOXYGEN_PROJECT_NUMBER v${CMAKE_PROJECT_VERSION})
+
 # Set layout file
 set(DOXYGEN_LAYOUT_FILE "${DOC_SOURCE_PATH}/DoxygenLayout.xml")
 

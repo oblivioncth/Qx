@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="157.04506mm"
+   height="120.696mm"
+   viewBox="0 0 157.04506 120.696"
+   version="1.1"
+   id="svg5"
+   sodipodi:docname="Qx Logo.svg"
+   inkscape:version="1.1.2 (b8e25be833, 2022-02-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="21.566756"
+     inkscape:cy="342.94678"
+     inkscape:window-width="3440"
+     inkscape:window-height="1417"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     inkscape:snap-bbox="true"
+     inkscape:bbox-paths="false"
+     inkscape:bbox-nodes="true"
+     width="209mm"
+     fit-margin-top="10"
+     fit-margin-left="10"
+     fit-margin-right="10"
+     fit-margin-bottom="10"
+     lock-margins="true" />
+  <defs
+     id="defs2">
+    <rect
+       x="104.15131"
+       y="532.32892"
+       width="298.30994"
+       height="191.58698"
+       id="rect23987" />
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath34">
+      <g
+         inkscape:label="Clip"
+         id="use36">
+        <path
+           id="path3724"
+           style="fill:#800000;fill-opacity:1;stroke-width:0.26441"
+           d="m 130.17505,115.95914 h 15.003 v 50.348 z"
+           sodipodi:nodetypes="cccc" />
+        <path
+           id="path3726"
+           style="fill:#800000;fill-opacity:1;stroke-width:0.264409"
+           d="m 145.17805,166.30714 v 50.348 h -15.003 z"
+           sodipodi:nodetypes="cccc" />
+      </g>
+    </clipPath>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(10,10.000001)">
+    <path
+       style="fill:#d22d2d;fill-opacity:1;stroke-width:0.187089"
+       d="M 4.5370031e-8,50.23389 V 0 L 59.058963,0.0471 l 59.058967,0.0471 9.50624,24.97633 c 5.44202,14.29815 9.46957,25.13631 9.42045,25.35052 -0.0472,0.2058 -4.32727,11.52934 -9.5113,25.16342 l -9.42551,24.78925 -59.053907,0.0471 L 4.5369994e-8,100.46792 Z"
+       id="path674" />
+    <text
+       xml:space="preserve"
+       transform="matrix(0.7820666,0,0,0.92301639,-62.695108,-489.00952)"
+       id="text23985"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:96px;line-height:1.25;font-family:Corbel;-inkscape-font-specification:'Corbel, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;white-space:pre;shape-inside:url(#rect23987);fill:#ffffff;fill-opacity:1;stroke:none"
+       inkscape:transform-center-x="5.0219963"
+       inkscape:transform-center-y="1.5979117"
+       inkscape:label="Logo Text"><tspan
+         x="104.15039"
+         y="615.71875"
+         id="tspan843">Qx</tspan></text>
+    <path
+       sodipodi:type="star"
+       style="fill:#990000;fill-opacity:1"
+       id="path23044"
+       inkscape:flatsided="false"
+       sodipodi:sides="3"
+       sodipodi:cx="67.281616"
+       sodipodi:cy="636.44775"
+       sodipodi:r1="103.72381"
+       sodipodi:r2="51.861904"
+       sodipodi:arg1="0"
+       sodipodi:arg2="1.0471976"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="m 171.00542,636.44775 -77.792854,44.91373 -77.792854,44.91373 0,-89.82746 0,-89.82745 77.792858,44.91373 z"
+       transform="matrix(0.12298044,0,0,0.5604968,-1.896323,-306.37893)"
+       inkscape:transform-center-x="-3.1889996"
+       inkscape:transform-center-y="1.9384751e-05" />
+  </g>
+</svg>
