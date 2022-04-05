@@ -13,8 +13,6 @@ namespace Qx
  *
  *  The range of an index tracker can be expanded or contracted, and indices within that range can be reserved
  *  or released. An example use-case for this class might be tracking which spaces in a parking lot are free.
- *
- *  @warning
  */
 
 //-Constructor----------------------------------------------------------------------------------------------
