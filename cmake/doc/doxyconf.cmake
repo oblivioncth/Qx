@@ -57,6 +57,7 @@ set(DOXYGEN_OUTPUT_DIRECTORY ${DOC_BUILD_PATH})
 set(DOXYGEN_GENERATE_TREEVIEW YES)
 set(DOXYGEN_HTML_EXTRA_STYLESHEET ${DOXYGEN_HTML_EXTRA_STYLESHEET}
     "${DOC_SOURCE_PATH}/theme/doxygen-awesome/doxygen-awesome.css"
+    "${DOC_SOURCE_PATH}/theme/doxygen-awesome/doxygen-awesome-sidebar-only.css"
 )
 
 # Customization
@@ -73,6 +74,9 @@ set(DOXYGEN_HTML_HEADER "${DOC_SOURCE_PATH}/header.html")
 # Extensions - Dark Mode Toggle
 set(DOXYGEN_HTML_EXTRA_FILES ${DOXYGEN_HTML_EXTRA_FILES}
     "${DOC_SOURCE_PATH}/theme/doxygen-awesome/doxygen-awesome-darkmode-toggle.js"
+)
+set(DOXYGEN_HTML_EXTRA_STYLESHEET ${DOXYGEN_HTML_EXTRA_STYLESHEET}
+    "${DOC_SOURCE_PATH}/theme/doxygen-awesome/doxygen-awesome-sidebar-only-darkmode-toggle.css"
 )
 
 # Extensions - Fragment Copy Button
