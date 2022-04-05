@@ -5,7 +5,7 @@ namespace Qx
 //===============================================================================================================
 
 /*!
- *  @class Cumulation
+ *  @class Cumulation qx/core/qx-cumulation.h
  *  @ingroup qx-core
  *
  *  @brief The Cumulation template class tracks the sum of multiple key-value components that can be change

@@ -12,7 +12,7 @@ namespace Qx
 //===============================================================================================================
 
 /*!
- *  @class FileDetails
+ *  @class FileDetails qx/windows/qx-filedetails.h
  *  @ingroup qx-windows
  *
  *  @brief The FileDetails class acts as a user-friendly container for holding a file's @e Version Info as
@@ -41,7 +41,7 @@ namespace Qx
 // FileDetails::Translation
 //===============================================================================================================
 /*!
- *  @struct FileDetails::Translation
+ *  @struct FileDetails::Translation qx/windows/qx-filedetails.h
  *
  *  @brief A structure used to represent a particular translation of the string table section of a file's details.
  *  It encapsulates a language and code page identifier pair.
@@ -97,7 +97,7 @@ size_t qHash(const FileDetails::Translation& key, size_t seed) noexcept
 //===============================================================================================================
 
 /*!
- *  @struct FileDetails::StringTable
+ *  @struct FileDetails::StringTable qx/windows/qx-filedetails.h
  *
  *  @brief A structure that contains all of the translation dependent optional fields of a file's details
  *

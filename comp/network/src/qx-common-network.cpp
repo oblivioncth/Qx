@@ -23,7 +23,7 @@ namespace Qx
 //===============================================================================================================
 
 /*!
- *  @struct DownloadTask
+ *  @struct DownloadTask <qx/network/qx-common-network.h>
  *
  *  @brief The DownloadTask struct contains the information necessary to download a file from a URL.
  */

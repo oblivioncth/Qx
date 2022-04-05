@@ -9,7 +9,7 @@ namespace Qx
 //===============================================================================================================
 
 /*!
- *  @class XmlStreamWriterError
+ *  @class XmlStreamWriterError qx/xml/qx-xmlstreamwritererror.h
  *  @ingroup qx-xml
  *
  *  @brief The XmlStreamWriterError class provides a full error object for QXmlStreamWriterError, similar to other

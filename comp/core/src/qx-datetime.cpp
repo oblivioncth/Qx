@@ -11,7 +11,7 @@ namespace Qx
 //===============================================================================================================
 
 /*!
- *  @class DateTime
+ *  @class DateTime qx/core/qx-datetime.h
  *  @ingroup qx-core
  *
  *  @brief The DateTime class is a collection of static functions pertaining to date and time.

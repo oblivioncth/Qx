@@ -17,7 +17,7 @@ namespace Qx
 //===============================================================================================================
 
 /*!
- *  @class SyncDownloadManager::Report
+ *  @class SyncDownloadManager::Report qx/network/qx-syncdownloadmanager.h
  *  @ingroup qx-network
  *
  *  @brief The SyncDownloadManager::Report class details the outcome of processing a SyncDownloadManager queue.
@@ -65,7 +65,7 @@ bool SyncDownloadManager::Report::wasSuccessful() const { return mFinishStatus =
 //===============================================================================================================
 
 /*!
- *  @class SyncDownloadManager
+ *  @class SyncDownloadManager qx/network/qx-syncdownloadmanager.h
  *
  *  @brief The SyncDownloadManager class is used to queue and process one or more downloads in a synchronous
  *  manner.

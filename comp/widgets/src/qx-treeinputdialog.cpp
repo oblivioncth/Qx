@@ -13,7 +13,7 @@ namespace Qx
 //===============================================================================================================
 
 /*!
- *  @class TreeInputDialog
+ *  @class TreeInputDialog qx/widgets/qx-treeinputdialog.h
  *  @ingroup qx-widgets
  *
  *  @brief The TreeInputDialog class provides a simple tree-based dialog from which the user can select one or

@@ -9,7 +9,7 @@ namespace Qx
 //===============================================================================================================
 
 /*!
- *  @class TextQuery
+ *  @class TextQuery qx/io/qx-textquery.h
  *  @ingroup qx-io
  *
  *  @brief The TextQuery class contains rules for conducting a search of text.

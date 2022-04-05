@@ -5,7 +5,7 @@ namespace Qx
 //===============================================================================================================
 
 /*!
- *  @class ByteArray
+ *  @class ByteArray qx/core/qx-bytearray.h
  *  @ingroup qx-core
  *
  *  @brief The ByteArray class is a collection of static functions pertaining to QByteArray.

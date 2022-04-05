@@ -5,7 +5,7 @@ namespace Qx
 //===============================================================================================================
 
 /*!
- *  @class Index
+ *  @class Index qx/core/qx-index.h
  *  @ingroup qx-core
  *
  *  @brief The Index template class provides a wrapper for integers with the notion of 'first', 'last' and 'null'.

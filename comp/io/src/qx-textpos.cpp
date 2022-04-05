@@ -9,7 +9,7 @@ namespace Qx
 //===============================================================================================================
 
 /*!
- *  @class TextPos
+ *  @class TextPos qx/io/qx-textpos.h
  *  @ingroup qx-io
  *
  *  @brief The TextPos class is used to represent an offset within a text file in terms of lines and characters.

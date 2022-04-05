@@ -9,7 +9,7 @@ namespace Qx
 //===============================================================================================================
 
 /*!
- *  @class GenericError
+ *  @class GenericError qx/core/qx-genericerror.h
  *  @ingroup qx-core
  *
  *  @brief The GenericError class is multi-purpose container for storing error information.

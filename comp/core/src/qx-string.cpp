@@ -16,7 +16,7 @@ namespace Qx
 //===============================================================================================================
 
 /*!
- *  @class String
+ *  @class String qx/core/qx-string.h
  *  @ingroup qx-core
  *
  *  @brief The String class is a collection of static functions pertaining to string types

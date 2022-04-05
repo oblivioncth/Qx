@@ -35,7 +35,7 @@ namespace Qx
 //===============================================================================================================
 
 /*!
- *  @struct ShortcutProperties
+ *  @struct ShortcutProperties <qx/windows/qx-common-windows.h>
  *
  *  @brief The ShortcutProperties struct acts as a user-friendly container for holding IShellLink data,
  *  which are the varies properties of a Windows @c .lnk shortcut.

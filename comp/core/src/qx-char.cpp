@@ -11,7 +11,7 @@ namespace Qx
 // Char
 //===============================================================================================================
 /*!
- *  @class Char
+ *  @class Char qx/core/qx-char.h
  *  @ingroup qx-core
  *
  *  @brief The Char class is a collection of static functions pertaining to character types

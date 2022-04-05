@@ -5,7 +5,7 @@ namespace Qx
 //===============================================================================================================
 
 /*!
- *  @class RegularExpression
+ *  @class RegularExpression qx/core/qx-regularexpression.h
  *  @ingroup qx-core
  *
  *  @brief The RegularExpression class is a collection of convenient regular expression statements.

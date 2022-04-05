@@ -5,7 +5,7 @@ namespace Qx
 //===============================================================================================================
 
 /*!
- *  @class Traverser
+ *  @class Traverser qx/core/qx-traverser.h
  *  @ingroup qx-core
  *
  *  @brief The Traverser template class provides a const_iterator wrapper for an alternate approach to

@@ -11,7 +11,7 @@ namespace Qx
 //===============================================================================================================
 
 /*!
- *  @class BitArray
+ *  @class BitArray qx/core/qx-bitarray.h
  *  @ingroup qx-core
  *
  *  @brief The BitArray class is a more robust variant of QBitArray, which provides an array of bits.

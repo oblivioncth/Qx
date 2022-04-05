@@ -5,7 +5,7 @@ namespace Qx
 //===============================================================================================================
 
 /*!
- *  @class List
+ *  @class List qx/core/qx-list.h
  *  @ingroup qx-core
  *
  *  @brief The List class is a collection of static functions pertaining to lists.

@@ -9,7 +9,7 @@ namespace Qx
 //===============================================================================================================
 
 /*!
- *  @class StandardItemModel
+ *  @class StandardItemModel qx/widgets/qx-standarditemmodel.h
  *  @ingroup qx-widgets
  *
  *  @brief The StandardItemModel class is a more robust variant of QStandardItemModel, which is a generic model

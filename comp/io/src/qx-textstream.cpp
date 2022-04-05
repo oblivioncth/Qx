@@ -12,7 +12,7 @@ namespace Qx
 //===============================================================================================================
 
 /*!
- *  @class TextStream
+ *  @class TextStream qx/io/qx-textstream.h
  *  @ingroup qx-io
  *
  *  @brief The TextStream class is a more robust variant of QTextStream, which provides a convenient interface

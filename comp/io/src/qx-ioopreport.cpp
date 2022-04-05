@@ -180,7 +180,7 @@ namespace Qx
 //===============================================================================================================
 
 /*!
- *  @class IoOpReport
+ *  @class IoOpReport qx/io/qx-ioopreport.h
  *  @ingroup qx-io
  *
  *  @brief The IoOpReport class is a container for details regarding the outcome of an IO operation.
