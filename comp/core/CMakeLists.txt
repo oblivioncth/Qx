@@ -58,5 +58,10 @@ set(COMPONENT_PUBLIC_LINKS
     Qx::Utility
 )
 
+# Inter-project Dependencies
+set(COMPONENT_SIBLING_DEPENDS
+    Utility
+)
+
 #=============== Component Handler =======================
 include(component_lib_rules)

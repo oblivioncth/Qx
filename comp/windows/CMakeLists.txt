@@ -27,6 +27,12 @@ set(COMPONENT_PUBLIC_LINKS
     Qx::Core
 )
 
+# Inter-project Dependencies
+set(COMPONENT_SIBLING_DEPENDS
+    Core
+    Io
+)
+
 #=============== Component Handler =======================
 include(component_lib_rules)
 

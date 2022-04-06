@@ -108,6 +108,14 @@ configure_file(
     NEWLINE_STYLE UNIX
 )
 
+#--------------------Package Config-----------------------
+
+# Create config file
+configure_file("${FILE_TEMPLATES_PATH}/${CMAKE_PROJECT_NAME}ComponentConfig.cmake.in"
+    "${CMAKE_BINARY_DIR}/cmake/${COMPONENT_NAME}/${CMAKE_PROJECT_NAME}${COMPONENT_NAME}Config.cmake"
+    @ONLY
+)
+
 #---------- Configure Target Properties------------------
 set_target_properties(${COMPONENT_TARGET_NAME} PROPERTIES
     VERSION ${CMAKE_PROJECT_VERSION}
@@ -134,16 +142,22 @@ install(FILES "${CMAKE_BINARY_DIR}/include/${COMPONENT_NAME_LC}/${PROJ_NAME_LC}/
     DESTINATION "${HEADER_INSTALL_SUFFIX}/${COMPONENT_NAME_LC}/${PROJ_NAME_LC}"
 )
 
-# Configure package target export
+# Install package target export
 install(EXPORT ${COMPONENT_NAME}Targets
     FILE "${CMAKE_PROJECT_NAME}${COMPONENT_NAME}Targets.cmake"
     NAMESPACE ${CMAKE_PROJECT_NAME}::
     DESTINATION cmake/${COMPONENT_NAME}
 )
 
+# Install package config
+install(FILES
+    "${CMAKE_BINARY_DIR}/cmake/${COMPONENT_NAME}/${CMAKE_PROJECT_NAME}${COMPONENT_NAME}Config.cmake"
+    DESTINATION cmake/${COMPONENT_NAME}
+)
+
 #========Export For In-tree Builds =================
 # For in source builds
 export(EXPORT ${COMPONENT_NAME}Targets
-    FILE "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}${COMPONENT_NAME}Targets.cmake"
+    FILE "${CMAKE_BINARY_DIR}/cmake/${COMPONENT_NAME}/${CMAKE_PROJECT_NAME}${COMPONENT_NAME}Targets.cmake"
     NAMESPACE ${CMAKE_PROJECT_NAME}::
 )
