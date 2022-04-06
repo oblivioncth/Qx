@@ -3,7 +3,7 @@ if(NOT DEFINED __@PROJ_NAME_UC@_@COMPONENT_NAME_UC@)
     message(VERBOSE "[@CMAKE_PROJECT_NAME@] Importing component: @COMPONENT_NAME@...")
     set(__@PROJ_NAME_UC@_@COMPONENT_NAME_UC@ TRUE)
 
-    # Inter-component dependencies (inserted when this file was configured
+    # Inter-component dependencies (inserted when this file was configured)
     set(__@PROJ_NAME_UC@_@COMPONENT_NAME_UC@_SIBLING_DEPENDS @COMPONENT_SIBLING_DEPENDS@)
 
     # Import above dependencies first
