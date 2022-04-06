@@ -33,6 +33,11 @@ set(COMPONENT_SIBLING_DEPENDS
     Io
 )
 
+# Qt Component Dependencies
+set(COMPONENT_QT_DEPENDS
+    Core
+)
+
 #=============== Component Handler =======================
 include(component_lib_rules)
 

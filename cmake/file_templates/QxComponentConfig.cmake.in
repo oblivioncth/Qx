@@ -12,6 +12,12 @@ if(NOT DEFINED __@PROJ_NAME_UC@_@COMPONENT_NAME_UC@)
         include("${CMAKE_CURRENT_LIST_DIR}/../${sibling}/@CMAKE_PROJECT_NAME@${sibling}Config.cmake")
     endforeach()
 
+    # Qt dependencies (inserted when this file was configured)
+    set(__@PROJ_NAME_UC@_@COMPONENT_NAME_UC@_QT_DEPENDS @COMPONENT_QT_DEPENDS@)
+    if(__@PROJ_NAME_UC@_@COMPONENT_NAME_UC@_QT_DEPENDS)
+        find_dependency(Qt6 @Qt6_VERSION_MAJOR@.@Qt6_VERSION_MINOR@ REQUIRED COMPONENTS ${__@PROJ_NAME_UC@_@COMPONENT_NAME_UC@_QT_DEPENDS})
+    endif()
+
     # Import component targets
     message(VERBOSE "[@CMAKE_PROJECT_NAME@] Importing @COMPONENT_NAME@ targets...")
     include("${CMAKE_CURRENT_LIST_DIR}/@CMAKE_PROJECT_NAME@@COMPONENT_NAME@Targets.cmake")
