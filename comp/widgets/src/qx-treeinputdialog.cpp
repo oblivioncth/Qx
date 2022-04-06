@@ -19,6 +19,8 @@ namespace Qx
  *  @brief The TreeInputDialog class provides a simple tree-based dialog from which the user can select one or
  *  more items.
  *
+ *  @image{inline} html qx-treeinputdialog-0.png
+ *
  *  The tree input dialog doesn't handle any selection logic itself, but instead provides a simple interface to
  *  facilitate user input.
  *
@@ -37,7 +39,7 @@ namespace Qx
  *
  *  @sa StandardItemModel.
  *
- *  @todo Include an image of the tree input dialog, expand the modes, options, and use cases of this dialog.
+ *  @todo Expand the modes, options, and use cases of this dialog.
  */
 
 

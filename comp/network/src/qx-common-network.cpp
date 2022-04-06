@@ -9,8 +9,6 @@
  *  @ingroup qx-network
  *
  *  @brief The qx-common-network header file provides various types, variables, and functions related to network operations.
- *
- *  @todo Well, the brief description is at least partially true.
  */
 
 namespace Qx

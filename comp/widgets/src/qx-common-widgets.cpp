@@ -21,8 +21,14 @@ namespace Qx
  *  @param defChoice The default button that is selected.
  *  @return The value of the selected button.
  *
+ *  As an example, this code:
+ *  @snippet qx-common-widgets.cpp 0
+ *
+ *  results in the following message box:
+ *
+ *  @image{inline} html qx-common-widgets-0.png
+ *
  *  @note This function only works with QMessageBox::StandardButton, not with custom buttons.
- *  @todo Provide an example picture of the resultant message box.
  */
 int postError(GenericError error, QMessageBox::StandardButtons choices, QMessageBox::StandardButton defChoice)
 {

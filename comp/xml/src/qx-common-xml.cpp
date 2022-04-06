@@ -11,7 +11,6 @@
  *  @brief The qx-common-xml header file provides various types, variables, and functions related to
  *  manipulating XML data.
  *
- *  @todo Well, the brief description is at least partially true.
  */
 
 namespace Qx

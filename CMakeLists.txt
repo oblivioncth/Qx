@@ -146,6 +146,12 @@ if(DOXYGEN_FOUND)
                 "${COMPONENTS_PATH}/${component}/doc/snippets"
             )
         endif()
+
+        if(EXISTS "${COMPONENTS_PATH}/${component}/doc/images")
+            set(DOC_IMAGE_LIST ${DOC_IMAGE_LIST}
+                "${COMPONENTS_PATH}/${component}/doc/images"
+            )
+        endif()
     endforeach()
 
     # Set Doxygen parameters

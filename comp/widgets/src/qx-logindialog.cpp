@@ -17,7 +17,9 @@ namespace Qx
  *
  * @brief The LoginDialog class provides a modal dialog that prompts a user for a username and password.
  *
- * @todo Provide a picture of the dialog. May allow for setting default field content and getting the
+ * @image{inline} html qx-logindialog-0.png
+ *
+ * @todo May allow for setting default field content and getting the
  * existing prompt.
  */
 
@@ -25,6 +27,8 @@ namespace Qx
 //Public:
 /*!
  *  Constructs a login dialog with parent @a parent that displays the given @a prompt.
+ *
+ *  The default prompt simply states "Login Required".
  */
 LoginDialog::LoginDialog(QWidget* parent, QString prompt) : QDialog(parent)
 {

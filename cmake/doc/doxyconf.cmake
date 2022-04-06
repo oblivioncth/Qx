@@ -23,6 +23,7 @@ set(DOXYGEN_LAYOUT_FILE "${DOC_SOURCE_PATH}/DoxygenLayout.xml")
 
 # Set extra input paths
 set(DOXYGEN_EXAMPLE_PATH ${DOC_EXAMPLE_LIST})
+set(DOXYGEN_IMAGE_PATH ${DOC_IMAGE_LIST})
 
 # Configure custom command/macro processing
 set(DOXYGEN_ALIASES
