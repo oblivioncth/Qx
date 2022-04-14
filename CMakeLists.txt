@@ -127,9 +127,15 @@ endforeach()
 #================ Build Documentation ======================
 
 if(DOXYGEN_FOUND)
+    # Configure files
+    configure_file("${FILE_TEMPLATES_PATH}/doc_mainpage.md.in"
+        "${CMAKE_BINARY_DIR}/docin/mainpage.md"
+        @ONLY
+    )
+
     # Top level input
     set(DOC_INPUT_LIST
-        "${DOC_SOURCE_PATH}/mainpage.md"
+        "${CMAKE_BINARY_DIR}/docin/mainpage.md"
         "${DOC_SOURCE_PATH}/namespace.dox"
     )
 
