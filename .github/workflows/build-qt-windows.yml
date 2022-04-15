@@ -2,6 +2,8 @@ name: Windows - Build static Qt 6.3.0 (With SSL)
 on:
   schedule:
     - cron: '37 03 */89 * *' # Every 89 days, at 3:37PM
+  workflow_dispatch:
+
 env:
   qt_ver: 6.3.0
   qt_download_dir: ${{ github.workspace }}/Qt/Download/
