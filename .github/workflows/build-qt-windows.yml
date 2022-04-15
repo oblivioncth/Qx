@@ -52,7 +52,7 @@ jobs:
     steps:
     - name: Set derived variables with shell because GitHub Actions env context sucks
       run: |
-        echo "qt_build_artifact_name=qt-build-${{ env.qt_ver }}-static-ssl-docs" >> $Env:GITHUB_ENV
+        echo "qt_build_artifact_name=qt-build-${{ runner.os }}-${{ env.qt_ver }}-static-ssl-docs" >> $Env:GITHUB_ENV
         echo "qt_src_cache_key=${{ runner.os }}-qt-${{ env.qt_ver }}-source-files" >> $Env:GITHUB_ENV
     - name: Get source from cache
       uses: actions/cache@v3

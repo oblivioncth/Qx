@@ -26,7 +26,7 @@ jobs:
     steps:
     - name: Set derived variables with shell because GitHub Actions env context sucks
       run: |
-        echo "qt_build_artifact_name=qt-build-${{ env.qt_ver }}-static-ssl-docs" >> $Env:GITHUB_ENV
+        echo "qt_build_artifact_name=qt-build-${{ runner.os }}-${{ env.qt_ver }}-static-ssl-docs" >> $Env:GITHUB_ENV
         echo "qx_package_path=${{ env.qx_src_dir }}/out/dist/" >> $Env:GITHUB_ENV
         $qx_install_path='${{ env.qx_src_dir }}/out/install/'
         echo "qx_install_path=$qx_install_path" >> $Env:GITHUB_ENV
