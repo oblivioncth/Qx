@@ -1,0 +1,88 @@
+name: [Windows] Build Qx (Qt 6.3.0)
+on:
+  workflow_dispatch:
+  workflow_call:
+    outputs:
+      artifact_name:
+        description: "The resultant build artifact"
+        value: ${{ jobs.build-qx.outputs.job_artifact_name }}
+
+env:
+  qt_ver: 6.3.0
+  qt_install_dir: ${{ github.workspace }}/Qt/Install/
+  qx_src_suffix: Qx/Source/
+  qx_src_dir: ${{ github.workspace }}/Qx/Source/
+  qx_build_dir: ${{ github.workspace }}/Qx/Build/
+
+jobs:
+  build-qx:
+    name: Build Qx master (Debug/Release)
+    runs-on: windows-latest
+    env:
+      vc_vars: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat
+      cmake_gen: Ninja Multi-Config
+    outputs:
+      job_artifact_name: ${{ steps.set_artifact_name.outputs.qx_artifact_name }}
+    steps:
+    - name: Set derived variables with shell because GitHub Actions env context sucks
+      run: |
+        echo "qt_build_artifact_name=qt-build-${{ env.qt_ver }-static-ssl-docs" >> $Env:GITHUB_ENV
+        echo "qx_package_path=${{ env.qx_src_dir }}/out/dist/" >> $Env:GITHUB_ENV
+        $qx_install_path='${{ env.qx_src_dir }}/out/install/'
+        echo "qx_install_path=$qx_install_path" >> $Env:GITHUB_ENV
+        echo "qt_cmake=${qx_install_path}/bin/qt-cmake" >> $Env:GITHUB_ENV
+        echo "qt_help_gen_def=QT_HELP_GEN_PATH:STRING=${qx_install_path}/bin/qhelpgenerator.exe" >> $Env:GITHUB_ENV
+        echo "qt_docs_dir_def=QT_HELP_GEN_PATH:STRING=${qx_install_path}/doc" >> $Env:GITHUB_ENV
+    - name: Install Doxygen
+      run: choco install doxygen.install
+    - name: Download Qt build artifact 
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        workflow: build-qt-windows.yml
+        name: ${{ env.qt_build_artifact_name }}
+        path: ${{ env.qt_install_dir }}
+    - name: Checkout Qx
+      uses: actions/checkout@v3
+      with:
+        path: ${{ env.qx_src_suffix }}
+    - name: Build/Install Qx
+      shell: cmd
+      working-directory: ${{ env.qx_src_dir }}
+      run: |
+        @echo off
+        echo Setting up VC++ environment...
+        CALL "%vc_vars%"
+        echo Configuring CMake...
+        CALL "%qt_cmake%" -G "%cmake_gen%" -S "%qx_src_dir%" -B "%qx_build_dir%" -D "%qt_help_gen_def%" -D "%qt_docs_dir_def%"
+        echo Changing to build directory...
+        cd /D "%qx_build_dir%"
+        echo Building Qx debug...
+        cmake --build . --target all --config Debug
+        echo Building Qx release...
+        cmake --build . --target all --config Release
+        echo Building Qx docs...
+        cmake --build . --target docs --config Release
+        echo Installing Qx...
+        cmake --build . --target install --config Release
+        echo Packaging Qx...
+        cpack -C Debug;Release
+        echo Build complete.
+    - name: Get current time
+      uses: josStorer/get-current-time@v2
+      id: current-time
+      with:
+        format: YYYYMMDD-HHmmss
+        utcOffset: "-05:00"
+    - name: Get Qx package name
+      run: echo "qx_package_name=$(Get-ChildItem -Path "$Env:qx_package_path" -Name -Filter *.zip)" >> $Env:GITHUB_ENV
+    - name: Set output artifact name
+      id: set_artifact_name
+      env:
+        artifact_time: ${{ steps.current-time.outputs.formattedTime }}
+      run: echo "::set-output name=qx_artifact_name::${Env:qx_package_name}[${Env:GITHUB_BASE_REF }_${Env:artifact_time}]"
+    - name: Upload Qx build artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ steps.set_artifact_name.outputs.qx_artifact_name }}
+        path: ${{ env.qx_install_path }}
+        if-no-files-found: error

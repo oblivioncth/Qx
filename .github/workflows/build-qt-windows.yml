@@ -1,0 +1,105 @@
+name: [Windows] Build static Qt 6.3.0 (With SSL) 
+on:
+  schedule:
+    - cron: '37 03 */89 * *' # Every 89 days, at 3:37PM
+env:
+  qt_ver: 6.3.0
+  qt_download_dir: ${{ github.workspace }}/Qt/Download/
+  qt_src_dir: ${{ github.workspace }}/Qt/Source/
+  qt_build_dir: ${{ github.workspace }}/Qt/Build/
+  qt_doc_build_dir: ${{ github.workspace }}/Qt/DocBuild/
+  qt_install_dir: ${{ github.workspace }}/Qt/Install/
+
+jobs:
+  get-qt-source:
+    name: Acquire Qt Source Package
+    runs-on: windows-latest
+    steps:
+    - name: Set derived variables with shell because GitHub Actions env context sucks
+      run: |
+        $qt_ver_main=$($Env:qt_ver.split('.')[0] + '.' + $Env:qt_ver.split('.')[1])
+        $qt_arch_base_name='qt-everywhere-src-${Env:qt_ver}'
+        echo "qt_arch_base_name=$qt_arch_base_name" >> $Env:GITHUB_ENV
+        echo "qt_src_dest=${Env:qt_download_dir}/${qt_arch_base_name}.tar.xz" >> $Env:GITHUB_ENV
+        echo "qt_src_url=https://download.qt.io/archive/qt/${Env:qt_ver_main}/${Env:qt_ver}/single/${$qt_arch_base_name}.tar.xz" >> $Env:GITHUB_ENV
+        echo "qt_src_cache_key=${{ runner.os }}-qt-${{ env.qt_ver }}-source-files" >> $Env:GITHUB_ENV
+    - name: Cache Qt source folder
+      uses: actions/cache@v3
+      id: qt-source-cache
+      with:
+        path: ${{ env.qt_src_dir }}
+        key: ${{ env.qt_src_cache_key }}
+    - name: Download from Qt Archives
+        if: steps.source.outputs.cache-hit != 'true'
+        run: wget -Uri ${{ env.qt_src_url }} -Outfile ${{ env.qt_src_dest }}
+    - name: Extract source archive
+        if: steps.source.outputs.cache-hit != 'true'
+        run: 7z x ${{ env.qt_src_dest }} -o ${{ env.qt_download_dir }}
+    - name: Move source files to main source directory
+        if: steps.source.outputs.cache-hit != 'true'
+        run: Move-Item -Path '${{ env.qt_download_dir }}/${{ env.qt_arch_base_name }}/*' -Destination '${{ env.qt_src_dir }}'
+          
+  build-qt-source:
+    name: Build Qt
+    needs: get-qt-source
+    runs-on: windows-latest
+    env:
+      vc_vars: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat
+      qt_general_build_options: -platform win32-msvc -static -debug-and-release -opensource -confirm-license
+      qt_specific_build_options: -skip qtwebengine -nomake tests -nomake examples -schannel
+    steps:
+    - name: Set derived variables with shell because GitHub Actions env context sucks
+      run: |
+        echo "qt_build_artifact_name=qt-build-${{ env.qt_ver }-static-ssl-docs" >> $Env:GITHUB_ENV
+        echo "qt_src_cache_key=${{ runner.os }}-qt-${{ env.qt_ver }}-source-files" >> $Env:GITHUB_ENV
+    - name: Get source from cache
+      uses: actions/cache@v3
+      id: qt-source-cache
+      with:
+        path: ${{ env.qt_src_dir }}
+        key: ${{ env.qt_src_cache_key }}
+    - name: Build/Install Qt
+      shell: cmd
+      working-directory: ${{ env.qt_build_dir }}
+      run: |
+        @echo off
+        echo Setting up VC++ environment...
+        CALL "%vc_vars%"
+        echo Adding build binary directory to path...
+        SET "PATH=%qt_build_dir%\qtbase\bin;%PATH%"
+        echo Configuring Qt...
+        CALL %qt_src_dir%\configure -prefix %qt_install_dir% %qt_general_build_options% %qt_specific_build_options%
+        echo Building Qt...
+        cmake --build . --parallel
+        echo Installing Qt...
+        ninja install
+        echo Build finished
+    - name: Build Qt Docs Separately (since only 'release' builds supported)
+      shell: cmd
+      working-directory: ${{ env.qt_doc_build_dir }}
+      env:
+        qt_doc_build_options: -platform win32-msvc -release -opensource -confirm-license -skip qtwebengine -nomake tests -nomake examples
+      run: |
+        @echo off
+        echo Setting up VC++ environment...
+        CALL "%vc_vars%"
+        echo Adding build binary directory to path...
+        SET "PATH=%qt_doc_build_dir%\qtbase\bin;%PATH%"
+        echo Configuring Qt for doc build...
+        CALL %qt_src_dir%\configure %qt_doc_build_options%
+        echo Building QDoc dependencies...
+        cmake --build . --target qtbase qtdeclarative qttools --parallel
+        echo Building Qt docs...
+        cmake --build . --target docs
+        echo Build finished
+    - name: Copy docs into actual build
+      env:
+        qt_doc_output_dir: ${{ env.qt_doc_build_dir }}/doc
+        qt_doc_install_dir: ${{ env.qt_install_dir }}/doc
+      run: Copy-Item -Path "$Env:qt_doc_output_dir" -Destination "$Env:qt_doc_install_dir" -Recurse
+    - name: Upload Qt build artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ env.qt_build_artifact_name }}
+        path: ${{ env.qt_install_dir }}
+        if-no-files-found: error

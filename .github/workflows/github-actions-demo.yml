@@ -1,5 +1,5 @@
 name: GitHub Actions Demo
-on: [push]
+on: [workflow_dispatch]
 env:
   main_var: Top
 
