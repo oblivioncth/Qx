@@ -5,21 +5,24 @@ env:
 
 jobs:
   trigger-build:
+    name: Build Qx
     uses: ./.github/workflows/build-qx-windows.yml
 
   update-docs:
+    name: Update gh-pages
+    runs-on: windows-latest
     needs: trigger-build
     steps:
     - name: Download built Qx artifact
       uses: dawidd6/action-download-artifact@v2
       with:
         workflow: build-qx-windows.yml
-        name: ${{ trigger-build.outputs.artifact_name }}
+        name: ${{ needs.trigger-build.outputs.artifact_name }}
         path: ${{ env.qt_install_dir }}
     - name: Upload docs to gh-pages
       uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ${{ env.qx_path }}/doc/html
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ${{ env.qx_path }}/doc/html
       
   

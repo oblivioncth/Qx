@@ -1,4 +1,4 @@
-name: [Windows] Build static Qt 6.3.0 (With SSL) 
+name: Windows - Build static Qt 6.3.0 (With SSL) 
 on:
   schedule:
     - cron: '37 03 */89 * *' # Every 89 days, at 3:37PM
@@ -30,14 +30,14 @@ jobs:
         path: ${{ env.qt_src_dir }}
         key: ${{ env.qt_src_cache_key }}
     - name: Download from Qt Archives
-        if: steps.source.outputs.cache-hit != 'true'
-        run: wget -Uri ${{ env.qt_src_url }} -Outfile ${{ env.qt_src_dest }}
+      if: steps.qt-source-cache.outputs.cache-hit != 'true'
+      run: wget -Uri ${{ env.qt_src_url }} -Outfile ${{ env.qt_src_dest }}
     - name: Extract source archive
-        if: steps.source.outputs.cache-hit != 'true'
-        run: 7z x ${{ env.qt_src_dest }} -o ${{ env.qt_download_dir }}
+      if: steps.qt-source-cache.outputs.cache-hit != 'true'
+      run: 7z x ${{ env.qt_src_dest }} -o ${{ env.qt_download_dir }}
     - name: Move source files to main source directory
-        if: steps.source.outputs.cache-hit != 'true'
-        run: Move-Item -Path '${{ env.qt_download_dir }}/${{ env.qt_arch_base_name }}/*' -Destination '${{ env.qt_src_dir }}'
+      if: steps.qt-source-cache.outputs.cache-hit != 'true'
+      run: Move-Item -Path '${{ env.qt_download_dir }}/${{ env.qt_arch_base_name }}/*' -Destination '${{ env.qt_src_dir }}'
           
   build-qt-source:
     name: Build Qt
@@ -50,7 +50,7 @@ jobs:
     steps:
     - name: Set derived variables with shell because GitHub Actions env context sucks
       run: |
-        echo "qt_build_artifact_name=qt-build-${{ env.qt_ver }-static-ssl-docs" >> $Env:GITHUB_ENV
+        echo "qt_build_artifact_name=qt-build-${{ env.qt_ver }}-static-ssl-docs" >> $Env:GITHUB_ENV
         echo "qt_src_cache_key=${{ runner.os }}-qt-${{ env.qt_ver }}-source-files" >> $Env:GITHUB_ENV
     - name: Get source from cache
       uses: actions/cache@v3
