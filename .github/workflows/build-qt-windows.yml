@@ -3,6 +3,9 @@ on:
   schedule:
     - cron: '37 03 */89 * *' # Every 89 days, at 3:37PM
   workflow_dispatch:
+  push:
+    paths:
+      '.github/workflows/build-qt-windows.yml'
 
 env:
   qt_ver: 6.3.0
