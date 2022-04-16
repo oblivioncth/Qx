@@ -39,7 +39,7 @@ jobs:
       run: Invoke-WebRequest -Uri ${{ env.qt_src_url }} -Outfile ( New-Item -Path "${{ env.qt_src_dest }}" -Force )  
     - name: Extract source archive
       if: steps.qt-source-cache.outputs.cache-hit != 'true'
-      run: 7z x ${{ env.qt_src_dest }} -o ${{ env.qt_download_dir }}
+      run: 7z x ${{ env.qt_src_dest }} -o${{ env.qt_download_dir }}
     - name: Move source files to main source directory
       if: steps.qt-source-cache.outputs.cache-hit != 'true'
       run: Move-Item -Path '${{ env.qt_download_dir }}/${{ env.qt_arch_base_name }}/*' -Destination '${{ env.qt_src_dir }}'
