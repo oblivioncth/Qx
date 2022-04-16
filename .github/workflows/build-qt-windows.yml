@@ -73,12 +73,21 @@ jobs:
       with:
         path: ${{ env.qt_src_dir }}
         key: ${{ env.qt_src_cache_key }}
+    - name: TEST] Compress source
+      run: 7z a ${{ env.qt_download_dir }}/qt_source_cache_test.7z ${{ env.qt_src_dir }}/
+    - name: TEST] Upload source to GD
+      uses: satackey/action-google-drive@v1
+      with:
+        skicka-tokencache-json: ${{ secrets.SKICKA_TOKENCACHE_JSON }}
+        upload-from: ${{ env.qt_download_dir }}/qt_source_cache_test.7z
+        upload-to: /github
     - name: Create builld directory
       run: New-Item -ItemType "directory" -Path "${{ env.qt_build_dir }}"
     - name: Build/Install Qt
       shell: cmd
       working-directory: ${{ env.qt_build_dir }}
       run: |
+        @echo off
         echo Setting up VC++ environment...
         CALL "%vc_vars%"
         echo Adding build binary directory to path...
@@ -90,13 +99,6 @@ jobs:
         echo Installing Qt...
         ninja install
         echo Build finished
-    - name: TEST UPLOAD LOG ARTIFACT
-      uses: actions/upload-artifact@v3
-      if: always()
-      with:
-        name: QT_PROBLEM_BUILD
-        path: ${{ env.qt_build_dir }}
-        if-no-files-found: error
     - name: Build Qt Docs Separately (since only 'release' builds supported)
       shell: cmd
       working-directory: ${{ env.qt_doc_build_dir }}
