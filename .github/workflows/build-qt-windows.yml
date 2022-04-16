@@ -50,10 +50,9 @@ jobs:
     - name: Cache source files
       if: steps.qt-source-cache.outputs.cache-hit != 'true'
       uses: martijnhols/actions-cache/save@v3
-      id: qt-source-cache
       with:
         path: ${{ env.qt_src_dir }}
-        key: ${{ env.qt_src_cache_key }}
+        key: ${{ steps.qt-source-cache.outputs.primary-key }}
 
   build-qt-source:
     name: Build Qt
