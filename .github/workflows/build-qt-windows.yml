@@ -36,7 +36,7 @@ jobs:
         key: ${{ env.qt_src_cache_key }}
     - name: Download from Qt Archives
       if: steps.qt-source-cache.outputs.cache-hit != 'true'
-      run: Invoke-WebRequest -Uri ${{ env.qt_src_url }} -Outfile ${{ env.qt_src_dest }}
+      run: Invoke-WebRequest -Uri ${{ env.qt_src_url }} -Outfile ( New-Item -Path "${{ env.qt_src_dest }}" -Force )  
     - name: Extract source archive
       if: steps.qt-source-cache.outputs.cache-hit != 'true'
       run: 7z x ${{ env.qt_src_dest }} -o ${{ env.qt_download_dir }}
