@@ -9,6 +9,7 @@ on:
 
 env:
   qt_ver: 6.3.0
+  qt_dir: ${{ github.workspace }}/Qt
   qt_download_dir: ${{ github.workspace }}/Qt/Download
   qt_src_dir: ${{ github.workspace }}/Qt/Source
   qt_build_dir: ${{ github.workspace }}/Qt/Build
@@ -47,7 +48,8 @@ jobs:
     - name: Move source files to main source directory
       if: steps.qt-source-cache.outputs.cache-hit != 'true'
       run: |
-        [System.IO.Directory]::Move('${{ env.qt_download_dir }}/${{ env.qt_arch_base_name }}','${{ env.qt_src_dir }}')
+        Rename-Item -Path '${{ env.qt_download_dir }}/${{ env.qt_arch_base_name }}' -NewName 'Source'
+        Move-Item -Path '${{ env.qt_download_dir }}/Source' -Destination '${{ env.qt_dir }}'
     - name: Cache source files
       if: steps.qt-source-cache.outputs.cache-hit != 'true'
       uses: martijnhols/actions-cache/save@v3
