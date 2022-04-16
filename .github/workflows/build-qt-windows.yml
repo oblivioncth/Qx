@@ -29,8 +29,8 @@ jobs:
         echo "qt_src_decomp_dest=${{ env.qt_download_dir }}/${qt_arch_base_name}.tar" >> $Env:GITHUB_ENV
         echo "qt_src_url=https://download.qt.io/archive/qt/${qt_ver_main}/${{ env.qt_ver }}/single/${qt_arch_base_name}.tar.xz" >> $Env:GITHUB_ENV
         echo "qt_src_cache_key=${{ runner.os }}-qt-${{ env.qt_ver }}-source-files" >> $Env:GITHUB_ENV
-    - name: Cache Qt source folder
-      uses: actions/cache@v3
+    - name: Check if Qt source folder cache is available
+      uses: martijnhols/actions-cache/check@v3
       id: qt-source-cache
       with:
         path: ${{ env.qt_src_dir }}
@@ -47,7 +47,14 @@ jobs:
     - name: Move source files to main source directory
       if: steps.qt-source-cache.outputs.cache-hit != 'true'
       run: Move-Item -Path '${{ env.qt_download_dir }}/${{ env.qt_arch_base_name }}/*' -Destination '${{ env.qt_src_dir }}'
-          
+    - name: Cache source files
+      if: steps.qt-source-cache.outputs.cache-hit != 'true'
+      uses: martijnhols/actions-cache/save@v3
+      id: qt-source-cache
+      with:
+        path: ${{ env.qt_src_dir }}
+        key: ${{ env.qt_src_cache_key }}
+
   build-qt-source:
     name: Build Qt
     needs: get-qt-source
@@ -62,7 +69,7 @@ jobs:
         echo "qt_build_artifact_name=qt-build-${{ runner.os }}-${{ env.qt_ver }}-static-ssl-docs" >> $Env:GITHUB_ENV
         echo "qt_src_cache_key=${{ runner.os }}-qt-${{ env.qt_ver }}-source-files" >> $Env:GITHUB_ENV
     - name: Get source from cache
-      uses: actions/cache@v3
+      uses: martijnhols/actions-cache/restore@v3
       id: qt-source-cache
       with:
         path: ${{ env.qt_src_dir }}
