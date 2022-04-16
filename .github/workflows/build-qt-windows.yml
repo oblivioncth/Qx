@@ -23,10 +23,10 @@ jobs:
     - name: Set derived variables with shell because GitHub Actions env context sucks
       run: |
         $qt_ver_main=$($Env:qt_ver.split('.')[0] + '.' + $Env:qt_ver.split('.')[1])
-        $qt_arch_base_name='qt-everywhere-src-${Env:qt_ver}'
+        $qt_arch_base_name='qt-everywhere-src-${{ env.qt_ver }}'
         echo "qt_arch_base_name=$qt_arch_base_name" >> $Env:GITHUB_ENV
-        echo "qt_src_dest=${Env:qt_download_dir}/${qt_arch_base_name}.tar.xz" >> $Env:GITHUB_ENV
-        echo "qt_src_url=https://download.qt.io/archive/qt/${qt_ver_main}/${Env:qt_ver}/single/${qt_arch_base_name}.tar.xz" >> $Env:GITHUB_ENV
+        echo "qt_src_dest=${{ env.qt_download_dir }}/${qt_arch_base_name}.tar.xz" >> $Env:GITHUB_ENV
+        echo "qt_src_url=https://download.qt.io/archive/qt/${qt_ver_main}/${{ env.qt_ver }}/single/${qt_arch_base_name}.tar.xz" >> $Env:GITHUB_ENV
         echo "qt_src_cache_key=${{ runner.os }}-qt-${{ env.qt_ver }}-source-files" >> $Env:GITHUB_ENV
     - name: Cache Qt source folder
       uses: actions/cache@v3
@@ -98,10 +98,7 @@ jobs:
         cmake --build . --target docs
         echo Build finished
     - name: Copy docs into actual build
-      env:
-        qt_doc_output_dir: ${{ env.qt_doc_build_dir }}/doc
-        qt_doc_install_dir: ${{ env.qt_install_dir }}/doc
-      run: Copy-Item -Path "$Env:qt_doc_output_dir" -Destination "$Env:qt_doc_install_dir" -Recurse
+      run: Copy-Item -Path "${{ env.qt_doc_build_dir }}/doc" -Destination "${{ env.qt_doc_install_dir }}/doc" -Recurse
     - name: Upload Qt build artifact
       uses: actions/upload-artifact@v3
       with:

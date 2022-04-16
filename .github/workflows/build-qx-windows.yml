@@ -74,12 +74,12 @@ jobs:
         format: YYYYMMDD-HHmmss
         utcOffset: "-05:00"
     - name: Get Qx package name
-      run: echo "qx_package_name=$(Get-ChildItem -Path "$Env:qx_package_path" -Name -Filter *.zip)" >> $Env:GITHUB_ENV
+      run: echo "qx_package_name=$(Get-ChildItem -Path "${{ env.qx_package_path }}" -Name -Filter *.zip)" >> $Env:GITHUB_ENV
     - name: Set output artifact name
       id: set_artifact_name
       env:
         artifact_time: ${{ steps.current-time.outputs.formattedTime }}
-      run: echo "::set-output name=qx_artifact_name::${Env:qx_package_name}[${Env:GITHUB_BASE_REF }_${Env:artifact_time}]"
+      run: echo "::set-output name=qx_artifact_name::${{ env.qx_package_name }}[${Env:GITHUB_BASE_REF }_${{ env.artifact_time }}]"
     - name: Upload Qx build artifact
       uses: actions/upload-artifact@v3
       with:
