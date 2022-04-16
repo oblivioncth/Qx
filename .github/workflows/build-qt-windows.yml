@@ -92,6 +92,7 @@ jobs:
         echo Build finished
     - name: TEST UPLOAD LOG ARTIFACT
       uses: actions/upload-artifact@v3
+      if: always()
       with:
         name: QT_PROBLEM_BUILD
         path: ${{ env.qt_build_dir }}
