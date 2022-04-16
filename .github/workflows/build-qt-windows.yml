@@ -9,11 +9,11 @@ on:
 
 env:
   qt_ver: 6.3.0
-  qt_download_dir: ${{ github.workspace }}/Qt/Download/
-  qt_src_dir: ${{ github.workspace }}/Qt/Source/
-  qt_build_dir: ${{ github.workspace }}/Qt/Build/
-  qt_doc_build_dir: ${{ github.workspace }}/Qt/DocBuild/
-  qt_install_dir: ${{ github.workspace }}/Qt/Install/
+  qt_download_dir: ${{ github.workspace }}/Qt/Download
+  qt_src_dir: ${{ github.workspace }}/Qt/Source
+  qt_build_dir: ${{ github.workspace }}/Qt/Build
+  qt_doc_build_dir: ${{ github.workspace }}/Qt/DocBuild
+  qt_install_dir: ${{ github.workspace }}/Qt/Install
 
 jobs:
   get-qt-source:
