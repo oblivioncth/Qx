@@ -16,13 +16,9 @@ env:
   qt_install_dir: ${{ github.workspace }}/Qt/Install
 
 jobs:
-  build-qt-source:
-    name: Build Qt
+  get-qt-source:
+    name: Acquire Qt Source Package
     runs-on: windows-latest
-    env:
-      vc_vars: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat
-      qt_general_build_options: -platform win32-msvc -static -debug-and-release -opensource -confirm-license
-      qt_specific_build_options: -skip qtwebengine -nomake tests -nomake examples -schannel
     steps:
     - name: Set derived variables with shell because GitHub Actions env context sucks
       run: |
@@ -32,15 +28,54 @@ jobs:
         echo "qt_src_dest=${{ env.qt_download_dir }}/${qt_arch_base_name}.tar.xz" >> $Env:GITHUB_ENV
         echo "qt_src_decomp_dest=${{ env.qt_download_dir }}/${qt_arch_base_name}.tar" >> $Env:GITHUB_ENV
         echo "qt_src_url=https://download.qt.io/archive/qt/${qt_ver_main}/${{ env.qt_ver }}/single/${qt_arch_base_name}.tar.xz" >> $Env:GITHUB_ENV
-        echo "qt_build_artifact_name=qt-build-${{ runner.os }}-${{ env.qt_ver }}-static-ssl-docs" >> $Env:GITHUB_ENV
+        echo "qt_src_cache_key=${{ runner.os }}-qt-${{ env.qt_ver }}-source" >> $Env:GITHUB_ENV
+    - name: Check if Qt source folder cache is available
+      uses: martijnhols/actions-cache/check@v3
+      id: qt-source-cache
+      with:
+        path: ${{ env.qt_src_dir }}
+        key: ${{ env.qt_src_cache_key }}
     - name: Download from Qt Archives
+      if: steps.qt-source-cache.outputs.cache-hit != 'true'
       run: Invoke-WebRequest -Uri ${{ env.qt_src_url }} -Outfile ( New-Item -Path "${{ env.qt_src_dest }}" -Force )  
     - name: Decompress source archive
+      if: steps.qt-source-cache.outputs.cache-hit != 'true'
       run: 7z x ${{ env.qt_src_dest }} -o${{ env.qt_download_dir }}
     - name: Unpack source archive
+      if: steps.qt-source-cache.outputs.cache-hit != 'true'
       run: 7z x ${{ env.qt_src_decomp_dest }} -o${{ env.qt_download_dir }}
     - name: Move source files to main source directory
-      run: Move-Item -Path '${{ env.qt_download_dir }}/${{ env.qt_arch_base_name }}/*' -Destination '${{ env.qt_src_dir }}'
+      if: steps.qt-source-cache.outputs.cache-hit != 'true'
+      run: |
+        echo 'Creating Qt source directory (required or move command has bizarre behavior)'
+        New-Item -ItemType "directory" -Path "${{ env.qt_src_dir }}"
+        Move-Item -Path '${{ env.qt_download_dir }}/${{ env.qt_arch_base_name }}/*' -Destination '${{ env.qt_src_dir }}'
+    - name: Cache source files
+      if: steps.qt-source-cache.outputs.cache-hit != 'true'
+      uses: martijnhols/actions-cache/save@v3
+      with:
+        path: ${{ env.qt_src_dir }}
+        key: ${{ steps.qt-source-cache.outputs.primary-key }}
+
+  build-qt-source:
+    name: Build Qt
+    needs: get-qt-source
+    runs-on: windows-latest
+    env:
+      vc_vars: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat
+      qt_general_build_options: -platform win32-msvc -static -debug-and-release -opensource -confirm-license
+      qt_specific_build_options: -skip qtwebengine -nomake tests -nomake examples -schannel
+    steps:
+    - name: Set derived variables with shell because GitHub Actions env context sucks
+      run: |
+        echo "qt_build_artifact_name=qt-build-${{ runner.os }}-${{ env.qt_ver }}-static-ssl-docs" >> $Env:GITHUB_ENV
+        echo "qt_src_cache_key=${{ runner.os }}-qt-${{ env.qt_ver }}-source-files" >> $Env:GITHUB_ENV
+    - name: Get source from cache
+      uses: martijnhols/actions-cache/restore@v3
+      id: qt-source-cache
+      with:
+        path: ${{ env.qt_src_dir }}
+        key: ${{ env.qt_src_cache_key }}
     - name: Create builld directory
       run: New-Item -ItemType "directory" -Path "${{ env.qt_build_dir }}"
     - name: Build/Install Qt
