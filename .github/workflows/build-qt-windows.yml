@@ -28,7 +28,7 @@ jobs:
         echo "qt_src_dest=${{ env.qt_download_dir }}/${qt_arch_base_name}.tar.xz" >> $Env:GITHUB_ENV
         echo "qt_src_decomp_dest=${{ env.qt_download_dir }}/${qt_arch_base_name}.tar" >> $Env:GITHUB_ENV
         echo "qt_src_url=https://download.qt.io/archive/qt/${qt_ver_main}/${{ env.qt_ver }}/single/${qt_arch_base_name}.tar.xz" >> $Env:GITHUB_ENV
-        echo "qt_src_cache_key=${{ runner.os }}-qt-${{ env.qt_ver }}-source" >> $Env:GITHUB_ENV
+        echo "qt_src_cache_key=${{ runner.os }}-qt-${{ env.qt_ver }}-src-cache" >> $Env:GITHUB_ENV
     - name: Check if Qt source folder cache is available
       uses: martijnhols/actions-cache/check@v3
       id: qt-source-cache
@@ -69,7 +69,7 @@ jobs:
     - name: Set derived variables with shell because GitHub Actions env context sucks
       run: |
         echo "qt_build_artifact_name=qt-build-${{ runner.os }}-${{ env.qt_ver }}-static-ssl-docs" >> $Env:GITHUB_ENV
-        echo "qt_src_cache_key=${{ runner.os }}-qt-${{ env.qt_ver }}-source-files" >> $Env:GITHUB_ENV
+        echo "qt_src_cache_key=${{ runner.os }}-qt-${{ env.qt_ver }}-src-cache" >> $Env:GITHUB_ENV
     - name: Get source from cache
       uses: martijnhols/actions-cache/restore@v3
       id: qt-source-cache
