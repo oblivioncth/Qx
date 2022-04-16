@@ -67,6 +67,8 @@ jobs:
       with:
         path: ${{ env.qt_src_dir }}
         key: ${{ env.qt_src_cache_key }}
+    - name: Create builld directory
+      run: New-Item -ItemType "directory" -Path "${{ env.qt_build_dir }}"
     - name: Build/Install Qt
       shell: cmd
       working-directory: ${{ env.qt_build_dir }}
