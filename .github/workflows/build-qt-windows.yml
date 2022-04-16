@@ -76,7 +76,17 @@ jobs:
       with:
         path: ${{ env.qt_src_dir }}
         key: ${{ env.qt_src_cache_key }}
-    - name: Create builld directory
+    - name: TEST] Create source tree
+      run: |
+        cd ${{ env.qt_src_dir }}
+        tree /F /A > ${{ github.workspace }}/tree.xls
+    - name: TEST] Upload tree
+      uses: actions/upload-artifact@v3
+      with:
+        name: qt-src-tree
+        path: ${{ github.workspace }}/tree.xls
+        if-no-files-found: error
+    - name: Create build directory
       run: New-Item -ItemType "directory" -Path "${{ env.qt_build_dir }}"
     - name: Build/Install Qt
       shell: cmd
