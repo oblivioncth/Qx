@@ -26,7 +26,7 @@ jobs:
         $qt_arch_base_name='qt-everywhere-src-${Env:qt_ver}'
         echo "qt_arch_base_name=$qt_arch_base_name" >> $Env:GITHUB_ENV
         echo "qt_src_dest=${Env:qt_download_dir}/${qt_arch_base_name}.tar.xz" >> $Env:GITHUB_ENV
-        echo "qt_src_url=https://download.qt.io/archive/qt/${qt_ver_main}/${Env:qt_ver}/single/${$qt_arch_base_name}.tar.xz" >> $Env:GITHUB_ENV
+        echo "qt_src_url=https://download.qt.io/archive/qt/${qt_ver_main}/${Env:qt_ver}/single/${qt_arch_base_name}.tar.xz" >> $Env:GITHUB_ENV
         echo "qt_src_cache_key=${{ runner.os }}-qt-${{ env.qt_ver }}-source-files" >> $Env:GITHUB_ENV
     - name: Cache Qt source folder
       uses: actions/cache@v3
