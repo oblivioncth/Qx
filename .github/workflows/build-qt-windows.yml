@@ -26,6 +26,7 @@ jobs:
         $qt_arch_base_name='qt-everywhere-src-${{ env.qt_ver }}'
         echo "qt_arch_base_name=$qt_arch_base_name" >> $Env:GITHUB_ENV
         echo "qt_src_dest=${{ env.qt_download_dir }}/${qt_arch_base_name}.tar.xz" >> $Env:GITHUB_ENV
+        echo "qt_src_decomp_dest=${{ env.qt_download_dir }}/${qt_arch_base_name}.tar" >> $Env:GITHUB_ENV
         echo "qt_src_url=https://download.qt.io/archive/qt/${qt_ver_main}/${{ env.qt_ver }}/single/${qt_arch_base_name}.tar.xz" >> $Env:GITHUB_ENV
         echo "qt_src_cache_key=${{ runner.os }}-qt-${{ env.qt_ver }}-source-files" >> $Env:GITHUB_ENV
     - name: Cache Qt source folder
@@ -37,9 +38,12 @@ jobs:
     - name: Download from Qt Archives
       if: steps.qt-source-cache.outputs.cache-hit != 'true'
       run: Invoke-WebRequest -Uri ${{ env.qt_src_url }} -Outfile ( New-Item -Path "${{ env.qt_src_dest }}" -Force )  
-    - name: Extract source archive
+    - name: Decompress source archive
       if: steps.qt-source-cache.outputs.cache-hit != 'true'
       run: 7z x ${{ env.qt_src_dest }} -o${{ env.qt_download_dir }}
+    - name: Unpack source archive
+      if: steps.qt-source-cache.outputs.cache-hit != 'true'
+      run: 7z x ${{ env.qt_src_decomp_dest }} -o${{ env.qt_download_dir }}
     - name: Move source files to main source directory
       if: steps.qt-source-cache.outputs.cache-hit != 'true'
       run: Move-Item -Path '${{ env.qt_download_dir }}/${{ env.qt_arch_base_name }}/*' -Destination '${{ env.qt_src_dir }}'
