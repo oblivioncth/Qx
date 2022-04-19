@@ -9,7 +9,8 @@ on:
 
 env:
   qt_install_name: qt-6.3.0-win32-msvc-x64-static-debug-and-release.7z
-  qt_install_url: "https://mega.nz/file/cmpElKSZ#${{ secrets.QT_BUILD_DECRYPT_KEY }}"
+  qt_install_url: "https://mega.nz/file/cmpElKSZ#"
+  qt_install_dec_key: ${{ secrets.QT_BUILD_DECRYPT_KEY }}
   qt_install_dir: ${{ github.workspace }}/Qt/Install/
   qt_download_dir: ${{ github.workspace }}/Qt/Download
   qx_src_suffix: Qx/Source/
@@ -35,20 +36,23 @@ jobs:
         echo "qt_cmake=${qx_install_path}/bin/qt-cmake" >> $Env:GITHUB_ENV
         echo "qt_help_gen_def=QT_HELP_GEN_PATH:STRING=${qx_install_path}/bin/qhelpgenerator.exe" >> $Env:GITHUB_ENV
         echo "qt_docs_dir_def=QT_HELP_GEN_PATH:STRING=${qx_install_path}/doc" >> $Env:GITHUB_ENV
-    - name: Install Doxygen
-      run: choco install doxygen.install
     - name: Cache Qt Build
       id: cache-qt
       uses: actions/cache@v3
       with:
         path: ${{ env.qt_install_dir }}
         key: ${{ env.qt_install_name }}
+    - name: Install megatools
+      if: steps.cache-qt.outputs.cache-hit != 'true'
+      run: choco install megatools
     - name: Download Qt Build
       if: steps.cache-qt.outputs.cache-hit != 'true'
-      run: Invoke-WebRequest -Uri ${{ env.qt_install_url }} -Outfile ( New-Item -Path "${{ env.qt_install_dest }}" -Force )
+      run: megatools dl "${Env:qt_install_url}${Env:qt_install_dec_key}" --path "${{ env.qt_download_dir }}"
     - name: Extract Qt Build
       if: steps.cache-qt.outputs.cache-hit != 'true'
       run: 7z x ${{ env.qt_install_dest }} -o${{ env.qt_install_dir }}
+    - name: Install Doxygen
+      run: choco install doxygen.install
     - name: Checkout Qx
       uses: actions/checkout@v3
       with:
