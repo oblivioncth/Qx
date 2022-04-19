@@ -9,6 +9,8 @@ jobs:
   trigger-build:
     name: Build Qx
     uses: ./.github/workflows/build-qx-windows.yml
+    secrets:
+      qt_install_dec_key: ${{ secrets.QT_INSTALL_DECRYPT_KEY }}
 
   update-docs:
     name: Update gh-pages

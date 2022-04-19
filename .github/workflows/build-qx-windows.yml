@@ -1,7 +1,10 @@
 name: Windows - Build Qx (Qt 6.3.0)
 on:
-  workflow_dispatch:
   workflow_call:
+    secrets:
+      qt_install_dec_key:
+        description: 'MEGA decryption key for Qt install archive URL'
+        required: true
     outputs:
       artifact_name:
         description: "The resultant build artifact"
@@ -10,7 +13,6 @@ on:
 env:
   qt_install_name: qt-6.3.0-win32-msvc-x64-static-debug-and-release.7z
   qt_install_url: https://mega.nz/file/cmpElKSZ
-  qt_install_dec_key: ${{ secrets.QT_BUILD_DECRYPT_KEY }}
   qt_install_dir: ${{ github.workspace }}/Qt/Install/
   qt_download_dir: ${{ github.workspace }}/Qt/Download
   qx_src_suffix: Qx/Source/
@@ -47,7 +49,9 @@ jobs:
       run: choco install megatools
     - name: Download Qt Build
       if: steps.cache-qt.outputs.cache-hit != 'true'
-      run: megatools dl "${Env:qt_install_url}#${Env:qt_install_dec_key}" --path "${{ env.qt_download_dir }}"
+      env:
+        mega_key: ${{ secrets.qt_install_dec_key }}
+      run: megatools dl "${Env:qt_install_url}#${Env:mega_key}" --path "${{ env.qt_download_dir }}"
     - name: Extract Qt Build
       if: steps.cache-qt.outputs.cache-hit != 'true'
       run: 7z x ${{ env.qt_install_dest }} -o${{ env.qt_install_dir }}
