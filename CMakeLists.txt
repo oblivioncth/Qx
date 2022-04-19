@@ -193,7 +193,11 @@ install(FILES
 )
 
 # Install Docs if available
-install(DIRECTORY ${DOC_BUILD_PATH} DESTINATION . OPTIONAL)
+install(DIRECTORY ${DOC_BUILD_PATH}
+    DESTINATION .
+    CONFIGURATIONS Release
+    OPTIONAL
+)
 
 #====================== CPack ==============================
 
