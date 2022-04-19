@@ -48,6 +48,7 @@ jobs:
       if: steps.cache-qt.outputs.cache-hit != 'true'
       run: choco install megatools
     - name: Create Qt Download Directory
+      if: steps.cache-qt.outputs.cache-hit != 'true'
       run: New-Item -Path "${{ env.qt_download_dir }}" -ItemType "directory"
     - name: Download Qt Install
       if: steps.cache-qt.outputs.cache-hit != 'true'
