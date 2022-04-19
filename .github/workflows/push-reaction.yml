@@ -22,7 +22,7 @@ jobs:
       with:
         workflow: build-qx-windows.yml
         name: ${{ needs.trigger-build.outputs.artifact_name }}
-        path: ${{ env.qt_install_dir }}
+        path: ${{ env.qx_path }}
     - name: Upload docs to gh-pages
       uses: peaceiris/actions-gh-pages@v3
       with:
