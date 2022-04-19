@@ -36,8 +36,8 @@ jobs:
         $qx_install_path='${{ env.qx_src_dir }}/out/install/'
         echo "qx_install_path=$qx_install_path" >> $Env:GITHUB_ENV
         echo "qt_cmake=${Env:qt_install_dir}/bin/qt-cmake" >> $Env:GITHUB_ENV
-        echo "qt_help_gen_def=QT_HELP_GEN_PATH:STRING=${qx_install_path}/bin/qhelpgenerator.exe" >> $Env:GITHUB_ENV
-        echo "qt_docs_dir_def=QT_HELP_GEN_PATH:STRING=${qx_install_path}/doc" >> $Env:GITHUB_ENV
+        echo "qt_help_gen_def=QT_HELP_GEN_PATH:STRING=${{ env.qt_install_dir }}/bin/qhelpgenerator.exe" >> $Env:GITHUB_ENV
+        echo "qt_docs_dir_def=QT_DOCS_DIR:STRING=${{ env.qt_install_dir }}/doc" >> $Env:GITHUB_ENV
     - name: Cache Qt Build
       id: cache-qt
       uses: actions/cache@v3
@@ -87,19 +87,23 @@ jobs:
         echo Packaging Qx...
         cpack -C Debug;Release
         echo Build complete.
-    - name: Get current time
-      uses: josStorer/get-current-time@v2
-      id: current-time
-      with:
-        format: YYYYMMDD-HHmmss
-        utcOffset: "-05:00"
+    - name: Get short commit SHA
+      id: calc_short_sha
+      working-directory: ${{ env.qx_src_dir }}
+      run: echo "::set-output name=sha::$(git rev-parse --short HEAD)"
+#    - name: Get current time
+#      uses: josStorer/get-current-time@v2
+#      id: current-time
+#      with:
+#        format: YYYYMMDD-HHmmss
+#        utcOffset: "-05:00"
     - name: Get Qx package name
-      run: echo "qx_package_name=$(Get-ChildItem -Path "${{ env.qx_package_path }}" -Name -Filter *.zip)" >> $Env:GITHUB_ENV
+      run: echo "qx_package_name=$((Get-ChildItem -Path "${{ env.qx_package_path }}" -Filter *.zip)[0].BaseName)" >> $Env:GITHUB_ENV
     - name: Set output artifact name
       id: set_artifact_name
-      env:
-        artifact_time: ${{ steps.current-time.outputs.formattedTime }}
-      run: echo "::set-output name=qx_artifact_name::${{ env.qx_package_name }}[${Env:GITHUB_BASE_REF }_${{ env.artifact_time }}]"
+#      env:
+#        artifact_time: ${{ steps.current-time.outputs.formattedTime }}
+      run: echo "::set-output name=qx_artifact_name::${{ env.qx_package_name }}_[${{ steps.calc_short_sha.outputs.sha }}]"
     - name: Upload Qx build artifact
       uses: actions/upload-artifact@v3
       with:
