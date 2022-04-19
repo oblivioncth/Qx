@@ -7,7 +7,6 @@
 set(QT_DOC_MODULES
 	qtconcurrent
 	qtcore
-        qtdoc
 	qtgui
 	qtnetwork
 	qtsql
