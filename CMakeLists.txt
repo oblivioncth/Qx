@@ -97,7 +97,7 @@ find_package(Qt6 REQUIRED COMPONENTS ${QT_FIND_COMPONENTS})
 
 # Find Doxygen package
 find_package(Doxygen
-             REQUIRED dot
+             COMPONENTS dot
              OPTIONAL_COMPONENTS mscgen dia
 )
 
