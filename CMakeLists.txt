@@ -5,6 +5,10 @@ if(NOT ${GENERATOR_IS_MULTI_CONFIG})
     message(FATAL_ERROR "This project currently only supports multi-config generators!")
 endif()
 
+# Store minimum required version for later since it can be overwritten
+# by find_package/macro calls in dependencies (stupid)
+set(TRUE_CMAKE_MINIMUM_REQUIRED ${CMAKE_MINIMUM_REQUIRED_VERSION})
+
 # Project
 project(Qx
     VERSION 0.1.0

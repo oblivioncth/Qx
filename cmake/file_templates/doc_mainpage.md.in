@@ -12,7 +12,7 @@ Requirements
  - A C++@CMAKE_CXX_STANDARD@ capable compiler
  - A compiler that can target the x64 architecture
  - Qt @Qt6_VERSION_MAJOR@.@Qt6_VERSION_MINOR@.x
- - CMake @CMAKE_MINIMUM_REQUIRED_VERSION@ or greater
+ - CMake @TRUE_CMAKE_MINIMUM_REQUIRED@ or greater
  - A Qt compatible platform (only tested on Windows and Debian Linux!)
 
 Packaging
