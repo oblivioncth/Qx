@@ -18,9 +18,13 @@ jobs:
     needs: trigger-build
     steps:
     - name: Download built Qx artifact
-      uses: dawidd6/action-download-artifact@v2
+#      uses: dawidd6/action-download-artifact@v2
+#      with:
+#        workflow: ./.github/workflows/build-qx-windows.yml
+#        name: ${{ needs.trigger-build.outputs.artifact_name }}
+#        path: ${{ env.qx_path }}
+      uses: actions/download-artifact@v3
       with:
-        workflow: ./.github/workflows/build-qx-windows.yml
         name: ${{ needs.trigger-build.outputs.artifact_name }}
         path: ${{ env.qx_path }}
     - name: Upload docs to gh-pages
