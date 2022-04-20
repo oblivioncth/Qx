@@ -30,7 +30,7 @@ jobs:
         publish_dir: ${{ env.qx_path }}/doc/html
         destination_dir: ./doc
         allow_empty_commit: true # So that doc build date is always roughly synced with latest build date
-        enable_jeykll: false
+        enable_jekyll: false
         
       
   
