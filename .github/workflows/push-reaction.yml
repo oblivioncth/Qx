@@ -26,7 +26,11 @@ jobs:
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_branch: gh-pages
         publish_dir: ${{ env.qx_path }}/doc/html
         destination_dir: ./doc
+        allow_empty_commit: true # So that doc build date is always roughly synced with latest build date
+        enable_jeykll: false
+        
       
   
