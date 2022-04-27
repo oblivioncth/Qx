@@ -37,7 +37,6 @@ else()
   set(TARGET_ARCH x86)
 endif()
 
-
 #--------------------Setup Paths-------------------
 
 # Cmake scripts
@@ -66,6 +65,10 @@ set(PACKAGE_PREFIX "${CMAKE_SOURCE_DIR}/out/dist")
 
 # Clean install when clean target is ran
 set_directory_properties(PROPERTIES ADDITIONAL_CLEAN_FILES "${CMAKE_INSTALL_PREFIX}")
+
+# Versioning
+include(verbose_versioning)
+setup_verbose_versioning(PROJECT_VERSION_VERBOSE)
 
 ################# Common Build #################
 set(LIB_COMPONENTS
@@ -207,7 +210,7 @@ install(DIRECTORY ${DOC_BUILD_PATH}
 
 set(CPACK_PACKAGE_VENDOR "oblivioncth")
 set(CPACK_PACKAGE_DIRECTORY "${PACKAGE_PREFIX}")
-set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}_${PROJECT_VERSION}_(Qt${Qt6_VERSION})_${CMAKE_SYSTEM_NAME}_${TARGET_ARCH}")
+set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}_${PROJECT_VERSION_VERBOSE}_(Qt${Qt6_VERSION})_${CMAKE_SYSTEM_NAME}_${TARGET_ARCH}")
 set(CPACK_GENERATOR "ZIP")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
 set(CPACK_RESOURCE_FILE_README "${CMAKE_SOURCE_DIR}/README.md")
