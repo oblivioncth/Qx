@@ -37,13 +37,13 @@ endif()
 if(${COMPONENT_LIB_TYPE} STREQUAL "INTERFACE")
     target_include_directories(${COMPONENT_TARGET_NAME} INTERFACE
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-            $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
             $<INSTALL_INTERFACE:include/${COMPONENT_NAME_LC}>
     )
 else()
     target_include_directories(${COMPONENT_TARGET_NAME} PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-            $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
             $<INSTALL_INTERFACE:include/${COMPONENT_NAME_LC}>
     )
 endif()
