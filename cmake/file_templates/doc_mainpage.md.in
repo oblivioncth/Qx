@@ -1,5 +1,3 @@
-
-
 Qx {#mainpage}
 ==============
 Qx is a basic C++ library built on top of the ubiquitous Qt framework, created with the intention of extending its existing functionality while following the same paradigm of its design.
@@ -148,6 +146,8 @@ cpack.exe -C Debug;Release
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This example can easily be adapted to bash for builds on Linux.
+
+Build artifacts are placed into the 'out' directory.
 
 **NOTE:**
 For the time being, Qx is only configured to be built as a static library, which means that the Qt binaries you use to make Qx must have also been built using static linking. No pre-built distributions of Qt are provided that use this configuration and so you must built Qt yourself in this manner.
