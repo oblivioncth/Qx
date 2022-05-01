@@ -1,7 +1,9 @@
 name: Qx Push Reaction
 on:
   workflow_dispatch:
-  push:      
+  push:
+    branches-ignore:
+    - 'master'
 env:
   qx_path: ${{ github.workspace }}/Qx
 
@@ -11,26 +13,3 @@ jobs:
     uses: ./.github/workflows/build-qx-windows.yml
     secrets:
       qt_install_dec_key: ${{ secrets.QT_INSTALL_DECRYPT_KEY }}
-
-  update-docs:
-    name: Update gh-pages
-    runs-on: windows-latest
-    needs: trigger-build
-    steps:
-    - name: Download built Qx artifact
-      uses: actions/download-artifact@v3
-      with:
-        name: ${{ needs.trigger-build.outputs.artifact_name }}
-        path: ${{ env.qx_path }}
-    - name: Upload docs to gh-pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_branch: gh-pages
-        publish_dir: ${{ env.qx_path }}/doc/html
-        destination_dir: ./doc
-        allow_empty_commit: true # So that doc build date is always roughly synced with latest build date
-        enable_jekyll: false
-        
-      
-  
