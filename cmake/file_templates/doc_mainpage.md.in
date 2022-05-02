@@ -61,7 +61,7 @@ It is possible to include portions of the Qx API with finer granularity by only 
 
 Building From Source
 --------------------
-The latest source is available in the Master branch of https://github.com/oblivioncth/Qx.
+The latest *generally* stable source is available in the 'master' branch of https://github.com/oblivioncth/Qx, while the most up-to-date source can be found in the 'dev' branch.
 
 The requirements for building from Git are the same as for using Qx, with the obvious exception that Doxygen (as well as Graphviz) is also needed to build the documentation.
 
