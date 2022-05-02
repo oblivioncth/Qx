@@ -1,0 +1,16 @@
+changelog:
+  exclude:
+    labels:
+      - release-pr
+  categories:
+    - title: Breaking Changes
+      labels:
+        - breaking
+    - title: New Features
+      labels:
+        - enhancement
+	- title: Bug Fixes
+		- bug
+    - title: Other Changes
+      labels:
+        - "*"
