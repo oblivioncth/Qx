@@ -1,0 +1,15 @@
+name: Qx Push Reaction
+on:
+  workflow_dispatch:
+  push:
+    branches-ignore:
+    - 'master'
+env:
+  qx_path: ${{ github.workspace }}/Qx
+
+jobs:
+  trigger-build:
+    name: Build Qx
+    uses: ./.github/workflows/build-qx-windows.yml
+    secrets:
+      qt_install_dec_key: ${{ secrets.QT_INSTALL_DECRYPT_KEY }}

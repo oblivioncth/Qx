@@ -1,0 +1,119 @@
+name: Master pull-request merge reaction
+on:
+  pull_request:
+    types: [closed]
+    branches:
+    - 'master'
+env:
+  ci_bot_username: ObyBotCI
+  ci_bot_email: 104651589+ObyBotCI@users.noreply.github.com
+  qx_artifact_path: ${{ github.workspace }}/Qx
+
+jobs:
+  tag_master_and_sync_dev:
+    name: Tag master merge commit, FF back to dev
+    if: github.event.pull_request.merged == true
+    runs-on: windows-latest
+    outputs:
+      version_tag: ${{ steps.tag_master.outputs.new_tag }}
+    steps:
+    - name: Checkout Qx Master
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Setup git user for bot
+      run: |
+        git config --global user.name "${{ env.ci_bot_username }}"
+        git config --global user.email "${{ env.ci_bot_email }}"
+    - name: Tag master with new version tag
+      id: tag_master
+      env:
+        match_start: set\(QX_BASE_VERSION
+        match_end: \)
+      run: |
+        $project_lists = Get-Content -Raw CMakeLists.txt
+        if(!($project_lists -match '(?<=${{ env.match_start }})(.*)(?=${{ env.match_end }})')){
+          throw "Could not get base version!"
+        }
+        $new_tag = "v$($Matches[1].Trim())"
+        echo "::set-output name=new_tag::$new_tag"
+        git tag -a $new_tag -m "Release $new_tag"
+        git push --tags
+    - name: Move 'latest' tag
+      run: |
+        echo "Checking for 'latest' tag..."
+        if(git tag -l latest){
+          echo "Removing previous 'latest' tag..."
+          git tag -d latest # Delete tag locally
+          git push origin :refs/tags/latest # Delete tag remotely
+        }
+        else{
+          echo "No tag to remove."
+        }
+        git tag -a latest -m "Latest Release"
+        git push origin latest
+    - name: Fast-forward merge master into to dev
+      if: always()
+      run: |
+        git checkout dev
+        git merge master --ff-only
+        git push
+  
+  build_qx_release:
+    name: Build Qx Release
+    needs: tag_master_and_sync_dev
+    if: github.event.pull_request.merged == true
+    uses: ./.github/workflows/build-qx-windows.yml
+    secrets:
+      qt_install_dec_key: ${{ secrets.QT_INSTALL_DECRYPT_KEY }}
+
+  update-docs:
+    name: Update gh-pages
+    needs: build_qx_release
+    if: github.event.pull_request.merged == true
+    runs-on: windows-latest
+    steps:
+    - name: Download built Qx artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: ${{ needs.build_qx_release.outputs.artifact_name }}
+        path: ${{ env.qx_artifact_path }}
+    - name: Upload docs to gh-pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_branch: gh-pages
+        publish_dir: ${{ env.qx_artifact_path }}/doc/html
+        destination_dir: ./docs
+        allow_empty_commit: true # So that doc build date is always roughly synced with latest build date
+        enable_jekyll: false
+        user_name: '${{ env.ci_bot_username}}'
+        user_email: '${{ env.ci_bot_email }}'
+
+  create-release:
+    name: Create GitHub release
+    needs: [tag_master_and_sync_dev, build_qx_release, update-docs]
+    if: github.event.pull_request.merged == true
+    runs-on: windows-latest
+    steps:
+    - name: Set release file artifact name
+      run: echo "release_package_name=${{ needs.build_qx_release.outputs.artifact_name }}" >> $Env:GITHUB_ENV
+    - name: Download built Qx artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: ${{ env.release_package_name }}
+        path: ${{ env.qx_artifact_path }}
+    - name: Zip up release artifact
+      run: 7z a "${{ env.release_package_name }}.zip" "${{ env.qx_artifact_path }}/*"
+    - name: DEBUG List files
+      run: ls
+    - name: Generate release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: "Qx Release ${{ needs.tag_master_and_sync_dev.outputs.version_tag }}"
+        tag_name: "${{ needs.tag_master_and_sync_dev.outputs.version_tag }}"
+        fail_on_unmatched_files: true
+        generate_release_notes: true
+        files: ${{ env.release_package_name }}.zip
+    
+        

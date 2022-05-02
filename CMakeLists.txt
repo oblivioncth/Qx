@@ -1,10 +1,21 @@
 #================= Project Setup ==========================
 # CMake
 cmake_minimum_required(VERSION 3.21.1)
+if(NOT ${GENERATOR_IS_MULTI_CONFIG})
+    message(FATAL_ERROR "This project currently only supports multi-config generators!")
+endif()
+
+# Store minimum required version for later since it can be overwritten
+# by find_package/macro calls in dependencies (stupid)
+set(TRUE_CMAKE_MINIMUM_REQUIRED ${CMAKE_MINIMUM_REQUIRED_VERSION})
 
 # Project
+# NOTE: For versions tick to w.x.y.z, where z is generally
+# avoided and only used for hotfixes. DON'T USE TRAILING
+# NUMBERS IN VERSIONS
+set(QX_BASE_VERSION 0.1) # Required for CI/CD
 project(Qx
-    VERSION 0.1.0
+    VERSION ${QX_BASE_VERSION}
     LANGUAGES CXX
     DESCRIPTION "Qt Extensions Library"
 )
@@ -29,7 +40,6 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
 else()
   set(TARGET_ARCH x86)
 endif()
-
 
 #--------------------Setup Paths-------------------
 
@@ -59,6 +69,10 @@ set(PACKAGE_PREFIX "${CMAKE_SOURCE_DIR}/out/dist")
 
 # Clean install when clean target is ran
 set_directory_properties(PROPERTIES ADDITIONAL_CLEAN_FILES "${CMAKE_INSTALL_PREFIX}")
+
+# Versioning
+include(verbose_versioning)
+setup_verbose_versioning(PROJECT_VERSION_VERBOSE)
 
 ################# Common Build #################
 set(LIB_COMPONENTS
@@ -97,7 +111,7 @@ find_package(Qt6 REQUIRED COMPONENTS ${QT_FIND_COMPONENTS})
 
 # Find Doxygen package
 find_package(Doxygen
-             REQUIRED dot
+             COMPONENTS dot
              OPTIONAL_COMPONENTS mscgen dia
 )
 
@@ -127,9 +141,15 @@ endforeach()
 #================ Build Documentation ======================
 
 if(DOXYGEN_FOUND)
+    # Configure files
+    configure_file("${FILE_TEMPLATES_PATH}/doc_mainpage.md.in"
+        "${CMAKE_BINARY_DIR}/docin/mainpage.md"
+        @ONLY
+    )
+
     # Top level input
     set(DOC_INPUT_LIST
-        "${DOC_SOURCE_PATH}/mainpage.md"
+        "${CMAKE_BINARY_DIR}/docin/mainpage.md"
         "${DOC_SOURCE_PATH}/namespace.dox"
     )
 
@@ -184,13 +204,17 @@ install(FILES
 )
 
 # Install Docs if available
-install(DIRECTORY ${DOC_BUILD_PATH} DESTINATION . OPTIONAL)
+install(DIRECTORY ${DOC_BUILD_PATH}
+    DESTINATION .
+    CONFIGURATIONS Release
+    OPTIONAL
+)
 
 #====================== CPack ==============================
 
 set(CPACK_PACKAGE_VENDOR "oblivioncth")
 set(CPACK_PACKAGE_DIRECTORY "${PACKAGE_PREFIX}")
-set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}_${PROJECT_VERSION}_(Qt${Qt6_VERSION})_${CMAKE_SYSTEM_NAME}_${TARGET_ARCH}")
+set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}_${PROJECT_VERSION_VERBOSE}_(Qt${Qt6_VERSION})_${CMAKE_SYSTEM_NAME}_${TARGET_ARCH}")
 set(CPACK_GENERATOR "ZIP")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
 set(CPACK_RESOURCE_FILE_README "${CMAKE_SOURCE_DIR}/README.md")

@@ -1,5 +1,5 @@
 /* [@CMAKE_PROJECT_NAME@]
- * Version: @CMAKE_PROJECT_VERSION@
+ * Version: @PROJECT_VERSION_VERBOSE@
  * Qt Version: @Qt6_VERSION@
  * Platform: @CMAKE_SYSTEM_NAME@
  * Build Date: @BUILD_DATE_TIME@

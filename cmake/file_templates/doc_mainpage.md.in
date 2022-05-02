@@ -1,5 +1,3 @@
-
-
 Qx {#mainpage}
 ==============
 Qx is a basic C++ library built on top of the ubiquitous Qt framework, created with the intention of extending its existing functionality while following the same paradigm of its design.
@@ -9,9 +7,10 @@ The library primarily consists data structures and routines that facilitate a va
 Requirements
 ------------
 
- - A C++20 capable compiler
- - Qt 6.2.x
- - CMake 3.21.1 or greater
+ - A C++@CMAKE_CXX_STANDARD@ capable compiler
+ - A compiler that can target the x64 architecture
+ - Qt @Qt6_VERSION_MAJOR@.@Qt6_VERSION_MINOR@.x
+ - CMake @TRUE_CMAKE_MINIMUM_REQUIRED@ or greater
  - A Qt compatible platform (only tested on Windows and Debian Linux!)
 
 Packaging
@@ -62,13 +61,13 @@ It is possible to include portions of the Qx API with finer granularity by only 
 
 Building From Source
 --------------------
-The latest source is available in the Master branch of https://github.com/oblivioncth/Qx.
+The latest *generally* stable source is available in the 'master' branch of https://github.com/oblivioncth/Qx, while the most up-to-date source can be found in the 'dev' branch.
 
-The requirements for building from Git are the same as for using Qx, with the obvious exception that Doxygen is also needed to build the documentation.
+The requirements for building from Git are the same as for using Qx, with the obvious exception that Doxygen (as well as Graphviz) is also needed to build the documentation.
 
 If newer to working with Qt, it is easiest to build from within Qt creator as it handles a large portion of environment setup, including adding Qt to CMake's package search list, automatically. Simply make sure that a kit is configured in Qt Creator that uses a compatible version of Qt, open the CMakeLists.txt file as a project, and build with the desired configuration.
 
-The CMake project is designed to be used with multi-configuration generators such as Visual Studio or Ninja Multi-Config, and may require some tweaking to work with single configuration generators.
+The CMake project is designed to be used with multi-configuration generators such as Visual Studio or Ninja Multi-Config (recommended), and may require some tweaking to work with single configuration generators.
 
 #### CMake Targets:
 
@@ -77,43 +76,82 @@ The CMake project is designed to be used with multi-configuration generators suc
  - docs - Builds the Qx documentation
 
 #### Documentation:
-In order to link the documentation to Qt documentation the CMake variable **QT_DOCS_DIR** must be set to the path that contains documentation for all Qt versions on the local system. By default this is:
+In order to link the documentation to Qt documentation the CMake variable **QT_DOCS_DIR** must be set to the root path that contains documentation for the Qt version you are building with. It should look something like this:
 
-    # Windows
-    C:\Program Files\Qt\Docs
+    doc/
+    ├── config
+    ├── global
+    ├── qdoc
+    ├── qmake
+    ├── qtcmake
+    ├── qtconcurrent
+    ├── qtcore
+    ├── ...
+    ├── qdoc.qch
+    ├── qmake.qch
+    └── ...
 
-    # Linux (some distros)
-    /usr/local/Qt/Docs
+    # In this case QT_DOCS_DIR should point to the directory 'doc'.
 
-Regardless of the exact path, the variable must point to the root Docs folder and not the folder specific to the version of Qt you plan to build with. The appropriate documentation version will selected automatically based on the supplied Qt binaries.
+The path for this documentation varies depending on how you obtained Qt, but is generally placed in one of two locations:
 
-In order to create a Qt Compressed Help (.qch) file of the documentation for use with Qt Creator the CMake variable **QT_HELP_GEN_PATH** must be set to the path of the *qhelpgenerator* tool that is part of a Qt installation.
+    # Official Qt Builds from Maintenance Tool/Installer
+    <QT_SOFTWARE>/Docs/Qt-<QT_VERSION>
+
+    # Self-built Qt
+    <QT_ROOT>/doc
+
+    # NOTE:
+    # By default on Windows <QT_SOFTWARE> is C:\Program Files\Qt
+    # On Linux it is often /usr/local/Qt
+    # <QT_ROOT> refers to the install directory of a given Qt build
+
+
+In order to create a Qt Compressed Help (.qch) file of the documentation for use with Qt Creator the CMake variable **QT_HELP_GEN_PATH** must be set to the path of the *qhelpgenerator* tool that is part of a Qt installation. Generally this is located at:
+
+    <QT_ROOT>/bin/qhelpgenerator.exe
+
 
 #### Package
 By default, the CMakeLists project configures CPack to create an artifact ZIP containing the binaries for Debug and Release configurations, as well as documentation.
 
-To properly create the full package, perform the following steps inside the source directory:
+The following is the general build process required to successfully generate this package via a shadow build on Windows:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Build the Debug libraries
-cmake.exe --build <path/to/build/dir> --target all --config Debug
 
-# Build the Release libraries
-cmake.exe --build <path/to/build/dir> --target all --config Release
+# Set the environment variables that follow as desired
+
+# Setup C++ Build Environment
+CALL "%VS_PATH%\Common7\Tools\VsDevCmd.bat" -arch=amd64
+
+# Configure CMake using Qt wrapper
+CALL "%Qt_ROOT%\bin\qt-cmake" -G "Ninja Multi-Config" -S "%Qx_SOURCE_DIR%" -B "%Qx_BUILD_DIR%" -D "QT_DOCS_DIR=%Qt_ROOT%/doc" -D "QT_DOCS_DIR=%Qt_ROOT%/bin/qhelpgenerator.exe"
+
+# Go to Build directory
+cd /D "%Qx_BUILD_DIR%"
+
+# Build the Debug/Release libraries
+cmake.exe --build . --target all --config Debug
+cmake.exe --build . --target all --config Release
 
 # Build the documentation
-cmake.exe -D QT_DOCS_DIR=<path/to/qt/docs> --build <path/to/build/dir> --target docs --config Release
+cmake --build . --target docs --config Release
 
 # Install Debug/Release libraries and documentation
-cmake.exe --build <path/to/build/dir> --target install --config Debug
-cmake.exe --build <path/to/build/dir> --target install --config Release
+cmake --build . --target install --config Debug
+cmake --build . --target install --config Release
 
 # Create the output package
 cpack.exe -C Debug;Release
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This example can easily be adapted to bash for builds on Linux.
+
+Build artifacts are placed into the 'out' directory.
 
 **NOTE:**
 For the time being, Qx is only configured to be built as a static library, which means that the Qt binaries you use to make Qx must have also been built using static linking. No pre-built distributions of Qt are provided that use this configuration and so you must built Qt yourself in this manner.
 
-See https://doc.qt.io/qt-6/windows-building.html for general information and be sure to pass the **-static** option to the *configure* script.
+See https://doc.qt.io/qt-6/build-sources.html for general information and be sure to pass the **-static** option to the *configure* script.
 
 If you get stuck building Qt statically (as there can be some gotchyas), feel free to open an issue under the project's Github repository for assistance.
