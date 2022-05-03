@@ -112,7 +112,7 @@ configure_file(
 
 # Create config file
 configure_file("${FILE_TEMPLATES_PATH}/${CMAKE_PROJECT_NAME}ComponentConfig.cmake.in"
-    "${CMAKE_BINARY_DIR}/cmake/${COMPONENT_NAME}/${CMAKE_PROJECT_NAME}${COMPONENT_NAME}Config.cmake"
+    "${PROJECT_BINARY_DIR}/cmake/${COMPONENT_NAME}/${CMAKE_PROJECT_NAME}${COMPONENT_NAME}Config.cmake"
     @ONLY
 )
 
@@ -151,13 +151,13 @@ install(EXPORT ${COMPONENT_NAME}Targets
 
 # Install package config
 install(FILES
-    "${CMAKE_BINARY_DIR}/cmake/${COMPONENT_NAME}/${CMAKE_PROJECT_NAME}${COMPONENT_NAME}Config.cmake"
+    "${PROJECT_BINARY_DIR}/cmake/${COMPONENT_NAME}/${CMAKE_PROJECT_NAME}${COMPONENT_NAME}Config.cmake"
     DESTINATION cmake/${COMPONENT_NAME}
 )
 
 #========Export For In-tree Builds =================
 # For in source builds
 export(EXPORT ${COMPONENT_NAME}Targets
-    FILE "${CMAKE_BINARY_DIR}/cmake/${COMPONENT_NAME}/${CMAKE_PROJECT_NAME}${COMPONENT_NAME}Targets.cmake"
+    FILE "${PROJECT_BINARY_DIR}/cmake/${COMPONENT_NAME}/${CMAKE_PROJECT_NAME}${COMPONENT_NAME}Targets.cmake"
     NAMESPACE ${CMAKE_PROJECT_NAME}::
 )
