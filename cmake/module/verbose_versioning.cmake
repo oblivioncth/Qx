@@ -57,7 +57,7 @@ else()
     function(setup_verbose_versioning return)
         # Handle fallback value
         if(NO_GIT)
-            set(VERSION_FALLBACK "v${CMAKE_PROJECT_VERSION}")
+            set(VERSION_FALLBACK "v${PROJECT_VERSION}")
         else()
             set(VERSION_FALLBACK "")
         endif()

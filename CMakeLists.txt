@@ -19,8 +19,8 @@ project(Qx
     LANGUAGES CXX
     DESCRIPTION "Qt Extensions Library"
 )
-string(TOLOWER ${CMAKE_PROJECT_NAME} PROJ_NAME_LC)
-string(TOUPPER ${CMAKE_PROJECT_NAME} PROJ_NAME_UC)
+string(TOLOWER ${PROJECT_NAME} PROJ_NAME_LC)
+string(TOUPPER ${PROJECT_NAME} PROJ_NAME_UC)
 
 # C++
 set(CMAKE_CXX_STANDARD 20)
@@ -45,7 +45,7 @@ endif()
 
 # Cmake scripts
 set(PROJ_SCRIPTS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-set(CMAKE_MODULE_PATH "${PROJ_SCRIPTS_PATH}/module")
+list(APPEND CMAKE_MODULE_PATH "${PROJ_SCRIPTS_PATH}/module")
 set(FILE_TEMPLATES_PATH "${PROJ_SCRIPTS_PATH}/file_templates")
 set(DOC_SCRIPTS_PATH "${PROJ_SCRIPTS_PATH}/doc")
 
@@ -118,16 +118,16 @@ find_package(Doxygen
 #--------------------Package Config-----------------------
 
 # Create config file
-configure_file("${FILE_TEMPLATES_PATH}/${CMAKE_PROJECT_NAME}Config.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/cmake/${CMAKE_PROJECT_NAME}Config.cmake"
+configure_file("${FILE_TEMPLATES_PATH}/${PROJECT_NAME}Config.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}Config.cmake"
     @ONLY
 )
 
 # Create version config file
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/cmake/${CMAKE_PROJECT_NAME}ConfigVersion.cmake"
-    VERSION ${CMAKE_PROJECT_VERSION}
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}ConfigVersion.cmake"
+    VERSION ${PROJECT_VERSION}
     COMPATIBILITY SameMinorVersion
 )
 
@@ -191,8 +191,8 @@ endif()
 
 # Install Package Config
 install(FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/cmake/${CMAKE_PROJECT_NAME}Config.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/cmake/${CMAKE_PROJECT_NAME}ConfigVersion.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}Config.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}ConfigVersion.cmake"
     DESTINATION cmake
 )
 
