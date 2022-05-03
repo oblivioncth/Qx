@@ -103,7 +103,7 @@ endforeach()
 # Copy template with modifications
 configure_file(
     "${FILE_TEMPLATES_PATH}/primary_component_header.h.in"
-    "${CMAKE_BINARY_DIR}/include/${COMPONENT_NAME_LC}/${PROJ_NAME_LC}/${COMPONENT_NAME_LC}.h"
+    "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJ_NAME_LC}/${COMPONENT_NAME_LC}.h"
     @ONLY
     NEWLINE_STYLE UNIX
 )
@@ -138,7 +138,7 @@ install(TARGETS ${COMPONENT_TARGET_NAME}
 install(DIRECTORY include/${PROJ_NAME_LC}
     DESTINATION "include/${COMPONENT_NAME_LC}"
 )
-install(FILES "${CMAKE_BINARY_DIR}/include/${COMPONENT_NAME_LC}/${PROJ_NAME_LC}/${COMPONENT_NAME_LC}.h"
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJ_NAME_LC}/${COMPONENT_NAME_LC}.h"
     DESTINATION "${HEADER_INSTALL_SUFFIX}/${COMPONENT_NAME_LC}/${PROJ_NAME_LC}"
 )
 

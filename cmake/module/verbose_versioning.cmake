@@ -63,10 +63,10 @@ else()
         endif()
 
         # Get verbose version
-        __get_verbose_version("${CMAKE_SOURCE_DIR}" "${VERSION_FALLBACK}" VERBOSE_VER)
+        __get_verbose_version("${CMAKE_CURRENT_SOURCE_DIR}" "${VERSION_FALLBACK}" VERBOSE_VER)
 
         # Write to "cache" file
-        set(VERBOSE_VER_CACHE ${CMAKE_BINARY_DIR}/verbose_ver.txt)
+        set(VERBOSE_VER_CACHE ${CMAKE_CURRENT_BINARY_DIR}/verbose_ver.txt)
         file(WRITE ${VERBOSE_VER_CACHE} ${VERBOSE_VER})
 
         # Add custom target to allow for build time re-check (byproduct important!)
@@ -77,7 +77,7 @@ else()
             COMMAND
                 ${CMAKE_COMMAND}
                 "-DVERBOSE_VER_CACHE=${VERBOSE_VER_CACHE}"
-                "-DGIT_REPO=${CMAKE_SOURCE_DIR}"
+                "-DGIT_REPO=${CMAKE_CURRENT_SOURCE_DIR}"
                 "-DVERSION_FALLBACK=${VERSION_FALLBACK}"
                 "-P" "${CMAKE_CURRENT_FUNCTION_LIST_FILE}"
             COMMENT
