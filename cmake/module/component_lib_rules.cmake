@@ -13,7 +13,7 @@ set(COMPONENT_TARGET_NAME ${COMPONENT_NAME})
 qt_add_library(${COMPONENT_TARGET_NAME} ${COMPONENT_LIB_TYPE})
 
 # Make alias target so target can be referred to with its export namespace
-add_library(${CMAKE_PROJECT_NAME}::${COMPONENT_NAME} ALIAS ${COMPONENT_TARGET_NAME})
+add_library(${PROJECT_NAME}::${COMPONENT_NAME} ALIAS ${COMPONENT_TARGET_NAME})
 
 #================= Build ==========================
 
@@ -97,13 +97,13 @@ set(PRIM_COMP_HEADER_DEF "${PROJ_NAME_UC}_${COMPONENT_NAME_UC}_H")
 
 # Generate include statements
 foreach(api_header ${COMPONENT_INCLUDE_HEADERS})
-    set(PRIM_COMP_HEADER_INCLUDES "${PRIM_COMP_HEADER_INCLUDES}#include \"${COMPONENT_NAME_LC}/${api_header}\"\n")
+    set(PRIM_COMP_HEADER_INCLUDES "${PRIM_COMP_HEADER_INCLUDES}#include <${PROJ_NAME_LC}/${COMPONENT_NAME_LC}/${api_header}>\n")
 endforeach()
 
 # Copy template with modifications
 configure_file(
     "${FILE_TEMPLATES_PATH}/primary_component_header.h.in"
-    "${CMAKE_BINARY_DIR}/include/${COMPONENT_NAME_LC}/${PROJ_NAME_LC}/${COMPONENT_NAME_LC}.h"
+    "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJ_NAME_LC}/${COMPONENT_NAME_LC}.h"
     @ONLY
     NEWLINE_STYLE UNIX
 )
@@ -111,15 +111,15 @@ configure_file(
 #--------------------Package Config-----------------------
 
 # Create config file
-configure_file("${FILE_TEMPLATES_PATH}/${CMAKE_PROJECT_NAME}ComponentConfig.cmake.in"
-    "${CMAKE_BINARY_DIR}/cmake/${COMPONENT_NAME}/${CMAKE_PROJECT_NAME}${COMPONENT_NAME}Config.cmake"
+configure_file("${FILE_TEMPLATES_PATH}/${PROJECT_NAME}ComponentConfig.cmake.in"
+    "${PROJECT_BINARY_DIR}/cmake/${COMPONENT_NAME}/${PROJECT_NAME}${COMPONENT_NAME}Config.cmake"
     @ONLY
 )
 
 #---------- Configure Target Properties------------------
 set_target_properties(${COMPONENT_TARGET_NAME} PROPERTIES
-    VERSION ${CMAKE_PROJECT_VERSION}
-    OUTPUT_NAME "${CMAKE_PROJECT_NAME}-${COMPONENT_NAME}"
+    VERSION ${PROJECT_VERSION}
+    OUTPUT_NAME "${PROJECT_NAME}-${COMPONENT_NAME}"
     DEBUG_POSTFIX "d"
 )
 
@@ -138,26 +138,26 @@ install(TARGETS ${COMPONENT_TARGET_NAME}
 install(DIRECTORY include/${PROJ_NAME_LC}
     DESTINATION "include/${COMPONENT_NAME_LC}"
 )
-install(FILES "${CMAKE_BINARY_DIR}/include/${COMPONENT_NAME_LC}/${PROJ_NAME_LC}/${COMPONENT_NAME_LC}.h"
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJ_NAME_LC}/${COMPONENT_NAME_LC}.h"
     DESTINATION "${HEADER_INSTALL_SUFFIX}/${COMPONENT_NAME_LC}/${PROJ_NAME_LC}"
 )
 
 # Install package target export
 install(EXPORT ${COMPONENT_NAME}Targets
-    FILE "${CMAKE_PROJECT_NAME}${COMPONENT_NAME}Targets.cmake"
-    NAMESPACE ${CMAKE_PROJECT_NAME}::
+    FILE "${PROJECT_NAME}${COMPONENT_NAME}Targets.cmake"
+    NAMESPACE ${PROJECT_NAME}::
     DESTINATION cmake/${COMPONENT_NAME}
 )
 
 # Install package config
 install(FILES
-    "${CMAKE_BINARY_DIR}/cmake/${COMPONENT_NAME}/${CMAKE_PROJECT_NAME}${COMPONENT_NAME}Config.cmake"
+    "${PROJECT_BINARY_DIR}/cmake/${COMPONENT_NAME}/${PROJECT_NAME}${COMPONENT_NAME}Config.cmake"
     DESTINATION cmake/${COMPONENT_NAME}
 )
 
 #========Export For In-tree Builds =================
 # For in source builds
 export(EXPORT ${COMPONENT_NAME}Targets
-    FILE "${CMAKE_BINARY_DIR}/cmake/${COMPONENT_NAME}/${CMAKE_PROJECT_NAME}${COMPONENT_NAME}Targets.cmake"
-    NAMESPACE ${CMAKE_PROJECT_NAME}::
+    FILE "${PROJECT_BINARY_DIR}/cmake/${COMPONENT_NAME}/${PROJECT_NAME}${COMPONENT_NAME}Targets.cmake"
+    NAMESPACE ${PROJECT_NAME}::
 )
