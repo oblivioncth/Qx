@@ -97,7 +97,7 @@ set(PRIM_COMP_HEADER_DEF "${PROJ_NAME_UC}_${COMPONENT_NAME_UC}_H")
 
 # Generate include statements
 foreach(api_header ${COMPONENT_INCLUDE_HEADERS})
-    set(PRIM_COMP_HEADER_INCLUDES "${PRIM_COMP_HEADER_INCLUDES}#include \"${COMPONENT_NAME_LC}/${api_header}\"\n")
+    set(PRIM_COMP_HEADER_INCLUDES "${PRIM_COMP_HEADER_INCLUDES}#include <${PROJ_NAME_LC}/${COMPONENT_NAME_LC}/${api_header}>\n")
 endforeach()
 
 # Copy template with modifications
