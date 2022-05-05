@@ -1,0 +1,13 @@
+/*!
+ *  @defgroup qx-windows-gui Qx Windows GUI
+ *
+ *  @brief The Windows-gui component provides functionality centered around Windows specific programming.
+ *
+ *  @component{Windows,windows.h}
+ *
+ *	@note This component is only available when Qx is built to target Windows
+ *
+ *  Qx Windows contains classes and functions that generally either wrap existing Win32 API functionality
+ *  into a more user friendly interface, other otherwise make various programming tasks on Windows more
+ *  convenient.
+ */
