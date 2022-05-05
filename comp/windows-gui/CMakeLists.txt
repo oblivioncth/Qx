@@ -6,38 +6,35 @@ set(COMPONENT_LIB_TYPE STATIC)
 
 # Headers
 set(COMPONENT_INCLUDE_HEADERS
-    qx-common-windows.h
-    qx-filedetails.h
     qx-taskbarbutton.h
 )
 
 # Source Files
 set(COMPONENT_IMPL
-    qx-common-windows.cpp
-    qx-filedetails.cpp
     qx-taskbarbutton.cpp
 )
 
 # Links
 set(COMPONENT_PRIVATE_LINKS
-    Qx::Io
+    Qx::Windows
+    Qx::Core
 )
 
 set(COMPONENT_PUBLIC_LINKS
     Qt6::Core
-    Version.lib
-    Qx::Core
+    Qt6::Gui
 )
 
 # Inter-project Dependencies
 set(COMPONENT_SIBLING_DEPENDS
     Core
-    Io
+    Windows
 )
 
 # Qt Component Dependencies
 set(COMPONENT_QT_DEPENDS
     Core
+    Gui
 )
 
 #=============== Component Handler =======================

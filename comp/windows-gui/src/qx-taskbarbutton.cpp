@@ -1,12 +1,12 @@
 // Unit Includes
-#include "qx/windows/qx-taskbarbutton.h"
+#include "qx/windows-gui/qx-taskbarbutton.h"
 
 // Windows Includes
 #define NOMINMAX
 #include "ShObjIdl_core.h"
 #undef NOMINMAX
 
-// Intra-component Includes
+// Extra-component Includes
 #include "qx/windows/qx-common-windows.h"
 
 namespace Qx
