@@ -5,8 +5,10 @@
 #include <QObject>
 #include <QWindow>
 
-// Non-Include Forward Declarations
-struct ITaskbarList4;
+// Windows Includes
+#define NOMINMAX
+#include "ShObjIdl_core.h"
+#undef NOMINMAX
 
 namespace Qx
 {
@@ -19,17 +21,21 @@ class TaskbarButton : public QObject
 //-Class Enums------------------------------------------------------------------------------------------------------
 public:
     enum ProgressState {
-        Normal,
-        Hidden,
-        Stopped,
-        Paused,
-        Busy
+        Normal = TBPF_NORMAL,
+        Hidden = TBPF_NOPROGRESS,
+        Stopped = TBPF_ERROR,
+        Paused = TBPF_PAUSED,
+        Busy = TBPF_INDETERMINATE
     };
     Q_ENUM(ProgressState) // Register for Meta-Object system
 
 //-Instance Properties-------------------------------------------------------------------------------------------------------
 private:
-    // General
+    // Overlay
+    Q_PROPERTY(QIcon overlayIcon READ overlayIcon WRITE setOverlayIcon RESET clearOverlayIcon)
+    Q_PROPERTY(QString overlayAccessibleDescription READ overlayAccessibleDescription WRITE setOverlayAccessibleDescription)
+
+    // Window
     Q_PROPERTY(QWindow* window READ window WRITE setWindow)
 
     // Progress
@@ -40,11 +46,15 @@ private:
 
 //-Instance Members-------------------------------------------------------------------------------------------------
 private:
-    // General
-    ITaskbarList4* mTaskbarInterface;
-    QWindow* window;
+    // Overlay
+    QIcon mOverlayIcon;
+    QString mOverlayAccessibleDescription;
+
+    // Window
+    QWindow* mWindow;
 
     // Progress
+    ITaskbarList4* mTaskbarInterface;
     int mProgressValue;
     int mProgressMinimum;
     int mProgressMaximum;
@@ -61,16 +71,28 @@ public:
 public:
      ~TaskbarButton();
 
-//-Class Functions----------------------------------------------------------------------------------------------
-private:
-    int getNativeProgressState(ProgressState progressState);
-
 //-Instance Functions----------------------------------------------------------------------------------------------
 private:
+    int getNativeIconSize();
+    HWND getNativeWindowHandle();
+
+    void updateOverlay();
     void updateProgressValue();
     void updateProgressState();
 
 public:
+    // General
+    bool eventFilter(QObject* object, QEvent* event) override;
+
+    // Overlay
+    QIcon overlayIcon() const;
+    QString overlayAccessibleDescription() const;
+
+    // Window
+    QWindow* window() const;
+    void setWindow(QWindow* window);
+
+    // Progress
     int progressValue() const;
     int progressMinimum() const;
     int progressMaximum() const;
@@ -78,6 +100,12 @@ public:
 
 //-Slots------------------------------------------------------------------------------------------------------------
 public slots:
+    // Overlay
+    void setOverlayIcon(const QIcon& icon);
+    void setOverlayAccessibleDescription(const QString& description);
+    void clearOverlayIcon();
+
+    // Progress
     void setProgressValue(int progressValue);
     void setProgressMinimum(int progressMinimum);
     void setProgressMaximum(int progressMaximum);
