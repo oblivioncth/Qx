@@ -7,6 +7,7 @@
 
 namespace Qx
 {
+/*! @cond */ // So doxygen ignores this class
 
 // Singleton class for filtering GUI related Windows events
 class WinGuiEventFilter : public QAbstractNativeEventFilter
@@ -35,6 +36,7 @@ public:
     bool nativeEventFilter(const QByteArray& eventType, void* message, qintptr* result) override;
 };
 
+/*! @endcond */ // So doxygen ignores this class
 }
 
 #endif // QX_WINGUIEVENTFILTER_H

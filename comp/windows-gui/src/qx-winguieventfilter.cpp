@@ -17,10 +17,19 @@
 
 namespace Qx
 {
+/*! @cond */
 
 //===============================================================================================================
 // WinGuiEventFilter
 //===============================================================================================================
+
+/*!
+ *  @internal
+ *  @class WinGuiEventFilter
+ *  @ingroup qx-windows-gui
+ *
+ *  @brief Filters Windows window messages and dispatches event version of them. Singleton.
+ */
 
 //-Constructor---------------------------------------------------------------------------------------------------
 //Private:
@@ -33,6 +42,10 @@ WinGuiEventFilter::WinGuiEventFilter() :
 
 //-Class Functions---------------------------------------------------------------------------------------------------
 //Public:
+/*!
+ *  @internal
+ *  Creates the WinGuiEventFilter singleton instance if it doesn't exist and installs it to the application
+ */
 void WinGuiEventFilter::installGlobally()
 {
     if (!instance)
@@ -61,6 +74,10 @@ QWindow* WinGuiEventFilter::getQtWindow(HWND nativeWindowHandle)
 }
 
 //Public:
+/*!
+ *  @internal
+ *  Handles GUI related event filtering for Windows
+ */
 bool WinGuiEventFilter::nativeEventFilter(const QByteArray& eventType, void* message, qintptr* result)
 {
     // Change void pointer to actual Windows window message type
@@ -94,4 +111,5 @@ bool WinGuiEventFilter::nativeEventFilter(const QByteArray& eventType, void* mes
     return messageHandled;
 }
 
+/*! @endcond */
 }
