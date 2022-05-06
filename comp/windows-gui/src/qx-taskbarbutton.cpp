@@ -27,6 +27,9 @@ TaskbarButton::TaskbarButton(QObject *parent) :
     // Ensure WinGuiEvent filter is installed
     WinGuiEventFilter::installGlobally();
 
+    // Set the TaskbarButtons default associated window to that of the parent if available
+    setWindow(qobject_cast<QWindow*>(parent));
+
     // Acquire Taskbar Interface
     HRESULT hresult = CoCreateInstance(CLSID_TaskbarList, nullptr, CLSCTX_INPROC_SERVER, IID_ITaskbarList4, reinterpret_cast<void **>(&mTaskbarInterface));
     if (FAILED(hresult))
