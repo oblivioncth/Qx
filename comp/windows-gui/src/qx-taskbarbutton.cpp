@@ -29,10 +29,10 @@ namespace Qx
  *
  *  @image{inline} html qx-taskbarbutton-0.png
  *
- *  The following example code illustrates how to use the TaskbarButton classes to adjust the look of the
+ *  The following example code illustrates how to use the TaskbarButton class to adjust the look of the
  *  taskbar button:
  *
- *  @snippet qx-tasbarbutton.cpp 0
+ *  @snippet qx-taskbarbutton.cpp 0
  *
  *  @note QWidget::windowHandle() returns a valid instance of a QWindow only after the widget has been shown.
  *  It is therefore recommended to delay the initialization of the TaskbarButton instances until
@@ -52,26 +52,25 @@ namespace Qx
  *
  *  @par
  *  The minimum and maximum number of steps can be specified by calling setProgressMinimum() and
- *  setProgressMaximum(). The current number of steps is set with setValue(). The progress indicator can be
+ *  setProgressMaximum(). The current number of steps is set with setProgressValue(). The progress indicator can be
  *  rewound to the beginning with resetProgress().
  *
  *  @par
- *  If minimumProgress and maximumProgress both are set to @c 0, the indicator state is automatically changed
- *  to ProgressState::Busy if it was previously ProgressState::Normal. This is useful when it is not possible
- *  to determine the number of steps. The progress state will be returned to normal when non-zero progress
- *  range is set and progress changes.
+ *  If @ref progressMinimum and @ref progressMaximum both are set to @c 0, the indicator state is automatically
+ *  changed to @ref Busy if it was previously @ref Normal. This is useful when it is
+ *  not possible to determine the number of steps. The progress state will be returned to normal when non-zero
+ *  progress range is set and progress changes.
  *
  *  @par
- *  @table
- *  @row @li @image{inline} html qx-taskbarbutton-1.png Screenshot of a progress indicator
- *       @li A progress indicator at 50%.
- *  @row @li @image{inline} html qx-taskbarbutton-2.png Screenshot of a paused progress indicator
- *       @li A paused progress indicator at 50%.
- *  @row @li @image{inline} html qx-taskbarbutton-3.png Screenshot of a stopped progress indicator
- *      @li A stopped progress indicator at 50%.
- *  @row @li @image{inline} html qx-taskbarbutton-4.png Screenshot of an indeterminate progress indicator
- *       @li An indeterminate progress indicator.
- *  @endtable
+ *  <table>
+ *  <caption>The different progress states of a taskbar button (at 50% progress)</caption>
+ *  <tr><th>Progress State  <th>Appearance
+ *  <tr><td>Normal          <td>@image{inline} html qx-taskbarbutton-1.png
+ *  <tr><td>Hidden          <td>@image{inline} html qx-taskbarbutton-2.png
+ *  <tr><td>Stopped         <td>@image{inline} html qx-taskbarbutton-3.png
+ *  <tr><td>Paused          <td>@image{inline} html qx-taskbarbutton-4.png
+ *  <tr><td>Busy            <td>@image{inline} html qx-taskbarbutton-5.png
+ *  </table>
  *
  *  @par
  *  @note The final appearance of the progress indicator varies depending on the active Windows theme.
@@ -110,12 +109,59 @@ namespace Qx
  *  The progress indicator is stylized to indicate progress is indeterminate.
  */
 
+//-Class Properties-----------------------------------------------------------------------------------------------
+//Private:
+/*!
+ *  @property TaskbarButton::overlayIcon
+ *  @brief the overlay icon of the taskbar button
+ */
+
+ /*!
+ *  @property TaskbarButton::overlayAccessibleDescription
+ *  @brief the description of the overlay for accessibility purposes
+ *
+ *  @sa overlayIcon
+ */
+
+ /*!
+ *  @property TaskbarButton::window
+ *  @brief the window whose taskbar button is manipulated
+ */
+
+ /*!
+ *   @property TaskbarButton::progressValue
+ *   @brief the current value of the progress indicator
+ *
+ *  The default value is @c 0.
+ */
+
+ /*!
+ *   @property TaskbarButton::progressMinimum
+ *   @brief the minimum value of the progress indicator
+ *
+ *  The default value is @c 0.
+ */
+
+ /*!
+ *   @property TaskbarButton::progressMaximum
+ *   @brief the maximum value of the progress indicator
+ *
+ *  The default value is @c 100.
+ */
+
+ /*!
+ *   @property TaskbarButton::progressState
+ *   @brief the display state of the progress indicator
+ *
+ *  The default value is @c ProgressState::Hidden.
+ */
+
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
 /*!
-    Constructs a TaskbarButton with the specified @a parent.
-
-    If @a parent is an instance of QWindow, it is automatically assigned as the taskbar button's @l window.
+ *  Constructs a TaskbarButton with the specified @a parent.
+ *
+ *  If @a parent is an instance of QWindow, it is automatically assigned as the taskbar button's @ref window.
  */
 TaskbarButton::TaskbarButton(QObject *parent) :
     QObject(parent),
@@ -238,10 +284,7 @@ void TaskbarButton::updateProgressState()
 }
 
 //Public:
-/*!
- *  @internal
- *  Intercepts TaskbarButtonCreated messages.
- */
+/*! @cond */ // Implementation detail
 bool TaskbarButton::eventFilter(QObject* object, QEvent* event)
 {
     if (object == mWindow && event->type() == WinGuiEvent::TaskbarButtonCreated)
@@ -251,27 +294,27 @@ bool TaskbarButton::eventFilter(QObject* object, QEvent* event)
     }
     return false;
 }
+/*! @endcond */
 
 /*!
- *  @property TaskbarButton::overlayIcon
- *  @brief the overlay icon of the taskbar button
+ *  Returns the taskbar button's current icon overlay.
  */
 QIcon TaskbarButton::overlayIcon() const { return mOverlayIcon; }
 
 /*!
- *  @property TaskbarButton::overlayAccessibleDescription
- *  @brief the description of the overlay for accessibility purposes
- *
- *  @sa overlayIcon
+ *  Returns the taskbar button's current overlay description.
  */
 QString TaskbarButton::overlayAccessibleDescription() const { return mOverlayAccessibleDescription; }
 
+
 /*!
- *  @property TaskbarButton::window
- *  @brief the window whose taskbar button is manipulated
+ *  Returns the window that the taskbar button is currently associated with.
  */
 QWindow* TaskbarButton::window() const { return mWindow; }
 
+/*!
+ *  Sets the taskbar button's associated window.
+ */
 void TaskbarButton::setWindow(QWindow* window)
 {
     // Remove existing event filter if present
@@ -294,57 +337,57 @@ void TaskbarButton::setWindow(QWindow* window)
 }
 
 /*!
- *   @property TaskbarButton::progressValue
- *   @brief the current value of the progress indicator
- *
- *  The default value is @c 0.
+ *  Returns the current value of the taskbar button's progress indicator.
  */
 int TaskbarButton::progressValue() const { return mProgressValue; }
 
 /*!
- *   @property TaskbarButton::progressMinimum
- *   @brief the minimum value of the progress indicator
- *
- *  The default value is @c 0.
+ *  Returns the minimum value of the taskbar button's progress indicator.
  */
 int TaskbarButton::progressMinimum() const { return mProgressMinimum; }
 
 /*!
- *   @property TaskbarButton::progressMaximum
- *   @brief the maximum value of the progress indicator
- *
- *  The default value is @c 100.
+ *  Returns the maximum value of the taskbar button's progress indicator.
  */
 int TaskbarButton::progressMaximum() const { return mProgressMaximum; }
 
 /*!
- *   @property TaskbarButton::progressState
- *   @brief the display state of the progress indicator
- *
- *  The default value is @c ProgressState::Hidden.
+ *  Returns the display state of the taskbar button's progress indicator.
  */
 TaskbarButton::ProgressState TaskbarButton::progressState() const { return mProgressState; }
 
 //-Slots------------------------------------------------------------------------------------------------------------
 //Public:
+/*!
+ *  Sets the taskbar button's icon overlay to @a icon.
+ */
 void TaskbarButton::setOverlayIcon(const QIcon& icon)
 {
     mOverlayIcon = icon;
     updateOverlay();
 }
 
+/*!
+ *  Sets the taskbar button's icon overlay description to @a description.
+ */
 void TaskbarButton::setOverlayAccessibleDescription(const QString& description)
 {
     mOverlayAccessibleDescription = description;
     updateOverlay();
 }
 
+/*!
+ *  Clears the taskbar button's icon overlay and its description, if any.
+ */
 void TaskbarButton::clearOverlayIcon()
 {
     setOverlayAccessibleDescription(QString());
     setOverlayIcon(QIcon());
 }
 
+/*!
+ *  Sets the current value of the taskbar button's progress indicator.
+ */
 void TaskbarButton::setProgressValue(int progressValue)
 {
     if(progressValue == mProgressValue || progressValue < mProgressMinimum || progressValue > mProgressMaximum)
@@ -355,10 +398,19 @@ void TaskbarButton::setProgressValue(int progressValue)
     emit progressValueChanged(mProgressValue);
 }
 
+/*!
+ *  Sets the minimum value of the taskbar button's progress indicator.
+ */
 void TaskbarButton::setProgressMinimum(int progressMinimum) { setProgressRange(progressMinimum, std::max(progressMinimum, mProgressMaximum)); }
 
+/*!
+ *  Sets the maximum value of the taskbar button's progress indicator.
+ */
 void TaskbarButton::setProgressMaximum(int progressMaximum) { setProgressRange(std::min(mProgressMinimum, progressMaximum), progressMaximum); }
 
+/*!
+ *  Sets the minimum and maximum value of the taskbar button's progress indicator.
+ */
 void TaskbarButton::setProgressRange(int progressMinimum, int progressMaximum)
 {
     const bool minChanged = progressMinimum != mProgressMinimum;
@@ -381,6 +433,9 @@ void TaskbarButton::setProgressRange(int progressMinimum, int progressMaximum)
         emit progressMaximumChanged(mProgressMaximum);
 }
 
+/*!
+ *  Sets the display state of the taskbar button's progress indicator.
+ */
 void TaskbarButton::setProgressState(Qx::TaskbarButton::ProgressState progressState)
 {
     if(progressState == mProgressState)
@@ -391,11 +446,34 @@ void TaskbarButton::setProgressState(Qx::TaskbarButton::ProgressState progressSt
     emit progressStateChanged(mProgressState);
 }
 
+/*!
+ *  Resets the current value of the taskbar button's progress indicator to the minimum value.
+ */
 void TaskbarButton::resetProgress() { setProgressValue(mProgressMinimum); }
 
 //-Signals------------------------------------------------------------------------------------------------
+
 /*!
-    @fn void QWinTaskbarProgress::progressStateChanged(Qx::TaskbarButton::ProgressState progressState)
-    @internal (for QWinTaskbarButton and QML compatibility)
+ *  @fn void TaskbarButton::progressValueChanged(int progressValue)
+ *
+ *  This signal is emitted whenever the taskbar button's current progress value changes.
+ */
+
+/*!
+ *  @fn void TaskbarButton::progressMinimumChanged(int progressMinimum)
+ *
+ *  This signal is emitted whenever the taskbar button's minimum progress value changes.
+ */
+
+/*!
+ *  @fn void TaskbarButton::progressMaximumChanged(int progressMaximum)
+ *
+ *  This signal is emitted whenever the taskbar button's maximum progress value changes.
+ */
+
+/*!
+ *  @fn void TaskbarButton::progressStateChanged(Qx::TaskbarButton::ProgressState progressState)
+ *
+ *  This signal is emitted whenever the taskbar button's progress display state changes.
  */
 }

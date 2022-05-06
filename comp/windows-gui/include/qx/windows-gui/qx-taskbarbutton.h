@@ -27,22 +27,24 @@ public:
         Paused = TBPF_PAUSED,
         Busy = TBPF_INDETERMINATE
     };
-    Q_ENUM(ProgressState) // Register for Meta-Object system
+    /*! @cond */
+    Q_ENUM(ProgressState); // Register for Meta-Object system
+    /*! @endcond */
 
 //-Instance Properties-------------------------------------------------------------------------------------------------------
 private:
     // Overlay
-    Q_PROPERTY(QIcon overlayIcon READ overlayIcon WRITE setOverlayIcon RESET clearOverlayIcon)
-    Q_PROPERTY(QString overlayAccessibleDescription READ overlayAccessibleDescription WRITE setOverlayAccessibleDescription)
+    Q_PROPERTY(QIcon overlayIcon READ overlayIcon WRITE setOverlayIcon RESET clearOverlayIcon);
+    Q_PROPERTY(QString overlayAccessibleDescription READ overlayAccessibleDescription WRITE setOverlayAccessibleDescription);
 
     // Window
-    Q_PROPERTY(QWindow* window READ window WRITE setWindow)
+    Q_PROPERTY(QWindow* window READ window WRITE setWindow);
 
     // Progress
-    Q_PROPERTY(int progressValue READ progressValue WRITE setProgressValue NOTIFY progressValueChanged)
-    Q_PROPERTY(int progressMinimum READ progressMinimum WRITE setProgressMinimum NOTIFY progressMinimumChanged)
-    Q_PROPERTY(int progressMaximum READ progressMaximum WRITE setProgressMaximum NOTIFY progressMaximumChanged)
-    Q_PROPERTY(ProgressState progressState READ progressState WRITE setProgressState NOTIFY progressStateChanged)
+    Q_PROPERTY(int progressValue READ progressValue WRITE setProgressValue NOTIFY progressValueChanged);
+    Q_PROPERTY(int progressMinimum READ progressMinimum WRITE setProgressMinimum NOTIFY progressMinimumChanged);
+    Q_PROPERTY(int progressMaximum READ progressMaximum WRITE setProgressMaximum NOTIFY progressMaximumChanged);
+    Q_PROPERTY(ProgressState progressState READ progressState WRITE setProgressState NOTIFY progressStateChanged);
 
 //-Instance Members-------------------------------------------------------------------------------------------------
 private:
@@ -82,7 +84,9 @@ private:
 
 public:
     // General
+    /*! @cond */
     bool eventFilter(QObject* object, QEvent* event) override;
+    /*! @endcond */
 
     // Overlay
     QIcon overlayIcon() const;
@@ -116,8 +120,8 @@ public slots:
 //-Signals------------------------------------------------------------------------------------------------------------
 signals:
     void progressValueChanged(int progressValue);
-    void progressMinimumChanged(int minimum);
-    void progressMaximumChanged(int maximum);
+    void progressMinimumChanged(int progressMinimum);
+    void progressMaximumChanged(int progressMaximum);
     void progressStateChanged(Qx::TaskbarButton::ProgressState progressState);
 };
 
