@@ -1,6 +1,10 @@
 // Unit Includes
 #include "qx/windows-gui/qx-taskbarbutton.h"
 
+// Intra-component Includes
+#include "qx/windows-gui/qx-winguievent.h"
+#include "qx-winguieventfilter_p.h"
+
 // Extra-component Includes
 #include "qx/windows/qx-common-windows.h"
 
@@ -20,6 +24,9 @@ TaskbarButton::TaskbarButton(QObject *parent) :
     mProgressMaximum(100),
     mProgressState(ProgressState::Hidden)
 {
+    // Ensure WinGuiEvent filter is installed
+    WinGuiEventFilter::installGlobally();
+
     // Acquire Taskbar Interface
     HRESULT hresult = CoCreateInstance(CLSID_TaskbarList, nullptr, CLSCTX_INPROC_SERVER, IID_ITaskbarList4, reinterpret_cast<void **>(&mTaskbarInterface));
     if (FAILED(hresult))
@@ -127,7 +134,7 @@ void TaskbarButton::updateProgressState()
 //Public:
 bool TaskbarButton::eventFilter(QObject* object, QEvent* event)
 {
-    if (object == mWindow && event->type() == QWinEvent::TaskbarButtonCreated)
+    if (object == mWindow && event->type() == WinGuiEvent::TaskbarButtonCreated)
     {
         updateProgressValue();
         updateOverlay();
