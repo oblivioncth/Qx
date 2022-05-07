@@ -165,6 +165,8 @@ namespace Qx
  */
 TaskbarButton::TaskbarButton(QObject *parent) :
     QObject(parent),
+    mWindow(nullptr),
+    mTaskbarInterface(nullptr),
     mProgressValue(0),
     mProgressMinimum(0),
     mProgressMaximum(100),
