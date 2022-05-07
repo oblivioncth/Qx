@@ -125,15 +125,5 @@ void matchAppendConditionParams(WriteMode& writeMode, TextPos& startPos)
 		startPos = TextPos::END;
 }
 
-template<typename T>
-void matchAppendConditionParams(WriteMode& writeMode, Index<T>& startPos)
-{
-	// Match append condition parameters
-	if(startPos.isLast())
-		writeMode = Append;
-	else if(writeMode == Append)
-		startPos = Index<T>::LAST;
-}
-
 /*! @endcond */
 }

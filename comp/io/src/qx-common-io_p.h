@@ -27,7 +27,14 @@ IoOpReport writePrep(bool& fileExists, QFile& file, WriteOptions writeOptions);
 void matchAppendConditionParams(WriteMode& writeMode, TextPos& startPos);
 
 template<typename T>
-void matchAppendConditionParams(WriteMode& writeMode, Index<T>& startPos);
+void matchAppendConditionParams(WriteMode& writeMode, Index<T>& startPos)
+{
+    // Match append condition parameters
+    if(startPos.isLast())
+        writeMode = Append;
+    else if(writeMode == Append)
+        startPos = Index<T>::LAST;
+}
 	
 /*! @endcond */
 }
