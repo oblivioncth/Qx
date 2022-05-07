@@ -21,11 +21,11 @@ class TaskbarButton : public QObject
 //-Class Enums------------------------------------------------------------------------------------------------------
 public:
     enum ProgressState {
-        Normal = TBPF_NORMAL,
         Hidden = TBPF_NOPROGRESS,
+        Busy = TBPF_INDETERMINATE,
+        Normal = TBPF_NORMAL,
         Stopped = TBPF_ERROR,
         Paused = TBPF_PAUSED,
-        Busy = TBPF_INDETERMINATE
     };
     /*! @cond */
     Q_ENUM(ProgressState); // Register for Meta-Object system
