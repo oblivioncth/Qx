@@ -79,8 +79,7 @@ private:
     HWND getNativeWindowHandle();
 
     void updateOverlay();
-    void updateProgressValue();
-    void updateProgressState();
+    void updateProgressIndicator();
 
 public:
     // General

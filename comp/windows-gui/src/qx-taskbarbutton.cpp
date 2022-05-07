@@ -255,7 +255,7 @@ void TaskbarButton::updateOverlay()
         DestroyIcon(iconHandle);
 }
 
-void TaskbarButton::updateProgressValue()
+void TaskbarButton::updateProgressIndicator()
 {
     if(!mWindow)
         return;
@@ -276,11 +276,6 @@ void TaskbarButton::updateProgressValue()
         mProgressState = ProgressState::Busy;
 
     // Reinforce progress state since SetProgressValue can change it
-    updateProgressState();
-}
-
-void TaskbarButton::updateProgressState()
-{
     mTaskbarInterface->SetProgressState(getNativeWindowHandle(),
                                         static_cast<TBPFLAG>(mProgressState));
 }
@@ -291,7 +286,7 @@ bool TaskbarButton::eventFilter(QObject* object, QEvent* event)
 {
     if (object == mWindow && event->type() == WinGuiEvent::TaskbarButtonCreated)
     {
-        updateProgressValue();
+        updateProgressIndicator();
         updateOverlay();
     }
     return false;
@@ -332,7 +327,7 @@ void TaskbarButton::setWindow(QWindow* window)
         mWindow->installEventFilter(this);
         if (mWindow->isVisible())
         {
-            updateProgressValue();
+            updateProgressIndicator();
             updateOverlay();
         }
     }
@@ -396,7 +391,7 @@ void TaskbarButton::setProgressValue(int progressValue)
         return;
 
     mProgressValue = progressValue;
-    updateProgressValue();
+    updateProgressIndicator();
     emit progressValueChanged(mProgressValue);
 }
 
@@ -427,7 +422,7 @@ void TaskbarButton::setProgressRange(int progressMinimum, int progressMaximum)
     if (mProgressValue < mProgressMinimum || mProgressValue > mProgressMaximum)
         resetProgress();
 
-    updateProgressValue();
+    updateProgressIndicator();
 
     if (minChanged)
         emit progressMinimumChanged(mProgressMinimum);
@@ -444,7 +439,7 @@ void TaskbarButton::setProgressState(Qx::TaskbarButton::ProgressState progressSt
         return;
 
     mProgressState = progressState;
-    updateProgressState();
+    updateProgressIndicator();
     emit progressStateChanged(mProgressState);
 }
 
