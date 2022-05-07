@@ -264,10 +264,6 @@ void TaskbarButton::updateProgressIndicator()
     const int progressRange = mProgressMaximum - mProgressMinimum;
     if(progressRange > 0)
     {
-        // Cancel indeterminate state if applicable
-        if(mProgressState == ProgressState::Busy)
-            mProgressState = ProgressState::Normal;
-
         // Scale value to 0-100 due to WinAPI limitations
         const int scaledValue = std::round(double(100) * (double(mProgressValue - mProgressMinimum)) / double(progressRange));
         mTaskbarInterface->SetProgressValue(getNativeWindowHandle(), ULONGLONG(scaledValue), 100);
@@ -389,6 +385,10 @@ void TaskbarButton::setProgressValue(int progressValue)
 {
     if(progressValue == mProgressValue || progressValue < mProgressMinimum || progressValue > mProgressMaximum)
         return;
+
+    // Cancel indeterminate state if applicable
+    if(mProgressState == ProgressState::Busy)
+        mProgressState = ProgressState::Normal;
 
     mProgressValue = progressValue;
     updateProgressIndicator();
