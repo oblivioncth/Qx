@@ -229,12 +229,12 @@ void TaskbarButton::updateOverlay()
         return;
 
     // Initial native references
-    LPCWSTR description = nullptr;
+    std::wstring description;
     HICON iconHandle = nullptr;
 
     // Get description if possible
     if (!mOverlayAccessibleDescription.isEmpty())
-        description = mOverlayAccessibleDescription.toStdWString().c_str();
+        description = mOverlayAccessibleDescription.toStdWString();
 
     // Get icon if possible
     if (!mOverlayIcon.isNull())
@@ -248,7 +248,7 @@ void TaskbarButton::updateOverlay()
     }
 
     // Set icon and description
-    mTaskbarInterface->SetOverlayIcon(getNativeWindowHandle(), iconHandle, description);
+    mTaskbarInterface->SetOverlayIcon(getNativeWindowHandle(), iconHandle, description.c_str());
 
     // Free converted icon if present (SetOverlayIcon creates a copy)
     if (iconHandle)
