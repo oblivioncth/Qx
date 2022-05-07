@@ -65,11 +65,11 @@ namespace Qx
  *  <table>
  *  <caption>The different progress states of a taskbar button (at 50% progress)</caption>
  *  <tr><th>Progress State  <th>Appearance
- *  <tr><td>Normal          <td>@image{inline} html qx-taskbarbutton-1.png
- *  <tr><td>Hidden          <td>@image{inline} html qx-taskbarbutton-2.png
- *  <tr><td>Stopped         <td>@image{inline} html qx-taskbarbutton-3.png
- *  <tr><td>Paused          <td>@image{inline} html qx-taskbarbutton-4.png
- *  <tr><td>Busy            <td>@image{inline} html qx-taskbarbutton-5.png
+ *  <tr><td>Hidden          <td>@image{inline} html qx-taskbarbutton-1.png
+ *  <tr><td>Busy            <td>@image{inline} html qx-taskbarbutton-2.png
+ *  <tr><td>Normal          <td>@image{inline} html qx-taskbarbutton-3.png
+ *  <tr><td>Stopped         <td>@image{inline} html qx-taskbarbutton-4.png
+ *  <tr><td>Paused          <td>@image{inline} html qx-taskbarbutton-5.png
  *  </table>
  *
  *  @par
