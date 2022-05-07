@@ -4,8 +4,8 @@ include(utility)
 
 # Determine component name via folder name
 get_filename_component(COMPONENT_NAME_LC "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
-string(TOUPPER ${COMPONENT_NAME_LC} COMPONENT_NAME_UC)
-string_proper_case(${COMPONENT_NAME_LC} COMPONENT_NAME)
+string_to_proper_case(${COMPONENT_NAME_LC} COMPONENT_NAME)
+create_header_guard(${PROJECT_NAME} ${COMPONENT_NAME} COMPONENT_HEADER_GUARD)
 
 set(COMPONENT_TARGET_NAME ${COMPONENT_NAME})
 
@@ -93,7 +93,6 @@ if(COMPONENT_PRIVATE_LINKS)
 endif()
 
 #-----------Generate Primary Component Header------------
-set(PRIM_COMP_HEADER_DEF "${PROJ_NAME_UC}_${COMPONENT_NAME_UC}_H")
 
 # Generate include statements
 foreach(api_header ${COMPONENT_INCLUDE_HEADERS})
