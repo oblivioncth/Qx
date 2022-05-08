@@ -113,45 +113,45 @@ namespace Qx
 //Private:
 /*!
  *  @property TaskbarButton::overlayIcon
- *  @brief the overlay icon of the taskbar button
+ *  @brief The overlay icon of the taskbar button
  */
 
  /*!
  *  @property TaskbarButton::overlayAccessibleDescription
- *  @brief the description of the overlay for accessibility purposes
+ *  @brief The description of the overlay for accessibility purposes
  *
  *  @sa overlayIcon
  */
 
  /*!
  *  @property TaskbarButton::window
- *  @brief the window whose taskbar button is manipulated
+ *  @brief The window whose taskbar button is manipulated
  */
 
  /*!
  *   @property TaskbarButton::progressValue
- *   @brief the current value of the progress indicator
+ *   @brief The current value of the progress indicator
  *
  *  The default value is @c 0.
  */
 
  /*!
  *   @property TaskbarButton::progressMinimum
- *   @brief the minimum value of the progress indicator
+ *   @brief The minimum value of the progress indicator
  *
  *  The default value is @c 0.
  */
 
  /*!
  *   @property TaskbarButton::progressMaximum
- *   @brief the maximum value of the progress indicator
+ *   @brief The maximum value of the progress indicator
  *
  *  The default value is @c 100.
  */
 
  /*!
  *   @property TaskbarButton::progressState
- *   @brief the display state of the progress indicator
+ *   @brief The display state of the progress indicator
  *
  *  The default value is @c ProgressState::Hidden.
  */
