@@ -97,6 +97,7 @@ set(QT_FIND_COMPONENTS
 ################# Windows Build #################
 if(CMAKE_SYSTEM_NAME STREQUAL Windows)
     list(APPEND LIB_COMPONENTS windows)
+    list(APPEND LIB_COMPONENTS windows-gui)
 endif()
 
 ################# Linux Build #################
