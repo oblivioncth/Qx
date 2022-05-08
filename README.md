@@ -8,6 +8,9 @@ It is based on Qt 6.
 
 [![Dev Builds](https://github.com/oblivioncth/Qx/actions/workflows/push-reaction.yml/badge.svg)](https://github.com/oblivioncth/Qx/actions/workflows/push-reaction.yml)
 
+## Documentation:
+Detailed documentation of this library, facilitated by Doxygen, is available at: https://oblivioncth.github.io/Qx/
+
 ## Disclaimer
 **I do not recommend using this library in your own projects.**
 
@@ -20,4 +23,11 @@ If you do end up using this project, either through my other software or in your
 ## Getting Started
 Either grab the latest [release](https://github.com/oblivioncth/Qx/releases/) or [build the library from source](https://oblivioncth.github.io/Qx/index.html#autotoc_md3), and import using CMake.
 
-Either way you'll then need to explore the [documentation](https://oblivioncth.github.io/Qx/index.html), which also expands on acquiring and setting up Qx.
+Building from source is recommended as this library can easily be integrated as a dependency into your project using CMake's FetchContent. An example of this is demonstrated in the documentation.
+
+Either way you'll then need to explore the [documentation](https://oblivioncth.github.io/Qx/index.html), which expands on acquiring, setting up, and using Qx.
+
+## Pre-built Releases/Artifacts
+All pre-built copies of the library available in this repository were compiled using a static build of Qt6 (the specific version is always part of the file name), which means a compatible static version of Qt must also be used when building your final application.
+
+Feel free to create issues pertaining to the use of these builds and Qt static in general.
