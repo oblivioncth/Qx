@@ -5,10 +5,9 @@
 #include <QObject>
 #include <QWindow>
 
-// Windows Includes
-#define NOMINMAX
-#include "ShObjIdl_core.h"
-#undef NOMINMAX
+// Windows Forward Declarations
+struct ITaskbarList4;
+
 
 namespace Qx
 {
@@ -21,11 +20,11 @@ class TaskbarButton : public QObject
 //-Class Enums------------------------------------------------------------------------------------------------------
 public:
     enum ProgressState {
-        Hidden = TBPF_NOPROGRESS,
-        Busy = TBPF_INDETERMINATE,
-        Normal = TBPF_NORMAL,
-        Stopped = TBPF_ERROR,
-        Paused = TBPF_PAUSED,
+        Hidden,
+        Busy,
+        Normal,
+        Stopped,
+        Paused
     };
     /*! @cond */
     Q_ENUM(ProgressState); // Register for Meta-Object system

@@ -8,12 +8,18 @@ set(COMPONENT_LIB_TYPE STATIC)
 set(COMPONENT_INCLUDE_HEADERS
     qx-common-windows.h
     qx-filedetails.h
+    qx-windefs.h
 )
 
 # Source Files
 set(COMPONENT_IMPL
     qx-common-windows.cpp
     qx-filedetails.cpp
+)
+
+# Doc Only Files
+set(COMPONENT_DOC_ONLY
+    qx-windefs.dox
 )
 
 # Links
