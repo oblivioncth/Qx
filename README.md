@@ -18,6 +18,8 @@ This library is essentially a personal library that I maintain for use in my own
 
 **However**, I do attempt to keep my changes organized and reasonable, and in the process of releasing this repository I heavily cleaned up the codebase and fully documented its API, so using this library in other projects is feasible if you so desire.
 
+At the moment, this library is only configured to be built as a static lib, so ABI changes are not a real issue for the time being.
+
 If you do end up using this project, either through my other software or in your own, feel free to contribute, complain, point out bugs, or offer suggestions.
 
 ## Getting Started
