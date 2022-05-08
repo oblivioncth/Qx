@@ -29,7 +29,10 @@ An imported component that depends on other Qx components will always cause said
 
 Getting Started
 ---------------
-1) Download the latest [Release](https://github.com/oblivioncth/Qx/releases).
+@note
+For a recommended alternative, see *Building From Source as a Direct CMake Dependency*
+
+1) Download the latest [Release](https://github.com/oblivioncth/Qx/releases)
 
 2) Place the package somewhere CMake can find it
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -43,7 +46,7 @@ set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} path\to\Qx_package)
 find_package(Qx 0.1) # Or whichever version
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-4)	Link to the required components where necessary
+4) Link to the required components where necessary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 target_link_libraries(example_ui_app PUBLIC Qx::Core Qx::Widgets)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -60,14 +63,7 @@ target_link_libraries(example_ui_app PUBLIC Qx::Core Qx::Widgets)
 It is possible to include portions of the Qx API with finer granularity by only referencing the exact headers you need in accordance with the include structure shown in the [File Index](files.html), but it is generally recommended to simply include the main header for each component you use as shown above.
 
 @warning
-When building a project that uses Qx, it is important to do so with a configuration of Qt that has binary compatibility with the one that was used to build a given version of Qx.
-
-@warning
-Generally this can be achieved by using a version of Qt with the same major/minor versions (e.g. 6.2.x if Qx was built with 6.2.0),
-and ensuring key options that affect binary compatibility are the same (e.g. building with the same toolchain and linkage).
-
-@warning
-Otherwise you are sure to encounter linker errors or experience undefined behavior.
+When building a project that uses Qx, it is important to do so with a configuration of Qt that has binary compatibility with the one that was used to build a given version of Qx. Excluding potential bugs, luckily this is easy as Qt advertising binary compatibility within each major version.
 
 Building From Source
 --------------------
@@ -160,7 +156,7 @@ This example can easily be adapted to bash for builds on Linux.
 Build artifacts are placed into the 'out' directory.
 
 
-Building From Source as a Direct Cmake Dependency
+Building From Source as a Direct CMake Dependency
 -------------------------------------------------
 If you want to use Qx compiled from source directly as a dependency in your CMake project and don't care about the intermediary redistributables, it is recommended to do the following.
 
@@ -199,10 +195,3 @@ target_link_libraries(SomeExe
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This approach will avoid concerns of ensuring compatibility between Qt configurations for your project and Qx, since both will be built with the same copy of Qt.
-
-@note
-For the time being, Qx is only configured to be built as a static library, which means that the Qt binaries you use to make Qx must have also been built using static linking. No pre-built distributions of Qt are provided that use this configuration and so you must built Qt yourself in this manner.
-
-See https://doc.qt.io/qt-6/build-sources.html for general information and be sure to pass the **-static** option to the *configure* script.
-
-If you get stuck building Qt statically (as there can be some gotchas), feel free to open an issue under the project's Github repository for assistance.
