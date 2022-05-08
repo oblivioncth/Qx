@@ -29,10 +29,10 @@ An imported component that depends on other Qx components will always cause said
 
 Getting Started
 ---------------
-@note
-For a recommended alternative, see *Building From Source as a Direct CMake Dependency*
-
 1) Download the latest [Release](https://github.com/oblivioncth/Qx/releases)
+
+@note
+For a recommended alternative, see *Source Build as a Direct CMake Dependency*
 
 2) Place the package somewhere CMake can find it
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -156,8 +156,8 @@ This example can easily be adapted to bash for builds on Linux.
 Build artifacts are placed into the 'out' directory.
 
 
-Building From Source as a Direct CMake Dependency
--------------------------------------------------
+Source Build as a Direct CMake Dependency
+-----------------------------------------
 If you want to use Qx compiled from source directly as a dependency in your CMake project and don't care about the intermediary redistributables, it is recommended to do the following.
 
 Create 'FetchQx.cmake' and add it to CMAKE_MODULE_PATH:
