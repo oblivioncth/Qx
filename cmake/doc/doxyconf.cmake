@@ -17,7 +17,7 @@ set(DOXYGEN_TREEVIEW_WIDTH 340)
 # Set logo
 set(DOXYGEN_PROJECT_LOGO "${DOC_SOURCE_PATH}/logo.svg")
 
-# Add 'v' prefix to version number
+# Set project number
 set(DOXYGEN_PROJECT_NUMBER ${PROJECT_VERSION_VERBOSE})
 
 # Set layout file
