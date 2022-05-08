@@ -1,0 +1,34 @@
+/*!
+ *  @file qx-windefs.h
+ *  @ingroup qx-windows
+ *
+ *  @brief The qx-windefs header file provides a subset of Windows data types definitions.
+ *
+ *  @note This header exists largely as an implementation detail and is unlikely to be useful in
+ *  external projects.
+ *
+ *  The purpose of this header is to allow the Qx API to refer to Windows data types without polluting
+ *  user code with the entirety of windows.h and related headers.
+ *
+ *  @sa https://docs.microsoft.com/en-us/windows/win32/winprog/windows-data-types
+ */
+
+/*!
+ *  @typedef DWORD
+ *  An unsigned 32-bit integer
+ */
+
+/*!
+ *  @typedef @ref LONG
+ *  A signed 32-bit integer
+ */
+
+/*!
+ *  @typedef HRESULT
+ *  Same as @ref LONG
+ */
+
+/*!
+ *  @typedef NTSTATUS
+ *  Same as @ref LONG
+ */

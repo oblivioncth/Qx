@@ -4,13 +4,9 @@
 // Qt Includes
 #include <QString>
 
-// Windows Includes
-#define NOMINMAX
-#include "Windows.h"
-#undef NOMINMAX
-
 // Intra-component Includes
 #include "qx/windows/qx-filedetails.h"
+#include "qx/windows/qx-windefs.h"
 
 // Extra-component Includes
 #include "qx/core/qx-genericerror.h"
@@ -22,9 +18,9 @@ namespace Qx
 struct ShortcutProperties
 {
     enum ShowMode {
-        NORMAL = SW_SHOWNORMAL,
-        MAXIMIZED = SW_SHOWMAXIMIZED,
-        MINIMIZED = SW_SHOWMINIMIZED
+        NORMAL,
+        MAXIMIZED,
+        MINIMIZED
     };
 
     QString target;

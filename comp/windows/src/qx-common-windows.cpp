@@ -6,6 +6,9 @@
 #include <QCoreApplication>
 
 // Windows Includes
+#define NOMINMAX
+#include "windows.h"
+#undef NOMINMAX
 #include "TlHelp32.h"
 #include "comdef.h"
 #include "ShObjIdl.h"
@@ -149,6 +152,21 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
 
         // Name is unique
         return true;
+    }
+
+    int nativeShowMode(ShortcutProperties::ShowMode showMode)
+    {
+        switch(showMode)
+        {
+            case ShortcutProperties::ShowMode::NORMAL:
+                return SW_SHOWNORMAL;
+            case ShortcutProperties::ShowMode::MAXIMIZED:
+                return SW_SHOWMAXIMIZED;
+            case ShortcutProperties::ShowMode::MINIMIZED:
+                return SW_SHOWMINIMIZED;
+            default:
+                return SW_SHOWNORMAL;
+        }
     }
 }
 
@@ -400,7 +418,7 @@ Qx::GenericError createShortcut(QString shortcutPath, ShortcutProperties sp)
                 return translateHresult(hRes);
         }
 
-        hRes = ipShellLink->SetShowCmd(sp.showMode);
+        hRes = ipShellLink->SetShowCmd(nativeShowMode(sp.showMode));
         if (FAILED(hRes))
             return translateHresult(hRes);
 

@@ -1,6 +1,11 @@
 // Unit Includes
 #include "qx/windows-gui/qx-taskbarbutton.h"
 
+// Windows Includes
+#define NOMINMAX
+#include "ShObjIdl_core.h"
+#undef NOMINMAX
+
 // Intra-component Includes
 #include "qx/windows-gui/qx-winguievent.h"
 #include "qx-winguieventfilter_p.h"
@@ -10,6 +15,28 @@
 
 namespace Qx
 {
+
+namespace  // Anonymous namespace for effectively private (to this cpp) functions
+{
+    TBPFLAG getNativeProgressState(TaskbarButton::ProgressState ps)
+    {
+        switch(ps)
+        {
+            case TaskbarButton::ProgressState::Hidden:
+                return TBPF_NOPROGRESS;
+            case TaskbarButton::ProgressState::Busy:
+                return TBPF_INDETERMINATE;
+            case TaskbarButton::ProgressState::Normal:
+                return TBPF_NORMAL;
+            case TaskbarButton::ProgressState::Stopped:
+                return TBPF_ERROR;
+            case TaskbarButton::ProgressState::Paused:
+                return TBPF_PAUSED;
+            default:
+                return TBPF_NOPROGRESS;
+        }
+    }
+}
 
 //===============================================================================================================
 // TaskbarButton
@@ -273,7 +300,7 @@ void TaskbarButton::updateProgressIndicator()
 
     // Reinforce progress state since SetProgressValue can change it
     mTaskbarInterface->SetProgressState(getNativeWindowHandle(),
-                                        static_cast<TBPFLAG>(mProgressState));
+                                        getNativeProgressState(mProgressState));
 }
 
 //Public:

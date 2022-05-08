@@ -1,6 +1,11 @@
 // Unit Includes
 #include "qx/windows/qx-filedetails.h"
 
+// Windows
+#define NOMINMAX
+#include "windows.h"
+#undef NOMINMAX
+
 // Qt Includes
 #include <QFileInfo>
 
