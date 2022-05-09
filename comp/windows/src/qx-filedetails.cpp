@@ -2,9 +2,7 @@
 #include "qx/windows/qx-filedetails.h"
 
 // Windows
-#define NOMINMAX
-#include "windows.h"
-#undef NOMINMAX
+#include "qx_windows.h"
 
 // Qt Includes
 #include <QFileInfo>

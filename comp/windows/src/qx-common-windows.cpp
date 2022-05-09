@@ -6,9 +6,7 @@
 #include <QCoreApplication>
 
 // Windows Includes
-#define NOMINMAX
-#include "windows.h"
-#undef NOMINMAX
+#include "qx_windows.h"
 #include "TlHelp32.h"
 #include "comdef.h"
 #include "ShObjIdl.h"

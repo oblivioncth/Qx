@@ -162,6 +162,12 @@ if(DOXYGEN_FOUND)
             "${COMPONENTS_PATH}/${component}/include"
         )
 
+        if(EXISTS "${COMPONENTS_PATH}/${component}/doc/general")
+            set(DOC_INPUT_LIST ${DOC_INPUT_LIST}
+                "${COMPONENTS_PATH}/${component}/doc/general"
+            )
+        endif()
+
         if(EXISTS "${COMPONENTS_PATH}/${component}/doc/snippets")
             set(DOC_EXAMPLE_LIST ${DOC_EXAMPLE_LIST}
                 "${COMPONENTS_PATH}/${component}/doc/snippets"

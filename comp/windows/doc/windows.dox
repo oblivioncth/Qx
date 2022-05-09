@@ -10,4 +10,7 @@
  *  Qx Windows contains classes and functions that generally either wrap existing Win32 API functionality
  *  into a more user friendly interface, other otherwise make various programming tasks on Windows more
  *  convenient.
+ *
+ *  Not to be confused with @c <qx/windows.h>, this component also provides the header qx_windows.h as
+ *  an alternative to the standard windows.h.
  */
