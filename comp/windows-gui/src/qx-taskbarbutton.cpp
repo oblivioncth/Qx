@@ -2,9 +2,7 @@
 #include "qx/windows-gui/qx-taskbarbutton.h"
 
 // Windows Includes
-#define NOMINMAX
-#include "ShObjIdl_core.h"
-#undef NOMINMAX
+#include "qx_windows.h"
 
 // Intra-component Includes
 #include "qx/windows-gui/qx-winguievent.h"

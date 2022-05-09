@@ -5,9 +5,7 @@
 #include <QGuiApplication>
 
 // Windows Includes
-#define NOMINMAX
-#include "Windows.h"
-#undef NOMINMAX
+#include "qx_windows.h"
 
 // Intra-component Includes
 #include "qx/windows-gui/qx-winguievent.h"

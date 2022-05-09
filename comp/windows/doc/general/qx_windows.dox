@@ -1,0 +1,19 @@
+/*!
+ *  @file qx_windows.h
+ *  @ingroup qx-windows
+ *
+ *  @brief The qx_windows header file acts as a lightweight alias for windows.h.
+ *
+ *  Including this header provides access to a subset of the Win32 API that consists of the most
+ *  frequently used components, and can be used as a less cumbersome drop-in replacement for windows.h
+ *  most of the time.
+ *
+ *  It is specifically designed to avoid well-known issues that can arise when simply including
+ *  windows.h, such as non-portable definitions of @c min and @c max.
+ *
+ *  Generally, any specific Windows API headers that are not included by this one can simply be
+ *  included afterwards to keep bloat to a minimum.
+ *
+ *  @warning This header will not work if you need to use Windows GDI+ due to their reliance on
+ *  Microsoft's definition of @c min and @c max.
+ */
