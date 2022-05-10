@@ -2,13 +2,19 @@ name: Windows - Build Qx (Qt 6.3.0)
 on:
   workflow_call:
     secrets:
-      qt_install_dec_key:
-        description: 'MEGA decryption key for Qt install archive URL'
+      qt_shared_dec_key:
+        description: 'MEGA decryption key for Qt shared install archive URL'
+        required: true
+      qt_static_dec_key:
+        description: 'MEGA decryption key for Qt static install archive URL'
         required: true
     outputs:
-      artifact_name:
-        description: "The resultant build artifact"
-        value: ${{ jobs.build-qx.outputs.job_artifact_name }}
+      qt_shared_artifact_name:
+        description: "Qx (Qt shared) build artifact"
+        value: ${{ jobs.build-qx.outputs.qt_shared_artifact_name }}
+      qt_static_artifact_name:
+        description: "Qx (Qt static) build artifact"
+        value: ${{ jobs.build-qx.outputs.qt_static_artifact_name }}
 env:
   qt_install_name: qt-6.3.0-win32-msvc-x64-static-debug-and-release.7z
   qt_install_url: https://mega.nz/file/cmpElKSZ
@@ -21,13 +27,37 @@ env:
 jobs:
   build-qx:
     name: Build Qx master (Debug/Release)
+    strategy:
+      matrix:
+        qt_linkage: [shared, static]
     runs-on: windows-latest
     env:
       vc_vars: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat
       cmake_gen: Ninja Multi-Config
     outputs:
-      job_artifact_name: ${{ steps.get_package_name.outputs.qx_package_name }}
+      qt_shared_artifact_name: ${{ steps.get_artifact_name.outputs.qt_shared_artifact_name }}
+      qt_static_artifact_name: ${{ steps.get_artifact_name.outputs.qt_static_artifact_name }}
     steps:
+    - name: Set matrix derived variables
+      uses: chris-madsen/variable-mapper@v0.1.3
+      with:
+        key: ${{ matrix.qt_linkage }}
+        map: |
+          {
+            "shared": {
+              "qt_install_name": "qt-6.3.0-win32-msvc-x64-shared-debug-and-release.7z",
+              "qt_install_url": "https://mega.nz/file/4vIzgYzS",
+              "qt_install_url_key": "${{ secrets.qt_shared_dec_key }}",
+              "artifact_output_var": "qt_shared_artifact_name"
+            },
+            "static": {
+              "qt_install_name": "qt-6.3.0-win32-msvc-x64-static-debug-and-release.7z",
+              "qt_install_url": "https://mega.nz/file/cmpElKSZ",
+              "qt_install_url_key": "${{ secrets.qt_static_dec_key }}",
+              "artifact_output_var": "qt_static_artifact_name"
+            }
+          }
+        export_to: env,log
     - name: Set derived variables with shell because GitHub Actions env context sucks
       run: |
         echo "qt_install_dest=${{ env.qt_download_dir }}/${{ env.qt_install_name }}" >> $Env:GITHUB_ENV
@@ -51,9 +81,7 @@ jobs:
       run: New-Item -Path "${{ env.qt_download_dir }}" -ItemType "directory"
     - name: Download Qt Install
       if: steps.cache-qt.outputs.cache-hit != 'true'
-      env:
-        mega_key: ${{ secrets.qt_install_dec_key }}
-      run: megatools dl "${Env:qt_install_url}#${Env:mega_key}" --path "${{ env.qt_download_dir }}"
+      run: megatools dl "${Env:qt_install_url}#${Env:qt_install_url_key}" --path "${{ env.qt_download_dir }}"
     - name: Extract Qt Install
       if: steps.cache-qt.outputs.cache-hit != 'true'
       run: 7z x ${{ env.qt_install_dest }} -o${{ env.qt_install_dir }}
@@ -90,12 +118,12 @@ jobs:
         echo Packaging Qx...
         cpack -C Debug;Release
         echo Build complete.
-    - name: Get Qx package name
-      id: get_package_name
-      run: echo "::set-output name=qx_package_name::$((Get-ChildItem -Path "${{ env.qx_package_path }}" -Filter *.zip)[0].BaseName)"
+    - name: Get Qx artifact name
+      id: get_artifact_name
+      run: echo "::set-output name=${{ env.artifact_output_var }}::$((Get-ChildItem -Path "${{ env.qx_package_path }}" -Filter *.zip)[0].BaseName)"
     - name: Upload Qx build artifact
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ steps.get_package_name.outputs.qx_package_name }}
+        name: ${{ steps.get_artifact_name.outputs[env.artifact_output_var] }}
         path: ${{ env.qx_install_path }}
         if-no-files-found: error
