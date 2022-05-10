@@ -98,11 +98,14 @@ set(QT_FIND_COMPONENTS
 if(CMAKE_SYSTEM_NAME STREQUAL Windows)
     list(APPEND LIB_COMPONENTS windows)
     list(APPEND LIB_COMPONENTS windows-gui)
+
+    set(QT_HELP_GEN_NAME "qthelpgenerator.exe")
 endif()
 
 ################# Linux Build #################
 if(CMAKE_SYSTEM_NAME STREQUAL Linux)
 
+    set(QT_HELP_GEN_NAME "qthelpgenerator")
 endif()
 
 #================= Top Level Build =========================
@@ -184,14 +187,14 @@ if(DOXYGEN_FOUND)
 
     # Determine Qt related doc paths
     if(NOT DEFINED QT_HELP_GEN_PATH)
-        if(EXISTS "${Qt6_PREFIX_PATH}/bin/qhelpgenerator.exe")
-            set(QT_HELP_GEN_PATH "${Qt6_PREFIX_PATH}/bin/qhelpgenerator.exe")
-            message(STATUS "Automatically configured qhelpgenerator.exe path")
+        if(EXISTS "${Qt6_PREFIX_PATH}/bin/${QT_HELP_GEN_NAME}")
+            set(QT_HELP_GEN_PATH "${Qt6_PREFIX_PATH}/bin/${QT_HELP_GEN_NAME}")
+            message(STATUS "Automatically configured qhelpgenerator path")
         else()
-            message(STATUS "Could not determine qhelpgenerator.exe path automatically.")
+            message(STATUS "Could not determine qhelpgenerator path automatically.")
         endif()
     else()
-        message(STATUS "Path of qhelpgenerator.exe set externally to: ${QT_HELP_GEN_PATH}")
+        message(STATUS "Path of qhelpgenerator set externally to: ${QT_HELP_GEN_PATH}")
     endif()
 
     if(NOT DEFINED QT_DOCS_DIR)

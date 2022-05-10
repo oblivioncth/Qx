@@ -17,7 +17,13 @@ macro(find_qt6_package)
     endif()
 
     # Ensure install prefix is valid
-    if(NOT EXISTS "${Qt6_PREFIX_PATH}/bin/qmake.exe")
+    if(CMAKE_SYSTEM_NAME STREQUAL Windows)
+        set(__QMAKE_NAME "qmake.exe")
+    elseif(CMAKE_SYSTEM_NAME STREQUAL Linux)
+        set(__QMAKE_NAME "qmake")
+    endif()
+
+    if(NOT EXISTS "${Qt6_PREFIX_PATH}/bin/${__QMAKE_NAME}")
         message(FATAL_ERROR "Qt6_PREFIX_PATH could not be determined!")
     endif()
 
