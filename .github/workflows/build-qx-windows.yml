@@ -39,7 +39,7 @@ jobs:
       qt_static_artifact_name: ${{ steps.get_artifact_name.outputs.qt_static_artifact_name }}
     steps:
     - name: Set matrix derived variables
-      uses: chris-madsen/variable-mapper@v0.1.3
+      uses: chris-madsen/variable-mapper@v0.2.2
       with:
         key: ${{ matrix.qt_linkage }}
         map: |
