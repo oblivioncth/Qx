@@ -16,8 +16,6 @@ on:
         description: "Qx (Qt static) build artifact"
         value: ${{ jobs.build-qx.outputs.qt_static_artifact_name }}
 env:
-  qt_install_name: qt-6.3.0-win32-msvc-x64-static-debug-and-release.7z
-  qt_install_url: https://mega.nz/file/cmpElKSZ
   qt_install_dir: ${{ github.workspace }}/Qt/Install/
   qt_download_dir: ${{ github.workspace }}/Qt/Download
   qx_src_suffix: Qx/Source/
