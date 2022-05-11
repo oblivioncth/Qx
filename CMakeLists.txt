@@ -98,27 +98,21 @@ set(QT_FIND_COMPONENTS
 if(CMAKE_SYSTEM_NAME STREQUAL Windows)
     list(APPEND LIB_COMPONENTS windows)
     list(APPEND LIB_COMPONENTS windows-gui)
+
+    set(QT_HELP_GEN_NAME "qthelpgenerator.exe")
 endif()
 
 ################# Linux Build #################
 if(CMAKE_SYSTEM_NAME STREQUAL Linux)
 
+    set(QT_HELP_GEN_NAME "qthelpgenerator")
 endif()
 
 #================= Top Level Build =========================
 
 # Find Qt package
-find_package(Qt6 REQUIRED COMPONENTS ${QT_FIND_COMPONENTS})
-
-# Determine Qt linkage
-get_target_property(QT_CORE_TARGET_TYPE Qt6::Core TYPE)
-if(QT_CORE_TARGET_TYPE STREQUAL SHARED_LIBRARY)
-    set(QT_LINKAGE shared)
-elseif(QT_CORE_TARGET_TYPE STREQUAL STATIC_LIBRARY)
-    set(QT_LINKAGE static)
-else()
-    message(FATAL_ERROR "Qt6 Core target type has an unexpected value!")
-endif()
+include(BetterFindQt6)
+find_qt6_package(REQUIRED COMPONENTS ${QT_FIND_COMPONENTS})
 
 # Find Doxygen package
 find_package(Doxygen
@@ -191,6 +185,29 @@ if(DOXYGEN_FOUND)
         endif()
     endforeach()
 
+    # Determine Qt related doc paths
+    if(NOT DEFINED QT_HELP_GEN_PATH)
+        if(EXISTS "${Qt6_PREFIX_PATH}/bin/${QT_HELP_GEN_NAME}")
+            set(QT_HELP_GEN_PATH "${Qt6_PREFIX_PATH}/bin/${QT_HELP_GEN_NAME}")
+            message(STATUS "Automatically configured qhelpgenerator path")
+        else()
+            message(STATUS "Could not determine qhelpgenerator path automatically.")
+        endif()
+    else()
+        message(STATUS "Path of qhelpgenerator set externally to: ${QT_HELP_GEN_PATH}")
+    endif()
+
+    if(NOT DEFINED QT_DOCS_DIR)
+        if(EXISTS "${Qt6_PREFIX_PATH}/doc/qtcore/qtcore.index")
+            set(QT_DOCS_DIR "${Qt6_PREFIX_PATH}/doc")
+            message(STATUS "Automatically configured Qt documentation path.")
+        else()
+            message(STATUS "Could not determine Qt documentation path automatically.")
+        endif()
+    else()
+        message(STATUS "Path of Qt documentation set externally to: ${QT_DOCS_DIR}")
+    endif()
+
     # Set Doxygen parameters
     include(${DOC_SCRIPTS_PATH}/doxyconf.cmake)
 
@@ -231,7 +248,7 @@ install(DIRECTORY ${DOC_BUILD_PATH}
 
 set(CPACK_PACKAGE_VENDOR "oblivioncth")
 set(CPACK_PACKAGE_DIRECTORY "${PACKAGE_PREFIX}")
-set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}_${PROJECT_VERSION_VERBOSE}_(Qt${Qt6_VERSION}-${QT_LINKAGE})_${CMAKE_SYSTEM_NAME}_${TARGET_ARCH}")
+set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}_${PROJECT_VERSION_VERBOSE}_(Qt${Qt6_VERSION}-${Qt6_LINKAGE})_${CMAKE_SYSTEM_NAME}_${TARGET_ARCH}")
 set(CPACK_GENERATOR "ZIP")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
