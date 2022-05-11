@@ -24,7 +24,7 @@ env:
 
 jobs:
   build-qx:
-    name: Build Qx master (Debug/Release)
+    name: Build Qx - Windows (Debug/Release)
     strategy:
       matrix:
         qt_linkage: [shared, static]
