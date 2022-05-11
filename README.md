@@ -34,11 +34,13 @@ Either way you'll then need to explore the [documentation](https://oblivioncth.g
 Releases and some workflows currently provide builds of Qx in the following configurations:
 
 1) - Windows (windows-latest)
+    - MSVC (latest)
     - Debug & Release
     - Static Linkage
     - Statically Linked Qt
 >>
 2) - Windows (windows-latest)
+    - MSVC (latest)
 	- Debug & Release
 	- Static Linkage
 	- Dynamically Linked Qt
