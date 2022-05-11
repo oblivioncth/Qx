@@ -12,7 +12,7 @@ It is based on Qt 6.
 Detailed documentation of this library, facilitated by Doxygen, is available at: https://oblivioncth.github.io/Qx/
 
 ## Disclaimer
-**I do not recommend using this library in your own projects.**
+**I cannot fully recommend using this library in your own projects.**
 
 This library is essentially a personal library that I maintain for use in my own Qt-based projects. I have decided to make it public in order to allow for full transparency in said projects and ensure that I'm abiding by open source license restrictions. Since this library is largely intended for personal use, there are no guarantees that are generally associated with production frameworks (i.e. stable ABI, minimal non-breaking changes, etc.)
 
@@ -30,6 +30,23 @@ Building from source is recommended as this library can easily be integrated as 
 Either way you'll then need to explore the [documentation](https://oblivioncth.github.io/Qx/index.html), which expands on acquiring, setting up, and using Qx.
 
 ## Pre-built Releases/Artifacts
-All pre-built copies of the library available in this repository were compiled using a static build of Qt6 (the specific version is always part of the file name), which means a compatible static version of Qt must also be used when building your final application.
 
-Feel free to create issues pertaining to the use of these builds and Qt static in general.
+Releases and some workflows currently provide builds of Qx in the following configurations:
+
+1) - Windows (windows-latest)
+    - Debug & Release
+    - Static Linkage
+    - Statically Linked Qt
+>>
+2) - Windows (windows-latest)
+	- Debug & Release
+	- Static Linkage
+	- Dynamically Linked Qt
+
+For all builds, Qt was configured as follows (excluding defaults):
+
+ - Release
+ - Shared/Static Linkage
+ - Modules: qtbase, qtimageformats, qtnetworkauth, qtsvg
+ - Features: relocatable
+ - -ssl (Linux) / -schannel (Windows)
