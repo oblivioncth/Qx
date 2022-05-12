@@ -19,4 +19,5 @@ set(COMPONENT_DOC_ONLY
 )
 
 #=============== Component Handler =======================
-include(component_lib_rules)
+include(ComponentHelper)
+register_qx_component()
