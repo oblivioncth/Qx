@@ -27,3 +27,26 @@ function(get_subdirectory_list path return)
 
     set(${return} "${subdirs}" PARENT_SCOPE)
 endfunction()
+
+function(get_proper_system_name return)
+    if(CMAKE_SYSTEM_NAME STREQUAL Windows)
+        set(${return} Windows)
+    elseif(CMAKE_SYSTEM_NAME STREQUAL Linux)
+        # Get name
+        execute_process(
+            COMMAND sh -c "( lsb_release -ds || cat /etc/*release || uname -om ) 2>/dev/null | head -n1"
+            ERROR_QUIET
+            RESULT_VARIABLE res
+            OUTPUT_VARIABLE distro_name
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+
+        if(NOT ${distro_name})
+            message(WARNING "Could not determine distro name. Falling back to 'Linux'")
+            set(distro_name "Linux")
+        endif()
+
+        set(${return} ${distro_name})
+    endif()
+
+endfunction()
