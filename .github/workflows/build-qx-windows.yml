@@ -85,7 +85,7 @@ jobs:
       run: 7z x ${{ env.qt_install_dest }} -o${{ env.qt_install_dir }}
     - name: Install Doxygen & Graphviz
       run: |
-        choco install doxygen.install
+        choco install doxygen.install --version 1.9.4
         choco install graphviz
     - name: Checkout Qx
       uses: actions/checkout@v3
