@@ -16,3 +16,14 @@ function(create_header_guard prefix name return)
 
     set(${return} "${prefix_clean_uc}_${name_clean_uc}_H" PARENT_SCOPE)
 endfunction()
+
+function(get_subdirectory_list path return)
+    file(GLOB path_children RELATIVE "${path}" "${path}/*")
+    foreach(child ${path_children})
+        if(IS_DIRECTORY "${path}/${child}")
+            list(APPEND subdirs ${child})
+        endif()
+    endforeach()
+
+    set(${return} "${subdirs}" PARENT_SCOPE)
+endfunction()
