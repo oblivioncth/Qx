@@ -75,15 +75,11 @@ include(VerboseVersioning)
 setup_verbose_versioning(PROJECT_VERSION_VERBOSE)
 
 ################# Common Build #################
-set(LIB_COMPONENTS
-    core
-    gui
-    io
-    utility
-    network
-    widgets
-    xml
-)
+
+# Enumerate Components
+include(Utility)
+get_subdirectory_list(${COMPONENTS_PATH} LIB_COMPONENTS)
+set(BUILD_COMPONENTS ${LIB_COMPONENTS})
 
 # Qt package components
 set(QT_FIND_COMPONENTS
@@ -96,14 +92,13 @@ set(QT_FIND_COMPONENTS
 
 ################# Windows Build #################
 if(CMAKE_SYSTEM_NAME STREQUAL Windows)
-    list(APPEND LIB_COMPONENTS windows)
-    list(APPEND LIB_COMPONENTS windows-gui)
-
     set(QT_HELP_GEN_NAME "qthelpgenerator.exe")
 endif()
 
 ################# Linux Build #################
 if(CMAKE_SYSTEM_NAME STREQUAL Linux)
+    list(REMOVE_ITEM BUILD_COMPONENTS windows)
+    list(REMOVE_ITEM BUILD_COMPONENTS windows-gui)
 
     set(QT_HELP_GEN_NAME "qthelpgenerator")
 endif()
@@ -139,7 +134,7 @@ write_basic_package_version_file(
 #================= Process Componets =======================
 
 # Build components
-foreach(component ${LIB_COMPONENTS})
+foreach(component ${BUILD_COMPONENTS})
     add_subdirectory(${COMPONENTS_PATH}/${component})
 endforeach()
 
