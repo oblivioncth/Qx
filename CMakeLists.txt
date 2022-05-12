@@ -92,15 +92,13 @@ set(QT_FIND_COMPONENTS
 
 ################# Windows Build #################
 if(CMAKE_SYSTEM_NAME STREQUAL Windows)
-    set(QT_HELP_GEN_NAME "qthelpgenerator.exe")
+
 endif()
 
 ################# Linux Build #################
 if(CMAKE_SYSTEM_NAME STREQUAL Linux)
     list(REMOVE_ITEM BUILD_COMPONENTS windows)
     list(REMOVE_ITEM BUILD_COMPONENTS windows-gui)
-
-    set(QT_HELP_GEN_NAME "qthelpgenerator")
 endif()
 
 #================= Top Level Build =========================
@@ -181,27 +179,8 @@ if(DOXYGEN_FOUND)
     endforeach()
 
     # Determine Qt related doc paths
-    if(NOT DEFINED QT_HELP_GEN_PATH)
-        if(EXISTS "${Qt6_PREFIX_PATH}/bin/${QT_HELP_GEN_NAME}")
-            set(QT_HELP_GEN_PATH "${Qt6_PREFIX_PATH}/bin/${QT_HELP_GEN_NAME}")
-            message(STATUS "Automatically configured qhelpgenerator path")
-        else()
-            message(STATUS "Could not determine qhelpgenerator path automatically.")
-        endif()
-    else()
-        message(STATUS "Path of qhelpgenerator set externally to: ${QT_HELP_GEN_PATH}")
-    endif()
-
-    if(NOT DEFINED QT_DOCS_DIR)
-        if(EXISTS "${Qt6_PREFIX_PATH}/doc/qtcore/qtcore.index")
-            set(QT_DOCS_DIR "${Qt6_PREFIX_PATH}/doc")
-            message(STATUS "Automatically configured Qt documentation path.")
-        else()
-            message(STATUS "Could not determine Qt documentation path automatically.")
-        endif()
-    else()
-        message(STATUS "Path of Qt documentation set externally to: ${QT_DOCS_DIR}")
-    endif()
+    include(QtDocsHelper)
+    configure_qt_doc_link(${Qt6_PREFIX_PATH})
 
     # Set Doxygen parameters
     include(${DOC_SCRIPTS_PATH}/doxyconf.cmake)
