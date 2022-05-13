@@ -17,11 +17,11 @@ on:
         value: ${{ jobs.build-qx.outputs.qt_static_artifact_name }}
 env:
   general_download_dir: ${{ github.workspace }}/Download
-  qt_install_dir: ${{ github.workspace }}/Qt/Install/
+  qt_install_dir: ${{ github.workspace }}/Qt/Install
   qt_download_dir: ${{ github.workspace }}/Qt/Download
-  qx_src_suffix: Qx/Source/
-  qx_src_dir: ${{ github.workspace }}/Qx/Source/
-  qx_build_dir: ${{ github.workspace }}/Qx/Build/
+  qx_src_suffix: Qx/Source
+  qx_src_dir: ${{ github.workspace }}/Qx/Source
+  qx_build_dir: ${{ github.workspace }}/Qx/Build
 
 jobs:
   build-qx:
@@ -61,8 +61,8 @@ jobs:
     - name: Set derived variables with shell because GitHub Actions env context sucks
       run: |
         echo "qt_install_dest=${{ env.qt_download_dir }}/${{ env.qt_install_name }}" >> $GITHUB_ENV
-        echo "qx_package_path=${{ env.qx_src_dir }}/out/dist/" >> $GITHUB_ENV
-        $qx_install_path='${{ env.qx_src_dir }}/out/install/'
+        echo "qx_package_path=${{ env.qx_src_dir }}/out/dist" >> $GITHUB_ENV
+        qx_install_path="${{ env.qx_src_dir }}/out/install"
         echo "qx_install_path=$qx_install_path" >> $GITHUB_ENV
         echo "qt_cmake=$qt_install_dir/bin/qt-cmake" >> $GITHUB_ENV
     - name: Cache Qt Build
@@ -133,8 +133,8 @@ jobs:
     - name: Get Qx artifact name
       id: get_artifact_name
       run: |
-        $cpack_name=$(find * -type f -name "*.zip")
-        $artifact_name=$(basename "$cpack_name" .zip)
+        cpack_name=$(find * -type f -name "*.zip")
+        artifact_name=$(basename "$cpack_name" .zip)
         echo "::set-output name=${{ env.artifact_output_var }}::$artifact_name"
     - name: Upload Qx build artifact
       uses: actions/upload-artifact@v3
