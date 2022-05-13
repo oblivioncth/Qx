@@ -102,7 +102,7 @@ jobs:
         cd $general_download_dir
         tar xf "$doxy_build.$doxy_arch_ext"
         cd "$doxy_build"
-        make install
+        sudo make install
     - name: Install Graphviz
       run: sudo apt-get install graphviz
     - name: Checkout Qx
