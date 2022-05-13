@@ -105,6 +105,8 @@ jobs:
         sudo make install
     - name: Install Graphviz
       run: sudo apt-get install graphviz
+    - name: Install Ninja
+      run: sudo apt-get install ninja
     - name: Checkout Qx
       uses: actions/checkout@v3
       with:
