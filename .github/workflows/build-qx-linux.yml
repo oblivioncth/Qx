@@ -92,6 +92,11 @@ jobs:
     - name: Extract Qt Install
       if: steps.cache-qt.outputs.cache-hit != 'true'
       run: 7z x ${{ env.qt_install_dest }} -o${{ env.qt_install_dir }}
+    - name: Set clang-12 as preferred
+      run: |
+        update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-12 100
+        update-alternatives --install /usr/bin/clang clang /usr/bin/clang-12 100
+        update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-12 100
     - name: Install Doxygen
       env:
         doxy_build: doxygen-1.9.4
@@ -116,7 +121,7 @@ jobs:
       working-directory: ${{ env.qx_src_dir }}
       run: |
         echo Configuring CMake...
-        "$qt_cmake" -G "$cmake_gen" -S "$qx_src_dir" -B "$qx_build_dir" -D CMAKE_CXX_COMPILER="$ccx_comp" -D CMAKE_C_COMPILER="$c_comp"
+        "$qt_cmake" -G "$cmake_gen" -S "$qx_src_dir" -B "$qx_build_dir" -D CMAKE_CXX_COMPILER="$cxx_comp" -D CMAKE_C_COMPILER="$c_comp"
         echo Changing to build directory...
         cd "$qx_build_dir"
         echo Building Qx debug...
