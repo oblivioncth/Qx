@@ -45,6 +45,20 @@ Releases and some workflows currently provide builds of Qx in the following conf
 	- Static Linkage
 	- Dynamically Linked Qt
 
+>>
+3) - Ubuntu (ubuntu-latest)
+    - Clang-12
+	- Debug & Release
+	- Static Linkage
+	- Dynamically Linked Qt
+	
+>>
+4) - Ubuntu (ubuntu-latest)
+    - Clang-12
+	- Debug & Release
+	- Static Linkage
+	- Statically Linked Qt
+
 For all builds, Qt was configured as follows (excluding defaults):
 
  - Release
