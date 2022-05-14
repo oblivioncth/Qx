@@ -1,0 +1,8 @@
+/*!
+ *  \file @COMPONENT_NAME_LC@.h
+ *  \ingroup qx-@COMPONENT_NAME_LC@
+ *
+ *  \brief The @COMPONENT_NAME_LC@ header file is the top-level include file for the @COMPONENT_NAME@ component.
+ *
+ *	This header exists merely for convenience as an easy means to access all available interfaces within @COMPONENT_NAME@ component.
+ */
