@@ -1,4 +1,5 @@
 #================= Project Setup ==========================
+
 # CMake
 cmake_minimum_required(VERSION 3.21.1)
 if(NOT ${GENERATOR_IS_MULTI_CONFIG})
@@ -34,18 +35,22 @@ set(CMAKE_AUTOUIC ON)
 # Disable deprecated code
 add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060000)
 
+# Add local modules
+set(PROJ_SCRIPTS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${PROJ_SCRIPTS_PATH}/module")
+include(Utility)
+
 # General Variables
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
   set(TARGET_ARCH x64)
 else()
   set(TARGET_ARCH x86)
 endif()
+get_proper_system_name(PROPER_SYSTEM_NAME)
 
 #--------------------Setup Paths-------------------
 
 # Cmake scripts
-set(PROJ_SCRIPTS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-list(APPEND CMAKE_MODULE_PATH "${PROJ_SCRIPTS_PATH}/module")
 set(FILE_TEMPLATES_PATH "${PROJ_SCRIPTS_PATH}/file_templates")
 set(DOC_SCRIPTS_PATH "${PROJ_SCRIPTS_PATH}/doc")
 
@@ -77,7 +82,6 @@ setup_verbose_versioning(PROJECT_VERSION_VERBOSE)
 ################# Common Build #################
 
 # Enumerate Components
-include(Utility)
 get_subdirectory_list(${COMPONENTS_PATH} LIB_COMPONENTS)
 set(BUILD_COMPONENTS ${LIB_COMPONENTS})
 
@@ -222,7 +226,7 @@ install(DIRECTORY ${DOC_BUILD_PATH}
 
 set(CPACK_PACKAGE_VENDOR "oblivioncth")
 set(CPACK_PACKAGE_DIRECTORY "${PACKAGE_PREFIX}")
-set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}_${PROJECT_VERSION_VERBOSE}_(Qt${Qt6_VERSION}-${Qt6_LINKAGE})_${CMAKE_SYSTEM_NAME}_${TARGET_ARCH}")
+set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}_${PROJECT_VERSION_VERBOSE}_(Qt${Qt6_VERSION}-${Qt6_LINKAGE})_${PROPER_SYSTEM_NAME}_${TARGET_ARCH}")
 set(CPACK_GENERATOR "ZIP")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")

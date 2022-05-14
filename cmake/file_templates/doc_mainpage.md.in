@@ -85,12 +85,13 @@ The Qx documentation supports two optional, but highly recommended features:
  - Linking to Qt documentation
  - Generating a Qt Compressed Help (.qch) file for use in Qt Creator
 
-In order to enable these features, the CMake variables **QT_DOCS_DIR** and **QT_HELP_GEN_PATH** respectively must be available. Qx tries to set them automatically according to the following defaults, but these can be overridden by passing definitions for the variables on the command line.
+In order to enable these features, the CMake variables **QT_DOCS_DIR** and **QT_HELP_GEN_PATH** respectively must be available. Qx tries to set them automatically according to the following defaults, but these can be overridden by passing definitions for the variables to CMake on the command line via @c -D.
 
     # Optional documentation defaults
     # Here <QT_ROOT> refers to the install directory of a given Qt build
     QT_DOCS_DIR: <QT_ROOT>/doc
-    QT_HELP_GEN_PATH: <QT_ROOT>/bin/qhelpgenerator(.exe) # Extension only on windows
+    (Windows) QT_HELP_GEN_PATH: <QT_ROOT>/bin/qhelpgenerator.exe
+	(Linux) QT_HELP_GEN_PATH: <QT_ROOT>/libexec/qhelpgenerator
 
 If supplying **QT_DOCS_DIR** manually, it must be set to the root path that contains documentation for the Qt version you are building with. It should look something like this:
 
@@ -120,11 +121,6 @@ The path for this documentation varies depending on how you obtained Qt, but is 
     # NOTE:
     # By default on Windows <QT_SOFTWARE> is C:\Program Files\Qt
     # On Linux it is often /usr/local/Qt
-
-If supplying **QT_HELP_GEN_PATH** manually, it must be set to the path of the *qhelpgenerator* tool that is part of a Qt installation. Generally this is located at:
-
-    <QT_ROOT>/bin/qhelpgenerator(.exe)
-
 
 #### Package
 By default, the CMakeLists project configures CPack to create an artifact ZIP containing the binaries for Debug and Release configurations, as well as documentation.
