@@ -100,7 +100,7 @@ jobs:
     - name: Install OpenGL lib
       run: sudo apt-get install libglu1-mesa-dev
     - name: Install XCB-XKB
-      run: sudo apt-get install libxcb-xkb-dev
+      run: sudo apt-get install libxkbcommon-dev libxcb-xkb-dev
     - name: Install Doxygen
       env:
         doxy_build: doxygen-1.9.4
