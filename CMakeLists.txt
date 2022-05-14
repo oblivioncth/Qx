@@ -62,6 +62,7 @@ set(COMPONENTS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/comp")
 
 # Build
 set(DOC_BUILD_PATH "${CMAKE_CURRENT_BINARY_DIR}/doc")
+set(DOC_GENERATED_PATH "${CMAKE_CURRENT_BINARY_DIR}/docin")
 
 # Install
 set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/out/install")
@@ -145,13 +146,13 @@ endforeach()
 if(DOXYGEN_FOUND)
     # Configure files
     configure_file("${FILE_TEMPLATES_PATH}/doc_mainpage.md.in"
-        "${CMAKE_CURRENT_BINARY_DIR}/docin/mainpage.md"
+        "${DOC_GENERATED_PATH}/mainpage.md"
         @ONLY
     )
 
     # Top level input
     set(DOC_INPUT_LIST
-        "${CMAKE_CURRENT_BINARY_DIR}/docin/mainpage.md"
+        "${DOC_GENERATED_PATH}/mainpage.md"
         "${DOC_SOURCE_PATH}/namespace.dox"
     )
 
