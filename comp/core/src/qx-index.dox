@@ -17,7 +17,7 @@ namespace Qx
  *  use -1 to mean 'none' in the context of searches.
  *
  *  The Index type is designed to remedy this issue by providing a more distinct representation of a set's final index
- *  via the member variable Index<T>::LAST, which for completeness is paired with Index<T>::START. The type also
+ *  via the member variable Index<T>::LAST, which for completeness is paired with Index<T>::FIRST. The type also
  *  can be null, providing further clarity for the 'none' case.
  *
  *  To minimize unintentional interactions, Index<T> only has comparison and arithmetic operators defined for when

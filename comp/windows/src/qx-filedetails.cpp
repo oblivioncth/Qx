@@ -1,6 +1,9 @@
 // Unit Includes
 #include "qx/windows/qx-filedetails.h"
 
+// Windows
+#include "qx_windows.h"
+
 // Qt Includes
 #include <QFileInfo>
 

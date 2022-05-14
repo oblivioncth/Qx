@@ -6,18 +6,36 @@ set(COMPONENT_LIB_TYPE STATIC)
 
 # Headers
 set(COMPONENT_INCLUDE_HEADERS
-    qx-color.h
+    qx-taskbarbutton.h
+    qx-winguievent.h
+)
+
+set(COMPONENT_PRIVATE_HEADERS
+    qx-winguieventfilter_p.h
 )
 
 # Source Files
 set(COMPONENT_IMPL
-    qx-color.cpp
+    qx-taskbarbutton.cpp
+    qx-winguievent.cpp
+    qx-winguieventfilter.cpp
 )
 
 # Links
+set(COMPONENT_PRIVATE_LINKS
+    Qx::Windows
+    Qx::Core
+)
+
 set(COMPONENT_PUBLIC_LINKS
     Qt6::Core
     Qt6::Gui
+)
+
+# Inter-project Dependencies
+set(COMPONENT_SIBLING_DEPENDS
+    Core
+    Windows
 )
 
 # Qt Component Dependencies

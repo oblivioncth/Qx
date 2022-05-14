@@ -11,11 +11,13 @@ set(DOXYGEN_BUILTIN_STL_SUPPORT YES)
 set(DOXYGEN_GROUP_NESTED_COMPOUND YES)
 set(DOXYGEN_ENUM_VALUES_PER_LINE 1)
 set(DOXYGEN_EXT_LINKS_IN_WINDOW YES)
+set(DOXYGEN_CLASS_GRAPH NO)
+set(DOXYGEN_TREEVIEW_WIDTH 340)
 
 # Set logo
 set(DOXYGEN_PROJECT_LOGO "${DOC_SOURCE_PATH}/logo.svg")
 
-# Add 'v' prefix to version number
+# Set project number
 set(DOXYGEN_PROJECT_NUMBER ${PROJECT_VERSION_VERBOSE})
 
 # Set layout file
@@ -28,7 +30,7 @@ set(DOXYGEN_IMAGE_PATH ${DOC_IMAGE_LIST})
 # Configure custom command/macro processing
 set(DOXYGEN_ALIASES
 	[[qflag{2}="@typedef \1^^<p>The \1 type is a typedef for QFlags\<\2\>. It stores an OR combination of \2 values.</p>"]]
-        "component{2}=\"@par Import:^^@code find_package(${CMAKE_PROJECT_NAME} REQUIRED COMPONENTS \\1)@endcode ^^@par Link:^^@code target_link_libraries(target_name ${CMAKE_PROJECT_NAME}::\\1)@endcode ^^@par Include:^^@code #include <${PROJ_NAME_LC}/\\2>@endcode\""
+        "component{2}=\"@par Import:^^@code find_package(${PROJECT_NAME} REQUIRED COMPONENTS \\1)@endcode ^^@par Link:^^@code target_link_libraries(target_name ${PROJECT_NAME}::\\1)@endcode ^^@par Include:^^@code #include <${PROJ_NAME_LC}/\\2>@endcode\""
 )
 
 set(DOXYGEN_PREDEFINED
@@ -48,7 +50,7 @@ endif()
 # Setup Qt Creator Help File
 if(DEFINED QT_HELP_GEN_PATH)
     set(DOXYGEN_GENERATE_QHP NO) # TODO: TEMPORARILY DISABLED DUE TO QTBUG-93238 (Waiting on 6.3.1)
-    set(DOXYGEN_QCH_FILE "../${CMAKE_PROJECT_NAME}.qch")
+    set(DOXYGEN_QCH_FILE "../${PROJECT_NAME}.qch")
     set(DOXYGEN_QHG_LOCATION ${QT_HELP_GEN_PATH})
 else()
     message(WARNING "QT_HELP_GEN_PATH is not defined, a .qch file will not be generated.")

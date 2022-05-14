@@ -4,37 +4,37 @@ include(CMakeFindDependencyMacro)
 # Find available Components
 file(GLOB __@PROJ_NAME_UC@_AVAILABLE_COMPONENTS
     RELATIVE "${CMAKE_CURRENT_LIST_DIR}"
-    "${CMAKE_CURRENT_LIST_DIR}/*/@CMAKE_PROJECT_NAME@*Config.cmake"
+    "${CMAKE_CURRENT_LIST_DIR}/*/@PROJECT_NAME@*Config.cmake"
 )
 
 # Report available Components
-message(STATUS "[@CMAKE_PROJECT_NAME@] Available Components:")
+message(STATUS "[@PROJECT_NAME@] Available Components:")
 foreach(component_config ${__@PROJ_NAME_UC@_AVAILABLE_COMPONENTS})
     message(STATUS "- ${component_config}")
 endforeach()
 
 # Components were requested
-if(@CMAKE_PROJECT_NAME@_FIND_COMPONENTS)
-    message(STATUS "[@CMAKE_PROJECT_NAME@] Components were requested.")
+if(@PROJECT_NAME@_FIND_COMPONENTS)
+    message(STATUS "[@PROJECT_NAME@] Components were requested.")
 
     # Check for and add each request
-    foreach(req_component ${@CMAKE_PROJECT_NAME@_FIND_COMPONENTS})
-        set(req_component_config ${req_component}/@CMAKE_PROJECT_NAME@${req_component}Config.cmake)
+    foreach(req_component ${@PROJECT_NAME@_FIND_COMPONENTS})
+        set(req_component_config ${req_component}/@PROJECT_NAME@${req_component}Config.cmake)
 
         if (";${__@PROJ_NAME_UC@_AVAILABLE_COMPONENTS};" MATCHES ";${req_component_config};")
-            message(STATUS "[@CMAKE_PROJECT_NAME@] Including matched component: ${req_component}.")
+            message(STATUS "[@PROJECT_NAME@] Including matched component: ${req_component}.")
             include("${CMAKE_CURRENT_LIST_DIR}/${req_component_config}")
-        elseif(@CMAKE_PROJECT_NAME@_FIND_REQUIRED_${req_component}})
-            set(@CMAKE_PROJECT_NAME@_FOUND False)
-            set(@CMAKE_PROJECT_NAME@_NOT_FOUND_MESSAGE "Unsupported component: ${req_component}")
+        elseif(@PROJECT_NAME@_FIND_REQUIRED_${req_component}})
+            set(@PROJECT_NAME@_FOUND False)
+            set(@PROJECT_NAME@_NOT_FOUND_MESSAGE "Unsupported component: ${req_component}")
         endif()
     endforeach()
 else() # Components were not requested
-    message(STATUS "[@CMAKE_PROJECT_NAME@] No components were requested.")
+    message(STATUS "[@PROJECT_NAME@] No components were requested.")
 
     # Add all components
     foreach(component_config ${__@PROJ_NAME_UC@_AVAILABLE_COMPONENTS})
-        message(STATUS "[@CMAKE_PROJECT_NAME@] Including available component: ${component_config}.")
+        message(STATUS "[@PROJECT_NAME@] Including available component: ${component_config}.")
         include("${CMAKE_CURRENT_LIST_DIR}/${component_config}")
     endforeach()
 endif()

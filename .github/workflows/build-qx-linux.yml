@@ -1,4 +1,4 @@
-name: Windows - Build Qx (Qt 6.3.0)
+name: Linux - Build Qx (Qt 6.3.0)
 on:
   workflow_call:
     secrets:
@@ -16,6 +16,7 @@ on:
         description: "Qx (Qt static) build artifact"
         value: ${{ jobs.build-qx.outputs.qt_static_artifact_name }}
 env:
+  general_download_dir: ${{ github.workspace }}/Download
   qt_install_dir: ${{ github.workspace }}/Qt/Install
   qt_download_dir: ${{ github.workspace }}/Qt/Download
   qx_src_suffix: Qx/Source
@@ -24,13 +25,14 @@ env:
 
 jobs:
   build-qx:
-    name: Build Qx - Windows (Debug/Release)
+    name: Build Qx - Linux (Debug/Release)
     strategy:
       matrix:
         qt_linkage: [shared, static]
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     env:
-      vc_vars: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat
+      c_comp: clang
+      cxx_comp: clang++
       cmake_gen: Ninja Multi-Config
     outputs:
       qt_shared_artifact_name: ${{ steps.get_artifact_name.outputs.qt_shared_artifact_name }}
@@ -43,14 +45,14 @@ jobs:
         map: |
           {
             "shared": {
-              "qt_install_name": "qt-Production-6.3.0-win32-msvc-x64-shared-release.7z",
-              "qt_install_url": "https://mega.nz/file/Znp0XBKR",
+              "qt_install_name": "qt-Production-6.3.0-linux-clang-x64-shared-release.7z",
+              "qt_install_url": "https://mega.nz/file/F2hTBLjK",
               "qt_install_url_key": "${{ secrets.qt_shared_dec_key }}",
               "artifact_output_var": "qt_shared_artifact_name"
             },
             "static": {
-              "qt_install_name": "qt-Production-6.3.0-win32-msvc-x64-static-release.7z",
-              "qt_install_url": "https://mega.nz/file/J7IxAbYL",
+              "qt_install_name": "qt-Production-6.3.0-linux-clang-x64-static-release.7z",
+              "qt_install_url": "https://mega.nz/file/R24wXbzQ",
               "qt_install_url_key": "${{ secrets.qt_static_dec_key }}",
               "artifact_output_var": "qt_static_artifact_name"
             }
@@ -58,11 +60,11 @@ jobs:
         export_to: env,log
     - name: Set derived variables with shell because GitHub Actions env context sucks
       run: |
-        echo "qt_install_dest=${{ env.qt_download_dir }}/${{ env.qt_install_name }}" >> $Env:GITHUB_ENV
-        echo "qx_package_path=${{ env.qx_src_dir }}/out/dist" >> $Env:GITHUB_ENV
-        $qx_install_path="${{ env.qx_src_dir }}/out/install"
-        echo "qx_install_path=$qx_install_path" >> $Env:GITHUB_ENV
-        echo "qt_cmake=${Env:qt_install_dir}/bin/qt-cmake" >> $Env:GITHUB_ENV
+        echo "qt_install_dest=${{ env.qt_download_dir }}/${{ env.qt_install_name }}" >> $GITHUB_ENV
+        echo "qx_package_path=${{ env.qx_src_dir }}/out/dist" >> $GITHUB_ENV
+        qx_install_path="${{ env.qx_src_dir }}/out/install"
+        echo "qx_install_path=$qx_install_path" >> $GITHUB_ENV
+        echo "qt_cmake=$qt_install_dir/bin/qt-cmake" >> $GITHUB_ENV
     - name: Cache Qt Build
       id: cache-qt
       uses: actions/cache@v3
@@ -71,36 +73,61 @@ jobs:
         key: ${{ env.qt_install_name }}
     - name: Install megatools
       if: steps.cache-qt.outputs.cache-hit != 'true'
-      run: choco install megatools
+      env:
+        mt_build: megatools-1.11.0-git-20200503-linux-x86_64
+        mt_arch_ext: tar.gz
+        mt_repo: https://megatools.megous.com/builds/experimental 
+      run: |
+        curl "$mt_repo/$mt_build.$mt_arch_ext" --output "$general_download_dir/$mt_build.$mt_arch_ext" --create-dirs --location --silent --show-error
+        cd $general_download_dir
+        tar xf "$mt_build.$mt_arch_ext"
+        cd "$mt_build"
+        cp -p megatools /usr/local/bin
     - name: Create Qt Download Directory
       if: steps.cache-qt.outputs.cache-hit != 'true'
-      run: New-Item -Path "${{ env.qt_download_dir }}" -ItemType "directory"
+      run: mkdir -p "${{ env.qt_download_dir }}"
     - name: Download Qt Install
       if: steps.cache-qt.outputs.cache-hit != 'true'
-      run: megatools dl "${Env:qt_install_url}#${Env:qt_install_url_key}" --path "${{ env.qt_download_dir }}"
+      run: megatools dl "$qt_install_url#$qt_install_url_key" --path "${{ env.qt_download_dir }}"
     - name: Extract Qt Install
       if: steps.cache-qt.outputs.cache-hit != 'true'
       run: 7z x ${{ env.qt_install_dest }} -o${{ env.qt_install_dir }}
-    - name: Install Doxygen & Graphviz
+    - name: Set clang-12 as preferred
       run: |
-        choco install doxygen.install --version 1.9.4
-        choco install graphviz
+        sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-12 100
+        sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-12 100
+        sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-12 100
+    - name: Install OpenGL lib
+      run: sudo apt-get install libglu1-mesa-dev
+    - name: Install XCB-XKB
+      run: sudo apt-get install libxkbcommon-dev libxcb-xkb-dev
+    - name: Install Doxygen
+      env:
+        doxy_build: doxygen-1.9.4
+        doxy_arch_ext: linux.bin.tar.gz
+        doxy_repo: https://www.doxygen.nl/files
+      run: |
+        curl "$doxy_repo/$doxy_build.$doxy_arch_ext" --output "$general_download_dir/$doxy_build.$doxy_arch_ext" --create-dirs --location --silent --show-error
+        cd $general_download_dir
+        tar xf "$doxy_build.$doxy_arch_ext"
+        cd "$doxy_build"
+        sudo make install
+    - name: Install Graphviz
+      run: sudo apt-get install graphviz
+    - name: Install Ninja
+      run: sudo apt-get install ninja-build
     - name: Checkout Qx
       uses: actions/checkout@v3
       with:
         path: ${{ env.qx_src_suffix }}
         fetch-depth: 0 # Required for verbose versioning to work correctly
     - name: Build/Install Qx
-      shell: cmd
       working-directory: ${{ env.qx_src_dir }}
       run: |
-        @echo off
-        echo Setting up VC++ environment...
-        CALL "%vc_vars%"
         echo Configuring CMake...
-        CALL "%qt_cmake%" -G "%cmake_gen%" -S "%qx_src_dir%" -B "%qx_build_dir%"
+        "$qt_cmake" -G "$cmake_gen" -S "$qx_src_dir" -B "$qx_build_dir" -D CMAKE_CXX_COMPILER="$cxx_comp" -D CMAKE_C_COMPILER="$c_comp"
         echo Changing to build directory...
-        cd /D "%qx_build_dir%"
+        cd "$qx_build_dir"
         echo Building Qx debug...
         cmake --build . --target all --config Debug
         echo Building Qx release...
@@ -116,7 +143,10 @@ jobs:
         echo Build complete.
     - name: Get Qx artifact name
       id: get_artifact_name
-      run: echo "::set-output name=${{ env.artifact_output_var }}::$((Get-ChildItem -Path "${{ env.qx_package_path }}" -Filter *.zip)[0].BaseName)"
+      run: |
+        cpack_name=$(find * -type f -name "*.zip")
+        artifact_name=$(basename "$cpack_name" .zip)
+        echo "::set-output name=${{ env.artifact_output_var }}::$artifact_name"
     - name: Upload Qx build artifact
       uses: actions/upload-artifact@v3
       with:

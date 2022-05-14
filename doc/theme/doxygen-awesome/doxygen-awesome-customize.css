@@ -1,4 +1,5 @@
 html {
+	--side-nav-fixed-width: 340px;
     --primary-color: #CC2828;
     --primary-dark-color: #7C3633;
     --primary-light-color: #E57670;

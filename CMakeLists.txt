@@ -1,4 +1,5 @@
 #================= Project Setup ==========================
+
 # CMake
 cmake_minimum_required(VERSION 3.21.1)
 if(NOT ${GENERATOR_IS_MULTI_CONFIG})
@@ -10,17 +11,17 @@ endif()
 set(TRUE_CMAKE_MINIMUM_REQUIRED ${CMAKE_MINIMUM_REQUIRED_VERSION})
 
 # Project
-# NOTE: For versions tick to w.x.y.z, where z is generally
+# NOTE: For versions stick to w.x.y.z, where z is generally
 # avoided and only used for hotfixes. DON'T USE TRAILING
 # NUMBERS IN VERSIONS
-set(QX_BASE_VERSION 0.1) # Required for CI/CD
+set(QX_BASE_VERSION 0.2) # Required for CI/CD
 project(Qx
     VERSION ${QX_BASE_VERSION}
     LANGUAGES CXX
     DESCRIPTION "Qt Extensions Library"
 )
-string(TOLOWER ${CMAKE_PROJECT_NAME} PROJ_NAME_LC)
-string(TOUPPER ${CMAKE_PROJECT_NAME} PROJ_NAME_UC)
+string(TOLOWER ${PROJECT_NAME} PROJ_NAME_LC)
+string(TOUPPER ${PROJECT_NAME} PROJ_NAME_UC)
 
 # C++
 set(CMAKE_CXX_STANDARD 20)
@@ -34,36 +35,41 @@ set(CMAKE_AUTOUIC ON)
 # Disable deprecated code
 add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060000)
 
+# Add local modules
+set(PROJ_SCRIPTS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${PROJ_SCRIPTS_PATH}/module")
+include(Utility)
+
 # General Variables
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
   set(TARGET_ARCH x64)
 else()
   set(TARGET_ARCH x86)
 endif()
+get_proper_system_name(PROPER_SYSTEM_NAME)
 
 #--------------------Setup Paths-------------------
 
 # Cmake scripts
-set(PROJ_SCRIPTS_PATH "${CMAKE_SOURCE_DIR}/cmake")
-set(CMAKE_MODULE_PATH "${PROJ_SCRIPTS_PATH}/module")
 set(FILE_TEMPLATES_PATH "${PROJ_SCRIPTS_PATH}/file_templates")
 set(DOC_SCRIPTS_PATH "${PROJ_SCRIPTS_PATH}/doc")
 
 # Source
-set(DOC_SOURCE_PATH "${CMAKE_SOURCE_DIR}/doc")
+set(DOC_SOURCE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/doc")
 
 # Sub projects
-set(COMPONENTS_PATH "${CMAKE_SOURCE_DIR}/comp")
+set(COMPONENTS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/comp")
 
 # Build
-set(DOC_BUILD_PATH "${CMAKE_BINARY_DIR}/doc")
+set(DOC_BUILD_PATH "${CMAKE_CURRENT_BINARY_DIR}/doc")
+set(DOC_GENERATED_PATH "${CMAKE_CURRENT_BINARY_DIR}/docin")
 
 # Install
-set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/out/install")
+set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/out/install")
 set(HEADER_INSTALL_SUFFIX "include")
 
 # Package
-set(PACKAGE_PREFIX "${CMAKE_SOURCE_DIR}/out/dist")
+set(PACKAGE_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/out/dist")
 
 #------------Set Global Build Rules----------------
 
@@ -71,19 +77,14 @@ set(PACKAGE_PREFIX "${CMAKE_SOURCE_DIR}/out/dist")
 set_directory_properties(PROPERTIES ADDITIONAL_CLEAN_FILES "${CMAKE_INSTALL_PREFIX}")
 
 # Versioning
-include(verbose_versioning)
+include(VerboseVersioning)
 setup_verbose_versioning(PROJECT_VERSION_VERBOSE)
 
 ################# Common Build #################
-set(LIB_COMPONENTS
-    core
-    gui
-    io
-    utility
-    network
-    widgets
-    xml
-)
+
+# Enumerate Components
+get_subdirectory_list(${COMPONENTS_PATH} LIB_COMPONENTS)
+set(BUILD_COMPONENTS ${LIB_COMPONENTS})
 
 # Qt package components
 set(QT_FIND_COMPONENTS
@@ -96,18 +97,20 @@ set(QT_FIND_COMPONENTS
 
 ################# Windows Build #################
 if(CMAKE_SYSTEM_NAME STREQUAL Windows)
-    list(APPEND LIB_COMPONENTS windows)
+
 endif()
 
 ################# Linux Build #################
 if(CMAKE_SYSTEM_NAME STREQUAL Linux)
-
+    list(REMOVE_ITEM BUILD_COMPONENTS windows)
+    list(REMOVE_ITEM BUILD_COMPONENTS windows-gui)
 endif()
 
 #================= Top Level Build =========================
 
 # Find Qt package
-find_package(Qt6 REQUIRED COMPONENTS ${QT_FIND_COMPONENTS})
+include(BetterFindQt6)
+find_qt6_package(REQUIRED COMPONENTS ${QT_FIND_COMPONENTS})
 
 # Find Doxygen package
 find_package(Doxygen
@@ -118,23 +121,23 @@ find_package(Doxygen
 #--------------------Package Config-----------------------
 
 # Create config file
-configure_file("${FILE_TEMPLATES_PATH}/${CMAKE_PROJECT_NAME}Config.cmake.in"
-    "${CMAKE_BINARY_DIR}/cmake/${CMAKE_PROJECT_NAME}Config.cmake"
+configure_file("${FILE_TEMPLATES_PATH}/${PROJECT_NAME}Config.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}Config.cmake"
     @ONLY
 )
 
 # Create version config file
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-    "${CMAKE_BINARY_DIR}/cmake/${CMAKE_PROJECT_NAME}ConfigVersion.cmake"
-    VERSION ${CMAKE_PROJECT_VERSION}
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}ConfigVersion.cmake"
+    VERSION ${PROJECT_VERSION}
     COMPATIBILITY SameMinorVersion
 )
 
 #================= Process Componets =======================
 
 # Build components
-foreach(component ${LIB_COMPONENTS})
+foreach(component ${BUILD_COMPONENTS})
     add_subdirectory(${COMPONENTS_PATH}/${component})
 endforeach()
 
@@ -143,13 +146,13 @@ endforeach()
 if(DOXYGEN_FOUND)
     # Configure files
     configure_file("${FILE_TEMPLATES_PATH}/doc_mainpage.md.in"
-        "${CMAKE_BINARY_DIR}/docin/mainpage.md"
+        "${DOC_GENERATED_PATH}/mainpage.md"
         @ONLY
     )
 
     # Top level input
     set(DOC_INPUT_LIST
-        "${CMAKE_BINARY_DIR}/docin/mainpage.md"
+        "${DOC_GENERATED_PATH}/mainpage.md"
         "${DOC_SOURCE_PATH}/namespace.dox"
     )
 
@@ -160,6 +163,12 @@ if(DOXYGEN_FOUND)
             "${COMPONENTS_PATH}/${component}/src"
             "${COMPONENTS_PATH}/${component}/include"
         )
+
+        if(EXISTS "${COMPONENTS_PATH}/${component}/doc/general")
+            set(DOC_INPUT_LIST ${DOC_INPUT_LIST}
+                "${COMPONENTS_PATH}/${component}/doc/general"
+            )
+        endif()
 
         if(EXISTS "${COMPONENTS_PATH}/${component}/doc/snippets")
             set(DOC_EXAMPLE_LIST ${DOC_EXAMPLE_LIST}
@@ -173,6 +182,10 @@ if(DOXYGEN_FOUND)
             )
         endif()
     endforeach()
+
+    # Determine Qt related doc paths
+    include(QtDocsHelper)
+    configure_qt_doc_link(${Qt6_PREFIX_PATH})
 
     # Set Doxygen parameters
     include(${DOC_SCRIPTS_PATH}/doxyconf.cmake)
@@ -191,15 +204,15 @@ endif()
 
 # Install Package Config
 install(FILES
-    "${CMAKE_BINARY_DIR}/cmake/${CMAKE_PROJECT_NAME}Config.cmake"
-    "${CMAKE_BINARY_DIR}/cmake/${CMAKE_PROJECT_NAME}ConfigVersion.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}Config.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}ConfigVersion.cmake"
     DESTINATION cmake
 )
 
 # Install README and LICENSE
 install(FILES
-    "${CMAKE_SOURCE_DIR}/README.md"
-    "${CMAKE_SOURCE_DIR}/LICENSE"
+    "${CMAKE_CURRENT_SOURCE_DIR}/README.md"
+    "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE"
     DESTINATION .
 )
 
@@ -214,8 +227,8 @@ install(DIRECTORY ${DOC_BUILD_PATH}
 
 set(CPACK_PACKAGE_VENDOR "oblivioncth")
 set(CPACK_PACKAGE_DIRECTORY "${PACKAGE_PREFIX}")
-set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}_${PROJECT_VERSION_VERBOSE}_(Qt${Qt6_VERSION})_${CMAKE_SYSTEM_NAME}_${TARGET_ARCH}")
+set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}_${PROJECT_VERSION_VERBOSE}_(Qt${Qt6_VERSION}-${Qt6_LINKAGE})_${PROPER_SYSTEM_NAME}_${TARGET_ARCH}")
 set(CPACK_GENERATOR "ZIP")
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
-set(CPACK_RESOURCE_FILE_README "${CMAKE_SOURCE_DIR}/README.md")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
 include(CPack)

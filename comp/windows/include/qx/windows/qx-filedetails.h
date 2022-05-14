@@ -5,10 +5,8 @@
 #include <QString>
 #include <QHash>
 
-// Windows Includes
-#define NOMINMAX
-#include "Windows.h"
-#undef NOMINMAX
+// Intra-component Includes
+#include "qx/windows/qx-windefs.h"
 
 // Extra-component Includes
 #include "qx/core/qx-versionnumber.h"

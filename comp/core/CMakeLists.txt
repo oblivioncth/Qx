@@ -69,4 +69,5 @@ set(COMPONENT_QT_DEPENDS
 )
 
 #=============== Component Handler =======================
-include(component_lib_rules)
+include(ComponentHelper)
+register_qx_component()
