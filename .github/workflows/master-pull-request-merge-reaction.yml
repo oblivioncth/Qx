@@ -105,7 +105,7 @@ jobs:
 
   create-release:
     name: Create GitHub release
-    needs: [update-docs, build_qx_release_linux]
+    needs: [update-docs, build_qx_release_windows, build_qx_release_linux, tag_master_and_sync_dev]
     if: github.event.pull_request.merged == true
     runs-on: windows-latest
     steps:
