@@ -99,6 +99,8 @@ jobs:
         sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-12 100
     - name: Install OpenGL lib
       run: sudo apt-get install libglu1-mesa-dev
+    - name: Install XCB-XKB
+      run: sudo apt-get install libxcb-xkb-dev
     - name: Install Doxygen
       env:
         doxy_build: doxygen-1.9.4
