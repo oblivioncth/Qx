@@ -1143,6 +1143,8 @@ IoOpReport deleteTextFromFile(QFile& textFile, TextPos startPos, TextPos endPos)
 }
 
 /*!
+ *  @overload
+ *
  *  Returns @c true if @a directory contains files in accordance with @a iteratorFlags; otherwise returns @c false.
  *
  *  @warning This also returns false if the directory doesn't exist.
@@ -1156,8 +1158,6 @@ bool dirContainsFiles(QDir directory, QDirIterator::IteratorFlags iteratorFlags)
 }
 
 /*!
- *  @overload
- *
  *  Sets @a returnBuffer to @c true if @a directory contains files in accordance with @a iteratorFlags; otherwise sets it to
  *  @c false.
  *

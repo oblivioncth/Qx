@@ -8,7 +8,7 @@ namespace Qx
  *  @class Cumulation qx/core/qx-cumulation.h
  *  @ingroup qx-core
  *
- *  @brief The Cumulation template class tracks the sum of multiple key-value components that can be change
+ *  @brief The Cumulation template class tracks the sum of multiple key-value components that can be changed
  *  independently.
  *
  *  A cumulation is a collection of key-value pairs (where V is any arithmetic type) with which the sum of all

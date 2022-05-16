@@ -56,13 +56,12 @@ target_link_libraries(example_ui_app PUBLIC Qx::Core Qx::Widgets)
 #include <qx/widgets.h>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+It is possible to include portions of the Qx API with finer granularity by only referencing the exact headers you need in accordance with the include structure shown in the [File Index](files.html), but at first it is generally recommended to simply include the main header for each component you use as shown.
+
 6) Review the rest of the documentation. A good place to start is the [Core](#qx-core) component.
 
 @note
-It is possible to include portions of the Qx API with finer granularity by only referencing the exact headers you need in accordance with the include structure shown in the [File Index](files.html), but it is generally recommended to simply include the main header for each component you use as shown above.
-
-@warning
-When building a project that uses Qx, it is important to do so with a configuration of Qt that has binary compatibility with the one that was used to build a given version of Qx. Excluding potential bugs, luckily this is easy as Qt advertising binary compatibility within each major version.
+When building a project that uses Qx, it is important to do so with a configuration of Qt that has binary compatibility with the one that was used to build a given version of Qx. Excluding potential bugs, luckily this is easy as Qt advertises binary compatibility within each major version.
 
 Building From Source
 --------------------

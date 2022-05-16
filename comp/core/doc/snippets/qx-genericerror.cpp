@@ -3,7 +3,7 @@ QString getTheKeysValue()
 {
 	QString keyValue = getMySetting("Key");
 
-	if(keyValue.isNull)
+	if(keyValue.isNull())
 	{
 		return Qx::GenericError(Qx::GenericError::Error,
 								"Failed to read settings file",
