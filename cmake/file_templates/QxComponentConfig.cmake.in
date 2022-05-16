@@ -15,7 +15,7 @@ if(NOT DEFINED __@PROJ_NAME_UC@_@COMPONENT_NAME_UC@)
     # Qt dependencies (inserted when this file was configured)
     set(__@PROJ_NAME_UC@_@COMPONENT_NAME_UC@_QT_DEPENDS @COMPONENT_QT_DEPENDS@)
     if(__@PROJ_NAME_UC@_@COMPONENT_NAME_UC@_QT_DEPENDS)
-        find_dependency(Qt6 @Qt6_VERSION_MAJOR@.@Qt6_VERSION_MINOR@ REQUIRED COMPONENTS ${__@PROJ_NAME_UC@_@COMPONENT_NAME_UC@_QT_DEPENDS})
+        find_dependency(Qt6 REQUIRED COMPONENTS ${__@PROJ_NAME_UC@_@COMPONENT_NAME_UC@_QT_DEPENDS})
     endif()
 
     # Import component targets
