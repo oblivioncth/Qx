@@ -27,10 +27,10 @@ public:
 
 //-Class Functions---------------------------------------------------------------------------------------------
 public:
-    VersionNumber commonPrefix(const VersionNumber& v1, const VersionNumber& v2);
-    VersionNumber fromString(const QString& string, int* suffixIndex = nullptr);
-    VersionNumber fromString(QLatin1String string, int* suffixIndex = nullptr);
-    VersionNumber fromString(QStringView string, int* suffixIndex = nullptr);
+    static VersionNumber commonPrefix(const VersionNumber& v1, const VersionNumber& v2);
+    static VersionNumber fromString(const QString& string, int* suffixIndex = nullptr);
+    static VersionNumber fromString(QLatin1String string, int* suffixIndex = nullptr);
+    static VersionNumber fromString(QStringView string, int* suffixIndex = nullptr);
 };	
 
 }
