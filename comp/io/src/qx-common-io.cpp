@@ -1181,6 +1181,87 @@ IoOpReport dirContainsFiles(bool& returnBuffer, QDir directory, QDirIterator::It
 }
 
 /*!
+ *  Fills @a returnBuffer with a list of QFileInfo objects for all the files and directories in @a directory, limited according
+ *  to the name and attribute filters previously set with QDir::setNameFilters() and QDir::setFilter(), while sort flags are ignored.
+ *
+ *  The name filter and file attribute filter can be overridden using the @a nameFilters and @a filters arguments respectively.
+ *
+ *  Directory traversal rules can be further refined via @a iteratorFlags.
+ *
+ *  Returns a report containing details of operation success or failure.
+ *
+ *  @sa QDir::entryInfoList
+ */
+IoOpReport dirContentInfoList(QFileInfoList& returnBuffer, QDir directory, QStringList nameFilters,
+                              QDir::Filters filters, QDirIterator::IteratorFlags flags)
+{
+    // Empty buffer
+    returnBuffer = QFileInfoList();
+
+    // Handle overrides
+    if(nameFilters.isEmpty())
+        nameFilters = directory.nameFilters();
+    if(filters == QDir::NoFilter)
+        filters = directory.filter();
+
+    // Check directory
+    IoOpResultType dirCheckResult = directoryCheck(directory);
+    if(dirCheckResult != IO_SUCCESS)
+        return IoOpReport(IO_OP_ENUMERATE, dirCheckResult, directory);
+
+
+    // Construct directory iterator
+    QDirIterator listIterator(directory.path(), nameFilters, filters, flags);
+
+    while(listIterator.hasNext())
+    {
+        listIterator.next();
+        returnBuffer.append(listIterator.fileInfo());
+    }
+
+    return IoOpReport(IO_OP_ENUMERATE, IO_SUCCESS, directory);
+}
+
+/*!
+ *  Fills @a returnBuffer with a list of names for all the files and directories in @a directory, limited according
+ *  to the name and attribute filters previously set with QDir::setNameFilters() and QDir::setFilter(), while sort flags are ignored.
+ *
+ *  The name filter and file attribute filter can be overridden using the @a nameFilters and @a filters arguments respectively.
+ *
+ *  Directory traversal rules can be further refined via @a iteratorFlags.
+ *
+ *  Returns a report containing details of operation success or failure.
+ *
+ *  @sa QDir::entryList
+ */
+IoOpReport dirContentList(QStringList& returnBuffer, QDir directory, QStringList nameFilters,
+                              QDir::Filters filters, QDirIterator::IteratorFlags flags)
+{
+    // Empty buffer
+    returnBuffer = QStringList();
+
+    // Handle overrides
+    if(nameFilters.isEmpty())
+        nameFilters = directory.nameFilters();
+    if(filters == QDir::NoFilter)
+        filters = directory.filter();
+
+    // Check directory
+    IoOpResultType dirCheckResult = directoryCheck(directory);
+    if(dirCheckResult != IO_SUCCESS)
+        return IoOpReport(IO_OP_ENUMERATE, dirCheckResult, directory);
+
+
+    // Construct directory iterator
+    QDirIterator listIterator(directory.path(), nameFilters, filters, flags);
+
+    while(listIterator.hasNext())
+        returnBuffer.append(listIterator.next());
+
+    return IoOpReport(IO_OP_ENUMERATE, IO_SUCCESS, directory);
+}
+
+/*!
  *  Computes a file's checksum.
  *
  *  @param[out] returnBuffer Set to the hexadecimal string representation of the file's checksum.
