@@ -127,6 +127,7 @@ SyncDownloadManager::SyncDownloadManager(QObject* parent) : QObject(parent)
     connect(&mDownloadAccessMan, &QNetworkAccessManager::finished, this, &SyncDownloadManager::downloadFinished);
     connect(&mDownloadAccessMan, &QNetworkAccessManager::sslErrors, this, &SyncDownloadManager::sslErrorHandler);
     connect(&mDownloadAccessMan, &QNetworkAccessManager::authenticationRequired, this, &SyncDownloadManager::authHandler);
+    connect(&mDownloadAccessMan, &QNetworkAccessManager::preSharedKeyAuthenticationRequired, this, &SyncDownloadManager::preSharedAuthHandler);
     connect(&mDownloadAccessMan, &QNetworkAccessManager::proxyAuthenticationRequired, this, &SyncDownloadManager::proxyAuthHandler);
 
     connect(&mQueryAccessMan, &QNetworkAccessManager::sslErrors, this, &SyncDownloadManager::sslErrorHandler);
@@ -529,24 +530,34 @@ void SyncDownloadManager::sslErrorHandler(QNetworkReply* reply, const QList<QSsl
 void SyncDownloadManager::authHandler(QNetworkReply* reply, QAuthenticator* authenticator)
 {
     // Signal result
-    bool abortDownload = true;
-    QString username = QString();
-    QString password = QString();
+    bool skipDownload = true;
 
     // Emit signal for answer
-    emit authenticationRequired(PROMPT_AUTH.arg(reply->url().host()), &username, &password, &abortDownload);
+    emit authenticationRequired(PROMPT_AUTH.arg(reply->url().host()), authenticator, &skipDownload);
 
-    // Abort if desired
-    if(abortDownload)
+    // Skip if desired
+    if(skipDownload)
     {
         reply->abort();
         mErrorList.append(ERR_SINGLE_ABORT.arg(reply->url().toString()));
         mFinishStatus = FinishStatus::Error;
     }
-    else
+}
+
+void SyncDownloadManager::preSharedAuthHandler(QNetworkReply* reply, QSslPreSharedKeyAuthenticator* authenticator)
+{
+    // Signal result
+    bool skipDownload = true;
+
+    // Emit signal for answer
+    emit preSharedKeyAuthenticationRequired(PROMPT_PRESHARED_AUTH.arg(reply->url().host()), authenticator, &skipDownload);
+
+    // Skip if desired
+    if(skipDownload)
     {
-        authenticator->setUser(username);
-        authenticator->setPassword(password);
+        reply->abort();
+        mErrorList.append(ERR_SINGLE_ABORT.arg(reply->url().toString()));
+        mFinishStatus = FinishStatus::Error;
     }
 }
 
@@ -554,20 +565,13 @@ void SyncDownloadManager::proxyAuthHandler(const QNetworkProxy& proxy, QAuthenti
 {
     // Signal result
     bool abortDownload = true;
-    QString username = QString();
-    QString password = QString();
 
     // Emit signal for answer
-    emit authenticationRequired(PROMPT_AUTH.arg(proxy.hostName()), &username, &password, &abortDownload);
+    emit proxyAuthenticationRequired(PROMPT_AUTH.arg(proxy.hostName()), authenticator, &abortDownload);
 
     // Abort if desired
     if(abortDownload)
         abort();
-    else
-    {
-        authenticator->setUser(username);
-        authenticator->setPassword(password);
-    }
 }
 
 //Public:
@@ -622,17 +626,52 @@ void SyncDownloadManager::abort()
  */
 
 /*!
- *  @fn void SyncDownloadManager::authenticationRequired(QString prompt, QString* username, QString* password, bool* abort)
+ *  @fn void SyncDownloadManager::authenticationRequired(QString prompt, QAuthenticator* authenticator, bool* skip)
  *
- *  This signal is emitted whenever a final server requests authentication before it delivers the requested contents, or
- *  a proxy requests authentication, with @a prompt indicating which.
+ *  This signal is emitted whenever a final server requests authentication before it delivers the requested contents,
+ *  with @a prompt providing user-friendly text that describes the request.
  *
- *  The slot connected to this signal should provide the requested credentials via @a username and @a password and set
- *  @a abort to false, or else processing will be aborted. If no slots are connected to this signal then downloads
- *  that require authentication will always cause the manager to abort.
+ *  The slot connected to this signal should provide the requested credentials via @a authenticator and set
+ *  @a skip to false, or else the download that requires this authentication will be stopped. If no slots are
+ *  connected to this signal then downloads that require authentication will always be skipped.
  *
  *  The manager caches the provided credentials internally and will send the same values if the server requires
  *  authentication again, without emitting the authenticationRequired() signal. If it rejects the credentials, this
  *  signal will be emitted again.
+ *
+ *  @note It is not possible to use a QueuedConnection to connect to this signal, as the connection will fail if the
+ *  authenticator has not been filled in with new information when the signal returns.
+ */
+
+/*!
+ *  @fn void SyncDownloadManager::preSharedKeyAuthenticationRequired(QString prompt, QSslPreSharedKeyAuthenticator* authenticator, bool* skip)
+ *
+ *  This signal is emitted if a sever SSL/TLS handshake negotiates a PSK ciphersuite, and therefore a PSK
+ *  authentication is then required. @a prompt provides a user-friendly text that describes the request.
+ *
+ *  The slot connected to this signal should provide the requested key via @a authenticator and set
+ *  @a skip to false, or else the download that requires this authentication will be stopped. If no slots are
+ *  connected to this signal then downloads that require PSK authentication will always be skipped.
+ *
+ *  @note It is not possible to use a QueuedConnection to connect to this signal, as the connection will fail if the
+ *  authenticator has not been filled in with new information when the signal returns.
+ */
+
+/*!
+ *  @fn void SyncDownloadManager::proxyAuthenticationRequired(QString prompt, QAuthenticator* authenticator, bool* abort)
+ *
+ *  This signal is emitted whenever a proxy requests authentication, with @a prompt providing user-friendly text that
+ *  describes the request.
+ *
+ *  The slot connected to this signal should provide the requested credentials via @a authenticator and set
+ *  @a abort to false, or else all processing will be aborted. If no slots are connected to this signal then downloads
+ *  that involve authenticated proxies will always cause the manager to abort.
+ *
+ *  The manager caches the provided credentials internally and will send the same values if the proxy requires
+ *  authentication again, without emitting the proxyAuthenticationRequired() signal. If it rejects the credentials, this
+ *  signal will be emitted again.
+ *
+ *  @note It is not possible to use a QueuedConnection to connect to this signal, as the connection will fail if the
+ *  authenticator has not been filled in with new information when the signal returns.
  */
 }

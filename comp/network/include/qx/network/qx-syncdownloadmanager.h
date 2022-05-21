@@ -74,7 +74,9 @@ private:
 
     // Prompts
     static inline const QString PROMPT_AUTH = "Authentication is required for %1";
+    static inline const QString PROMPT_PRESHARED_AUTH = "Pre-shared key authentication is required for %1";
     static inline const QString PROMPT_PROXY_AUTH = "Proxy authentication is required for %1";
+
 
 //-Instance Members---------------------------------------------------------------------------------------------------
 private:
@@ -143,6 +145,7 @@ private slots:
     void readyRead();
     void sslErrorHandler(QNetworkReply* reply, const QList<QSslError>& errors);
     void authHandler(QNetworkReply* reply, QAuthenticator* authenticator);
+    void preSharedAuthHandler(QNetworkReply* reply, QSslPreSharedKeyAuthenticator* authenticator);
     void proxyAuthHandler(const QNetworkProxy& proxy, QAuthenticator* authenticator);
 
 public slots:
@@ -156,7 +159,10 @@ signals:
     void downloadTotalChanged(quint64 bytesTotal);
 
     void sslErrors(Qx::GenericError errorMsg, bool* abort);
-    void authenticationRequired(QString prompt, QString* username, QString* password, bool* abort);
+    void authenticationRequired(QString prompt, QAuthenticator* authenticator, bool* skip);
+    void preSharedKeyAuthenticationRequired(QString prompt, QSslPreSharedKeyAuthenticator* authenticator, bool* skip);
+    void proxyAuthenticationRequired(QString prompt, QAuthenticator* authenticator, bool* abort);
+
 };
 
 }
