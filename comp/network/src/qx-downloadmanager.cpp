@@ -200,6 +200,7 @@ AsyncDownloadManager::AsyncDownloadManager(QObject* parent) :
 
     connect(&mQueryAccessMan, &QNetworkAccessManager::sslErrors, this, &AsyncDownloadManager::sslErrorHandler);
     connect(&mQueryAccessMan, &QNetworkAccessManager::authenticationRequired, this, &AsyncDownloadManager::authHandler);
+    connect(&mQueryAccessMan, &QNetworkAccessManager::preSharedKeyAuthenticationRequired, this, &AsyncDownloadManager::preSharedAuthHandler);
     connect(&mQueryAccessMan, &QNetworkAccessManager::proxyAuthenticationRequired, this, &AsyncDownloadManager::proxyAuthHandler);
 }
 
