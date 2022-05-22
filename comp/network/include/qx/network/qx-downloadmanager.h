@@ -4,6 +4,7 @@
 // Qt Includes
 #include <QEventLoop>
 #include <QNetworkAccessManager>
+#include <QAuthenticator>
 
 // Intra-component Includes
 #include "qx/network/qx-networkreplyerror.h"
