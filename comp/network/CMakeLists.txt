@@ -8,14 +8,14 @@ set(COMPONENT_LIB_TYPE STATIC)
 set(COMPONENT_INCLUDE_HEADERS
     qx-common-network.h
     qx-networkreplyerror.h
-    qx-syncdownloadmanager.h
+    qx-downloadmanager.h
 )
 
 # Source Files
 set(COMPONENT_IMPL
     qx-common-network.cpp
     qx-networkreplyerror.cpp
-    qx-syncdownloadmanager.cpp
+    qx-downloadmanager.cpp
 )
 
 # Links
