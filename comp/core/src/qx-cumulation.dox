@@ -68,4 +68,19 @@ namespace Qx
  *  Returns the current total of the cumulation, which is the sum of all its component values.
  */
 
+/*!
+ * @fn template <typename K, typename V> qsizetype Cumulation<K, V>::count() const
+ *
+ *  Returns that number of components that compose the cumulation.
+ */
+
+/*!
+ *  @fn template <typename K, typename V> V Cumulation<K, V>::mean() const
+ *
+ *  Returns the current mean of the cumulation, which is the sum of all its component values divided the
+ *  number of components, or zero if the cumulation is empty.
+ *
+ *  If
+ */
+
 }
