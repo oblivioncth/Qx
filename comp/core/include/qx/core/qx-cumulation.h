@@ -66,8 +66,9 @@ public:
     bool contains(K component) const { return mComponents.contains(component); }
     V value(K component) const { return mComponents.value(component); }
     V total() const { return mTotal; }
-    qsizetype count() const { return mComponents.count(); }
 
+    qsizetype count() const { return mComponents.count(); }
+    bool isEmpty() const { return mComponents.isEmpty(); }
     V mean() const { return sMean<V>(); }
 
 };	
