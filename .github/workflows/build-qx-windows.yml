@@ -62,7 +62,7 @@ jobs:
         echo "qx_package_path=${{ env.qx_src_dir }}/out/dist" >> $Env:GITHUB_ENV
         $qx_install_path="${{ env.qx_src_dir }}/out/install"
         echo "qx_install_path=$qx_install_path" >> $Env:GITHUB_ENV
-        echo "qt_cmake=${Env:qt_install_dir}/bin/qt-cmake" >> $Env:GITHUB_ENV
+        echo "qt_cmake=${Env:qt_install_dir}/bin/qt-cmake.bat" >> $Env:GITHUB_ENV
     - name: Cache Qt Build
       id: cache-qt
       uses: actions/cache@v3
@@ -106,23 +106,23 @@ jobs:
         }
         popd
         Write-Host "Building Qx..." -ForegroundColor Green
-        echo Configuring CMake...
-        CALL "$Env:qt_cmake" -G "$Env:cmake_gen" -S "$Env:qx_src_dir" -B "$Env:qx_build_dir"
-        echo Changing to build directory...
+        echo "Configuring CMake..."
+        Start-Process -FilePath "$Env:qt_cmake" -ArgumentList "-G \"$Env:cmake_gen\" -S \"$Env:qx_src_dir\" -B \"$Env:qx_build_dir\"" -Wait -NoNewWindow
+        echo "Changing to build directory..."
         cd "$Env:qx_build_dir"
-        echo Building Qx debug...
+        echo "Building Qx debug..."
         cmake --build . --target all --config Debug
-        echo Building Qx release...
+        echo "Building Qx release..."
         cmake --build . --target all --config Release
-        echo Building Qx docs...
+        echo "Building Qx docs..."
         cmake --build . --target docs --config Release
-        echo Installing Qx Debug
+        echo "Installing Qx Debug"
         cmake --build . --target install --config Debug
-        echo Installing Qx Release/Docs...
+        echo "Installing Qx Release/Docs..."
         cmake --build . --target install --config Release
-        echo Packaging Qx...
+        echo "Packaging Qx..."
         cpack -C "Debug;Release"
-        echo Build complete.
+        echo "Build complete."
     - name: Get Qx artifact name
       id: get_artifact_name
       run: echo "::set-output name=${{ env.artifact_output_var }}::$((Get-ChildItem -Path "${{ env.qx_package_path }}" -Filter *.zip)[0].BaseName)"
