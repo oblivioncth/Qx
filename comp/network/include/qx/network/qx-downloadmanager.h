@@ -1,5 +1,5 @@
-#ifndef QX_SYNCDOWNLOADMANAGER_H
-#define QX_SYNCDOWNLOADMANAGER_H
+#ifndef QX_DOWNLOADMANAGER_H
+#define QX_DOWNLOADMANAGER_H
 
 // Qt Includes
 #include <QEventLoop>
@@ -15,8 +15,14 @@
 #include "qx/core/qx-cumulation.h"
 #include "qx/io/qx-filestreamwriter.h"
 
+/* TODO: Try to improve efficiency like making DownloadTask uses in hashes and the like pointers instead,
+ * and passing them as pointers/references where possible. Cant use a pointer for download task list because
+ * then the manager cant prevent multiple of the same download task from being added. Though, if this would
+ * be the only way to achieve significant gains, it might be worth sacrificing.
+ */
 namespace Qx
 {
+
 //-Forward Declarations-------------------------------------------------------------------------------------------
 class AsyncDownloadManager;
 class SyncDownloadManager;
@@ -29,11 +35,11 @@ friend SyncDownloadManager;
 
 //-Class Enums----------------------------------------------------------------------------------------------------
 public:
-   enum class Outcome {Fail, UserAbort, Success};
-
-//-Class Variables------------------------------------------------------------------------------------------------
-private:
-    static inline const QString ERR_ENUM_TOTAL_SIZE = "[%1] Error enumerating download size";
+   enum class Outcome{
+       Success = 0x0,
+       Fail = 0x1,
+       Abort = 0x2
+   };
 
 //-Instance Variables---------------------------------------------------------------------------------------------
 private:
@@ -43,9 +49,6 @@ private:
     QList<DownloadOpReport> mTaskReports;
 
 //-Constructor-------------------------------------------------------------------------------------------------------
-private:
-    DownloadManagerReport(NetworkReplyError sizeEnumerationError);
-
 public:
     DownloadManagerReport();
 
@@ -63,10 +66,11 @@ private:
     {
     //-Class Variables-----------------------------------------------------------------------------------------------
     private:
-        static inline const QString ERR_QUEUE_INCOMPL = "The download(s) failed to complete successfully";
-        static inline const QString ERR_OUTCOME_FAIL = "One or more downloads failed due to the following reasons.";
-        static inline const QString ERR_ABORT_SKIP = "%1 remaining download(s) were skipped after processing was aborted.";
-        static inline const QString ERR_LIST_ITEM = "[%1] %2";
+        static inline const QString ERR_P_QUEUE_INCOMPL = "The download(s) failed to complete successfully";
+        static inline const QString ERR_S_OUTCOME_FAIL = "One or more downloads failed due to the following reasons.";
+        static inline const QString ERR_D_SKIP = "%1 remaining download(s) were skipped due to previous errors aborted.";
+        static inline const QString ERR_D_ABORT = "%1 remaining download(s) were aborted.";
+        static inline const QString ERR_D_LIST_ITEM = "[%1] %2";
 
     //-Instance Variables---------------------------------------------------------------------------------------------
     private:
@@ -77,9 +81,12 @@ private:
         Builder();
 
     //-Instance Functions----------------------------------------------------------------------------------------------
+    private:
+        void updateOutcome(const DownloadOpReport& dop);
+
     public:
         void wDownload(DownloadOpReport downloadReport);
-        DownloadManagerReport finalize(bool userAborted);
+        DownloadManagerReport build();
     };
 };
 
@@ -88,12 +95,15 @@ class AsyncDownloadManager: public QObject
 //-QObject Macro (Required for all QObject Derived Classes)-----------------------------------------------------------
     Q_OBJECT
 
-//-Class Members------------------------------------------------------------------------------------------------------
+//-Class Enums------------------------------------------------------------------------------------------------------
 private:
-    enum Status {PreStart, Processing, UserAborting, AutoAborting};
+    enum Status {Initial, Enumerating, Downloading, Aborting, StoppingOnError};
 
 //-Class Members------------------------------------------------------------------------------------------------------
 private:
+    // Enumeration
+    static const qint64 PRESUMED_SIZE = 10485760; // 10 MB
+
     // Errors - Messages
     static inline const QString SSL_ERR = "The following SSL issues occurred while attempting to download %1";
     static inline const QString CONTINUE_QUES = "Continue downloading?";
@@ -105,32 +115,31 @@ private:
     static inline const QString PROMPT_PRESHARED_AUTH = "Pre-shared key authentication is required for %1";
     static inline const QString PROMPT_PROXY_AUTH = "Proxy authentication is required for %1";
 
-
 //-Instance Members---------------------------------------------------------------------------------------------------
 private:
-    // Network Access
-    QNetworkAccessManager mDownloadAccessMan;
-    QNetworkAccessManager mQueryAccessMan;
-
     // Properties
-    int mMaxSimultaneous = 3; // < 1 is unlimited
-    QNetworkRequest::RedirectPolicy mRedirectPolicy = QNetworkRequest::NoLessSafeRedirectPolicy;  // Applied to each request as well as manager because of priority levels
-    bool mOverwrite = false;
-    bool mAutoAbort = false;
+    int mMaxSimultaneous; // < 1 is unlimited
+    QNetworkRequest::RedirectPolicy mRedirectPolicy; // Applied to each request as well as manager because of priority levels
+    bool mOverwrite;
+    bool mStopOnError;
 
-    // Task tracking
-    QHash<QNetworkReply*, DownloadTask> mReplyTaskMap;
+    // Status
+    Status mStatus;
+
+    // Network Access
+    QNetworkAccessManager mNam;
 
     // Downloads
+    QList<DownloadTask> mPendingEnumerants;
     QList<DownloadTask> mPendingDownloads;
-    QHash<QNetworkReply*, std::shared_ptr<FileStreamWriter>> mActiveDownloads;
+    QHash<QNetworkReply*, DownloadTask> mActiveTasks;
+    QHash<QNetworkReply*, std::shared_ptr<FileStreamWriter>> mActiveWriters;
 
     // Progress
     Cumulation<DownloadTask, qint64> mTotalBytes;
     Cumulation<QNetworkReply*, qint64> mCurrentBytes;
 
-    // Status tracking
-    Status mStatus;
+    // Report
     DownloadManagerReport::Builder mReportBuilder;
 
 //-Constructor-------------------------------------------------------------------------------------------------------
@@ -139,37 +148,54 @@ public:
 
 //-Instance Functions----------------------------------------------------------------------------------------------
 private:
-    NetworkReplyError enumerateTotalSize();
-    NetworkReplyError queryFileSize(qint64& returnBuffer, QUrl target);
-    IoOpReport startDownload(DownloadTask task);
-    void cancelAll();
-    void cleanup();
+    // Size enumeration
+    void startSizeEnumeration();
+    void startSizeQuery(DownloadTask task);
+
+    // Download
+    void startTrueDownloads();
+    void startDownload(DownloadTask task);
+
+    // Halting
+    void stopOnError();
+    void abortD();
+
+    // Cleanup
+    void finish();
     void reset();
 
 public:
-    void appendTask(const DownloadTask& task);
-
+    // Properties
     int maxSimultaneous() const;
     QNetworkRequest::RedirectPolicy redirectPolicy() const;
     bool isOverwrite() const;
-    bool isAutoAbort() const;
+    bool isStopOnError() const;
     int taskCount() const;
     bool hasTasks() const;
+    bool isProcessing() const;
 
     void setMaxSimultaneous(int maxSimultaneous);
     void setRedirectPolicy(QNetworkRequest::RedirectPolicy redirectPolicy);
     void setOverwrite(bool overwrite);
-    void setAutoAbort(bool autoAbort);
+    void setStopOnError(bool stopOnError);
+
+    // Tasks
+    void appendTask(const DownloadTask& task);
+    void clearTasks();
 
 //-Slots------------------------------------------------------------------------------------------------------------
 private slots:
-    void downloadProgressHandler(qint64 bytesCurrent, qint64 bytesTotal);
-    void downloadFinished(QNetworkReply* reply);
-    void readyRead();
+    // In-progress handlers
     void sslErrorHandler(QNetworkReply* reply, const QList<QSslError>& errors);
     void authHandler(QNetworkReply* reply, QAuthenticator* authenticator);
     void preSharedAuthHandler(QNetworkReply* reply, QSslPreSharedKeyAuthenticator* authenticator);
     void proxyAuthHandler(const QNetworkProxy& proxy, QAuthenticator* authenticator);
+    void readyReadHandler();
+    void downloadProgressHandler(qint64 bytesCurrent, qint64 bytesTotal);
+
+    // Finished handlers
+    void sizeQueryFinishedHandler(QNetworkReply* reply);
+    void downloadFinishedHandler(QNetworkReply* reply);
 
 public slots:
     void processQueue();
@@ -177,15 +203,16 @@ public slots:
 
 //-Signals------------------------------------------------------------------------------------------------------------
 signals:
+    // In-progress signals
+    void sslErrors(Qx::GenericError errorMsg, bool* ignore);
+    void authenticationRequired(QString prompt, QAuthenticator* authenticator);
+    void preSharedKeyAuthenticationRequired(QString prompt, QSslPreSharedKeyAuthenticator* authenticator);
+    void proxyAuthenticationRequired(QString prompt, QAuthenticator* authenticator);
     void downloadProgress(qint64 bytesCurrent);
     void downloadTotalChanged(quint64 bytesTotal);
+
+    // Finished signal
     void finished(Qx::DownloadManagerReport report);
-
-    void sslErrors(Qx::GenericError errorMsg, bool* abort);
-    void authenticationRequired(QString prompt, QAuthenticator* authenticator, bool* skip);
-    void preSharedKeyAuthenticationRequired(QString prompt, QSslPreSharedKeyAuthenticator* authenticator, bool* skip);
-    void proxyAuthenticationRequired(QString prompt, QAuthenticator* authenticator, bool* abort);
-
 };
 
 class SyncDownloadManager: public QObject
@@ -205,20 +232,25 @@ public:
 
 //-Instance Functions----------------------------------------------------------------------------------------------
 public:
-    void appendTask(const DownloadTask& task);
-
+    // Properties
     int maxSimultaneous() const;
     QNetworkRequest::RedirectPolicy redirectPolicy() const;
     bool isOverwrite() const;
-    bool isAutoAbort() const;
+    bool isStopOnError() const;
     int taskCount() const;
     bool hasTasks() const;
+    bool isProcessing() const;
 
     void setMaxSimultaneous(int maxSimultaneous);
     void setRedirectPolicy(QNetworkRequest::RedirectPolicy redirectPolicy);
     void setOverwrite(bool overwrite);
-    void setAutoAbort(bool autoAbort);
+    void setStopOnError(bool stopOnError);
 
+    // Tasks
+    void appendTask(const DownloadTask& task);
+    void clearTasks();
+
+    // Synchronous processing
     DownloadManagerReport processQueue();
 
 //-Slots------------------------------------------------------------------------------------------------------------
@@ -233,12 +265,13 @@ signals:
     void downloadProgress(qint64 bytesCurrent);
     void downloadTotalChanged(quint64 bytesTotal);
 
-    void sslErrors(Qx::GenericError errorMsg, bool* abort);
-    void authenticationRequired(QString prompt, QAuthenticator* authenticator, bool* skip);
-    void preSharedKeyAuthenticationRequired(QString prompt, QSslPreSharedKeyAuthenticator* authenticator, bool* skip);
-    void proxyAuthenticationRequired(QString prompt, QAuthenticator* authenticator, bool* abort);
+    void sslErrors(Qx::GenericError errorMsg, bool* ignore);
+    void authenticationRequired(QString prompt, QAuthenticator* authenticator);
+    void preSharedKeyAuthenticationRequired(QString prompt, QSslPreSharedKeyAuthenticator* authenticator);
+    void proxyAuthenticationRequired(QString prompt, QAuthenticator* authenticator);
 };
 
 }
+
 Q_DECLARE_METATYPE(Qx::DownloadManagerReport);
-#endif // QX_SYNCDOWNLOADMANAGER_H
+#endif // QX_DOWNLOADMANAGER_H

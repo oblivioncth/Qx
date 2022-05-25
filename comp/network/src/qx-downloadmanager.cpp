@@ -1,10 +1,8 @@
-﻿// Unit Includes
+// Unit Includes
 #include "qx/network/qx-downloadmanager.h"
 
 // Qt Includes
-#include <QAuthenticator>
 #include <QNetworkProxy>
-#include <QScopeGuard>
 
 // Extra-component Includes
 #include "qx/core/qx-string.h"
@@ -36,8 +34,8 @@ namespace Qx
  */
 
 /*!
- *  @var DownloadManagerReport::Outcome DownloadManagerReport::UserAbort
- *  A queue that was aborted in-progress by the user.
+ *  @var DownloadManagerReport::Outcome DownloadManagerReport::Abort
+ *  A queue that was aborted in-progress.
  */
 
 /*!
@@ -46,28 +44,13 @@ namespace Qx
  */
 
 //-Constructor-------------------------------------------------------------------------------------------------------
-//Private:
-DownloadManagerReport::DownloadManagerReport(NetworkReplyError sizeEnumerationError) :
-    mNull(false),
-    mOutcome(Outcome::Fail),
-    mTaskReports()
-{
-    if(sizeEnumerationError.isValid())
-    {
-        mErrorInfo = GenericError(GenericError::Error,
-                                  ERR_ENUM_TOTAL_SIZE.arg(sizeEnumerationError.url().toString()), sizeEnumerationError.text());
-    }
-    else
-        throw std::runtime_error("DownloadManagerReport(NetworkReplyError) called with non-valid network reply error!");
-}
-
 //Public:
 /*!
  *  Constructs a null download manager report
  */
 DownloadManagerReport::DownloadManagerReport() :
     mNull(true),
-    mOutcome(Outcome::Fail),
+    mOutcome(Outcome::Success),
     mErrorInfo(),
     mTaskReports()
 {}
@@ -116,42 +99,71 @@ DownloadManagerReport::Builder::Builder()
 }
 
 //-Instance Functions------------------------------------------------------------------------------------------------
+// Private:
+void DownloadManagerReport::Builder::updateOutcome(const DownloadOpReport& dop)
+{
+    Outcome newOutcome;
+
+    switch(dop.result())
+    {
+        case DownloadOpReport::Completed:
+            return;
+        case DownloadOpReport::Failed:
+        case DownloadOpReport::Skipped:
+            newOutcome = Outcome::Fail;
+            break;
+        case DownloadOpReport::Aborted:
+            newOutcome = Outcome::Abort;
+            break;
+    }
+
+    if(newOutcome > mWorkingReport->mOutcome)
+        mWorkingReport->mOutcome = newOutcome;
+}
+
 //Public:
 void DownloadManagerReport::Builder::wDownload(DownloadOpReport downloadReport)
 {
-    if(!downloadReport.wasSuccessful())
-        mWorkingReport->mOutcome = Outcome::Fail;
-
+    updateOutcome(downloadReport);
     mWorkingReport->mTaskReports.append(downloadReport);
 }
 
-DownloadManagerReport DownloadManagerReport::Builder::finalize(bool userAborted)
+DownloadManagerReport DownloadManagerReport::Builder::build()
 {
-    // Check for user abort
-    if(userAborted)
-        mWorkingReport->mOutcome = Outcome::UserAbort;
-
     // Build error info
     if(mWorkingReport->mOutcome != Outcome::Success)
     {
-        uint skippedFromAbort = 0; // Count downloads that were skipped due to overall abortion
+        uint skipped = 0;
+        uint aborted = 0;
         QStringList errorList;
 
         // Enumerate individual errors
         for(const DownloadOpReport& dop : qAsConst(mWorkingReport->mTaskReports))
         {
-            if(dop.result() == DownloadOpReport::Result::Aborted)
-                skippedFromAbort++;
-            else if(dop.result() != DownloadOpReport::Result::Completed)
-                errorList.append(ERR_LIST_ITEM.arg(dop.task().target.toDisplayString(), dop.errorInfo().secondaryInfo()));
+            switch(dop.result())
+            {
+                case DownloadOpReport::Failed:
+                    errorList.append(ERR_D_LIST_ITEM.arg(dop.task().target.toDisplayString(), dop.errorInfo().secondaryInfo()));
+                    break;
+                case DownloadOpReport::Skipped:
+                    skipped++;
+                    break;
+                case DownloadOpReport::Aborted:
+                    aborted++;
+                    break;
+                default:
+                    break;
+            }
         }
 
         // Create error details
         QString errorDetails = "- " + errorList.join("\n- ");
-        if(skippedFromAbort)
-            errorDetails += "\n\n" + ERR_ABORT_SKIP.arg(skippedFromAbort);
+        if(skipped)
+            errorDetails += "\n\n" + ERR_D_SKIP.arg(skipped);
+        if(aborted)
+            errorDetails += "\n\n" + ERR_D_ABORT.arg(aborted);
 
-        mWorkingReport->mErrorInfo = GenericError(GenericError::Error, ERR_QUEUE_INCOMPL, ERR_OUTCOME_FAIL, errorDetails);
+        mWorkingReport->mErrorInfo = GenericError(GenericError::Error, ERR_P_QUEUE_INCOMPL, ERR_S_OUTCOME_FAIL, errorDetails);
     }
 
     mWorkingReport->mNull = false;
@@ -161,6 +173,8 @@ DownloadManagerReport DownloadManagerReport::Builder::finalize(bool userAborted)
 //===============================================================================================================
 // AsyncDownloadManager
 //===============================================================================================================
+
+// TODO: Add a way to retry failed downloads
 
 /*!
  *  @class AsyncDownloadManager qx/network/qx-downloadmanager.h
@@ -183,87 +197,58 @@ DownloadManagerReport DownloadManagerReport::Builder::finalize(bool userAborted)
  */
 AsyncDownloadManager::AsyncDownloadManager(QObject* parent) :
     QObject(parent),
-    mStatus(PreStart)
+    mMaxSimultaneous(3),
+    mRedirectPolicy(QNetworkRequest::NoLessSafeRedirectPolicy),
+    mOverwrite(false),
+    mStopOnError(false),
+    mStatus(Status::Initial)
 {
-    // Configure access managers
-    mDownloadAccessMan.setAutoDeleteReplies(true);
-    mQueryAccessMan.setAutoDeleteReplies(true);
-    mDownloadAccessMan.setRedirectPolicy(mRedirectPolicy);
-    mQueryAccessMan.setRedirectPolicy(mRedirectPolicy);
+    // Configure access manager
+    mNam.setAutoDeleteReplies(true);
+    mNam.setRedirectPolicy(mRedirectPolicy);
+    assert(connect(&mNam, &QNetworkAccessManager::sslErrors, this, &AsyncDownloadManager::sslErrorHandler));
+    assert(connect(&mNam, &QNetworkAccessManager::authenticationRequired, this, &AsyncDownloadManager::authHandler));
+    assert(connect(&mNam, &QNetworkAccessManager::preSharedKeyAuthenticationRequired, this, &AsyncDownloadManager::preSharedAuthHandler));
+    assert(connect(&mNam, &QNetworkAccessManager::proxyAuthenticationRequired, this, &AsyncDownloadManager::proxyAuthHandler));
 
-    // Connect slots
-    connect(&mDownloadAccessMan, &QNetworkAccessManager::finished, this, &AsyncDownloadManager::downloadFinished);
-    connect(&mDownloadAccessMan, &QNetworkAccessManager::sslErrors, this, &AsyncDownloadManager::sslErrorHandler);
-    connect(&mDownloadAccessMan, &QNetworkAccessManager::authenticationRequired, this, &AsyncDownloadManager::authHandler);
-    connect(&mDownloadAccessMan, &QNetworkAccessManager::preSharedKeyAuthenticationRequired, this, &AsyncDownloadManager::preSharedAuthHandler);
-    connect(&mDownloadAccessMan, &QNetworkAccessManager::proxyAuthenticationRequired, this, &AsyncDownloadManager::proxyAuthHandler);
-
-    connect(&mQueryAccessMan, &QNetworkAccessManager::sslErrors, this, &AsyncDownloadManager::sslErrorHandler);
-    connect(&mQueryAccessMan, &QNetworkAccessManager::authenticationRequired, this, &AsyncDownloadManager::authHandler);
-    connect(&mQueryAccessMan, &QNetworkAccessManager::preSharedKeyAuthenticationRequired, this, &AsyncDownloadManager::preSharedAuthHandler);
-    connect(&mQueryAccessMan, &QNetworkAccessManager::proxyAuthenticationRequired, this, &AsyncDownloadManager::proxyAuthHandler);
 }
 
 //-Instance Functions------------------------------------------------------------------------------------------------
 //Private:
-NetworkReplyError AsyncDownloadManager::enumerateTotalSize()
+void AsyncDownloadManager::startSizeEnumeration()
 {
-    // Check size of each file
-    for(const DownloadTask& task : qAsConst(mPendingDownloads))
-    {
-        // Get download size
-        qint64 singleFileSize = 0;
-        NetworkReplyError errorStatus = queryFileSize(singleFileSize, task.target);
+    mStatus = Status::Enumerating;
 
-        // Check for network error
-        if(errorStatus.isValid())
-            return errorStatus;
+    // Connect to finished handler
+    assert(connect(&mNam, &QNetworkAccessManager::finished, this, &AsyncDownloadManager::sizeQueryFinishedHandler));
 
-        // Add to total size
-        mTotalBytes.setValue(task, singleFileSize);
-    }
-
-    // Emit calculated total
-    emit downloadTotalChanged(mTotalBytes.total());
-
-    // Return no error
-    return NetworkReplyError();
+    for(int i = 0; !mPendingEnumerants.isEmpty() && (i < mMaxSimultaneous || mMaxSimultaneous < 1); i++)
+        startSizeQuery(mPendingEnumerants.takeFirst());
 }
 
-NetworkReplyError AsyncDownloadManager::queryFileSize(qint64& returnBuffer, QUrl target)
+void AsyncDownloadManager::startSizeQuery(DownloadTask task)
 {
-    // Ensure return buffer is reset
-    returnBuffer = 0;
-
-    // Event loop for waiting and error status holder
-    QEventLoop sizeCheckWait;
-
     // Create and send size request
-    QNetworkRequest sizeReq(target);
+    QNetworkRequest sizeReq(task.target);
     sizeReq.setAttribute(QNetworkRequest::RedirectPolicyAttribute, mRedirectPolicy);
-    QNetworkReply* sizeReply = mQueryAccessMan.head(sizeReq);
+    QNetworkReply* sizeReply = mNam.head(sizeReq);
 
-    // Result handler lambda
-    connect(sizeReply, &QNetworkReply::finished, this, [&]()
-    {
-        // clazy lamda warnings are disabled since the outer function can never return without this lamda being called
-
-        // Set size return buffer
-        if(sizeReply->error() == QNetworkReply::NoError) // clazy:exclude=lambda-in-connect
-            returnBuffer = sizeReply->header(QNetworkRequest::ContentLengthHeader).toLongLong();
-
-        // End wait loop
-        sizeCheckWait.quit(); // clazy:exclude=lambda-in-connect
-    });
-
-    // Stall until request is finished
-    sizeCheckWait.exec();
-
-    // Return error status
-    return NetworkReplyError(sizeReply, target);
+    // Store reply association
+    mActiveTasks[sizeReply] = task;
 }
 
-IoOpReport AsyncDownloadManager::startDownload(DownloadTask task)
+void AsyncDownloadManager::startTrueDownloads()
+{
+    mStatus = Status::Downloading;
+
+    // Connect to finished handler
+    assert(connect(&mNam, &QNetworkAccessManager::finished, this, &AsyncDownloadManager::downloadFinishedHandler));
+
+    for(int i = 0; !mPendingDownloads.isEmpty() && (i < mMaxSimultaneous || mMaxSimultaneous < 1); i++)
+        startDownload(mPendingDownloads.takeFirst());
+}
+
+void AsyncDownloadManager::startDownload(DownloadTask task)
 {
     // Create file handle
     QFile* file = new QFile(task.dest, this); // Parent constructor ensures deletion when 'this' is deleted
@@ -277,74 +262,61 @@ IoOpReport AsyncDownloadManager::startDownload(DownloadTask task)
     // Open file
     IoOpReport streamOpen = fileWriter->openFile();
     if(!streamOpen.wasSuccessful())
-        return streamOpen;
+        mReportBuilder.wDownload(DownloadOpReport::failedDownload(task, streamOpen.outcome() + ": " + streamOpen.outcomeInfo()));
 
     // Start download
     QNetworkRequest downloadReq(task.target);
     downloadReq.setAttribute(QNetworkRequest::RedirectPolicyAttribute, mRedirectPolicy);
-    QNetworkReply* reply = mDownloadAccessMan.get(downloadReq);
+    QNetworkReply* reply = mNam.get(downloadReq);
 
     // Connect reply to support slots
-    connect(reply, &QNetworkReply::readyRead, this, &AsyncDownloadManager::readyRead);
-    connect(reply, &QNetworkReply::downloadProgress, this, &AsyncDownloadManager::downloadProgressHandler);
+    assert(connect(reply, &QNetworkReply::readyRead, this, &AsyncDownloadManager::readyReadHandler));
+    assert(connect(reply, &QNetworkReply::downloadProgress, this, &AsyncDownloadManager::downloadProgressHandler));
 
-    // Add to active list
-    mActiveDownloads[reply] = fileWriter;
+    // Add to active writers
+    mActiveWriters[reply] = fileWriter;
 
-    // Add reply to task map
-    mReplyTaskMap[reply] = task;
-
-    // Return success
-    return IoOpReport();
+    // Add to active tasks
+    mActiveTasks[reply] = task;
 }
 
-void AsyncDownloadManager::cancelAll()
+void AsyncDownloadManager::stopOnError()
 {
-    // Remove pending downloads
-    mPendingDownloads.clear();
+    Status oldStatus = mStatus;
+    mStatus = Status::StoppingOnError;
 
-    // Abort all remaining downloads
-    QHash<QNetworkReply*, std::shared_ptr<FileStreamWriter>>::const_iterator i;
-    for(i = mActiveDownloads.constBegin(); i != mActiveDownloads.constEnd(); i++)
+    // Abort active tasks
+    QHash<QNetworkReply*, DownloadTask>::const_iterator i;
+    for(i = mActiveTasks.constBegin(); i != mActiveTasks.constEnd(); i++)
         i.key()->abort();
 
-    mActiveDownloads.clear();
+    if(oldStatus == Status::Enumerating)
+    {
+        while(!mPendingEnumerants.isEmpty())
+            mReportBuilder.wDownload(DownloadOpReport::skippedDownload(mPendingEnumerants.takeFirst()));
+        }
+    else if(oldStatus == Status::Downloading)
+    {
+        while(!mPendingDownloads.isEmpty())
+            mReportBuilder.wDownload(DownloadOpReport::skippedDownload(mPendingDownloads.takeFirst()));
+    }
 }
 
-void AsyncDownloadManager::cleanup()
+void AsyncDownloadManager::finish()
 {
-    // Emit final report
-    emit finished(mReportBuilder.finalize(mStatus == Status::UserAborting));
-
-    // Reset
+    emit finished(mReportBuilder.build());
     reset();
 }
 
 void AsyncDownloadManager::reset()
 {
-    // Reset state
-    mPendingDownloads.clear();
-    mActiveDownloads.clear();
-    mReplyTaskMap.clear();
-    mCurrentBytes.clear();
-    mTotalBytes.clear();
+    mStatus = Status::Initial;
     mReportBuilder = DownloadManagerReport::Builder();
-    mStatus = Status::PreStart;
+    mTotalBytes.clear();
+    mCurrentBytes.clear();
 }
 
 //Public:
-/*!
- *  Inserts @a task into the download queue.
- *
- *  If the same task is already present in the queue then this function does nothing.
- */
-void AsyncDownloadManager::appendTask(const DownloadTask& task)
-{
-    // Don't let the same task be added twice
-    if(mStatus != Status::Processing && !mPendingDownloads.contains(task))
-        mPendingDownloads.append(task);
-}
-
 /*!
  *  Returns the number of allowed simultaneous downloads.
  *
@@ -361,7 +333,7 @@ int AsyncDownloadManager::maxSimultaneous() const { return mMaxSimultaneous; }
  *
  *  @sa setRedirectPolicy().
  */
-QNetworkRequest::RedirectPolicy AsyncDownloadManager::redirectPolicy() const { return mDownloadAccessMan.redirectPolicy(); }
+QNetworkRequest::RedirectPolicy AsyncDownloadManager::redirectPolicy() const { return mNam.redirectPolicy(); }
 
 /*!
  *  Returns @c true if the manager is configured to overwrite local files that already exist;
@@ -374,26 +346,34 @@ QNetworkRequest::RedirectPolicy AsyncDownloadManager::redirectPolicy() const { r
 bool AsyncDownloadManager::isOverwrite() const { return mOverwrite; }
 
 /*!
- *  Returns @c true if the manager is configured to automatically abort all downloads if one fails;
+ *  Returns @c true if the manager is configured to automatically halt all downloads if one fails;
  *  otherwise returns @c false.
  *
  *  The default is @c false.
  *
- *  @sa setAutoAbort().
+ *  @sa setStopOnError().
  */
-bool AsyncDownloadManager::isAutoAbort() const { return mAutoAbort; }
+bool AsyncDownloadManager::isStopOnError() const { return mStopOnError; }
 
 /*!
  *  Returns current number of download tasks remaining, which includes pending and active downloads.
  *
  *  @sa hasTasks().
  */
-int AsyncDownloadManager::taskCount() const { return mPendingDownloads.count() + mActiveDownloads.count(); }
+int AsyncDownloadManager::taskCount() const
+{
+    return mPendingEnumerants.count() + mPendingDownloads.count() + mActiveTasks.count();
+}
 
 /*!
  *  Returns @c true if the manager has tasks left to process; otherwise returns @c false.
  */
 bool AsyncDownloadManager::hasTasks() const { return taskCount() > 0; }
+
+/*!
+ *  Returns @c true if the manager is currently processing its download queue; otherwise returns @c false.
+ */
+bool AsyncDownloadManager::isProcessing() const { return mStatus != Status::Initial; }
 
 /*!
  *  Sets the number of allowed simultaneous downloads to @a maxSimultaneous.
@@ -412,8 +392,7 @@ void AsyncDownloadManager::setMaxSimultaneous(int maxSimultaneous) { mMaxSimulta
 void AsyncDownloadManager::setRedirectPolicy(QNetworkRequest::RedirectPolicy redirectPolicy)
 {
     mRedirectPolicy = redirectPolicy;
-    mDownloadAccessMan.setRedirectPolicy(redirectPolicy);
-    mQueryAccessMan.setRedirectPolicy(redirectPolicy);
+    mNam.setRedirectPolicy(redirectPolicy);
 }
 
 /*!
@@ -425,15 +404,113 @@ void AsyncDownloadManager::setRedirectPolicy(QNetworkRequest::RedirectPolicy red
 void AsyncDownloadManager::setOverwrite(bool overwrite) { mOverwrite = overwrite; }
 
 /*!
- *  Configures the manager to automatically abort all downloads after a single failure on if @a autoAbort
+ *  Configures the manager to automatically halt all downloads after a single failure on if @a stopOnError
  *  is @c true.
  *
- *  @sa isAutoAbort().
+ *  @sa isStopOnError().
  */
-void AsyncDownloadManager::setAutoAbort(bool autoAbort) { mAutoAbort = autoAbort; }
+void AsyncDownloadManager::setStopOnError(bool stopOnError) { mStopOnError = stopOnError; }
+
+/*!
+ *  Inserts @a task into the download queue.
+ *
+ *  If the same task is already present in the queue then this function does nothing.
+ *
+ *  @note Tasks can only be added if the download manager isn't currently processing its queue.
+ */
+void AsyncDownloadManager::appendTask(const DownloadTask& task)
+{
+    // Don't let the same task be added twice
+    if(!isProcessing() && !mPendingEnumerants.contains(task))
+        mPendingEnumerants.append(task);
+}
+
+/*!
+ *  Removes all tasks from the download manager queue.
+ *
+ *  @note Tasks can only be cleared if the download manager isn't currently processing its queue.
+ */
+void AsyncDownloadManager::clearTasks()
+{
+    if(!isProcessing() && hasTasks())
+        mPendingEnumerants.clear();
+}
 
 //-Slots----------------------------------------------------------------------------------------------------------
 //Private:
+
+/*  NOTE: In most of these slots we don't want to abort replies manually as this will make error handling when
+ *  the finished() signal of the reply is emitted a mess. By letting the signal simply return without taking
+ *  the action required to proceed with the task, the reply will be failed by the network access manager
+ *  with the appropriate error type, which can then cleanly be handled in the finished() handler.
+*/
+
+void AsyncDownloadManager::sslErrorHandler(QNetworkReply* reply, const QList<QSslError>& errors)
+{
+    // Create error message
+    GenericError errMsg(GenericError::Warning, SSL_ERR.arg(reply->url().toString()), CONTINUE_QUES,
+                        String::join(errors, [](const QSslError& err){ return err.errorString(); }, ENDL, LIST_ITEM_PREFIX));
+
+    // Signal result
+    bool ignoreErrors = false;
+
+    // Emit signal for answer
+    emit sslErrors(errMsg, &ignoreErrors);
+
+    if(ignoreErrors)
+        reply->ignoreSslErrors();
+    //else -> Reply will end with error, which will be handled by the finished() handler
+}
+
+void AsyncDownloadManager::authHandler(QNetworkReply* reply, QAuthenticator* authenticator)
+{
+    // Emit signal for auth
+    emit authenticationRequired(PROMPT_AUTH.arg(reply->url().host()), authenticator);
+
+    // If auth object doesn't have credentials filled in, reply will auto fail and be handled
+    // by the finished() handler
+}
+
+void AsyncDownloadManager::preSharedAuthHandler(QNetworkReply* reply, QSslPreSharedKeyAuthenticator* authenticator)
+{
+    // Emit signal for auth
+    emit preSharedKeyAuthenticationRequired(PROMPT_PRESHARED_AUTH.arg(reply->url().host()), authenticator);
+
+    // If auth object doesn't have key filled in, reply will auto fail and be handled
+    // by the finished() handler
+}
+
+void AsyncDownloadManager::proxyAuthHandler(const QNetworkProxy& proxy, QAuthenticator* authenticator)
+{
+    // Emit signal for auth
+    emit proxyAuthenticationRequired(PROMPT_AUTH.arg(proxy.hostName()), authenticator);
+}
+
+void AsyncDownloadManager::readyReadHandler()
+{
+    // Get the object that called this slot
+    QNetworkReply* senderNetworkReply = qobject_cast<QNetworkReply*>(sender());
+
+    // Ensure the signal that triggered this slot belongs to the above class by checking for null pointer
+    if(senderNetworkReply == nullptr)
+        throw std::runtime_error("Pointer conversion to network reply failed");
+
+    // Write available data
+    std::shared_ptr<FileStreamWriter> writer = mActiveWriters[senderNetworkReply];
+    IoOpReport wr = writer->writeRawData(senderNetworkReply->readAll());
+
+    if(!wr.wasSuccessful())
+    {
+        // Close and delete file, finished handler will use this info to create correct report
+        writer->file()->remove(); // Closes file first
+
+        if(mStopOnError)
+            stopOnError();
+        else
+            senderNetworkReply->abort();
+    }
+}
+
 void AsyncDownloadManager::downloadProgressHandler(qint64 bytesCurrent, qint64 bytesTotal)
 {
     // Get the object that called this slot
@@ -446,10 +523,10 @@ void AsyncDownloadManager::downloadProgressHandler(qint64 bytesCurrent, qint64 b
     // Update total size if needed
     if(bytesTotal != 0)
     {
-        DownloadTask taskOfReply = mReplyTaskMap.value(senderNetworkReply);
-        if(mTotalBytes.value(taskOfReply) != bytesTotal)
+        DownloadTask task = mActiveTasks.value(senderNetworkReply);
+        if(mTotalBytes.value(task) != bytesTotal)
         {
-            mTotalBytes.setValue(taskOfReply, bytesTotal);
+            mTotalBytes.setValue(task, bytesTotal);
             emit downloadTotalChanged(mTotalBytes.total());
         }
     }
@@ -461,191 +538,261 @@ void AsyncDownloadManager::downloadProgressHandler(qint64 bytesCurrent, qint64 b
     emit downloadProgress(mCurrentBytes.total());
 }
 
-void AsyncDownloadManager::downloadFinished(QNetworkReply* reply)
+void AsyncDownloadManager::sizeQueryFinishedHandler(QNetworkReply* reply)
 {
-    // Get writer
-    std::shared_ptr<FileStreamWriter> fileWriter = mActiveDownloads[reply];
+    // Get associated task and remove from active hash
+    DownloadTask task = mActiveTasks.take(reply);
 
-    // Close and delete file
-    mActiveDownloads[reply]->closeFile();
-    delete fileWriter->file();
-
-    // Remove from active downloads
-    mActiveDownloads.remove(reply);
-
-    // Check for errors
-    if(reply->error() == QNetworkReply::OperationCanceledError)
+    // Successful query
+    if(reply->error() == QNetworkReply::NoError)
     {
-        // Download op report was already handled in the case of skipping, so only mark if aborting
-        if(mStatus == Status::AutoAborting || mStatus == Status::UserAborting)
-            mReportBuilder.wDownload(DownloadOpReport::abortedDownload(mReplyTaskMap[reply]));
+        // Record file size
+        qint64 fileSize = reply->header(QNetworkRequest::ContentLengthHeader).toLongLong();
+
+        // Guess reasonable size if 0 was given (server doesn't support/fill field)
+        if(fileSize == 0)
+            fileSize = mTotalBytes.isEmpty() ? PRESUMED_SIZE : mTotalBytes.mean();
+
+        // Record size
+        mTotalBytes.setValue(task, fileSize);
+
+        // Forward task to download list
+        mPendingDownloads.append(task);
     }
-    else if(reply->error() != QNetworkReply::NoError)
+    else if(reply->error() == QNetworkReply::OperationCanceledError) // Aborted query
     {
-        mReportBuilder.wDownload(DownloadOpReport::failedDownload(mReplyTaskMap[reply], reply->errorString()));
-
-        if(mAutoAbort)
+        switch(mStatus)
         {
-            mStatus = Status::AutoAborting;
-            cancelAll();
+            case Status::StoppingOnError:
+                    mReportBuilder.wDownload(DownloadOpReport::skippedDownload(task));
+                break;
+            case Status::Aborting:
+                    mReportBuilder.wDownload(DownloadOpReport::abortedDownload(task));
+                break;
+            default:
+                throw std::runtime_error("Aborted query handler reached without matching status!");
         }
     }
-    else
-        mReportBuilder.wDownload(DownloadOpReport::completedDownload(mReplyTaskMap[reply]));
-
-    // Remove corresponding task
-    mReplyTaskMap.remove(reply);
-
-    // Add next pending download if not aborting
-    if(mStatus != Status::AutoAborting && mStatus != Status::UserAborting && !mPendingDownloads.isEmpty())
-        startDownload(mPendingDownloads.takeFirst());
-    else if(mPendingDownloads.isEmpty()) // End processing if all downloads are finished
-        cleanup();
-}
-
-void AsyncDownloadManager::readyRead()
-{
-    // Get the object that called this slot
-    QNetworkReply* senderNetworkReply = qobject_cast<QNetworkReply*>(sender());
-
-    // Ensure the signal that triggered this slot belongs to the above class by checking for null pointer
-    if(senderNetworkReply == nullptr)
-        throw std::runtime_error("Pointer conversion to network reply failed");
-
-    // Write available data
-    std::shared_ptr<FileStreamWriter> writer = mActiveDownloads[senderNetworkReply];
-    writer->writeRawData(senderNetworkReply->readAll());
-
-    if(!writer->status().wasSuccessful())
+    else // Failed query
     {
-        mReportBuilder.wDownload(DownloadOpReport::failedDownload(mReplyTaskMap[senderNetworkReply],
-                                                                  writer->status().outcome() + ": " + writer->status().outcomeInfo()));
+        // Record error
+        mReportBuilder.wDownload(DownloadOpReport::failedDownload(task, reply->errorString()));
 
-        if(mAutoAbort)
+        if(mStopOnError)
+            stopOnError();
+    }
+
+    // Check for next steps
+    if(!mPendingEnumerants.isEmpty())
+    {
+        // We shouldn't add more tasks if aborting, but this doesn't need to be checked for explicitly
+        // as the abort will empty out the pending list
+        startSizeQuery(mPendingEnumerants.takeFirst());
+    }
+    else if(mActiveTasks.isEmpty()) // Enumeration finished
+    {
+        // Disconnect from this slot
+        assert(disconnect(&mNam, &QNetworkAccessManager::finished, this, &AsyncDownloadManager::sizeQueryFinishedHandler));
+
+        if(mStatus == Status::Enumerating) // Didn't abort
         {
-            mStatus = Status::AutoAborting;
-            cancelAll();
+            emit downloadTotalChanged(mTotalBytes.total());
+            startTrueDownloads();
         }
         else
-            senderNetworkReply->abort();
+            finish();
     }
 }
 
-void AsyncDownloadManager::sslErrorHandler(QNetworkReply* reply, const QList<QSslError>& errors)
+void AsyncDownloadManager::downloadFinishedHandler(QNetworkReply* reply)
 {
-    // Create error message
-    GenericError errMsg(GenericError::Warning, SSL_ERR.arg(reply->url().toString()), CONTINUE_QUES,
-                        String::join(errors, [](const QSslError& err){ return err.errorString(); }, ENDL, LIST_ITEM_PREFIX));
+    // Get associated task and remove from active hash
+    DownloadTask task = mActiveTasks.take(reply);
 
-    // Signal result
-    bool abortDownload = true;
+    // Get writer
+    std::shared_ptr<FileStreamWriter> fileWriter = mActiveWriters[reply];
 
-    // Emit signal for answer
-    emit sslErrors(errMsg, &abortDownload);
+    // Check for write error
+    bool writeError = !fileWriter->file()->isOpen();
 
-    // Abort if desired
-    if(abortDownload)
+    // Successful download
+    if(reply->error() == QNetworkReply::NoError)
+        mReportBuilder.wDownload(DownloadOpReport::completedDownload(task));
+    else if(reply->error() == QNetworkReply::OperationCanceledError) // Aborted download
     {
-        mReportBuilder.wDownload(DownloadOpReport::skippedDownload(mReplyTaskMap[reply]));
-        reply->abort();
+        if(writeError)
+            mReportBuilder.wDownload(DownloadOpReport::failedDownload(task, fileWriter->status().outcomeInfo()));
+        else
+        {
+            switch(mStatus)
+            {
+                case Status::StoppingOnError:
+                        mReportBuilder.wDownload(DownloadOpReport::skippedDownload(task));
+                    break;
+                case Status::Aborting:
+                        mReportBuilder.wDownload(DownloadOpReport::abortedDownload(task));
+                    break;
+                default:
+                    throw std::runtime_error("Aborted query handler reached without matching status!");
+            }
+        }
     }
-    else
-        reply->ignoreSslErrors();
-}
-
-void AsyncDownloadManager::authHandler(QNetworkReply* reply, QAuthenticator* authenticator)
-{
-    // Signal result
-    bool skipDownload = true;
-
-    // Emit signal for answer
-    emit authenticationRequired(PROMPT_AUTH.arg(reply->url().host()), authenticator, &skipDownload);
-
-    // Skip if desired
-    if(skipDownload)
+    else // Failed Download
     {
-        mReportBuilder.wDownload(DownloadOpReport::skippedDownload(mReplyTaskMap[reply]));
-        reply->abort();
+        // Record error
+        mReportBuilder.wDownload(DownloadOpReport::failedDownload(task, reply->errorString()));
+
+        if(mStopOnError)
+            stopOnError();
     }
-}
 
-void AsyncDownloadManager::preSharedAuthHandler(QNetworkReply* reply, QSslPreSharedKeyAuthenticator* authenticator)
-{
-    // Signal result
-    bool skipDownload = true;
+    // Close and delete file handle
 
-    // Emit signal for answer
-    emit preSharedKeyAuthenticationRequired(PROMPT_PRESHARED_AUTH.arg(reply->url().host()), authenticator, &skipDownload);
+    if(!writeError)
+        fileWriter->closeFile();
+    delete fileWriter->file();
 
-    // Skip if desired
-    if(skipDownload)
+    // Remove from active writers
+    mActiveWriters.remove(reply);
+
+    // Check for next steps
+    if(!mPendingDownloads.isEmpty())
     {
-        mReportBuilder.wDownload(DownloadOpReport::skippedDownload(mReplyTaskMap[reply]));
-        reply->abort();
+        // We shouldn't add more tasks if aborting, but this doesn't need to be checked for explicitly
+        // as the abort will empty out the pending list
+        startDownload(mPendingDownloads.takeFirst());
     }
-}
+    else if(mActiveTasks.isEmpty()) // Downloads finished
+    {
+        // Disconnect from this slot
+        assert(disconnect(&mNam, &QNetworkAccessManager::finished, this, &AsyncDownloadManager::downloadFinishedHandler));
 
-void AsyncDownloadManager::proxyAuthHandler(const QNetworkProxy& proxy, QAuthenticator* authenticator)
-{
-    // Signal result
-    bool abortDownload = true;
-
-    // Emit signal for answer
-    emit proxyAuthenticationRequired(PROMPT_AUTH.arg(proxy.hostName()), authenticator, &abortDownload);
-
-    // Abort if desired
-    if(abortDownload)
-        cancelAll();
+        // Generate report and end
+        finish();
+    }
 }
 
 //Public:
 /*!
- *  Starts processing the download queue, which prevents further additions to the queue.
+ *  Starts processing the download queue, which prevents further modifications to the queue.
  *
  *  Various signals of this class are used to communicate download progress or issues with downloads
  *  while processing is in-progress.
+ *
+ *  If the manager's queue is empty or the manager is already processing the queue this function does nothing.
  *
  *  @sa finished()
  */
 void AsyncDownloadManager::processQueue()
 {
-    // Set status
-    mStatus = Status::Processing;
-
-    // Ensure instance will reset when complete
-    QScopeGuard resetGuard([this](){ reset(); }); // Need lambda since function is private
-
-    // Get total task size
-    NetworkReplyError enumError = enumerateTotalSize();
-    if(enumError.isValid())
+    if(hasTasks() && !isProcessing())
     {
-        reset();
-        emit finished(DownloadManagerReport(enumError));
-    }
-    else
-    {
-        // Add initial downloads
-        for(int j = 0; j < mMaxSimultaneous && !mPendingDownloads.isEmpty() || mMaxSimultaneous < 1; j++)
-            startDownload(mPendingDownloads.takeFirst());
+        // Cause busy state on connected progress bars
+        emit downloadProgress(0);
+        emit downloadTotalChanged(0);
+
+        startSizeEnumeration();
     }
 }
-
 
 /*!
  *  Aborts all in-progress and remaining downloads immediately.
  *
- *  The outcome of the following manager's report is set to Outcome::UserAbort.
+ *  The outcome of the following manager's report is set to Outcome::Abort.
  */
 void AsyncDownloadManager::abort()
 {
-    if(!mActiveDownloads.isEmpty() || !mPendingDownloads.isEmpty())
+    if(isProcessing() && mStatus != Status::Aborting && mStatus != Status::StoppingOnError)
     {
-        mStatus = Status::UserAborting;
-        cancelAll();
+        Status oldStatus = mStatus;
+        mStatus = Status::Aborting;
+
+        // Abort active tasks
+        QHash<QNetworkReply*, DownloadTask>::const_iterator i;
+        for(i = mActiveTasks.constBegin(); i != mActiveTasks.constEnd(); i++)
+            i.key()->abort();
+
+        if(oldStatus == Status::Enumerating)
+        {
+            while(!mPendingEnumerants.isEmpty())
+                mReportBuilder.wDownload(DownloadOpReport::abortedDownload(mPendingEnumerants.takeFirst()));
+            }
+        else if(oldStatus == Status::Downloading)
+        {
+            while(!mPendingDownloads.isEmpty())
+                mReportBuilder.wDownload(DownloadOpReport::abortedDownload(mPendingDownloads.takeFirst()));
+        }
     }
 }
 
 //-Signals------------------------------------------------------------------------------------------------
+/*!
+ *  @fn void AsyncDownloadManager::sslErrors(Qx::GenericError errorMsg, bool* ignore)
+ *
+ *  This signal is emitted if the SSL/TLS session encountered errors during the set up, including certificate
+ *  verification errors. The @a errorMsg parameter details the errors.
+ *
+ *  To indicate that the errors are not fatal and that the connection should proceed, the @a ignore parameter
+ *  should be set to @c true; otherwise the task experiencing the errors will be halted with an error.
+ *
+ *  This signal can be used to display an error message to the user indicating that security may be compromised.
+ *
+ *  @note It is not possible to use a QueuedConnection to connect to this signal, as the connection will automatically
+ *  aborts if @a abort has not been modified when the signal returns.
+ *
+ *  See also QNetworkAccessManager::sslErrors().
+ */
+
+/*!
+ *  @fn void AsyncDownloadManager::authenticationRequired(QString prompt, QAuthenticator* authenticator)
+ *
+ *  This signal is emitted whenever a final server requests authentication before it delivers the requested contents,
+ *  with @a prompt providing user-friendly text that describes the request.
+ *
+ *  The slot connected to this signal should provide the requested credentials via @a authenticator, or else the
+ *  download that requires this authentication will fail with an error. If no slots are  connected to this signal
+ *  then downloads that require authentication will always fail.
+ *
+ *  The manager caches the provided credentials internally and will send the same values if the server requires
+ *  authentication again, without emitting the authenticationRequired() signal. If it rejects the credentials, this
+ *  signal will be emitted again.
+ *
+ *  @note It is not possible to use a QueuedConnection to connect to this signal, as the connection will fail if the
+ *  authenticator has not been filled in with new information when the signal returns.
+ */
+
+/*!
+ *  @fn void AsyncDownloadManager::preSharedKeyAuthenticationRequired(QString prompt, QSslPreSharedKeyAuthenticator* authenticator)
+ *
+ *  This signal is emitted if a sever SSL/TLS handshake negotiates a PSK ciphersuite, and therefore a PSK
+ *  authentication is then required. @a prompt provides a user-friendly text that describes the request.
+ *
+ *  The slot connected to this signal should provide the requested key via @a authenticator, or else the download that
+ *  requires this authentication will fail with an error. If no slots are connected to this signal then downloads that
+ *  require PSK authentication will always fail.
+ *
+ *  @note It is not possible to use a QueuedConnection to connect to this signal, as the connection will fail if the
+ *  authenticator has not been filled in with new information when the signal returns.
+ */
+
+/*!
+ *  @fn void AsyncDownloadManager::proxyAuthenticationRequired(QString prompt, QAuthenticator* authenticator)
+ *
+ *  This signal is emitted whenever a proxy requests authentication, with @a prompt providing user-friendly text that
+ *  describes the request.
+ *
+ *  The slot connected to this signal should provide the requested credentials via @a authenticator, or else
+ *  all downloads that rely on the proxy will fail with an error. If no slots are connected to this signal then downloads
+ *  that involve authenticated proxies will always fail.
+ *
+ *  The manager caches the provided credentials internally and will send the same values if the proxy requires
+ *  authentication again, without emitting the proxyAuthenticationRequired() signal. If it rejects the credentials, this
+ *  signal will be emitted again.
+ *
+ *  @note It is not possible to use a QueuedConnection to connect to this signal, as the connection will fail if the
+ *  authenticator has not been filled in with new information when the signal returns.
+ */
+
 /*!
  *  @fn void AsyncDownloadManager::downloadProgress(qint64 bytesCurrent)
  *
@@ -673,74 +820,6 @@ void AsyncDownloadManager::abort()
  *  or because a fatal error or user abortion caused it to end prematurely,
  *
  *  The signal parameter @a report details the outcome of the download procedure.
- */
-
-/*!
- *  @fn void AsyncDownloadManager::sslErrors(Qx::GenericError errorMsg, bool* abort)
- *
- *  This signal is emitted if the SSL/TLS session encountered errors during the set up, including certificate
- *  verification errors. The errors parameter contains the list of errors.
- *
- *  To indicate that the errors are not fatal and that the connection should proceed, the @a abort parameter
- *  should be set to @c false; otherwise processing will be aborted.
- *
- *  This signal can be used to display an error message to the user indicating that security may be compromised and
- *  display the SSL settings (see sslConfiguration() to obtain it).
- *
- *  @note It is not possible to use a QueuedConnection to connect to this signal, as the connection will automatically
- *  aborts if @a abort has not been modified when the signal returns.
- *
- *  See also QNetworkAccessManager::sslErrors().
- */
-
-/*!
- *  @fn void AsyncDownloadManager::authenticationRequired(QString prompt, QAuthenticator* authenticator, bool* skip)
- *
- *  This signal is emitted whenever a final server requests authentication before it delivers the requested contents,
- *  with @a prompt providing user-friendly text that describes the request.
- *
- *  The slot connected to this signal should provide the requested credentials via @a authenticator and set
- *  @a skip to false, or else the download that requires this authentication will be stopped. If no slots are
- *  connected to this signal then downloads that require authentication will always be skipped.
- *
- *  The manager caches the provided credentials internally and will send the same values if the server requires
- *  authentication again, without emitting the authenticationRequired() signal. If it rejects the credentials, this
- *  signal will be emitted again.
- *
- *  @note It is not possible to use a QueuedConnection to connect to this signal, as the connection will fail if the
- *  authenticator has not been filled in with new information when the signal returns.
- */
-
-/*!
- *  @fn void AsyncDownloadManager::preSharedKeyAuthenticationRequired(QString prompt, QSslPreSharedKeyAuthenticator* authenticator, bool* skip)
- *
- *  This signal is emitted if a sever SSL/TLS handshake negotiates a PSK ciphersuite, and therefore a PSK
- *  authentication is then required. @a prompt provides a user-friendly text that describes the request.
- *
- *  The slot connected to this signal should provide the requested key via @a authenticator and set
- *  @a skip to false, or else the download that requires this authentication will be stopped. If no slots are
- *  connected to this signal then downloads that require PSK authentication will always be skipped.
- *
- *  @note It is not possible to use a QueuedConnection to connect to this signal, as the connection will fail if the
- *  authenticator has not been filled in with new information when the signal returns.
- */
-
-/*!
- *  @fn void AsyncDownloadManager::proxyAuthenticationRequired(QString prompt, QAuthenticator* authenticator, bool* abort)
- *
- *  This signal is emitted whenever a proxy requests authentication, with @a prompt providing user-friendly text that
- *  describes the request.
- *
- *  The slot connected to this signal should provide the requested credentials via @a authenticator and set
- *  @a abort to false, or else all processing will be aborted. If no slots are connected to this signal then downloads
- *  that involve authenticated proxies will always cause the manager to abort.
- *
- *  The manager caches the provided credentials internally and will send the same values if the proxy requires
- *  authentication again, without emitting the proxyAuthenticationRequired() signal. If it rejects the credentials, this
- *  signal will be emitted again.
- *
- *  @note It is not possible to use a QueuedConnection to connect to this signal, as the connection will fail if the
- *  authenticator has not been filled in with new information when the signal returns.
  */
 
 //===============================================================================================================
@@ -786,11 +865,6 @@ SyncDownloadManager::SyncDownloadManager(QObject* parent) :
 }
 
 /*!
- *  @copydoc AsyncDownloadManager::appendTask(const DownloadTask& task)
- */
-void SyncDownloadManager::appendTask(const DownloadTask& task) { mAsyncDm->appendTask(task); }
-
-/*!
  *  @copydoc AsyncDownloadManager::maxSimultaneous()
  */
 int SyncDownloadManager::maxSimultaneous() const { return mAsyncDm->maxSimultaneous(); }
@@ -806,9 +880,9 @@ QNetworkRequest::RedirectPolicy SyncDownloadManager::redirectPolicy() const { re
 bool SyncDownloadManager::isOverwrite() const { return mAsyncDm->isOverwrite(); }
 
 /*!
- *  @copydoc AsyncDownloadManager::isAutoAbort()
+ *  @copydoc AsyncDownloadManager::isStopOnError()
  */
-bool SyncDownloadManager::isAutoAbort() const { return mAsyncDm->isAutoAbort(); }
+bool SyncDownloadManager::isStopOnError() const { return mAsyncDm->isStopOnError(); }
 
 /*!
  *  @copydoc AsyncDownloadManager::taskCount()
@@ -819,6 +893,11 @@ int SyncDownloadManager::taskCount() const { return mAsyncDm->taskCount(); }
  *  @copydoc AsyncDownloadManager::hasTasks()
  */
 bool SyncDownloadManager::hasTasks() const { return mAsyncDm->hasTasks(); }
+
+/*!
+ *  @copydoc AsyncDownloadManager::isProcessing()
+ */
+bool SyncDownloadManager::isProcessing() const { return mAsyncDm->isProcessing(); }
 
 /*!
  *  @copydoc AsyncDownloadManager::setMaxSimultaneous(int maxSimultaneous)
@@ -839,9 +918,16 @@ void SyncDownloadManager::setRedirectPolicy(QNetworkRequest::RedirectPolicy redi
 void SyncDownloadManager::setOverwrite(bool overwrite) { mAsyncDm->setOverwrite(overwrite); }
 
 /*!
- *  @copydoc AsyncDownloadManager::setAutoAbort(bool autoAbort)
+ *  @copydoc AsyncDownloadManager::setStopOnError(bool autoAbort)
  */
-void SyncDownloadManager::setAutoAbort(bool autoAbort) { mAsyncDm->setAutoAbort(autoAbort); }
+void SyncDownloadManager::setStopOnError(bool autoAbort) { mAsyncDm->setStopOnError(autoAbort); }
+
+
+/*!
+ *  @copydoc AsyncDownloadManager::appendTask(const DownloadTask& task)
+ */
+void SyncDownloadManager::appendTask(const DownloadTask& task) { mAsyncDm->appendTask(task); }
+
 
 /*!
  *  Starts processing the download queue and returns once the queue has been exhausted, a fatal error has
@@ -849,22 +935,30 @@ void SyncDownloadManager::setAutoAbort(bool autoAbort) { mAsyncDm->setAutoAbort(
  *
  *  Various signals of this class are used to communicate download progress or issues with downloads during
  *  this time.
+ *
+ *  If the manager's queue is empty or the manager is already processing the queue this function does nothing
+ *  and a null DownloadManagerReport is returned.
  */
 DownloadManagerReport SyncDownloadManager::processQueue()
 {
-    // Setup scope guard so that inner report isn't kept around wasting memory when this function ends
-    QScopeGuard resetGuard([this](){ mReport = DownloadManagerReport(); });
+    if(hasTasks() && !isProcessing())
+    {
+        // Setup scope guard so that inner report isn't kept around wasting memory when this function ends
+        QScopeGuard resetGuard([this](){ mReport = DownloadManagerReport(); });
 
-    // Start downloads
-    mAsyncDm->processQueue();
+        // Start downloads
+        mAsyncDm->processQueue();
 
-    // Spin internal event loop
-    mSpinner.exec();
+        // Spin internal event loop
+        mSpinner.exec();
 
-    // Waiting for Async manager to report finished...
+        // Waiting for Async manager to report finished...
 
-    // Return report
-    return mReport;
+        // Return report
+        return mReport;
+    }
+    else
+        return DownloadManagerReport();
 }
 
 //-Slots----------------------------------------------------------------------------------------------------------
@@ -895,27 +989,27 @@ void SyncDownloadManager::abort() { mAsyncDm->abort(); }
  */
 
 /*!
- *  @fn void SyncDownloadManager::sslErrors(Qx::GenericError errorMsg, bool* abort)
+ *  @fn void SyncDownloadManager::sslErrors(Qx::GenericError errorMsg, bool* ignore)
  *
- *  @copydoc AsyncDownloadManager::sslErrors(Qx::GenericError errorMsg, bool* abort)
+ *  @copydoc AsyncDownloadManager::sslErrors(Qx::GenericError errorMsg, bool* ignore)
  */
 
 /*!
- *  @fn void SyncDownloadManager::authenticationRequired(QString prompt, QAuthenticator* authenticator, bool* skip)
+ *  @fn void SyncDownloadManager::authenticationRequired(QString prompt, QAuthenticator* authenticator)
  *
- *  @copydoc AsyncDownloadManager::authenticationRequired(QString prompt, QAuthenticator* authenticator, bool* skip)
+ *  @copydoc AsyncDownloadManager::authenticationRequired(QString prompt, QAuthenticator* authenticator)
  */
 
 /*!
- *  @fn void SyncDownloadManager::preSharedKeyAuthenticationRequired(QString prompt, QSslPreSharedKeyAuthenticator* authenticator, bool* skip)
+ *  @fn void SyncDownloadManager::preSharedKeyAuthenticationRequired(QString prompt, QSslPreSharedKeyAuthenticator* authenticator)
  *
- *  @copydoc AsyncDownloadManager::preSharedKeyAuthenticationRequired(QString prompt, QSslPreSharedKeyAuthenticator* authenticator, bool* skip)
+ *  @copydoc AsyncDownloadManager::preSharedKeyAuthenticationRequired(QString prompt, QSslPreSharedKeyAuthenticator* authenticator)
  */
 
 /*!
- *  @fn void SyncDownloadManager::proxyAuthenticationRequired(QString prompt, QAuthenticator* authenticator, bool* abort)
+ *  @fn void SyncDownloadManager::proxyAuthenticationRequired(QString prompt, QAuthenticator* authenticator)
  *
- *  @copydoc AsyncDownloadManager::proxyAuthenticationRequired(QString prompt, QAuthenticator* authenticator, bool* abort)
+ *  @copydoc AsyncDownloadManager::proxyAuthenticationRequired(QString prompt, QAuthenticator* authenticator)
  */
 
 }

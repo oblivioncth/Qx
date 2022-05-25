@@ -97,7 +97,7 @@ size_t qHash(const DownloadTask& key, size_t seed) noexcept
 
 /*!
  *  @var DownloadOpReport::Result DownloadOpReport::Aborted
- *  A critical/fatal error.
+ *  An aborted download.
  */
 
 //-Constructor-------------------------------------------------------------------------------------------------------
