@@ -75,6 +75,12 @@ namespace Qx
  */
 
 /*!
+ * @fn template <typename K, typename V> bool Cumulation<K, V>::isEmpty() const
+ *
+ *  Returns @c true if the cumulation has no components; otherwise, returns @c false.
+ */
+
+/*!
  *  @fn template <typename K, typename V> V Cumulation<K, V>::mean() const
  *
  *  Returns the current mean of the cumulation, which is the sum of all its component values divided the
