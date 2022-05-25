@@ -922,12 +922,15 @@ void SyncDownloadManager::setOverwrite(bool overwrite) { mAsyncDm->setOverwrite(
  */
 void SyncDownloadManager::setStopOnError(bool autoAbort) { mAsyncDm->setStopOnError(autoAbort); }
 
-
 /*!
  *  @copydoc AsyncDownloadManager::appendTask(const DownloadTask& task)
  */
 void SyncDownloadManager::appendTask(const DownloadTask& task) { mAsyncDm->appendTask(task); }
 
+/*!
+ *  @copydoc AsyncDownloadManager::clearTasks()
+ */
+void SyncDownloadManager::clearTasks() { mAsyncDm->clearTasks(); }
 
 /*!
  *  Starts processing the download queue and returns once the queue has been exhausted, a fatal error has
