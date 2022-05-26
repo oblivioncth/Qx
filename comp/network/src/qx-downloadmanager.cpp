@@ -278,14 +278,7 @@ bool AsyncDownloadManager::startDownload(DownloadTask task)
     IoOpReport streamOpen = fileWriter->openFile();
     if(!streamOpen.wasSuccessful())
     {
-        /* Advance progress so that the task is accounted for. While it may seem more appropriate to remove the task
-         * from the total progress object and emit totalProgressChanged, this is undesirable because in the case where
-         * all downloads fail to start the maximum progress value would be reduced to zero which would put connected
-         * progress dialogs back into the busy state, instead of showing 100% as intended.
-         */
-        mCurrentBytes.setValue(task, mTotalBytes.value(task));
-        emit downloadProgress(mCurrentBytes.total());
-
+        forceFinishProgress(task);
         mReportBuilder.wDownload(DownloadOpReport::failedDownload(task, streamOpen.outcome() + ": " + streamOpen.outcomeInfo()));
         return false;
     }
@@ -327,6 +320,20 @@ void AsyncDownloadManager::stopOnError()
     {
         while(!mPendingDownloads.isEmpty())
             mReportBuilder.wDownload(DownloadOpReport::skippedDownload(mPendingDownloads.takeFirst()));
+    }
+}
+
+void AsyncDownloadManager::forceFinishProgress(const DownloadTask& task)
+{
+    if(mCurrentBytes.contains(task))
+    {
+        /* Advance progress so that the task is accounted for. While it may seem more appropriate to remove the task
+         * from the total progress object and emit totalProgressChanged, this is undesirable because in the case where
+         * all downloads fail to start the maximum progress value would be reduced to zero which would put connected
+         * progress dialogs back into the busy state, instead of showing 100% as intended.
+         */
+        mCurrentBytes.setValue(task, mTotalBytes.value(task));
+        emit downloadProgress(mCurrentBytes.total());
     }
 }
 
@@ -708,6 +715,9 @@ void AsyncDownloadManager::downloadFinishedHandler(QNetworkReply* reply)
     {
         // Record error
         mReportBuilder.wDownload(DownloadOpReport::failedDownload(task, reply->errorString()));
+
+        // Account for download in overall progress
+        forceFinishProgress(task);
 
         if(mStopOnError)
             stopOnError();

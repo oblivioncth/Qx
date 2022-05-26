@@ -176,7 +176,7 @@ private:
 
     // Halting
     void stopOnError();
-    void abortD();
+    void forceFinishProgress(const DownloadTask& task);
 
     // Cleanup
     void finish();
