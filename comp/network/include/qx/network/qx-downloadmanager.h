@@ -137,7 +137,6 @@ private:
 private:
     // Properties
     int mMaxSimultaneous; // < 1 is unlimited
-    QNetworkRequest::RedirectPolicy mRedirectPolicy; // Applied to each request as well as manager because of priority levels
     bool mOverwrite;
     bool mStopOnError;
 

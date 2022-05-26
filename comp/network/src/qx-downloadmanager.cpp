@@ -209,14 +209,12 @@ DownloadManagerReport DownloadManagerReport::Builder::build()
 AsyncDownloadManager::AsyncDownloadManager(QObject* parent) :
     QObject(parent),
     mMaxSimultaneous(3),
-    mRedirectPolicy(QNetworkRequest::NoLessSafeRedirectPolicy),
     mOverwrite(false),
     mStopOnError(false),
     mStatus(Status::Initial)
 {
     // Configure access manager
     mNam.setAutoDeleteReplies(true);
-    mNam.setRedirectPolicy(mRedirectPolicy);
     connect(&mNam, &QNetworkAccessManager::sslErrors, this, &AsyncDownloadManager::sslErrorHandler);
     connect(&mNam, &QNetworkAccessManager::authenticationRequired, this, &AsyncDownloadManager::authHandler);
     connect(&mNam, &QNetworkAccessManager::preSharedKeyAuthenticationRequired, this, &AsyncDownloadManager::preSharedAuthHandler);
@@ -240,7 +238,6 @@ void AsyncDownloadManager::startSizeQuery(DownloadTask task)
 {
     // Create and send size request
     QNetworkRequest sizeReq(task.target);
-    sizeReq.setAttribute(QNetworkRequest::RedirectPolicyAttribute, mRedirectPolicy);
     sizeReq.setTransferTimeout(SIZE_QUERY_TIMEOUT_MS); // Override primary timeout
     QNetworkReply* sizeReply = mNam.head(sizeReq);
 
@@ -296,7 +293,6 @@ bool AsyncDownloadManager::startDownload(DownloadTask task)
 
     // Start download
     QNetworkRequest downloadReq(task.target);
-    downloadReq.setAttribute(QNetworkRequest::RedirectPolicyAttribute, mRedirectPolicy);
     QNetworkReply* reply = mNam.get(downloadReq);
 
     // Connect reply to support slots
@@ -444,13 +440,17 @@ bool AsyncDownloadManager::isProcessing() const { return mStatus != Status::Init
 void AsyncDownloadManager::setMaxSimultaneous(int maxSimultaneous) { mMaxSimultaneous = maxSimultaneous; }
 
 /*!
- *  Sets the directory policy of the manager to @a redirectPolicy.
+ *  Sets the redirect policy of the manager to @a redirectPolicy. This policy will affect all subsequent
+ *  requests created by the manager.
+ *
+ *  Use this function to enable or disable HTTP redirects on the manager's level.
+ *
+ *  The default value is QNetworkRequest::NoLessSafeRedirectPolicy.
  *
  *  @sa redirectPolicy().
  */
 void AsyncDownloadManager::setRedirectPolicy(QNetworkRequest::RedirectPolicy redirectPolicy)
 {
-    mRedirectPolicy = redirectPolicy;
     mNam.setRedirectPolicy(redirectPolicy);
 }
 
