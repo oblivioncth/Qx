@@ -278,6 +278,14 @@ bool AsyncDownloadManager::startDownload(DownloadTask task)
     IoOpReport streamOpen = fileWriter->openFile();
     if(!streamOpen.wasSuccessful())
     {
+        /* Advance progress so that the task is accounted for. While it may seem more appropriate to remove the task
+         * from the total progress object and emit totalProgressChanged, this is undesirable because in the case where
+         * all downloads fail to start the maximum progress value would be reduced to zero which would put connected
+         * progress dialogs back into the busy state, instead of showing 100% as intended.
+         */
+        mCurrentBytes.setValue(task, mTotalBytes.value(task));
+        emit downloadProgress(mCurrentBytes.total());
+
         mReportBuilder.wDownload(DownloadOpReport::failedDownload(task, streamOpen.outcome() + ": " + streamOpen.outcomeInfo()));
         return false;
     }
@@ -540,19 +548,18 @@ void AsyncDownloadManager::downloadProgressHandler(qint64 bytesCurrent, qint64 b
     if(senderNetworkReply == nullptr)
         throw std::runtime_error("Pointer conversion to network reply failed");
 
+    // Get associated task
+    DownloadTask task = mActiveTasks.value(senderNetworkReply);
+
     // Update total size if needed
-    if(bytesTotal != 0)
+    if(bytesTotal != 0 && mTotalBytes.value(task) != bytesTotal)
     {
-        DownloadTask task = mActiveTasks.value(senderNetworkReply);
-        if(mTotalBytes.value(task) != bytesTotal)
-        {
-            mTotalBytes.setValue(task, bytesTotal);
-            emit downloadTotalChanged(mTotalBytes.total());
-        }
+        mTotalBytes.setValue(task, bytesTotal);
+        emit downloadTotalChanged(mTotalBytes.total());
     }
 
     // Update cumulative progress
-    mCurrentBytes.setValue(senderNetworkReply, bytesCurrent);
+    mCurrentBytes.setValue(task, bytesCurrent);
 
     // Emit progress
     emit downloadProgress(mCurrentBytes.total());

@@ -19,6 +19,20 @@
  * and passing them as pointers/references where possible. Cant use a pointer for download task list because
  * then the manager cant prevent multiple of the same download task from being added. Though, if this would
  * be the only way to achieve significant gains, it might be worth sacrificing.
+ *
+ * Another approach may be prehashing DownloadTask (provide access to value with method), then have the
+ * download progress cumulations use those hashes as a key instead of a full DownloadTask object. This
+ * could be further optimized by implementing a template class wrapper with qHash implemented such that
+ * it just passes this hash value along so that when used in a QHash computational load is reduced to a
+ * minimum
+ *
+ * I.e https://stackoverflow.com/questions/33188513/how-to-pass-hash-value-into-unordered-map-to-reduce-time-lock-held
+ *
+ * Though since this would require storing the hash with the download task, the space savings would be
+ * somewhat reduced.
+ *
+ * Ultimately allocating the download tasks on the heap and trying to implement an efficient way to detect
+ * duplicates with pointers to the tasks, or simply giving up this detection, may be the way to go.
  */
 namespace Qx
 {
@@ -137,7 +151,7 @@ private:
 
     // Progress
     Cumulation<DownloadTask, qint64> mTotalBytes;
-    Cumulation<QNetworkReply*, qint64> mCurrentBytes;
+    Cumulation<DownloadTask, qint64> mCurrentBytes;
 
     // Report
     DownloadManagerReport::Builder mReportBuilder;
