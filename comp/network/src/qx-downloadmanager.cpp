@@ -176,6 +176,17 @@ DownloadManagerReport DownloadManagerReport::Builder::build()
 
 // TODO: Add a way to retry failed downloads
 
+/* TODO: Currently assuming all abortions not triggered by user or this class are due
+ * to timeouts. This seems *mostly* safe, and is somewhat the only option until Qt
+ * adds an error type specifically for transfer timeouts. This is partially limited
+ * by emscripten not exposing them either (used for Qt's Wasm network implementation),
+ * though it is definitely possible to change the HTTP implementation to support this.
+ * I've created an issue for emscripten as the first steps to try to get a patch for
+ * Qt going https://github.com/emscripten-core/emscripten/issues/17070
+ *
+ * Ideally the change is made and they are handled as their own enum.
+ */
+
 /*!
  *  @class AsyncDownloadManager qx/network/qx-downloadmanager.h
  *  @ingroup qx-network
@@ -303,23 +314,27 @@ bool AsyncDownloadManager::startDownload(DownloadTask task)
 
 void AsyncDownloadManager::stopOnError()
 {
-    Status oldStatus = mStatus;
-    mStatus = Status::StoppingOnError;
-
-    // Abort active tasks
-    QHash<QNetworkReply*, DownloadTask>::const_iterator i;
-    for(i = mActiveTasks.constBegin(); i != mActiveTasks.constEnd(); i++)
-        i.key()->abort();
-
-    if(oldStatus == Status::Enumerating)
+    // Protect against overlap
+    if(mStatus != Status::StoppingOnError && mStatus != Status::Aborting)
     {
-        while(!mPendingEnumerants.isEmpty())
-            mReportBuilder.wDownload(DownloadOpReport::skippedDownload(mPendingEnumerants.takeFirst()));
+        Status oldStatus = mStatus;
+        mStatus = Status::StoppingOnError;
+
+        // Abort active tasks
+        QHash<QNetworkReply*, DownloadTask>::const_iterator i;
+        for(i = mActiveTasks.constBegin(); i != mActiveTasks.constEnd(); i++)
+            i.key()->abort();
+
+        if(oldStatus == Status::Enumerating)
+        {
+            while(!mPendingEnumerants.isEmpty())
+                mReportBuilder.wDownload(DownloadOpReport::skippedDownload(mPendingEnumerants.takeFirst()));
         }
-    else if(oldStatus == Status::Downloading)
-    {
-        while(!mPendingDownloads.isEmpty())
-            mReportBuilder.wDownload(DownloadOpReport::skippedDownload(mPendingDownloads.takeFirst()));
+        else if(oldStatus == Status::Downloading)
+        {
+            while(!mPendingDownloads.isEmpty())
+                mReportBuilder.wDownload(DownloadOpReport::skippedDownload(mPendingDownloads.takeFirst()));
+        }
     }
 }
 
@@ -617,34 +632,35 @@ void AsyncDownloadManager::sizeQueryFinishedHandler(QNetworkReply* reply)
         // Forward task to download list
         mPendingDownloads.append(task);
     }
-    else if(reply->error() == QNetworkReply::OperationCanceledError) // Aborted query
+    else
     {
-        switch(mStatus)
-        {
-            case Status::StoppingOnError:
-                    mReportBuilder.wDownload(DownloadOpReport::skippedDownload(task));
-                break;
-            case Status::Aborting:
-                    mReportBuilder.wDownload(DownloadOpReport::abortedDownload(task));
-                break;
-            default:
-                /* TODO: Currently assuming all abortions not triggered by user or this class are due
-                 * to timeouts. This seems *mostly* safe, and is somewhat the only option until Qt
-                 * adds an error type specifically for transfer timeouts. This is partially limited
-                 * by emscripten not exposing them either (used for Qt's Wasm network implementation),
-                 * though it is definitely possible to change the HTTP implementation to support this.
-                 * I've created an issue for emscripten as the first steps to try to get a patch for
-                 * Qt going https://github.com/emscripten-core/emscripten/issues/17070
-                 */
-                mReportBuilder.wDownload(DownloadOpReport::failedDownload(task, ERR_TIMEOUT));
-        }
-    }
-    else // Failed query
-    {
-        // Record error
-        mReportBuilder.wDownload(DownloadOpReport::failedDownload(task, reply->errorString()));
+        // Get error info
+        QNetworkReply::NetworkError error = reply->error();
+        bool abortLike = error == QNetworkReply::OperationCanceledError;
+        bool timeout = abortLike && mStatus != Status::StoppingOnError && mStatus != Status::Aborting;
 
-        if(mStopOnError)
+        // Handle this error
+        if(timeout) // Transfer timeout error
+            mReportBuilder.wDownload(DownloadOpReport::failedDownload(task, ERR_TIMEOUT));
+        else if(abortLike) // True abort (by user or StopOnError)
+        {
+            switch(mStatus)
+            {
+                case Status::StoppingOnError:
+                        mReportBuilder.wDownload(DownloadOpReport::skippedDownload(task));
+                    break;
+                case Status::Aborting:
+                        mReportBuilder.wDownload(DownloadOpReport::abortedDownload(task));
+                    break;
+                default:
+                    throw std::runtime_error("Illegal usage of aborted download handler");
+            }
+        }
+        else // Other error
+            mReportBuilder.wDownload(DownloadOpReport::failedDownload(task, reply->errorString()));
+
+        // Followup if needed
+        if(mStopOnError && mStatus == Status::Enumerating)
             stopOnError();
     }
 
@@ -678,17 +694,25 @@ void AsyncDownloadManager::downloadFinishedHandler(QNetworkReply* reply)
     // Get writer
     std::shared_ptr<FileStreamWriter> fileWriter = mActiveWriters[reply];
 
-    // Check for write error
-    bool writeError = !fileWriter->file()->isOpen();
-
-    // Successful download
-    if(reply->error() == QNetworkReply::NoError)
+    // Handle outcomes
+    if(reply->error() == QNetworkReply::NoError) // Successful download
         mReportBuilder.wDownload(DownloadOpReport::completedDownload(task));
-    else if(reply->error() == QNetworkReply::OperationCanceledError) // Aborted download
+    else
     {
-        if(writeError)
+        // Get error info
+        QNetworkReply::NetworkError error = reply->error();
+        bool abortLike = error == QNetworkReply::OperationCanceledError;
+        bool timeout = abortLike && mStatus != Status::StoppingOnError && mStatus != Status::Aborting;
+        bool writeError = abortLike && !fileWriter->file()->isOpen();
+
+        // Handle this error
+        forceFinishProgress(task);
+
+        if(timeout) // Transfer timeout error
+            mReportBuilder.wDownload(DownloadOpReport::failedDownload(task, ERR_TIMEOUT));
+        else if(writeError) // IO error
             mReportBuilder.wDownload(DownloadOpReport::failedDownload(task, fileWriter->status().outcomeInfo()));
-        else
+        else if(abortLike) // True abort (by user or StopOnError)
         {
             switch(mStatus)
             {
@@ -699,34 +723,19 @@ void AsyncDownloadManager::downloadFinishedHandler(QNetworkReply* reply)
                         mReportBuilder.wDownload(DownloadOpReport::abortedDownload(task));
                     break;
                 default:
-                    /* TODO: Currently assuming all abortions not triggered by user or this class are due
-                     * to timeouts. This seems *mostly* safe, and is somewhat the only option until Qt
-                     * adds an error type specifically for transfer timeouts. This is partially limited
-                     * by emscripten not exposing them either (used for Qt's Wasm network implementation),
-                     * though it is definitely possible to change the HTTP implementation to support this.
-                     * I've created an issue for emscripten as the first steps to try to get a patch for
-                     * Qt going https://github.com/emscripten-core/emscripten/issues/17070
-                     */
-                    mReportBuilder.wDownload(DownloadOpReport::failedDownload(task, ERR_TIMEOUT));
+                    throw std::runtime_error("Illegal usage of aborted download handler");
             }
         }
-    }
-    else // Failed Download
-    {
-        // Record error
-        mReportBuilder.wDownload(DownloadOpReport::failedDownload(task, reply->errorString()));
+        else // Other error
+            mReportBuilder.wDownload(DownloadOpReport::failedDownload(task, reply->errorString()));
 
-        // Account for download in overall progress
-        forceFinishProgress(task);
-
-        if(mStopOnError)
+        // Followup if needed
+        if(mStopOnError && mStatus == Status::Downloading)
             stopOnError();
     }
 
-    // Close and delete file handle
-
-    if(!writeError)
-        fileWriter->closeFile();
+    // Cleanup writer
+    fileWriter->closeFile();
     delete fileWriter->file();
 
     // Remove from active writers
