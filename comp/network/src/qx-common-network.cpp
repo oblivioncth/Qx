@@ -103,6 +103,7 @@ size_t qHash(const DownloadTask& key, size_t seed) noexcept
 //-Constructor-------------------------------------------------------------------------------------------------------
 //Private:
 DownloadOpReport::DownloadOpReport(Result result, const DownloadTask& task, const GenericError& errorInfo) :
+    mResult(result),
     mTask(task),
     mErrorInfo(errorInfo)
 {}

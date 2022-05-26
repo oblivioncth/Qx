@@ -154,7 +154,7 @@ private:
 
     // Download
     void startTrueDownloads();
-    void startDownload(DownloadTask task);
+    bool startDownload(DownloadTask task);
 
     // Halting
     void stopOnError();

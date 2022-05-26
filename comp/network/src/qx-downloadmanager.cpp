@@ -102,7 +102,7 @@ DownloadManagerReport::Builder::Builder()
 // Private:
 void DownloadManagerReport::Builder::updateOutcome(const DownloadOpReport& dop)
 {
-    Outcome newOutcome;
+    Outcome newOutcome = Outcome::Success;
 
     switch(dop.result())
     {
@@ -244,11 +244,26 @@ void AsyncDownloadManager::startTrueDownloads()
     // Connect to finished handler
     assert(connect(&mNam, &QNetworkAccessManager::finished, this, &AsyncDownloadManager::downloadFinishedHandler));
 
+    // At least one download must start successfully or else finished handler is never called
+    bool atLeastOne = false;
+
     for(int i = 0; !mPendingDownloads.isEmpty() && (i < mMaxSimultaneous || mMaxSimultaneous < 1); i++)
-        startDownload(mPendingDownloads.takeFirst());
+    {
+        if(startDownload(mPendingDownloads.takeFirst()))
+            atLeastOne = true;
+        else
+            i--;
+    }
+
+    if(!atLeastOne)
+    {
+        // End immediately
+        assert(disconnect(&mNam, &QNetworkAccessManager::finished, this, &AsyncDownloadManager::downloadFinishedHandler));
+        finish();
+    }
 }
 
-void AsyncDownloadManager::startDownload(DownloadTask task)
+bool AsyncDownloadManager::startDownload(DownloadTask task)
 {
     // Create file handle
     QFile* file = new QFile(task.dest, this); // Parent constructor ensures deletion when 'this' is deleted
@@ -262,7 +277,10 @@ void AsyncDownloadManager::startDownload(DownloadTask task)
     // Open file
     IoOpReport streamOpen = fileWriter->openFile();
     if(!streamOpen.wasSuccessful())
+    {
         mReportBuilder.wDownload(DownloadOpReport::failedDownload(task, streamOpen.outcome() + ": " + streamOpen.outcomeInfo()));
+        return false;
+    }
 
     // Start download
     QNetworkRequest downloadReq(task.target);
@@ -278,6 +296,8 @@ void AsyncDownloadManager::startDownload(DownloadTask task)
 
     // Add to active tasks
     mActiveTasks[reply] = task;
+
+    return true;
 }
 
 void AsyncDownloadManager::stopOnError()
@@ -716,7 +736,7 @@ void AsyncDownloadManager::abort()
         {
             while(!mPendingEnumerants.isEmpty())
                 mReportBuilder.wDownload(DownloadOpReport::abortedDownload(mPendingEnumerants.takeFirst()));
-            }
+        }
         else if(oldStatus == Status::Downloading)
         {
             while(!mPendingDownloads.isEmpty())
