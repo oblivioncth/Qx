@@ -206,10 +206,10 @@ AsyncDownloadManager::AsyncDownloadManager(QObject* parent) :
     // Configure access manager
     mNam.setAutoDeleteReplies(true);
     mNam.setRedirectPolicy(mRedirectPolicy);
-    assert(connect(&mNam, &QNetworkAccessManager::sslErrors, this, &AsyncDownloadManager::sslErrorHandler));
-    assert(connect(&mNam, &QNetworkAccessManager::authenticationRequired, this, &AsyncDownloadManager::authHandler));
-    assert(connect(&mNam, &QNetworkAccessManager::preSharedKeyAuthenticationRequired, this, &AsyncDownloadManager::preSharedAuthHandler));
-    assert(connect(&mNam, &QNetworkAccessManager::proxyAuthenticationRequired, this, &AsyncDownloadManager::proxyAuthHandler));
+    connect(&mNam, &QNetworkAccessManager::sslErrors, this, &AsyncDownloadManager::sslErrorHandler);
+    connect(&mNam, &QNetworkAccessManager::authenticationRequired, this, &AsyncDownloadManager::authHandler);
+    connect(&mNam, &QNetworkAccessManager::preSharedKeyAuthenticationRequired, this, &AsyncDownloadManager::preSharedAuthHandler);
+    connect(&mNam, &QNetworkAccessManager::proxyAuthenticationRequired, this, &AsyncDownloadManager::proxyAuthHandler);
 
 }
 
@@ -220,7 +220,7 @@ void AsyncDownloadManager::startSizeEnumeration()
     mStatus = Status::Enumerating;
 
     // Connect to finished handler
-    assert(connect(&mNam, &QNetworkAccessManager::finished, this, &AsyncDownloadManager::sizeQueryFinishedHandler));
+    connect(&mNam, &QNetworkAccessManager::finished, this, &AsyncDownloadManager::sizeQueryFinishedHandler);
 
     for(int i = 0; !mPendingEnumerants.isEmpty() && (i < mMaxSimultaneous || mMaxSimultaneous < 1); i++)
         startSizeQuery(mPendingEnumerants.takeFirst());
@@ -242,7 +242,7 @@ void AsyncDownloadManager::startTrueDownloads()
     mStatus = Status::Downloading;
 
     // Connect to finished handler
-    assert(connect(&mNam, &QNetworkAccessManager::finished, this, &AsyncDownloadManager::downloadFinishedHandler));
+    connect(&mNam, &QNetworkAccessManager::finished, this, &AsyncDownloadManager::downloadFinishedHandler);
 
     // At least one download must start successfully or else finished handler is never called
     bool atLeastOne = false;
@@ -258,7 +258,7 @@ void AsyncDownloadManager::startTrueDownloads()
     if(!atLeastOne)
     {
         // End immediately
-        assert(disconnect(&mNam, &QNetworkAccessManager::finished, this, &AsyncDownloadManager::downloadFinishedHandler));
+        disconnect(&mNam, &QNetworkAccessManager::finished, this, &AsyncDownloadManager::downloadFinishedHandler);
         finish();
     }
 }
@@ -296,8 +296,8 @@ bool AsyncDownloadManager::startDownload(DownloadTask task)
     QNetworkReply* reply = mNam.get(downloadReq);
 
     // Connect reply to support slots
-    assert(connect(reply, &QNetworkReply::readyRead, this, &AsyncDownloadManager::readyReadHandler));
-    assert(connect(reply, &QNetworkReply::downloadProgress, this, &AsyncDownloadManager::downloadProgressHandler));
+    connect(reply, &QNetworkReply::readyRead, this, &AsyncDownloadManager::readyReadHandler);
+    connect(reply, &QNetworkReply::downloadProgress, this, &AsyncDownloadManager::downloadProgressHandler);
 
     // Add to active writers
     mActiveWriters[reply] = fileWriter;
@@ -619,7 +619,7 @@ void AsyncDownloadManager::sizeQueryFinishedHandler(QNetworkReply* reply)
     else if(mActiveTasks.isEmpty()) // Enumeration finished
     {
         // Disconnect from this slot
-        assert(disconnect(&mNam, &QNetworkAccessManager::finished, this, &AsyncDownloadManager::sizeQueryFinishedHandler));
+        disconnect(&mNam, &QNetworkAccessManager::finished, this, &AsyncDownloadManager::sizeQueryFinishedHandler);
 
         if(mStatus == Status::Enumerating) // Didn't abort
         {
@@ -692,7 +692,7 @@ void AsyncDownloadManager::downloadFinishedHandler(QNetworkReply* reply)
     else if(mActiveTasks.isEmpty()) // Downloads finished
     {
         // Disconnect from this slot
-        assert(disconnect(&mNam, &QNetworkAccessManager::finished, this, &AsyncDownloadManager::downloadFinishedHandler));
+        disconnect(&mNam, &QNetworkAccessManager::finished, this, &AsyncDownloadManager::downloadFinishedHandler);
 
         // Generate report and end
         finish();
