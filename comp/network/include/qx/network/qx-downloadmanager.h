@@ -117,6 +117,10 @@ private:
 private:
     // Enumeration
     static const qint64 PRESUMED_SIZE = 10485760; // 10 MB
+    static const qint64 SIZE_QUERY_TIMEOUT_MS = 5000;
+
+    // Errors - Finish
+    static inline const QString ERR_TIMEOUT = "The data transfer failed to start before the timeout was reached.";
 
     // Errors - Messages
     static inline const QString SSL_ERR = "The following SSL issues occurred while attempting to download %1";
@@ -182,6 +186,7 @@ public:
     // Properties
     int maxSimultaneous() const;
     QNetworkRequest::RedirectPolicy redirectPolicy() const;
+    int transferTimeout() const;
     bool isOverwrite() const;
     bool isStopOnError() const;
     int taskCount() const;
@@ -190,6 +195,7 @@ public:
 
     void setMaxSimultaneous(int maxSimultaneous);
     void setRedirectPolicy(QNetworkRequest::RedirectPolicy redirectPolicy);
+    void setTransferTimeout(int timeout = QNetworkRequest::DefaultTransferTimeoutConstant);
     void setOverwrite(bool overwrite);
     void setStopOnError(bool stopOnError);
 
@@ -249,6 +255,7 @@ public:
     // Properties
     int maxSimultaneous() const;
     QNetworkRequest::RedirectPolicy redirectPolicy() const;
+    int transferTimeout() const;
     bool isOverwrite() const;
     bool isStopOnError() const;
     int taskCount() const;
@@ -257,6 +264,7 @@ public:
 
     void setMaxSimultaneous(int maxSimultaneous);
     void setRedirectPolicy(QNetworkRequest::RedirectPolicy redirectPolicy);
+    void setTransferTimeout(int timeout = QNetworkRequest::DefaultTransferTimeoutConstant);
     void setOverwrite(bool overwrite);
     void setStopOnError(bool stopOnError);
 

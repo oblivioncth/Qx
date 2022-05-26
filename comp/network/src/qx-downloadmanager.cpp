@@ -210,7 +210,6 @@ AsyncDownloadManager::AsyncDownloadManager(QObject* parent) :
     connect(&mNam, &QNetworkAccessManager::authenticationRequired, this, &AsyncDownloadManager::authHandler);
     connect(&mNam, &QNetworkAccessManager::preSharedKeyAuthenticationRequired, this, &AsyncDownloadManager::preSharedAuthHandler);
     connect(&mNam, &QNetworkAccessManager::proxyAuthenticationRequired, this, &AsyncDownloadManager::proxyAuthHandler);
-
 }
 
 //-Instance Functions------------------------------------------------------------------------------------------------
@@ -231,6 +230,7 @@ void AsyncDownloadManager::startSizeQuery(DownloadTask task)
     // Create and send size request
     QNetworkRequest sizeReq(task.target);
     sizeReq.setAttribute(QNetworkRequest::RedirectPolicyAttribute, mRedirectPolicy);
+    sizeReq.setTransferTimeout(SIZE_QUERY_TIMEOUT_MS); // Override primary timeout
     QNetworkReply* sizeReply = mNam.head(sizeReq);
 
     // Store reply association
@@ -364,6 +364,15 @@ int AsyncDownloadManager::maxSimultaneous() const { return mMaxSimultaneous; }
 QNetworkRequest::RedirectPolicy AsyncDownloadManager::redirectPolicy() const { return mNam.redirectPolicy(); }
 
 /*!
+ *  Returns the transfer timeout of the manager.
+ *
+ *  The default is zero, which means the timeout is disabled.
+ *
+ *  @sa setTransferTimeout().
+ */
+int AsyncDownloadManager::transferTimeout() const { return mNam.transferTimeout(); }
+
+/*!
  *  Returns @c true if the manager is configured to overwrite local files that already exist;
  *  otherwise returns @c false.
  *
@@ -422,6 +431,21 @@ void AsyncDownloadManager::setRedirectPolicy(QNetworkRequest::RedirectPolicy red
     mRedirectPolicy = redirectPolicy;
     mNam.setRedirectPolicy(redirectPolicy);
 }
+
+/*!
+ *  Sets @a timeout as the transfer timeout in milliseconds.
+ *
+ *  Transfers are aborted if no bytes are transferred before the timeout expires.
+ *
+ *  Zero means no timer is set.
+ *
+ *  @note The manager performs small HEAD operations behind the scenes to proactively query the size
+ *  of downloads. These operations always have a short timeout set regardless of what is set via
+ *  this function.
+ *
+ *  @sa transferTimeout().
+ */
+void AsyncDownloadManager::setTransferTimeout(int timeout) { mNam.setTransferTimeout(timeout); }
 
 /*!
  *  Configures the manager to overwrite existing local files that already exist if @a overwrite is @c true;
@@ -597,7 +621,15 @@ void AsyncDownloadManager::sizeQueryFinishedHandler(QNetworkReply* reply)
                     mReportBuilder.wDownload(DownloadOpReport::abortedDownload(task));
                 break;
             default:
-                throw std::runtime_error("Aborted query handler reached without matching status!");
+                /* TODO: Currently assuming all abortions not triggered by user or this class are due
+                 * to timeouts. This seems *mostly* safe, and is somewhat the only option until Qt
+                 * adds an error type specifically for transfer timeouts. This is partially limited
+                 * by emscripten not exposing them either (used for Qt's Wasm network implementation),
+                 * though it is definitely possible to change the HTTP implementation to support this.
+                 * I've created an issue for emscripten as the first steps to try to get a patch for
+                 * Qt going https://github.com/emscripten-core/emscripten/issues/17070
+                 */
+                mReportBuilder.wDownload(DownloadOpReport::failedDownload(task, ERR_TIMEOUT));
         }
     }
     else // Failed query
@@ -660,7 +692,15 @@ void AsyncDownloadManager::downloadFinishedHandler(QNetworkReply* reply)
                         mReportBuilder.wDownload(DownloadOpReport::abortedDownload(task));
                     break;
                 default:
-                    throw std::runtime_error("Aborted query handler reached without matching status!");
+                    /* TODO: Currently assuming all abortions not triggered by user or this class are due
+                     * to timeouts. This seems *mostly* safe, and is somewhat the only option until Qt
+                     * adds an error type specifically for transfer timeouts. This is partially limited
+                     * by emscripten not exposing them either (used for Qt's Wasm network implementation),
+                     * though it is definitely possible to change the HTTP implementation to support this.
+                     * I've created an issue for emscripten as the first steps to try to get a patch for
+                     * Qt going https://github.com/emscripten-core/emscripten/issues/17070
+                     */
+                    mReportBuilder.wDownload(DownloadOpReport::failedDownload(task, ERR_TIMEOUT));
             }
         }
     }
@@ -902,6 +942,11 @@ int SyncDownloadManager::maxSimultaneous() const { return mAsyncDm->maxSimultane
 QNetworkRequest::RedirectPolicy SyncDownloadManager::redirectPolicy() const { return mAsyncDm->redirectPolicy(); }
 
 /*!
+ *  @copydoc AsyncDownloadManager::transferTimeout()
+ */
+int SyncDownloadManager::transferTimeout() const { return mAsyncDm->transferTimeout(); }
+
+/*!
  *  @copydoc AsyncDownloadManager::isOverwrite()
  */
 bool SyncDownloadManager::isOverwrite() const { return mAsyncDm->isOverwrite(); }
@@ -938,6 +983,11 @@ void SyncDownloadManager::setRedirectPolicy(QNetworkRequest::RedirectPolicy redi
 {
     mAsyncDm->setRedirectPolicy(redirectPolicy);
 }
+
+/*!
+ *  @copydoc AsyncDownloadManager::setTransferTimeout()
+ */
+void SyncDownloadManager::setTransferTimeout(int timeout) { mAsyncDm->setTransferTimeout(timeout); }
 
 /*!
  *  @copydoc AsyncDownloadManager::setOverwrite(bool overwrite)
