@@ -463,10 +463,6 @@ void AsyncDownloadManager::setRedirectPolicy(QNetworkRequest::RedirectPolicy red
  *
  *  Zero means no timer is set.
  *
- *  @note The manager performs small HEAD operations behind the scenes to proactively query the size
- *  of downloads. These operations always have a short timeout set regardless of what is set via
- *  this function.
- *
  *  @sa transferTimeout().
  */
 void AsyncDownloadManager::setTransferTimeout(int timeout) { mNam.setTransferTimeout(timeout); }
@@ -905,9 +901,12 @@ void AsyncDownloadManager::abort()
  *  This signal is emitted to indicate that total number of bytes required to complete all downloads has changed,
  *  with @a bytesTotal containing the new value.
  *
- *  This will always be emitted once just before the first batch of downloads are started after the size of all
- *  downloads in the queue has been requested, but may be emitted later when a download is started if the
+ *  This will always be emitted at least once just before the first batch of downloads are started after the size of all
+ *  downloads in the queue have been enumerated, but may be emitted later when a download is started if the
  *  initially reported size was determined to be inaccurate.
+ *
+ *  @note The potential second emission of this signal can cause connected progress indicators to move backwards
+ *  if there was a discrepancy between the initially reported size of a file and its true size.
  */
 
 /*!
