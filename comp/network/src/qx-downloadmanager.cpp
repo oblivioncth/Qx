@@ -336,7 +336,7 @@ void AsyncDownloadManager::stopOnError()
 
 void AsyncDownloadManager::forceFinishProgress(const DownloadTask& task)
 {
-    if(mCurrentBytes.contains(task))
+    if(mTotalBytes.contains(task))
     {
         /* Advance progress so that the task is accounted for. While it may seem more appropriate to remove the task
          * from the total progress object and emit totalProgressChanged, this is undesirable because in the case where
