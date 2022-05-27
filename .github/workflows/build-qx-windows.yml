@@ -107,7 +107,7 @@ jobs:
         popd
         Write-Host "Building Qx..." -ForegroundColor Green
         echo "Configuring CMake..."
-        Start-Process -FilePath "${{ env.qt_cmake }}" -ArgumentList '-G "${{ env.cmake_gen }}" -S "${{ env.qx_src_dir}}" -B "${{ env.qx_build_dir }}"' -Wait -NoNewWindow
+        Start-Process -FilePath "${{ env.qt_cmake }}" -ArgumentList '-G "${{ env.cmake_gen }}" -S "${{ env.qx_src_dir}}" -B "${{ env.qx_build_dir }}" -D QX_DOCS_TARGET=ON' -Wait -NoNewWindow
         echo "Changing to build directory..."
         cd "$Env:qx_build_dir"
         echo "Building Qx debug..."
