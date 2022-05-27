@@ -112,12 +112,6 @@ endif()
 include(BetterFindQt6)
 find_qt6_package(REQUIRED COMPONENTS ${QT_FIND_COMPONENTS})
 
-# Find Doxygen package
-find_package(Doxygen
-             COMPONENTS dot
-             OPTIONAL_COMPONENTS mscgen dia
-)
-
 #--------------------Package Config-----------------------
 
 # Create config file
@@ -143,7 +137,18 @@ endforeach()
 
 #================ Build Documentation ======================
 
-if(DOXYGEN_FOUND)
+if(QX_DOCS_TARGET)
+    # Find Doxygen package
+    find_package(Doxygen
+                 COMPONENTS dot
+                 OPTIONAL_COMPONENTS mscgen dia
+    )
+
+    # Require Doxygen
+    if(NOT DOXYGEN_FOUND)
+        message(FATAL_ERROR "Doxygen not available, documentation cannot not be built!")
+    endif()
+
     # Configure files
     configure_file("${FILE_TEMPLATES_PATH}/doc_mainpage.md.in"
         "${DOC_GENERATED_PATH}/mainpage.md"
@@ -196,8 +201,6 @@ if(DOXYGEN_FOUND)
     )
 
     message(STATUS "Doxygen configured. Build target 'docs' to build the documentation.")
-else()
-    message(WARNING "Doxygen not available, documentation cannot not be built.")
 endif()
 
 #================= Top Level Install =======================

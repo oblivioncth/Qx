@@ -80,6 +80,11 @@ The CMake project is designed to be used with multi-configuration generators suc
  - docs - Builds the Qx documentation
 
 #### Documentation:
+In order for the `docs` target to be generated the CMake cache variable **QX_DOCS_TARGET** must be set to *ON* when CMake is invoked:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cmake.exe (...) -D QX_DOCS_TARGET=ON
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 The Qx documentation supports two optional, but highly recommended features:
  - Linking to Qt documentation
  - Generating a Qt Compressed Help (.qch) file for use in Qt Creator
@@ -133,7 +138,7 @@ The following is the general build process required to successfully generate thi
 CALL "%VS_PATH%\Common7\Tools\VsDevCmd.bat" -arch=amd64
 
 # Configure CMake using Qt wrapper
-CALL "%Qt_ROOT%\bin\qt-cmake" -G "Ninja Multi-Config" -S "%Qx_SOURCE_DIR%" -B "%Qx_BUILD_DIR%" -D "QT_DOCS_DIR=%Qt_ROOT%/doc" -D "QT_DOCS_DIR=%Qt_ROOT%/bin/qhelpgenerator.exe"
+CALL "%Qt_ROOT%\bin\qt-cmake" -G "Ninja Multi-Config" -S "%Qx_SOURCE_DIR%" -B "%Qx_BUILD_DIR%" -D QX_DOCS_TARGET=ON
 
 # Go to Build directory
 cd /D "%Qx_BUILD_DIR%"
