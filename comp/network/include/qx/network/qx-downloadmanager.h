@@ -117,7 +117,7 @@ private:
 private:
     // Enumeration
     static const qint64 PRESUMED_SIZE = 10485760; // 10 MB
-    static const qint64 SIZE_QUERY_TIMEOUT_MS = 5000;
+    static const qint64 SIZE_QUERY_TIMEOUT_MS = 500;
 
     // Errors - Finish
     static inline const QString ERR_TIMEOUT = "The data transfer failed to start before the timeout was reached.";

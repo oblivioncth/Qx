@@ -219,6 +219,8 @@ AsyncDownloadManager::AsyncDownloadManager(QObject* parent) :
     connect(&mNam, &QNetworkAccessManager::authenticationRequired, this, &AsyncDownloadManager::authHandler);
     connect(&mNam, &QNetworkAccessManager::preSharedKeyAuthenticationRequired, this, &AsyncDownloadManager::preSharedAuthHandler);
     connect(&mNam, &QNetworkAccessManager::proxyAuthenticationRequired, this, &AsyncDownloadManager::proxyAuthHandler);
+
+    mNam.proxyFactory()->setUseSystemConfiguration(true);
 }
 
 //-Instance Functions------------------------------------------------------------------------------------------------
@@ -641,7 +643,16 @@ void AsyncDownloadManager::sizeQueryFinishedHandler(QNetworkReply* reply)
 
         // Handle this error
         if(timeout) // Transfer timeout error
-            mReportBuilder.wDownload(DownloadOpReport::failedDownload(task, ERR_TIMEOUT));
+        {
+            // Guess reasonable size
+            qint64 fileSize = mTotalBytes.isEmpty() ? PRESUMED_SIZE : mTotalBytes.mean();
+
+            // Record size
+            mTotalBytes.setValue(task, fileSize);
+
+            // Forward task to download list
+            mPendingDownloads.append(task);
+        }
         else if(abortLike) // True abort (by user or StopOnError)
         {
             switch(mStatus)
