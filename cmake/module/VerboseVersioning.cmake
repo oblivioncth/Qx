@@ -71,7 +71,7 @@ else()
 
         # Add custom target to allow for build time re-check (byproduct important!)
         add_custom_target(
-            verbose_ver_check
+            ${PROJECT_NAME}_verbose_ver_check
             BYPRODUCTS
                 ${VERBOSE_VER_CACHE}
             COMMAND
