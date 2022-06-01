@@ -8,12 +8,15 @@ macro(register_qx_component)
     string_to_proper_case(${COMPONENT_NAME_LC} COMPONENT_NAME)
     create_header_guard(${PROJECT_NAME} ${COMPONENT_NAME} COMPONENT_HEADER_GUARD)
 
-    set(COMPONENT_TARGET_NAME ${COMPONENT_NAME})
+    # Name here needs to be as unique as possible for when this project is inlcuded
+    # in another via FetchContent or add_subdirectory (prevent target clashes)
+    set(COMPONENT_TARGET_NAME ${PROJECT_NAME}_${COMPONENT_NAME})
 
     # Make lib target
     qt_add_library(${COMPONENT_TARGET_NAME} ${COMPONENT_LIB_TYPE})
 
-    # Make alias target so target can be referred to with its export namespace
+    # Make alias target so target can be referred to with its friendly
+    # export name both internally and when part of another build tree
     add_library(${PROJECT_NAME}::${COMPONENT_NAME} ALIAS ${COMPONENT_TARGET_NAME})
 
     #================= Build ==========================
@@ -121,6 +124,7 @@ macro(register_qx_component)
         VERSION ${PROJECT_VERSION}
         OUTPUT_NAME "${PROJECT_NAME}-${COMPONENT_NAME}"
         DEBUG_POSTFIX "d"
+        EXPORT_NAME "${COMPONENT_NAME}"
     )
 
     #================= Install ==========================
