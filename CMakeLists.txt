@@ -20,8 +20,8 @@ project(Qx
     LANGUAGES CXX
     DESCRIPTION "Qt Extensions Library"
 )
-string(TOLOWER ${PROJECT_NAME} PROJ_NAME_LC)
-string(TOUPPER ${PROJECT_NAME} PROJ_NAME_UC)
+string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LC)
+string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UC)
 
 # C++
 set(CMAKE_CXX_STANDARD 20)
@@ -205,10 +205,13 @@ endif()
 
 #================= Top Level Install =======================
 
+set(TOP_LEVEL_INSTALL_COMPONENT ${PROJECT_NAME_LC})
+
 # Install Package Config
 install(FILES
     "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}Config.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}ConfigVersion.cmake"
+    COMPONENT ${TOP_LEVEL_INSTALL_COMPONENT}
     DESTINATION cmake
 )
 
@@ -216,11 +219,13 @@ install(FILES
 install(FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/README.md"
     "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE"
+    COMPONENT ${TOP_LEVEL_INSTALL_COMPONENT}
     DESTINATION .
 )
 
 # Install Docs if available
 install(DIRECTORY ${DOC_BUILD_PATH}
+    COMPONENT ${PROJECT_NAME_LC}_docs
     DESTINATION .
     CONFIGURATIONS Release
     OPTIONAL

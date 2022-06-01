@@ -10,7 +10,7 @@ macro(register_qx_component)
 
     # Name here needs to be as unique as possible for when this project is inlcuded
     # in another via FetchContent or add_subdirectory (prevent target clashes)
-    set(COMPONENT_TARGET_NAME ${PROJECT_NAME}_${COMPONENT_NAME})
+    set(COMPONENT_TARGET_NAME ${PROJECT_NAME_LC}_${COMPONENT_NAME_LC})
 
     # Make lib target
     qt_add_library(${COMPONENT_TARGET_NAME} ${COMPONENT_LIB_TYPE})
@@ -55,11 +55,11 @@ macro(register_qx_component)
     if(COMPONENT_INCLUDE_HEADERS)
         # Build pathed include file list
         foreach(api_header ${COMPONENT_INCLUDE_HEADERS})
-            set(pathed_api_headers ${pathed_api_headers} "include/${PROJ_NAME_LC}/${COMPONENT_NAME_LC}/${api_header}")
+            set(pathed_api_headers ${pathed_api_headers} "include/${PROJECT_NAME_LC}/${COMPONENT_NAME_LC}/${api_header}")
         endforeach()
 
         # Group include files with their parent directories stripped
-        source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJ_NAME_LC}/${COMPONENT_NAME_LC}"
+        source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME_LC}/${COMPONENT_NAME_LC}"
             PREFIX "Include Files"
             FILES ${pathed_api_headers}
         )
@@ -100,13 +100,13 @@ macro(register_qx_component)
 
     # Generate include statements
     foreach(api_header ${COMPONENT_INCLUDE_HEADERS})
-        set(PRIM_COMP_HEADER_INCLUDES "${PRIM_COMP_HEADER_INCLUDES}#include <${PROJ_NAME_LC}/${COMPONENT_NAME_LC}/${api_header}>\n")
+        set(PRIM_COMP_HEADER_INCLUDES "${PRIM_COMP_HEADER_INCLUDES}#include <${PROJECT_NAME_LC}/${COMPONENT_NAME_LC}/${api_header}>\n")
     endforeach()
 
     # Copy template with modifications
     configure_file(
         "${FILE_TEMPLATES_PATH}/primary_component_header.h.in"
-        "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJ_NAME_LC}/${COMPONENT_NAME_LC}.h"
+        "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME_LC}/${COMPONENT_NAME_LC}.h"
         @ONLY
         NEWLINE_STYLE UNIX
     )
@@ -131,23 +131,26 @@ macro(register_qx_component)
 
     # Install component lib
     install(TARGETS ${COMPONENT_TARGET_NAME}
+        COMPONENT ${COMPONENT_TARGET_NAME}
         EXPORT ${COMPONENT_NAME}Targets
-        COMPONENT ${COMPONENT_NAME}
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
         RUNTIME DESTINATION bin # For potential future shared version
     )
 
     # Install public headers
-    install(DIRECTORY include/${PROJ_NAME_LC}
+    install(DIRECTORY include/${PROJECT_NAME_LC}
+        COMPONENT ${COMPONENT_TARGET_NAME}
         DESTINATION "include/${COMPONENT_NAME_LC}"
     )
-    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJ_NAME_LC}/${COMPONENT_NAME_LC}.h"
-        DESTINATION "${HEADER_INSTALL_SUFFIX}/${COMPONENT_NAME_LC}/${PROJ_NAME_LC}"
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME_LC}/${COMPONENT_NAME_LC}.h"
+        COMPONENT ${COMPONENT_TARGET_NAME}
+        DESTINATION "${HEADER_INSTALL_SUFFIX}/${COMPONENT_NAME_LC}/${PROJECT_NAME_LC}"
     )
 
     # Install package target export
     install(EXPORT ${COMPONENT_NAME}Targets
+        COMPONENT ${COMPONENT_TARGET_NAME}
         FILE "${PROJECT_NAME}${COMPONENT_NAME}Targets.cmake"
         NAMESPACE ${PROJECT_NAME}::
         DESTINATION cmake/${COMPONENT_NAME}
@@ -156,6 +159,7 @@ macro(register_qx_component)
     # Install package config
     install(FILES
         "${PROJECT_BINARY_DIR}/cmake/${COMPONENT_NAME}/${PROJECT_NAME}${COMPONENT_NAME}Config.cmake"
+        COMPONENT ${COMPONENT_TARGET_NAME}
         DESTINATION cmake/${COMPONENT_NAME}
     )
 
