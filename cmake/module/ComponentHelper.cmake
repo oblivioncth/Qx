@@ -133,10 +133,10 @@ macro(register_qx_component)
     install(TARGETS ${COMPONENT_TARGET_NAME}
         COMPONENT ${COMPONENT_TARGET_NAME}
         EXPORT ${COMPONENT_NAME}Targets
+        ${SUB_PROJ_EXCLUDE_FROM_ALL} # "EXCLUDE_FROM_ALL" if project is not top-level
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
         RUNTIME DESTINATION bin # For potential future shared version
-        ${SUB_PROJ_EXCLUDE_FROM_ALL} # "EXCLUDE_FROM_ALL" if project is not top-level
     )
 
     # Install public headers
