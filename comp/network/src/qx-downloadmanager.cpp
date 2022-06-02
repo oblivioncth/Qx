@@ -891,6 +891,9 @@ void AsyncDownloadManager::abort()
  *
  *  This signal is emitted to indicate the progress of all downloads handled by the manager.
  *
+ *  It will always be emitted with a value of @c 0 when processing is first started in order to induce a
+ *  busy state in connected progress bars.
+ *
  *  The @a bytesCurrent parameter indicates the total number of bytes received since queue processing was
  *  started.
  */
@@ -901,11 +904,17 @@ void AsyncDownloadManager::abort()
  *  This signal is emitted to indicate that total number of bytes required to complete all downloads has changed,
  *  with @a bytesTotal containing the new value.
  *
- *  This will always be emitted at least once just before the first batch of downloads are started after the size of all
- *  downloads in the queue have been enumerated, but may be emitted later when a download is started if the
- *  initially reported size was determined to be inaccurate.
+ *  This will always be emitted at least twice:
  *
- *  @note The potential second emission of this signal can cause connected progress indicators to move backwards
+ *  @li Once with a value of @c 0 when processing is first started in order to induce a busy state in connected progress
+ *  bars.
+ *  @li A second time just before the first batch of downloads are started after the size of all downloads in the
+ *  queue have been enumerated.
+ *
+ *  It may be emitted again later when a download is started if the initially reported size was determined to be
+ *  inaccurate.
+ *
+ *  @note The potential additional emissions of this signal can cause connected progress indicators to move backwards
  *  if there was a discrepancy between the initially reported size of a file and its true size.
  */
 
