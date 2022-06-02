@@ -136,16 +136,19 @@ macro(register_qx_component)
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
         RUNTIME DESTINATION bin # For potential future shared version
+        ${SUB_PROJ_EXCLUDE_FROM_ALL} # "EXCLUDE_FROM_ALL" if project is not top-level
     )
 
     # Install public headers
     install(DIRECTORY include/${PROJECT_NAME_LC}
         COMPONENT ${COMPONENT_TARGET_NAME}
         DESTINATION "include/${COMPONENT_NAME_LC}"
+        ${SUB_PROJ_EXCLUDE_FROM_ALL} # "EXCLUDE_FROM_ALL" if project is not top-level
     )
     install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME_LC}/${COMPONENT_NAME_LC}.h"
         COMPONENT ${COMPONENT_TARGET_NAME}
         DESTINATION "${HEADER_INSTALL_SUFFIX}/${COMPONENT_NAME_LC}/${PROJECT_NAME_LC}"
+        ${SUB_PROJ_EXCLUDE_FROM_ALL} # "EXCLUDE_FROM_ALL" if project is not top-level
     )
 
     # Install package target export
@@ -154,6 +157,7 @@ macro(register_qx_component)
         FILE "${PROJECT_NAME}${COMPONENT_NAME}Targets.cmake"
         NAMESPACE ${PROJECT_NAME}::
         DESTINATION cmake/${COMPONENT_NAME}
+        ${SUB_PROJ_EXCLUDE_FROM_ALL} # "EXCLUDE_FROM_ALL" if project is not top-level
     )
 
     # Install package config
@@ -161,6 +165,7 @@ macro(register_qx_component)
         "${PROJECT_BINARY_DIR}/cmake/${COMPONENT_NAME}/${PROJECT_NAME}${COMPONENT_NAME}Config.cmake"
         COMPONENT ${COMPONENT_TARGET_NAME}
         DESTINATION cmake/${COMPONENT_NAME}
+        ${SUB_PROJ_EXCLUDE_FROM_ALL} # "EXCLUDE_FROM_ALL" if project is not top-level
     )
 
     #========Export For In-tree Builds =================

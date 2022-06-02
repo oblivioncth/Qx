@@ -23,6 +23,14 @@ project(Qx
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LC)
 string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UC)
 
+# Check if top level
+if(${PROJECT_IS_TOP_LEVEL})
+    message(STATUS "NOTE: Qx is being configured as a top-level project")
+else()
+    set(SUB_PROJ_EXCLUDE_FROM_ALL "EXCLUDE_FROM_ALL")
+    message(STATUS "NOTE: Qx is being configured as a sub-project")
+endif()
+
 # C++
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -213,6 +221,7 @@ install(FILES
     "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}ConfigVersion.cmake"
     COMPONENT ${TOP_LEVEL_INSTALL_COMPONENT}
     DESTINATION cmake
+    ${SUB_PROJ_EXCLUDE_FROM_ALL} # "EXCLUDE_FROM_ALL" if project is not top-level
 )
 
 # Install README and LICENSE
@@ -221,6 +230,7 @@ install(FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE"
     COMPONENT ${TOP_LEVEL_INSTALL_COMPONENT}
     DESTINATION .
+    ${SUB_PROJ_EXCLUDE_FROM_ALL} # "EXCLUDE_FROM_ALL" if project is not top-level
 )
 
 # Install Docs if available
@@ -229,6 +239,7 @@ install(DIRECTORY ${DOC_BUILD_PATH}
     DESTINATION .
     CONFIGURATIONS Release
     OPTIONAL
+    ${SUB_PROJ_EXCLUDE_FROM_ALL} # "EXCLUDE_FROM_ALL" if project is not top-level
 )
 
 #====================== CPack ==============================
