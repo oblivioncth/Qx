@@ -2,14 +2,14 @@
 include(CMakeFindDependencyMacro)
 
 # Find available Components
-file(GLOB __@PROJ_NAME_UC@_AVAILABLE_COMPONENTS
+file(GLOB __@PROJECT_NAME_UC@_AVAILABLE_COMPONENTS
     RELATIVE "${CMAKE_CURRENT_LIST_DIR}"
     "${CMAKE_CURRENT_LIST_DIR}/*/@PROJECT_NAME@*Config.cmake"
 )
 
 # Report available Components
 message(STATUS "[@PROJECT_NAME@] Available Components:")
-foreach(component_config ${__@PROJ_NAME_UC@_AVAILABLE_COMPONENTS})
+foreach(component_config ${__@PROJECT_NAME_UC@_AVAILABLE_COMPONENTS})
     message(STATUS "- ${component_config}")
 endforeach()
 
@@ -21,7 +21,7 @@ if(@PROJECT_NAME@_FIND_COMPONENTS)
     foreach(req_component ${@PROJECT_NAME@_FIND_COMPONENTS})
         set(req_component_config ${req_component}/@PROJECT_NAME@${req_component}Config.cmake)
 
-        if (";${__@PROJ_NAME_UC@_AVAILABLE_COMPONENTS};" MATCHES ";${req_component_config};")
+        if (";${__@PROJECT_NAME_UC@_AVAILABLE_COMPONENTS};" MATCHES ";${req_component_config};")
             message(STATUS "[@PROJECT_NAME@] Including matched component: ${req_component}.")
             include("${CMAKE_CURRENT_LIST_DIR}/${req_component_config}")
         elseif(@PROJECT_NAME@_FIND_REQUIRED_${req_component}})
@@ -33,7 +33,7 @@ else() # Components were not requested
     message(STATUS "[@PROJECT_NAME@] No components were requested.")
 
     # Add all components
-    foreach(component_config ${__@PROJ_NAME_UC@_AVAILABLE_COMPONENTS})
+    foreach(component_config ${__@PROJECT_NAME_UC@_AVAILABLE_COMPONENTS})
         message(STATUS "[@PROJECT_NAME@] Including available component: ${component_config}.")
         include("${CMAKE_CURRENT_LIST_DIR}/${component_config}")
     endforeach()
