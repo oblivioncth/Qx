@@ -44,8 +44,6 @@ set(DOXYGEN_VERBATIM_VARS DOXYGEN_ALIASES)
 # Link to Qt docs
 if(DEFINED QT_DOCS_DIR)
     include(${DOC_SCRIPTS_PATH}/qttags.cmake)
-else()
-    message(WARNING "QT_DOCS_DIR is not defined, Qt Documentation will not be linked to.")
 endif()
 
 # Setup Qt Creator Help File
@@ -53,8 +51,6 @@ if(DEFINED QT_HELP_GEN_PATH)
     set(DOXYGEN_GENERATE_QHP NO) # TODO: TEMPORARILY DISABLED DUE TO QTBUG-93238 (Waiting on 6.3.1)
     set(DOXYGEN_QCH_FILE "../${PROJECT_NAME}.qch")
     set(DOXYGEN_QHG_LOCATION ${QT_HELP_GEN_PATH})
-else()
-    message(WARNING "QT_HELP_GEN_PATH is not defined, a .qch file will not be generated.")
 endif()
 
 # Set output paths

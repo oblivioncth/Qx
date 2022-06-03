@@ -10,6 +10,9 @@ endif()
 # by find_package/macro calls in dependencies (stupid)
 set(TRUE_CMAKE_MINIMUM_REQUIRED ${CMAKE_MINIMUM_REQUIRED_VERSION})
 
+# Configuration options
+option(QX_DOCS_TARGET "Build Qx documentation" OFF)
+
 # Project
 # NOTE: For versions stick to w.x.y.z, where z is generally
 # avoided and only used for hotfixes. DON'T USE TRAILING
