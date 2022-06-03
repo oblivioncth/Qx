@@ -75,8 +75,12 @@ set(COMPONENTS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/comp")
 set(DOC_BUILD_PATH "${CMAKE_CURRENT_BINARY_DIR}/doc")
 set(DOC_GENERATED_PATH "${CMAKE_CURRENT_BINARY_DIR}/docin")
 
-# Install
-set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/out/install")
+# Install (override the CMake default, but not a user set value)
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/out/install"
+           CACHE PATH "Project install path" FORCE
+    )
+endif()
 set(HEADER_INSTALL_SUFFIX "include")
 
 # Package
