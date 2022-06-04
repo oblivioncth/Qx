@@ -484,7 +484,7 @@ IoOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const
     {
         fileTextStream >> currentChar;
 
-        if(Char::compare(currentChar, *queryIt, query.caseSensitivity()))
+        if(Char::compare(currentChar, *queryIt, query.caseSensitivity()) == 0)
         {
             if(possibleMatch.isNull())
                 possibleMatch = currentPos;
