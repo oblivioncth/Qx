@@ -43,7 +43,7 @@ add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060000)
 # Add local modules
 set(PROJ_SCRIPTS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 list(APPEND CMAKE_MODULE_PATH "${PROJ_SCRIPTS_PATH}/module")
-include(Utility)
+include(Qx/Utility)
 
 # General Variables
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -99,7 +99,7 @@ set(PACKAGE_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/out/dist")
 set_directory_properties(PROPERTIES ADDITIONAL_CLEAN_FILES "${CMAKE_INSTALL_PREFIX}")
 
 # Versioning
-include(VerboseVersioning)
+include(Qx/VerboseVersioning)
 setup_verbose_versioning(PROJECT_VERSION_VERBOSE)
 
 ################# Common Build #################
@@ -131,7 +131,7 @@ endif()
 #================= Top Level Build =========================
 
 # Find Qt package
-include(BetterFindQt6)
+include(Qx/BetterFindQt6)
 find_qt6_package(REQUIRED COMPONENTS ${QT_FIND_COMPONENTS})
 
 #--------------------Package Config-----------------------
@@ -211,7 +211,7 @@ if(QX_DOCS_TARGET)
     endforeach()
 
     # Determine Qt related doc paths
-    include(QtDocsHelper)
+    include(Qx/QtDocsHelper)
     configure_qt_doc_link(${Qt6_PREFIX_PATH})
 
     # Set Doxygen parameters

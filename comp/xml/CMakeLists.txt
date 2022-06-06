@@ -31,6 +31,6 @@ set(COMPONENT_QT_DEPENDS
 )
 
 #=============== Component Handler =======================
-include(ComponentHelper)
+include(Qx/ComponentHelper)
 register_qx_component()
 
