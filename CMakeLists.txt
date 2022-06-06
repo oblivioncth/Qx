@@ -26,13 +26,7 @@ project(Qx
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LC)
 string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UC)
 
-# Check if top level
-if(${PROJECT_IS_TOP_LEVEL})
-    message(STATUS "NOTE: Qx is being configured as a top-level project")
-else()
-    set(SUB_PROJ_EXCLUDE_FROM_ALL "EXCLUDE_FROM_ALL")
-    message(STATUS "NOTE: Qx is being configured as a sub-project")
-endif()
+
 
 # C++
 set(CMAKE_CXX_STANDARD 20)
@@ -59,6 +53,24 @@ else()
 endif()
 get_proper_system_name(PROPER_SYSTEM_NAME)
 
+#--------------Top Level Project Setup-------------
+
+if(${PROJECT_IS_TOP_LEVEL})
+    message(STATUS "NOTE: ${PROJECT_NAME} is being configured as a top-level project")
+
+    # Install (override the CMake default, but not a user set value)
+    if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+        set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/out/install"
+               CACHE PATH "Project install path" FORCE
+        )
+    endif()
+else()
+    message(STATUS "NOTE: ${PROJECT_NAME} is being configured as a sub-project")
+
+    # Keep install components out of 'all' target
+    set(SUB_PROJ_EXCLUDE_FROM_ALL "EXCLUDE_FROM_ALL")
+endif()
+
 #--------------------Setup Paths-------------------
 
 # Cmake scripts
@@ -75,12 +87,7 @@ set(COMPONENTS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/comp")
 set(DOC_BUILD_PATH "${CMAKE_CURRENT_BINARY_DIR}/doc")
 set(DOC_GENERATED_PATH "${CMAKE_CURRENT_BINARY_DIR}/docin")
 
-# Install (override the CMake default, but not a user set value; only if top level)
-if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND PROJECT_IS_TOP_LEVEL)
-    set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/out/install"
-           CACHE PATH "Project install path" FORCE
-    )
-endif()
+
 set(HEADER_INSTALL_SUFFIX "include")
 
 # Package
