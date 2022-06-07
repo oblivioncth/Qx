@@ -25,3 +25,10 @@
  *  lvalues and rvalues, instead of having to employ mixed usage of qxAsConst() and
  *  qAsConst().
  */
+
+
+/*!
+ *  @fn template <typename T> void qxDelete(T*& pointer)
+ *
+ *  Calls @c delete on @a pointer and then sets it to @c nullptr .
+ */
