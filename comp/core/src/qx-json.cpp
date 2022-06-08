@@ -39,7 +39,7 @@ namespace Qx
  *
  *  @a valueBuffer is set to @c false in the event of an error.
  */
-GenericError Json::checkedKeyRetrieval(bool& valueBuffer, QJsonObject jObject, QString key)
+GenericError Json::checkedKeyRetrieval(bool& valueBuffer, QJsonObject jObject, const QString& key)
 {
     // Reset buffer
     valueBuffer = false;
@@ -62,7 +62,7 @@ GenericError Json::checkedKeyRetrieval(bool& valueBuffer, QJsonObject jObject, Q
  *
  *  @a valueBuffer is set to zero in the event of an error.
  */
-GenericError Json::checkedKeyRetrieval(double& valueBuffer, QJsonObject jObject, QString key)
+GenericError Json::checkedKeyRetrieval(double& valueBuffer, QJsonObject jObject, const QString& key)
 {
     // Reset buffer
     valueBuffer = 0.0;
@@ -85,7 +85,7 @@ GenericError Json::checkedKeyRetrieval(double& valueBuffer, QJsonObject jObject,
  *
  *  @a valueBuffer is set to a null string in the event of an error.
  */
-GenericError Json::checkedKeyRetrieval(QString& valueBuffer, QJsonObject jObject, QString key)
+GenericError Json::checkedKeyRetrieval(QString& valueBuffer, QJsonObject jObject, const QString& key)
 {
     // Reset buffer
     valueBuffer = QString();
@@ -108,7 +108,7 @@ GenericError Json::checkedKeyRetrieval(QString& valueBuffer, QJsonObject jObject
  *
  *  @a valueBuffer is set to an empty JSON array in the event of an error.
  */
-GenericError Json:: checkedKeyRetrieval(QJsonArray& valueBuffer, QJsonObject jObject, QString key)
+GenericError Json:: checkedKeyRetrieval(QJsonArray& valueBuffer, QJsonObject jObject, const QString& key)
 {
     // Reset buffer
     valueBuffer = QJsonArray();
@@ -132,7 +132,7 @@ GenericError Json:: checkedKeyRetrieval(QJsonArray& valueBuffer, QJsonObject jOb
  *
  *  @a valueBuffer is set to an empty JSON object in the event of an error.
  */
-GenericError Json::checkedKeyRetrieval(QJsonObject& valueBuffer, QJsonObject jObject, QString key)
+GenericError Json::checkedKeyRetrieval(QJsonObject& valueBuffer, QJsonObject jObject, const QString& key)
 {
     // Reset buffer
     valueBuffer = QJsonObject();
