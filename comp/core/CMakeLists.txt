@@ -25,6 +25,9 @@ set(COMPONENT_INCLUDE_HEADERS
     qx-string.h
     qx-traverser.h
 )
+set(COMPONENT_PRIVATE_HEADERS
+    qx-json_p.h
+)
 
 # Source Files
 set(COMPONENT_IMPL
@@ -34,6 +37,7 @@ set(COMPONENT_IMPL
     qx-genericerror.cpp
     qx-integrity.cpp
     qx-json.cpp
+    qx-json_p.cpp
     qx-versionnumber.cpp
     qx-string.cpp
 )
