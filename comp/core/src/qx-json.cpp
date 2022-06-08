@@ -1,5 +1,6 @@
 // Unit Includes
 #include "qx/core/qx-json.h"
+#include "qx-json_p.h"
 
 // Qt Includes
 #include <QJsonObject>
@@ -148,6 +149,20 @@ GenericError Json::checkedKeyRetrieval(QJsonObject& valueBuffer, QJsonObject jOb
         valueBuffer = potentialObject.toObject();
 
     return GenericError();
+}
+
+/*!
+ *  Recursively searches @a rootValue for @a key and returns the associated value for
+ *  all matches as a list, or an empty list if the key was not found.
+ *
+ *  If @a rootValue is of any type other than QJsonValue::Array or QJsonValue::Object
+ *  then returned list will always be empty.
+ */
+QList<QJsonValue> Json::findAllValues(const QJsonValue& rootValue, const QString& key)
+{
+    QList<QJsonValue> hits;
+    recursiveValueFinder(hits, rootValue, key);
+    return hits;
 }
 
 }
