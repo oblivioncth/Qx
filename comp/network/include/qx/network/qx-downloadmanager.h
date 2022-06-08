@@ -15,7 +15,7 @@
 #include "qx/core/qx-cumulation.h"
 #include "qx/io/qx-filestreamwriter.h"
 
-/* TODO: Try to improve efficiency like making DownloadTask uses in hashes and the like pointers instead,
+/* TODO: Try to improve efficiency like making uses of DownloadTask in hashes and the like pointers instead,
  * and passing them as pointers/references where possible. Cant use a pointer for download task list because
  * then the manager cant prevent multiple of the same download task from being added. Though, if this would
  * be the only way to achieve significant gains, it might be worth sacrificing.
