@@ -84,6 +84,28 @@ public:
         }
     }
 
+    V increment(K component)
+    {
+        if(mComponents.contains(component))
+        {
+            mTotal += mScalers[component];
+            mComponents[component]++;
+        }
+
+        return mTotal;
+    }
+
+    V decrement(K component)
+    {
+        if(mComponents.contains(component))
+        {
+            mTotal -= mScalers[component];
+            mComponents[component]--;
+        }
+
+        return mTotal;
+    }
+
     void remove(K component)
     {
         if(mComponents.contains(component))
