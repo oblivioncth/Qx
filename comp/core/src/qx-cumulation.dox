@@ -62,6 +62,24 @@ namespace Qx
  */
 
 /*!
+ *  @fn template <typename K, typename V> V Cumulation<K, V>::increment(K component)
+ *
+ *  Increments the value of the given @a component and returns the new total.
+ *
+ *  If the cumulation does not contain the specified component, this method simply
+ *  returns the current total.
+ */
+
+/*!
+ *  @fn template <typename K, typename V> V Cumulation<K, V>::decrement(K component)
+ *
+ *  Decrements the value of the given @a component and returns the new total.
+ *
+ *  If the cumulation does not contain the specified component, this method simply
+ *  returns the current total.
+ */
+
+/*!
  *  @fn template <typename K, typename V> void Cumulation<K, V>::remove(K component)
  *
  *  Removes the value associated with the key @a component from the cumulation, if it exists.
