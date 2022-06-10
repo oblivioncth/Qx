@@ -84,6 +84,24 @@ public:
         }
     }
 
+    void increase(K component, V amount)
+    {
+        if(mComponents.contains(component))
+        {
+            mTotal += amount * mScalers[component];
+            mComponents[component] + amount;
+        }
+    }
+
+    void reduce(K component, V amount)
+    {
+        if(mComponents.contains(component))
+        {
+            mTotal -= amount * mScalers[component];
+            mComponents[component] - amount;
+        }
+    }
+
     V increment(K component)
     {
         if(mComponents.contains(component))
