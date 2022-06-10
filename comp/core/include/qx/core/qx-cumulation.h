@@ -37,7 +37,7 @@ private:
         requires std::floating_point<N>
     N sMean() const
     {
-        return !mComponents.isEmpty() ? static_cast<double>(mTotal)/mComponents.count() : 0;
+        return !mComponents.isEmpty() ? mTotal/mComponents.count() : 0;
     }
 
 public:
