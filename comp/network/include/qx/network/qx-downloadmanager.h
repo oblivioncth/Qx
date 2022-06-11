@@ -172,6 +172,7 @@ private:
     // Download
     void startTrueDownloads();
     bool startDownload(DownloadTask task);
+    void recordFinishedDownload(DownloadOpReport report);
 
     // Halting
     void stopOnError();
@@ -229,6 +230,7 @@ signals:
     void proxyAuthenticationRequired(QString prompt, QAuthenticator* authenticator);
     void downloadProgress(qint64 bytesCurrent);
     void downloadTotalChanged(quint64 bytesTotal);
+    void downloadFinished(Qx::DownloadOpReport downloadReport);
 
     // Finished signal
     void finished(Qx::DownloadManagerReport report);
@@ -283,13 +285,14 @@ public slots:
 
 //-Signals------------------------------------------------------------------------------------------------------------
 signals:
-    void downloadProgress(qint64 bytesCurrent);
-    void downloadTotalChanged(quint64 bytesTotal);
-
+    // In-progress signals
     void sslErrors(Qx::GenericError errorMsg, bool* ignore);
     void authenticationRequired(QString prompt, QAuthenticator* authenticator);
     void preSharedKeyAuthenticationRequired(QString prompt, QSslPreSharedKeyAuthenticator* authenticator);
     void proxyAuthenticationRequired(QString prompt, QAuthenticator* authenticator);
+    void downloadProgress(qint64 bytesCurrent);
+    void downloadTotalChanged(quint64 bytesTotal);
+    void downloadFinished(Qx::DownloadOpReport downloadReport);
 };
 
 }

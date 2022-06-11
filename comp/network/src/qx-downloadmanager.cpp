@@ -289,7 +289,7 @@ bool AsyncDownloadManager::startDownload(DownloadTask task)
     if(!streamOpen.wasSuccessful())
     {
         forceFinishProgress(task);
-        mReportBuilder.wDownload(DownloadOpReport::failedDownload(task, streamOpen.outcome() + ": " + streamOpen.outcomeInfo()));
+        recordFinishedDownload(DownloadOpReport::failedDownload(task, streamOpen.outcome() + ": " + streamOpen.outcomeInfo()));
         return false;
     }
 
@@ -310,6 +310,12 @@ bool AsyncDownloadManager::startDownload(DownloadTask task)
     return true;
 }
 
+void AsyncDownloadManager::recordFinishedDownload(DownloadOpReport report)
+{
+    mReportBuilder.wDownload(report);
+    emit downloadFinished(report);
+}
+
 void AsyncDownloadManager::stopOnError()
 {
     // Protect against overlap
@@ -326,12 +332,12 @@ void AsyncDownloadManager::stopOnError()
         if(oldStatus == Status::Enumerating)
         {
             while(!mPendingEnumerants.isEmpty())
-                mReportBuilder.wDownload(DownloadOpReport::skippedDownload(mPendingEnumerants.takeFirst()));
+                recordFinishedDownload(DownloadOpReport::skippedDownload(mPendingEnumerants.takeFirst()));
         }
         else if(oldStatus == Status::Downloading)
         {
             while(!mPendingDownloads.isEmpty())
-                mReportBuilder.wDownload(DownloadOpReport::skippedDownload(mPendingDownloads.takeFirst()));
+                recordFinishedDownload(DownloadOpReport::skippedDownload(mPendingDownloads.takeFirst()));
         }
     }
 }
@@ -654,17 +660,17 @@ void AsyncDownloadManager::sizeQueryFinishedHandler(QNetworkReply* reply)
             switch(mStatus)
             {
                 case Status::StoppingOnError:
-                        mReportBuilder.wDownload(DownloadOpReport::skippedDownload(task));
+                        recordFinishedDownload(DownloadOpReport::skippedDownload(task));
                     break;
                 case Status::Aborting:
-                        mReportBuilder.wDownload(DownloadOpReport::abortedDownload(task));
+                        recordFinishedDownload(DownloadOpReport::abortedDownload(task));
                     break;
                 default:
                     throw std::runtime_error("Illegal usage of aborted download handler");
             }
         }
         else // Other error
-            mReportBuilder.wDownload(DownloadOpReport::failedDownload(task, reply->errorString()));
+            recordFinishedDownload(DownloadOpReport::failedDownload(task, reply->errorString()));
 
         // Followup if needed
         if(mStopOnError && mStatus == Status::Enumerating)
@@ -703,7 +709,7 @@ void AsyncDownloadManager::downloadFinishedHandler(QNetworkReply* reply)
 
     // Handle outcomes
     if(reply->error() == QNetworkReply::NoError) // Successful download
-        mReportBuilder.wDownload(DownloadOpReport::completedDownload(task));
+        recordFinishedDownload(DownloadOpReport::completedDownload(task));
     else
     {
         // Get error info
@@ -716,25 +722,25 @@ void AsyncDownloadManager::downloadFinishedHandler(QNetworkReply* reply)
         forceFinishProgress(task);
 
         if(timeout) // Transfer timeout error
-            mReportBuilder.wDownload(DownloadOpReport::failedDownload(task, ERR_TIMEOUT));
+            recordFinishedDownload(DownloadOpReport::failedDownload(task, ERR_TIMEOUT));
         else if(writeError) // IO error
-            mReportBuilder.wDownload(DownloadOpReport::failedDownload(task, fileWriter->status().outcomeInfo()));
+            recordFinishedDownload(DownloadOpReport::failedDownload(task, fileWriter->status().outcomeInfo()));
         else if(abortLike) // True abort (by user or StopOnError)
         {
             switch(mStatus)
             {
                 case Status::StoppingOnError:
-                        mReportBuilder.wDownload(DownloadOpReport::skippedDownload(task));
+                        recordFinishedDownload(DownloadOpReport::skippedDownload(task));
                     break;
                 case Status::Aborting:
-                        mReportBuilder.wDownload(DownloadOpReport::abortedDownload(task));
+                        recordFinishedDownload(DownloadOpReport::abortedDownload(task));
                     break;
                 default:
                     throw std::runtime_error("Illegal usage of aborted download handler");
             }
         }
         else // Other error
-            mReportBuilder.wDownload(DownloadOpReport::failedDownload(task, reply->errorString()));
+            recordFinishedDownload(DownloadOpReport::failedDownload(task, reply->errorString()));
 
         // Followup if needed
         if(mStopOnError && mStatus == Status::Downloading)
@@ -808,12 +814,12 @@ void AsyncDownloadManager::abort()
         if(oldStatus == Status::Enumerating)
         {
             while(!mPendingEnumerants.isEmpty())
-                mReportBuilder.wDownload(DownloadOpReport::abortedDownload(mPendingEnumerants.takeFirst()));
+                recordFinishedDownload(DownloadOpReport::abortedDownload(mPendingEnumerants.takeFirst()));
         }
         else if(oldStatus == Status::Downloading)
         {
             while(!mPendingDownloads.isEmpty())
-                mReportBuilder.wDownload(DownloadOpReport::abortedDownload(mPendingDownloads.takeFirst()));
+                recordFinishedDownload(DownloadOpReport::abortedDownload(mPendingDownloads.takeFirst()));
         }
     }
 }
@@ -916,6 +922,13 @@ void AsyncDownloadManager::abort()
  *
  *  @note The potential additional emissions of this signal can cause connected progress indicators to move backwards
  *  if there was a discrepancy between the initially reported size of a file and its true size.
+ */
+
+/*!
+ *  @fn void AsyncDownloadManager::downloadFinished(Qx::DownloadOpReport downloadReport)
+ *
+ *  This signal is emitted when a single download has finished, with @a downloadReport containing identifying
+ *  and outcome related info.
  */
 
 /*!
@@ -1095,18 +1108,6 @@ void SyncDownloadManager::abort() { mAsyncDm->abort(); }
 
 //-Signals---------------------------------------------------------------------------------------------------
 /*!
- *  @fn void SyncDownloadManager::downloadProgress(qint64 bytesCurrent)
- *
- *  @copydoc AsyncDownloadManager::downloadProgress(qint64 bytesCurrent)
- */
-
-/*!
- *  @fn void SyncDownloadManager::downloadTotalChanged(quint64 bytesTotal)
- *
- *  @copydoc AsyncDownloadManager::downloadTotalChanged(quint64 bytesTotal)
- */
-
-/*!
  *  @fn void SyncDownloadManager::sslErrors(Qx::GenericError errorMsg, bool* ignore)
  *
  *  @copydoc AsyncDownloadManager::sslErrors(Qx::GenericError errorMsg, bool* ignore)
@@ -1130,4 +1131,21 @@ void SyncDownloadManager::abort() { mAsyncDm->abort(); }
  *  @copydoc AsyncDownloadManager::proxyAuthenticationRequired(QString prompt, QAuthenticator* authenticator)
  */
 
+/*!
+ *  @fn void SyncDownloadManager::downloadProgress(qint64 bytesCurrent)
+ *
+ *  @copydoc AsyncDownloadManager::downloadProgress(qint64 bytesCurrent)
+ */
+
+/*!
+ *  @fn void SyncDownloadManager::downloadTotalChanged(quint64 bytesTotal)
+ *
+ *  @copydoc AsyncDownloadManager::downloadTotalChanged(quint64 bytesTotal)
+ */
+
+/*!
+ *  @fn void SyncDownloadManager::downloadFinished(Qx::DownloadOpReport downloadReport)
+ *
+ *  @copydoc AsyncDownloadManager::downloadFinished(Qx::DownloadOpReport downloadReport)
+ */
 }
