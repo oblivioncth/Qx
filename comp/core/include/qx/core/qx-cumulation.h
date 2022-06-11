@@ -51,7 +51,7 @@ public:
 
             // Remove old component portion from running total if different
             if(curVal != value || curScal != scaler)
-                mTotal -= mComponents[component] * mScalers[scaler];
+                mTotal -= mComponents[component] * mScalers[component];
             else
                 return;
         }
@@ -89,7 +89,7 @@ public:
         if(mComponents.contains(component))
         {
             mTotal += amount * mScalers[component];
-            mComponents[component] + amount;
+            mComponents[component] += amount;
         }
     }
 
@@ -98,7 +98,7 @@ public:
         if(mComponents.contains(component))
         {
             mTotal -= amount * mScalers[component];
-            mComponents[component] - amount;
+            mComponents[component] -= amount;
         }
     }
 
