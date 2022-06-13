@@ -153,8 +153,8 @@ private:
     QHash<QNetworkReply*, std::shared_ptr<FileStreamWriter>> mActiveWriters;
 
     // Progress
-    Cumulation<DownloadTask, qint64> mTotalBytes;
-    Cumulation<DownloadTask, qint64> mCurrentBytes;
+    Cumulation<DownloadTask, quint64> mTotalBytes;
+    Cumulation<DownloadTask, quint64> mCurrentBytes;
 
     // Report
     DownloadManagerReport::Builder mReportBuilder;
