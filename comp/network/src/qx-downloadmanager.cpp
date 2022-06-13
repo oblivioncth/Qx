@@ -631,7 +631,7 @@ void AsyncDownloadManager::sizeQueryFinishedHandler(QNetworkReply* reply)
             fileSize = mTotalBytes.isEmpty() ? PRESUMED_SIZE : mTotalBytes.mean();
 
         // Record size
-        mTotalBytes.setValue(task, fileSize);
+        mTotalBytes.insert(task, fileSize);
 
         // Forward task to download list
         mPendingDownloads.append(task);
@@ -650,7 +650,7 @@ void AsyncDownloadManager::sizeQueryFinishedHandler(QNetworkReply* reply)
             qint64 fileSize = mTotalBytes.isEmpty() ? PRESUMED_SIZE : mTotalBytes.mean();
 
             // Record size
-            mTotalBytes.setValue(task, fileSize);
+            mTotalBytes.insert(task, fileSize);
 
             // Forward task to download list
             mPendingDownloads.append(task);
