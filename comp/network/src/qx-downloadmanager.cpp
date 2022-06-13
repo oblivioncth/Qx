@@ -852,7 +852,7 @@ void AsyncDownloadManager::processQueue()
         if(mSkipEnumeration)
         {
             // Move pending enumerants straight to pending downloads
-            std::move(mPendingEnumerants.begin(), mPendingEnumerants.end(), mPendingDownloads.begin());
+            mPendingDownloads.swap(mPendingEnumerants);
             startTrueDownloads();
         }
         else
