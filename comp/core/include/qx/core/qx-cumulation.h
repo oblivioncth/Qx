@@ -42,6 +42,13 @@ private:
         return !mComponents.isEmpty() ? mTotal/mComponents.count() : 0;
     }
 
+    void basicInsert(K component, V value, V scaler)
+    {
+        mTotal += value * scaler;
+        mComponents[component] = value;
+        mScalers[component] = scaler;
+    }
+
 public:
     void insert(K component, V value, V scaler = 1)
     {
@@ -53,37 +60,45 @@ public:
 
             // Remove old component portion from running total if different
             if(curVal != value || curScal != scaler)
-                mTotal -= mComponents[component] * mScalers[component];
+                mTotal -= curVal * curScal;
             else
                 return;
         }
 
         // Insert/replace
-        mTotal += value * scaler;
-        mComponents[component] = value;
-        mScalers[component] = scaler;
+        basicInsert(component, value, scaler);
     }
 
     void setValue(K component, V value)
     {
-        V& curVal = mComponents[component];
-        if(mComponents.contains(component) && curVal != value)
+        if(mComponents.contains(component))
         {
-            const V& scaler = mScalers[component];
-            mTotal += (value * scaler) - (curVal * scaler);
-            curVal = value;
+            V& curVal = mComponents[component];
+            if(value != curVal)
+            {
+                const V& scaler = mScalers[component];
+                mTotal += (value * scaler) - (curVal * scaler);
+                curVal = value;
+            }
         }
+        else
+            basicInsert(component, value, 1);
     }
 
     void setScaler(K component, V scaler)
     {
-        V& curScaler = mScalers[component];
-        if(mComponents.contains(component) && curScaler != scaler)
+        if(mComponents.contains(component))
         {
-            const V& value = mComponents[component];
-            mTotal += (value * scaler) - (value * curScaler);
-            curScaler = scaler;
+            V& curScaler = mScalers[component];
+            if(scaler != curScaler)
+            {
+                const V& value = mComponents[component];
+                mTotal += (value * scaler) - (value * curScaler);
+                curScaler = scaler;
+            }
         }
+        else
+            basicInsert(component, 0, scaler);
     }
 
     void increase(K component, V amount)
@@ -93,6 +108,8 @@ public:
             mTotal += amount * mScalers[component];
             mComponents[component] += amount;
         }
+        else
+            basicInsert(component, amount, 1);
     }
 
     void reduce(K component, V amount)
@@ -102,6 +119,8 @@ public:
             mTotal -= amount * mScalers[component];
             mComponents[component] -= amount;
         }
+        else
+            basicInsert(component, -amount, 1);
     }
 
     V increment(K component)
@@ -111,6 +130,8 @@ public:
             mTotal += mScalers[component];
             mComponents[component]++;
         }
+        else
+            basicInsert(component, 1, 1);
 
         return mTotal;
     }
@@ -122,6 +143,8 @@ public:
             mTotal -= mScalers[component];
             mComponents[component]--;
         }
+        else
+            basicInsert(component, -1, 1);
 
         return mTotal;
     }

@@ -47,7 +47,8 @@ namespace Qx
  *
  *  Sets the value of @a component to @a value.
  *
- *  If the cumulation does not contain the specified component, this method does nothing.
+ *  If the cumulation does not contain the specified component it will be added with a value of
+ *  @a value and a scaler of 1.
  */
 
 /*!
@@ -58,7 +59,8 @@ namespace Qx
  *  The amount that a component contributes to a cumulation's total is its value multiplied
  *  by its scaler.
  *
- *  If the cumulation does not contain the specified component, this method does nothing.
+ *  If the cumulation does not contain the specified component it will be added with a value of
+ *  0 and a scaler of @a scaler.
  */
 
 /*!
@@ -66,7 +68,8 @@ namespace Qx
  *
  *  Adds @a amount to the value of @a component.
  *
- *  If the cumulation does not contain the specified component, this method does nothing.
+ *  If the cumulation does not contain the specified component it will be added with a value of
+ *  @a amount and a scaler of 1.
  */
 
 /*!
@@ -74,7 +77,8 @@ namespace Qx
 *
 *  Subtracts @a amount from the value of @a component.
 *
-*  If the cumulation does not contain the specified component, this method does nothing.
+*  If the cumulation does not contain the specified component it will be added with a value of
+*  <em>-amount</em> and a scaler of 1.
 */
 
 /*!
@@ -82,8 +86,8 @@ namespace Qx
  *
  *  Increments the value of the given @a component and returns the new total.
  *
- *  If the cumulation does not contain the specified component, this method simply
- *  returns the current total.
+ *  If the cumulation does not contain the specified component it will be added with a value of
+ *  1 and a scaler of 1.
  */
 
 /*!
@@ -91,8 +95,8 @@ namespace Qx
  *
  *  Decrements the value of the given @a component and returns the new total.
  *
- *  If the cumulation does not contain the specified component, this method simply
- *  returns the current total.
+ *  If the cumulation does not contain the specified component it will be added with a value of
+ *  -1 and a scaler of 1.
  */
 
 /*!
