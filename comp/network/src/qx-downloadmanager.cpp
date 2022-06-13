@@ -209,6 +209,7 @@ DownloadManagerReport DownloadManagerReport::Builder::build()
 AsyncDownloadManager::AsyncDownloadManager(QObject* parent) :
     QObject(parent),
     mMaxSimultaneous(3),
+    mEnumerationTimeout(SIZE_QUERY_TIMEOUT_MS),
     mOverwrite(false),
     mStopOnError(false),
     mStatus(Status::Initial)
@@ -240,7 +241,7 @@ void AsyncDownloadManager::startSizeQuery(DownloadTask task)
 {
     // Create and send size request
     QNetworkRequest sizeReq(task.target);
-    sizeReq.setTransferTimeout(SIZE_QUERY_TIMEOUT_MS); // Override primary timeout
+    sizeReq.setTransferTimeout(mEnumerationTimeout); // Override primary timeout
     QNetworkReply* sizeReply = mNam.head(sizeReq);
 
     // Store reply association
@@ -385,6 +386,7 @@ void AsyncDownloadManager::reset()
  */
 int AsyncDownloadManager::maxSimultaneous() const { return mMaxSimultaneous; }
 
+
 /*!
  *  Returns the directory policy of the manager.
  *
@@ -402,6 +404,16 @@ QNetworkRequest::RedirectPolicy AsyncDownloadManager::redirectPolicy() const { r
  *  @sa setTransferTimeout().
  */
 int AsyncDownloadManager::transferTimeout() const { return mNam.transferTimeout(); }
+
+/*!
+ *  Returns the enumeration timeout of the manager, which is how long the initial file size query
+ *  for a download has to complete before the manager falls back to predicting its size.
+ *
+ *  The default is 500ms.
+ *
+ *  @sa setEnumerationTimeout().
+ */
+int AsyncDownloadManager::enumerationTimeout() const { return mEnumerationTimeout; }
 
 /*!
  *  Returns @c true if the manager is configured to overwrite local files that already exist;
@@ -477,6 +489,18 @@ void AsyncDownloadManager::setRedirectPolicy(QNetworkRequest::RedirectPolicy red
  *  @sa transferTimeout().
  */
 void AsyncDownloadManager::setTransferTimeout(int timeout) { mNam.setTransferTimeout(timeout); }
+
+/*!
+ *  Sets @a timeout as the enumeration timeout in milliseconds.
+ *
+ *  The manager falls back to guessing a files size based on previous size queries if a given size query
+ *  fails to complete before the timeout expires.
+ *
+ *  Zero means no timer is set.
+ *
+ *  @sa setEnumerationTimeout().
+ */
+void AsyncDownloadManager::setEnumerationTimeout(int timeout) { mEnumerationTimeout = timeout; }
 
 /*!
  *  Configures the manager to overwrite existing local files that already exist if @a overwrite is @c true;
@@ -1003,6 +1027,11 @@ QNetworkRequest::RedirectPolicy SyncDownloadManager::redirectPolicy() const { re
 int SyncDownloadManager::transferTimeout() const { return mAsyncDm->transferTimeout(); }
 
 /*!
+ *  @copydoc AsyncDownloadManager::enumerationTimeout()
+ */
+int SyncDownloadManager::enumerationTimeout() const { return mAsyncDm->enumerationTimeout(); }
+
+/*!
  *  @copydoc AsyncDownloadManager::isOverwrite()
  */
 bool SyncDownloadManager::isOverwrite() const { return mAsyncDm->isOverwrite(); }
@@ -1044,6 +1073,11 @@ void SyncDownloadManager::setRedirectPolicy(QNetworkRequest::RedirectPolicy redi
  *  @copydoc AsyncDownloadManager::setTransferTimeout()
  */
 void SyncDownloadManager::setTransferTimeout(int timeout) { mAsyncDm->setTransferTimeout(timeout); }
+
+/*!
+ *  @copydoc AsyncDownloadManager::setEnumerationTimeout()
+ */
+void SyncDownloadManager::setEnumerationTimeout(int timeout) { mAsyncDm->setEnumerationTimeout(timeout); }
 
 /*!
  *  @copydoc AsyncDownloadManager::setOverwrite(bool overwrite)

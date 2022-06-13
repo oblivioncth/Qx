@@ -137,6 +137,7 @@ private:
 private:
     // Properties
     int mMaxSimultaneous; // < 1 is unlimited
+    int mEnumerationTimeout;
     bool mOverwrite;
     bool mStopOnError;
 
@@ -187,6 +188,7 @@ public:
     int maxSimultaneous() const;
     QNetworkRequest::RedirectPolicy redirectPolicy() const;
     int transferTimeout() const;
+    int enumerationTimeout() const;
     bool isOverwrite() const;
     bool isStopOnError() const;
     int taskCount() const;
@@ -196,6 +198,7 @@ public:
     void setMaxSimultaneous(int maxSimultaneous);
     void setRedirectPolicy(QNetworkRequest::RedirectPolicy redirectPolicy);
     void setTransferTimeout(int timeout = QNetworkRequest::DefaultTransferTimeoutConstant);
+    void setEnumerationTimeout(int timeout = 500);
     void setOverwrite(bool overwrite);
     void setStopOnError(bool stopOnError);
 
@@ -257,6 +260,7 @@ public:
     int maxSimultaneous() const;
     QNetworkRequest::RedirectPolicy redirectPolicy() const;
     int transferTimeout() const;
+    int enumerationTimeout() const;
     bool isOverwrite() const;
     bool isStopOnError() const;
     int taskCount() const;
@@ -266,6 +270,7 @@ public:
     void setMaxSimultaneous(int maxSimultaneous);
     void setRedirectPolicy(QNetworkRequest::RedirectPolicy redirectPolicy);
     void setTransferTimeout(int timeout = QNetworkRequest::DefaultTransferTimeoutConstant);
+    void setEnumerationTimeout(int timeout = 500);
     void setOverwrite(bool overwrite);
     void setStopOnError(bool stopOnError);
 
