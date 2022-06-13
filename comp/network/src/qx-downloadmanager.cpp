@@ -262,7 +262,12 @@ void AsyncDownloadManager::startTrueDownloads()
         if(startDownload(mPendingDownloads.takeFirst()))
             atLeastOne = true;
         else
-            i--;
+        {
+            if(mStopOnError)
+                stopOnError();
+            else
+                i--;
+        }
     }
 
     if(!atLeastOne)
