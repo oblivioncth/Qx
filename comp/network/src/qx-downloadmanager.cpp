@@ -451,7 +451,7 @@ bool AsyncDownloadManager::isStopOnError() const { return mStopOnError; }
  *  or downloadFinished() and comparing to the original queue size of the manager before processing
  *  began.
  *
- *  The default is @c true.
+ *  The default is @c false.
  *
  *  @sa setSkipEnumeration().
  */
