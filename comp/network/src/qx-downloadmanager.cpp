@@ -234,8 +234,30 @@ void AsyncDownloadManager::startSizeEnumeration()
     // Connect to finished handler
     connect(&mNam, &QNetworkAccessManager::finished, this, &AsyncDownloadManager::sizeQueryFinishedHandler);
 
-    for(int i = 0; !mPendingEnumerants.isEmpty() && (i < mMaxSimultaneous || mMaxSimultaneous < 1); i++)
+    // Initiate queries
+    pushEnumerationsUntilFinished();
+}
+
+void AsyncDownloadManager::pushEnumerationsUntilFinished()
+{
+    // Start size queries until at capacity or queue is exhausted
+    while(!mPendingEnumerants.isEmpty() && (mActiveTasks.count() < mMaxSimultaneous || mMaxSimultaneous < 1))
         startSizeQuery(mPendingEnumerants.takeFirst());
+
+    // Check for enumeration completion
+    if(mPendingEnumerants.isEmpty() && mActiveTasks.empty())
+    {
+        // Disconnect NAM from enumeration handler slot
+        disconnect(&mNam, &QNetworkAccessManager::finished, this, &AsyncDownloadManager::sizeQueryFinishedHandler);
+
+        if(mStatus == Status::Enumerating) // Didn't abort
+        {
+            emit downloadTotalChanged(mTotalBytes.total());
+            startTrueDownloads();
+        }
+        else
+            finish();
+    }
 }
 
 void AsyncDownloadManager::startSizeQuery(DownloadTask task)
@@ -256,31 +278,28 @@ void AsyncDownloadManager::startTrueDownloads()
     // Connect to finished handler
     connect(&mNam, &QNetworkAccessManager::finished, this, &AsyncDownloadManager::downloadFinishedHandler);
 
-    // At least one download must start successfully or else finished handler is never called
-    bool atLeastOne = false;
+    // Initiate downloads
+    pushDownloadsUntilFinished();
+}
 
-    for(int i = 0; !mPendingDownloads.isEmpty() && (i < mMaxSimultaneous || mMaxSimultaneous < 1); i++)
-    {
-        if(startDownload(mPendingDownloads.takeFirst()))
-            atLeastOne = true;
-        else
-        {
-            if(mStopOnError)
-                stopOnError();
-            else
-                i--;
-        }
-    }
+void AsyncDownloadManager::pushDownloadsUntilFinished()
+{
+    // Start downloads until at capacity or queue is exhausted
+    while(!mPendingDownloads.isEmpty() && (mActiveTasks.count() < mMaxSimultaneous || mMaxSimultaneous < 1))
+        startDownload(mPendingDownloads.takeFirst());
 
-    if(!atLeastOne)
+    // Check for task completion
+    if(mPendingDownloads.isEmpty() && mActiveTasks.empty())
     {
-        // End immediately
+        // Disconnect NAM from download handler slot
         disconnect(&mNam, &QNetworkAccessManager::finished, this, &AsyncDownloadManager::downloadFinishedHandler);
+
+        // Generate report and end
         finish();
     }
 }
 
-bool AsyncDownloadManager::startDownload(DownloadTask task)
+void AsyncDownloadManager::startDownload(DownloadTask task)
 {
     // Create file handle
     QFile* file = new QFile(task.dest, this); // Parent constructor ensures deletion when 'this' is deleted
@@ -297,7 +316,8 @@ bool AsyncDownloadManager::startDownload(DownloadTask task)
     {
         forceFinishProgress(task);
         recordFinishedDownload(DownloadOpReport::failedDownload(task, streamOpen.outcome() + ": " + streamOpen.outcomeInfo()));
-        return false;
+        if(mStopOnError)
+            stopOnError();
     }
 
     // Start download
@@ -313,8 +333,6 @@ bool AsyncDownloadManager::startDownload(DownloadTask task)
 
     // Add to active tasks
     mActiveTasks[reply] = task;
-
-    return true;
 }
 
 void AsyncDownloadManager::recordFinishedDownload(DownloadOpReport report)
@@ -736,26 +754,8 @@ void AsyncDownloadManager::sizeQueryFinishedHandler(QNetworkReply* reply)
             stopOnError();
     }
 
-    // Check for next steps
-    if(!mPendingEnumerants.isEmpty())
-    {
-        // We shouldn't add more tasks if aborting, but this doesn't need to be checked for explicitly
-        // as the abort will empty out the pending list
-        startSizeQuery(mPendingEnumerants.takeFirst());
-    }
-    else if(mActiveTasks.isEmpty()) // Enumeration finished
-    {
-        // Disconnect from this slot
-        disconnect(&mNam, &QNetworkAccessManager::finished, this, &AsyncDownloadManager::sizeQueryFinishedHandler);
-
-        if(mStatus == Status::Enumerating) // Didn't abort
-        {
-            emit downloadTotalChanged(mTotalBytes.total());
-            startTrueDownloads();
-        }
-        else
-            finish();
-    }
+    // Proceed
+    pushEnumerationsUntilFinished();
 }
 
 void AsyncDownloadManager::downloadFinishedHandler(QNetworkReply* reply)
@@ -813,21 +813,8 @@ void AsyncDownloadManager::downloadFinishedHandler(QNetworkReply* reply)
     // Remove from active writers
     mActiveWriters.remove(reply);
 
-    // Check for next steps
-    if(!mPendingDownloads.isEmpty())
-    {
-        // We shouldn't add more tasks if aborting, but this doesn't need to be checked for explicitly
-        // as the abort will empty out the pending list
-        startDownload(mPendingDownloads.takeFirst());
-    }
-    else if(mActiveTasks.isEmpty()) // Downloads finished
-    {
-        // Disconnect from this slot
-        disconnect(&mNam, &QNetworkAccessManager::finished, this, &AsyncDownloadManager::downloadFinishedHandler);
-
-        // Generate report and end
-        finish();
-    }
+    // Proceed
+    pushDownloadsUntilFinished();
 }
 
 //Public:

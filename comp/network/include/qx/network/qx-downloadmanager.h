@@ -169,11 +169,13 @@ public:
 private:
     // Size enumeration
     void startSizeEnumeration();
+    void pushEnumerationsUntilFinished();
     void startSizeQuery(DownloadTask task);
 
     // Download
     void startTrueDownloads();
-    bool startDownload(DownloadTask task);
+    void pushDownloadsUntilFinished();
+    void startDownload(DownloadTask task);
     void recordFinishedDownload(DownloadOpReport report);
 
     // Halting
