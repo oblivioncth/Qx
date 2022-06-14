@@ -32,7 +32,7 @@ public:
 //-Class Members----------------------------------------------------------------------------------------------------
 private:
     static inline const QString INCOMPLETE = "The download [%1] -> [%2] did not complete";
-    static inline const QString FAILED = "Error: %1.";
+    static inline const QString FAILED = "Error: %1";
     static inline const QString ABORTED = "Task was aborted.";
     static inline const QString SKIPPED = "Task was skipped due to previous errors.";
 
