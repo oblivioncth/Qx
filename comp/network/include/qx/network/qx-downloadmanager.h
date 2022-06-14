@@ -140,6 +140,7 @@ private:
     int mEnumerationTimeout;
     bool mOverwrite;
     bool mStopOnError;
+    bool mSkipEnumeration;
 
     // Status
     Status mStatus;
@@ -191,6 +192,7 @@ public:
     int enumerationTimeout() const;
     bool isOverwrite() const;
     bool isStopOnError() const;
+    bool isSkipEnumeration() const;
     int taskCount() const;
     bool hasTasks() const;
     bool isProcessing() const;
@@ -201,6 +203,7 @@ public:
     void setEnumerationTimeout(int timeout = 500);
     void setOverwrite(bool overwrite);
     void setStopOnError(bool stopOnError);
+    void setSkipEnumeration(bool skipEnumeration);
 
     // Tasks
     void appendTask(const DownloadTask& task);
@@ -263,6 +266,7 @@ public:
     int enumerationTimeout() const;
     bool isOverwrite() const;
     bool isStopOnError() const;
+    bool isSkipEnumeration() const;
     int taskCount() const;
     bool hasTasks() const;
     bool isProcessing() const;
@@ -273,6 +277,7 @@ public:
     void setEnumerationTimeout(int timeout = 500);
     void setOverwrite(bool overwrite);
     void setStopOnError(bool stopOnError);
+    void setSkipEnumeration(bool skipEnumeration);
 
     // Tasks
     void appendTask(const DownloadTask& task);

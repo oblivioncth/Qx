@@ -212,6 +212,7 @@ AsyncDownloadManager::AsyncDownloadManager(QObject* parent) :
     mEnumerationTimeout(SIZE_QUERY_TIMEOUT_MS),
     mOverwrite(false),
     mStopOnError(false),
+    mSkipEnumeration(false),
     mStatus(Status::Initial)
 {
     // Configure access manager
@@ -436,6 +437,27 @@ bool AsyncDownloadManager::isOverwrite() const { return mOverwrite; }
 bool AsyncDownloadManager::isStopOnError() const { return mStopOnError; }
 
 /*!
+ *  Returns @c true if the manager is configured to query the size of all queued tasks before
+ *  actually initiating any downloads; otherwise returns @c false.
+ *
+ *  If enumeration is disabled, total download progress reported by the manager will be limited
+ *  in scope to only active and finished downloads, as the size of future download tasks cannot
+ *  be determined until they are started. This means that every time a new download is initiated
+ *  the total byte count reported by the manager will increase, causing all connected progress
+ *  indicators to move backwards.
+ *
+ *  For this reason, when enumeration is disabled it is recommended to ignore the size of each
+ *  download and instead track overall progress by task count only, using either taskCount()
+ *  or downloadFinished() and comparing to the original queue size of the manager before processing
+ *  began.
+ *
+ *  The default is @c false.
+ *
+ *  @sa setSkipEnumeration().
+ */
+bool AsyncDownloadManager::isSkipEnumeration() const { return mSkipEnumeration; }
+
+/*!
  *  Returns current number of download tasks remaining, which includes pending and active downloads.
  *
  *  @sa hasTasks().
@@ -517,6 +539,14 @@ void AsyncDownloadManager::setOverwrite(bool overwrite) { mOverwrite = overwrite
  *  @sa isStopOnError().
  */
 void AsyncDownloadManager::setStopOnError(bool stopOnError) { mStopOnError = stopOnError; }
+
+/*!
+ *  Specifies whether or not the manager should attempt to query the size of all queued tasks before
+ *  actually initiating any downloads.
+ *
+ *  @sa isSkipEnumeration().
+ */
+void AsyncDownloadManager::setSkipEnumeration(bool skipEnumeration) { mSkipEnumeration = skipEnumeration; }
 
 /*!
  *  Inserts @a task into the download queue.
@@ -819,7 +849,14 @@ void AsyncDownloadManager::processQueue()
         emit downloadProgress(0);
         emit downloadTotalChanged(0);
 
-        startSizeEnumeration();
+        if(mSkipEnumeration)
+        {
+            // Move pending enumerants straight to pending downloads
+            mPendingDownloads.swap(mPendingEnumerants);
+            startTrueDownloads();
+        }
+        else
+            startSizeEnumeration();
     }
 }
 
@@ -1042,6 +1079,11 @@ bool SyncDownloadManager::isOverwrite() const { return mAsyncDm->isOverwrite(); 
 bool SyncDownloadManager::isStopOnError() const { return mAsyncDm->isStopOnError(); }
 
 /*!
+ *  @copydoc AsyncDownloadManager::isSkipEnumeration()
+ */
+bool SyncDownloadManager::isSkipEnumeration() const { return mAsyncDm->isSkipEnumeration(); }
+
+/*!
  *  @copydoc AsyncDownloadManager::taskCount()
  */
 int SyncDownloadManager::taskCount() const { return mAsyncDm->taskCount(); }
@@ -1088,6 +1130,11 @@ void SyncDownloadManager::setOverwrite(bool overwrite) { mAsyncDm->setOverwrite(
  *  @copydoc AsyncDownloadManager::setStopOnError(bool autoAbort)
  */
 void SyncDownloadManager::setStopOnError(bool autoAbort) { mAsyncDm->setStopOnError(autoAbort); }
+
+/*!
+ *  @copydoc AsyncDownloadManager::setSkipEnumeration(bool skipEnumeration)
+ */
+void SyncDownloadManager::setSkipEnumeration(bool skipEnumeration) { mAsyncDm->setSkipEnumeration(skipEnumeration); }
 
 /*!
  *  @copydoc AsyncDownloadManager::appendTask(const DownloadTask& task)
