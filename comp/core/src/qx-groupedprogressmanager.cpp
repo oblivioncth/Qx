@@ -160,7 +160,7 @@ void GroupedProgressManager::removeGroup(const QString& name)
 /*!
  *  Returns the current value of the manager.
  */
-quint64 GroupedProgressManager::value() { return mCurrentValue; }
+quint64 GroupedProgressManager::value() const { return mCurrentValue; }
 
 /*!
  *  Returns the maximum value of the manager.
@@ -168,7 +168,7 @@ quint64 GroupedProgressManager::value() { return mCurrentValue; }
  *  This function will always return @c 100, and exists as a convenience method so that
  *  user code does not need to remember this.
  */
-quint64 GroupedProgressManager::maximum() { return UNIFIED_MAXIMUM; }
+quint64 GroupedProgressManager::maximum() const { return UNIFIED_MAXIMUM; }
 
 //-Slots------------------------------------------------------------------------------------------------------------
 //Private:

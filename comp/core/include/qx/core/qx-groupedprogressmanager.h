@@ -46,8 +46,8 @@ public:
     ProgressGroup* group(const QString& name);
     void removeGroup(const QString& name);
 
-    quint64 value();
-    quint64 maximum();
+    quint64 value() const;
+    quint64 maximum() const;
 
 //-Slots------------------------------------------------------------------------------------------------------------
 private slots:
