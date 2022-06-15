@@ -75,9 +75,18 @@ The CMake project is designed to be used with multi-configuration generators suc
 
 #### CMake Targets:
 
- - all - Builds all Qx components (the entire library)
- - install - Installs the build output of the provided configuration (--config X) into `CMAKE_INSTALL_PREFIX`
- - qx_docs - Builds the Qx documentation
+ - `all` - Builds all Qx components (the entire library)
+ - `install` - Installs the build output into `CMAKE_INSTALL_PREFIX`
+ - `qx_docs` - Builds the Qx documentation
+ - `qx_<lowercase_component_name>` - Builds a specific Qx component
+
+#### CMake Install Components:
+- `all` - Installs all built components
+- `qx` - Installs top-level files (README.md, CMake package configuration files, etc.) 
+- `qx_docs` - Installs documentation
+- `qx_<lowercase_component_name>` - Installs a specific Qx component
+
+If Qx is configured as a sub-project, its install components are automatically removed from the `all` component, as to not pollute the install directory of the top-level project.
 
 #### Documentation:
 In order for the `qx_docs` target to be generated the CMake cache variable **QX_DOCS_TARGET** must be set to *ON* when CMake is invoked:
