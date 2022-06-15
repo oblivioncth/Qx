@@ -95,6 +95,7 @@ void GroupedProgressManager::updateValue()
 
 //Public:
 /*!
+ *  @overload
  *  Adds progress group @a progressGroup to the manager.
  *
  *  If a group with the same name is already present, it will be replaced.
