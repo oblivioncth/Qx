@@ -15,11 +15,13 @@ set(COMPONENT_INCLUDE_HEADERS
     qx-datetime.h
     qx-freeindextracker.h
     qx-genericerror.h
+    qx-groupedprogressmanager.h
     qx-index.h
     qx-integrity.h
     qx-iostream.h
     qx-json.h
     qx-list.h
+    qx-progressgroup.h
     qx-versionnumber.h
     qx-regularexpression.h
     qx-string.h
@@ -35,9 +37,11 @@ set(COMPONENT_IMPL
     qx-char.cpp
     qx-datetime.cpp
     qx-genericerror.cpp
+    qx-groupedprogressmanager.cpp
     qx-integrity.cpp
     qx-json.cpp
     qx-json_p.cpp
+    qx-progressgroup.cpp
     qx-versionnumber.cpp
     qx-string.cpp
 )
