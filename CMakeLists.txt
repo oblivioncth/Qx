@@ -218,11 +218,11 @@ if(QX_DOCS_TARGET)
     include(${DOC_SCRIPTS_PATH}/doxyconf.cmake)
 
     # Add Doxygen target
-    doxygen_add_docs(docs
+    doxygen_add_docs(qx_docs
         ${DOC_INPUT_LIST}
     )
 
-    message(STATUS "Doxygen configured. Build target 'docs' to build the documentation.")
+    message(STATUS "Doxygen configured. Build target 'qx_docs' to build the documentation.")
 endif()
 
 #================= Top Level Install =======================

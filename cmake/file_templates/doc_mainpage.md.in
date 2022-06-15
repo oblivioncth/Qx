@@ -77,10 +77,10 @@ The CMake project is designed to be used with multi-configuration generators suc
 
  - all - Builds all Qx components (the entire library)
  - install - Installs the build output of the provided configuration (--config X) into `CMAKE_INSTALL_PREFIX`
- - docs - Builds the Qx documentation
+ - qx_docs - Builds the Qx documentation
 
 #### Documentation:
-In order for the `docs` target to be generated the CMake cache variable **QX_DOCS_TARGET** must be set to *ON* when CMake is invoked:
+In order for the `qx_docs` target to be generated the CMake cache variable **QX_DOCS_TARGET** must be set to *ON* when CMake is invoked:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 cmake.exe (...) -D QX_DOCS_TARGET=ON
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -148,7 +148,7 @@ cmake.exe --build . --target all --config Debug
 cmake.exe --build . --target all --config Release
 
 # Build the documentation
-cmake --build . --target docs --config Release
+cmake --build . --target qx_docs --config Release
 
 # Install Debug/Release libraries and documentation
 cmake --build . --target install --config Debug
