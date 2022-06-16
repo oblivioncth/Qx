@@ -155,6 +155,10 @@ void GroupedProgressManager::removeGroup(const QString& name)
         ProgressGroup* pg = mGroups.take(name);
         pg->deleteLater();
         mRelativePortions.remove(name);
+
+        // Update values
+        updateRelativePortions();
+        updateValue();
     }
 }
 
