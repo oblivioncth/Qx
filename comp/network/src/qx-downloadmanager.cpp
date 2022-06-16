@@ -1161,7 +1161,7 @@ DownloadManagerReport SyncDownloadManager::processQueue()
         // Waiting for Async manager to report finished...
 
         // Return report
-        return mReport;
+        return std::move(mReport); // May not matter without a custom move constructor
     }
     else
         return DownloadManagerReport();
