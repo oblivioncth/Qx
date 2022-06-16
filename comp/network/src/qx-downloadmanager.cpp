@@ -1025,12 +1025,13 @@ SyncDownloadManager::SyncDownloadManager(QObject* parent) :
     mAsyncDm(new AsyncDownloadManager(this))
 {
     // Forward inner Async DM signals
-    connect(mAsyncDm, &AsyncDownloadManager::downloadProgress, this, &SyncDownloadManager::downloadProgress);
-    connect(mAsyncDm, &AsyncDownloadManager::downloadTotalChanged, this, &SyncDownloadManager::downloadTotalChanged);
     connect(mAsyncDm, &AsyncDownloadManager::sslErrors, this, &SyncDownloadManager::sslErrors);
     connect(mAsyncDm, &AsyncDownloadManager::authenticationRequired, this, &SyncDownloadManager::authenticationRequired);
     connect(mAsyncDm, &AsyncDownloadManager::preSharedKeyAuthenticationRequired, this, &SyncDownloadManager::preSharedKeyAuthenticationRequired);
     connect(mAsyncDm, &AsyncDownloadManager::proxyAuthenticationRequired, this, &SyncDownloadManager::proxyAuthenticationRequired);
+    connect(mAsyncDm, &AsyncDownloadManager::downloadProgress, this, &SyncDownloadManager::downloadProgress);
+    connect(mAsyncDm, &AsyncDownloadManager::downloadTotalChanged, this, &SyncDownloadManager::downloadTotalChanged);
+    connect(mAsyncDm, &AsyncDownloadManager::downloadFinished, this, &SyncDownloadManager::downloadFinished);
 
     // Handle Async DM finish
     connect(mAsyncDm, &AsyncDownloadManager::finished, this, &SyncDownloadManager::finishHandler);
