@@ -66,7 +66,8 @@ namespace Qx
 *
 *  This is expressed as a floating-point value between @c 0 and @c 1.
 *
-*  A progress group with a @ref maximum of @c 0 is considered to have a proportion complete of @c 0.
+*  @note For technical reasons, a progress group with a @ref maximum of @c 0 is considered to have a proportion
+*  complete of @c 1 (100%).
 */
 
 //-Constructor----------------------------------------------------------------------------------------------
@@ -87,7 +88,7 @@ ProgressGroup::ProgressGroup(QString name, QObject* parent) :
     mProportion(0)
 {
     // Setup proportion binding
-    mProportion.setBinding([&](){ return mMaximum.value() ? static_cast<double>(mValue.value())/mMaximum.value() : 0; });
+    mProportion.setBinding([&](){ return mMaximum.value() ? static_cast<double>(mValue.value())/mMaximum.value() : 1; });
     mProportionNotifier = mProportion.addNotifier([&]() { emit proportionCompleteChanged(mProportion); });
 }
 
