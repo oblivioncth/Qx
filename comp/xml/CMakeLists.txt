@@ -24,12 +24,6 @@ set(COMPONENT_PUBLIC_LINKS
     Qt6::Xml
 )
 
-# Qt Component Dependencies
-set(COMPONENT_QT_DEPENDS
-    Core
-    Xml
-)
-
 #=============== Component Handler =======================
 include(Qx/ComponentHelper)
 register_qx_component()

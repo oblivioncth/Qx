@@ -26,18 +26,6 @@ set(COMPONENT_PUBLIC_LINKS
     Qx::Io
 )
 
-# Inter-project Dependencies
-set(COMPONENT_SIBLING_DEPENDS
-    Core
-    Io
-)
-
-# Qt Component Dependencies
-set(COMPONENT_QT_DEPENDS
-    Core
-    Network
-)
-
 #=============== Component Handler =======================
 include(Qx/ComponentHelper)
 register_qx_component()

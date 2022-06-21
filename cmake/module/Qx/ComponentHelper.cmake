@@ -1,3 +1,6 @@
+# Qt/Qx (Inter-)Dependencies are determiend automatically via target link lists,
+# but this requires namespace prefixes to always be used in order to work!
+
 macro(register_qx_component)
     #================= Setup ==========================
     # Utility functions
@@ -18,6 +21,29 @@ macro(register_qx_component)
     # Make alias target so target can be referred to with its friendly
     # export name both internally and when part of another build tree
     add_library(${PROJECT_NAME}::${COMPONENT_NAME} ALIAS ${COMPONENT_TARGET_NAME})
+
+    #================= Dependencies ===================
+    list(APPEND __COMPONENT_ALL_LINKS ${COMPONENT_PRIVATE_LINKS})
+    list(APPEND __COMPONENT_ALL_LINKS ${COMPONENT_PUBLIC_LINKS})
+
+    foreach(link ${__COMPONENT_ALL_LINKS})
+        string(FIND "${link}" "Qt6::" __QT_NAMESPACE_POS)
+        string(FIND "${link}" "Qx::" __QX_NAMESPACE_POS)
+
+        if(__QT_NAMESPACE_POS EQUAL 0)
+            string(REPLACE "Qt6::" "" __QT_LINK ${link})
+            list(FIND "${COMPONENT_QT_DEPENDS}" ${__QT_LINK} __QT_LINK_IDX)
+            if(__QT_LINK_IDX EQUAL -1)
+                list(APPEND COMPONENT_QT_DEPENDS ${__QT_LINK})
+            endif()
+        elseif(__QX_NAMESPACE_POS EQUAL 0)
+            string(REPLACE "Qx::" "" __QX_LINK ${link})
+            list(FIND "${COMPONENT_SIBLING_DEPENDS}" ${__QX_LINK} __QX_LINK_IDX)
+            if(__QX_LINK_IDX EQUAL -1)
+                list(APPEND COMPONENT_SIBLING_DEPENDS ${__QX_LINK})
+            endif()
+        endif()
+    endforeach()
 
     #================= Build ==========================
 

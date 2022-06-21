@@ -66,16 +66,6 @@ set(COMPONENT_PUBLIC_LINKS
     Qx::Utility
 )
 
-# Inter-project Dependencies
-set(COMPONENT_SIBLING_DEPENDS
-    Utility
-)
-
-# Qt Component Dependencies
-set(COMPONENT_QT_DEPENDS
-    Core
-)
-
 #=============== Component Handler =======================
 include(Qx/ComponentHelper)
 register_qx_component()

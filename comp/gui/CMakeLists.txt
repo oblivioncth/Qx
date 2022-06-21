@@ -20,12 +20,6 @@ set(COMPONENT_PUBLIC_LINKS
     Qt6::Gui
 )
 
-# Qt Component Dependencies
-set(COMPONENT_QT_DEPENDS
-    Core
-    Gui
-)
-
 #=============== Component Handler =======================
 include(Qx/ComponentHelper)
 register_qx_component()
