@@ -48,14 +48,13 @@ endif()
 
 # Setup Qt Creator Help File
 if(DEFINED QT_HELP_GEN_PATH)
-    set(DOXYGEN_GENERATE_QHP NO) # TODO: TEMPORARILY DISABLED DUE TO QTBUG-93238 (Waiting on 6.3.1)
+    set(DOXYGEN_GENERATE_QHP YES)
     set(DOXYGEN_QCH_FILE "../${PROJECT_NAME}.qch")
     set(DOXYGEN_QHG_LOCATION ${QT_HELP_GEN_PATH})
 endif()
 
 # Set output paths
 set(DOXYGEN_OUTPUT_DIRECTORY ${DOC_BUILD_PATH})
-
 
 #-------------Doxygen Awsome Options--------------
 
