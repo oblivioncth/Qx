@@ -26,7 +26,7 @@ public:
 //-Instance Functions------------------------------------------------------------------------------------------------
 public:
     bool precedingBreak();
-    QString readLineWithBreak(qint64 maxlen = 0); //TODO: In docs note that this is very slow when maxlen != 0
+    QString readLineWithBreak(qint64 maxlen = 0);
 };	
 
 }

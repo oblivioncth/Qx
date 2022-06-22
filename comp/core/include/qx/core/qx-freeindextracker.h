@@ -7,6 +7,9 @@
 // Qt Includes
 #include <QSet>
 
+// Intra-component Includes
+#include <qx/core/qx-algorithm.h>
+
 namespace Qx
 {
 	

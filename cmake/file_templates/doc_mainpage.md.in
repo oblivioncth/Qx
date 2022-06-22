@@ -56,13 +56,12 @@ target_link_libraries(example_ui_app PUBLIC Qx::Core Qx::Widgets)
 #include <qx/widgets.h>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+It is possible to include portions of the Qx API with finer granularity by only referencing the exact headers you need in accordance with the include structure shown in the [File Index](files.html), but at first it is generally recommended to simply include the main header for each component you use as shown.
+
 6) Review the rest of the documentation. A good place to start is the [Core](#qx-core) component.
 
 @note
-It is possible to include portions of the Qx API with finer granularity by only referencing the exact headers you need in accordance with the include structure shown in the [File Index](files.html), but it is generally recommended to simply include the main header for each component you use as shown above.
-
-@warning
-When building a project that uses Qx, it is important to do so with a configuration of Qt that has binary compatibility with the one that was used to build a given version of Qx. Excluding potential bugs, luckily this is easy as Qt advertising binary compatibility within each major version.
+When building a project that uses Qx, it is important to do so with a configuration of Qt that has binary compatibility with the one that was used to build a given version of Qx. Excluding potential bugs, luckily this is easy as Qt advertises binary compatibility within each major version.
 
 Building From Source
 --------------------
@@ -76,11 +75,25 @@ The CMake project is designed to be used with multi-configuration generators suc
 
 #### CMake Targets:
 
- - all - Builds all Qx components (the entire library)
- - install - Installs the build output of the provided configuration (--config X) into the *out* directory
- - docs - Builds the Qx documentation
+ - `all` - Builds all Qx components (the entire library)
+ - `install` - Installs the build output into `CMAKE_INSTALL_PREFIX`
+ - `qx_docs` - Builds the Qx documentation
+ - `qx_<lowercase_component_name>` - Builds a specific Qx component
+
+#### CMake Install Components:
+- `all` - Installs all built components
+- `qx` - Installs top-level files (README.md, CMake package configuration files, etc.) 
+- `qx_docs` - Installs documentation
+- `qx_<lowercase_component_name>` - Installs a specific Qx component
+
+If Qx is configured as a sub-project, its install components are automatically removed from the `all` component, as to not pollute the install directory of the top-level project.
 
 #### Documentation:
+In order for the `qx_docs` target to be generated the CMake cache variable **QX_DOCS_TARGET** must be set to *ON* when CMake is invoked:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cmake.exe (...) -D QX_DOCS_TARGET=ON
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 The Qx documentation supports two optional, but highly recommended features:
  - Linking to Qt documentation
  - Generating a Qt Compressed Help (.qch) file for use in Qt Creator
@@ -134,7 +147,7 @@ The following is the general build process required to successfully generate thi
 CALL "%VS_PATH%\Common7\Tools\VsDevCmd.bat" -arch=amd64
 
 # Configure CMake using Qt wrapper
-CALL "%Qt_ROOT%\bin\qt-cmake" -G "Ninja Multi-Config" -S "%Qx_SOURCE_DIR%" -B "%Qx_BUILD_DIR%" -D "QT_DOCS_DIR=%Qt_ROOT%/doc" -D "QT_DOCS_DIR=%Qt_ROOT%/bin/qhelpgenerator.exe"
+CALL "%Qt_ROOT%\bin\qt-cmake" -G "Ninja Multi-Config" -S "%Qx_SOURCE_DIR%" -B "%Qx_BUILD_DIR%" -D QX_DOCS_TARGET=ON
 
 # Go to Build directory
 cd /D "%Qx_BUILD_DIR%"
@@ -144,7 +157,7 @@ cmake.exe --build . --target all --config Debug
 cmake.exe --build . --target all --config Release
 
 # Build the documentation
-cmake --build . --target docs --config Release
+cmake --build . --target qx_docs --config Release
 
 # Install Debug/Release libraries and documentation
 cmake --build . --target install --config Debug
@@ -157,7 +170,7 @@ cpack.exe -C Debug;Release
 
 This example can easily be adapted to bash for builds on Linux.
 
-Build artifacts are placed into the 'out' directory.
+By default, build artifacts are placed into `<BUILD_DIR>/out`.
 
 
 Source Build as a Direct CMake Dependency

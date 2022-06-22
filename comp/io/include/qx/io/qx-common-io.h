@@ -65,6 +65,10 @@ IoOpReport deleteTextFromFile(QFile& textFile, TextPos startPos, TextPos endPos)
 // Directory:
 bool dirContainsFiles(QDir directory, QDirIterator::IteratorFlags iteratorFlags);
 IoOpReport dirContainsFiles(bool& returnBuffer, QDir directory, QDirIterator::IteratorFlags iteratorFlags);
+IoOpReport dirContentInfoList(QFileInfoList& returnBuffer, QDir directory, QStringList nameFilters = QStringList(),
+                              QDir::Filters filters = QDir::NoFilter, QDirIterator::IteratorFlags flags = QDirIterator::NoIteratorFlags);
+IoOpReport dirContentList(QStringList& returnBuffer, QDir directory, QStringList nameFilters = QStringList(),
+                              QDir::Filters filters = QDir::NoFilter, QDirIterator::IteratorFlags flags = QDirIterator::NoIteratorFlags);
 
 // Integrity
 IoOpReport calculateFileChecksum(QString& returnBuffer, QFile& file, QCryptographicHash::Algorithm hashAlgorithm);

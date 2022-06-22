@@ -27,18 +27,7 @@ set(COMPONENT_PUBLIC_LINKS
     Qx::Core
 )
 
-# Inter-project Dependencies
-set(COMPONENT_SIBLING_DEPENDS
-    Core
-)
-
-# Qt Component Dependencies
-set(COMPONENT_QT_DEPENDS
-    Core
-    Widgets
-)
-
 #=============== Component Handler =======================
-include(ComponentHelper)
+include(Qx/ComponentHelper)
 register_qx_component()
 

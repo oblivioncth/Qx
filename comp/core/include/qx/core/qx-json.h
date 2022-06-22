@@ -3,6 +3,7 @@
 
 // Qt Includes
 #include <QString>
+#include <QJsonValueRef>
 
 // Intra-component Includes
 #include "qx/core/qx-genericerror.h"
@@ -29,11 +30,13 @@ private:
 
 //-Class Functions-----------------------------------------------------------------------------------------------
 public:
-    static Qx::GenericError checkedKeyRetrieval(bool& valueBuffer, QJsonObject jObject, QString key);
-    static Qx::GenericError checkedKeyRetrieval(double& valueBuffer, QJsonObject jObject, QString key);
-    static Qx::GenericError checkedKeyRetrieval(QString& valueBuffer, QJsonObject jObject, QString key);
-    static Qx::GenericError checkedKeyRetrieval(QJsonArray& valueBuffer, QJsonObject jObject, QString key);
-    static Qx::GenericError checkedKeyRetrieval(QJsonObject& valueBuffer, QJsonObject jObject, QString key);
+    static Qx::GenericError checkedKeyRetrieval(bool& valueBuffer, QJsonObject jObject, const QString& key);
+    static Qx::GenericError checkedKeyRetrieval(double& valueBuffer, QJsonObject jObject, const QString& key);
+    static Qx::GenericError checkedKeyRetrieval(QString& valueBuffer, QJsonObject jObject, const QString& key);
+    static Qx::GenericError checkedKeyRetrieval(QJsonArray& valueBuffer, QJsonObject jObject, const QString& key);
+    static Qx::GenericError checkedKeyRetrieval(QJsonObject& valueBuffer, QJsonObject jObject, const QString& key);
+
+    static QList<QJsonValue> findAllValues(const QJsonValue& rootValue, const QString& key);
 };	
 
 }

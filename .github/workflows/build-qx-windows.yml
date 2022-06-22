@@ -1,4 +1,4 @@
-name: Windows - Build Qx (Qt 6.3.0)
+name: Windows - Build Qx (Qt 6.3.1)
 on:
   workflow_call:
     secrets:
@@ -30,7 +30,7 @@ jobs:
         qt_linkage: [shared, static]
     runs-on: windows-latest
     env:
-      vc_vars: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat
+      vs_dir: C:/Program Files/Microsoft Visual Studio/2022/Enterprise
       cmake_gen: Ninja Multi-Config
     outputs:
       qt_shared_artifact_name: ${{ steps.get_artifact_name.outputs.qt_shared_artifact_name }}
@@ -43,14 +43,14 @@ jobs:
         map: |
           {
             "shared": {
-              "qt_install_name": "qt-Production-6.3.0-win32-msvc-x64-shared-release.7z",
-              "qt_install_url": "https://mega.nz/file/Znp0XBKR",
+              "qt_install_name": "qt-Production-6.3.1-win32-msvc-x64-shared-release.7z",
+              "qt_install_url": "https://mega.nz/file/h7ZgWSRa",
               "qt_install_url_key": "${{ secrets.qt_shared_dec_key }}",
               "artifact_output_var": "qt_shared_artifact_name"
             },
             "static": {
-              "qt_install_name": "qt-Production-6.3.0-win32-msvc-x64-static-release.7z",
-              "qt_install_url": "https://mega.nz/file/J7IxAbYL",
+              "qt_install_name": "qt-Production-6.3.1-win32-msvc-x64-static-release.7z",
+              "qt_install_url": "https://mega.nz/file/h2RWCKhS",
               "qt_install_url_key": "${{ secrets.qt_static_dec_key }}",
               "artifact_output_var": "qt_static_artifact_name"
             }
@@ -59,10 +59,10 @@ jobs:
     - name: Set derived variables with shell because GitHub Actions env context sucks
       run: |
         echo "qt_install_dest=${{ env.qt_download_dir }}/${{ env.qt_install_name }}" >> $Env:GITHUB_ENV
-        echo "qx_package_path=${{ env.qx_src_dir }}/out/dist" >> $Env:GITHUB_ENV
-        $qx_install_path="${{ env.qx_src_dir }}/out/install"
+        echo "qx_package_path=${{ env.qx_build_dir }}/out/dist" >> $Env:GITHUB_ENV
+        $qx_install_path="${{ env.qx_build_dir }}/out/install"
         echo "qx_install_path=$qx_install_path" >> $Env:GITHUB_ENV
-        echo "qt_cmake=${Env:qt_install_dir}/bin/qt-cmake" >> $Env:GITHUB_ENV
+        echo "qt_cmake=${Env:qt_install_dir}/bin/qt-cmake.bat" >> $Env:GITHUB_ENV
     - name: Cache Qt Build
       id: cache-qt
       uses: actions/cache@v3
@@ -91,29 +91,28 @@ jobs:
         path: ${{ env.qx_src_suffix }}
         fetch-depth: 0 # Required for verbose versioning to work correctly
     - name: Build/Install Qx
-      shell: cmd
       working-directory: ${{ env.qx_src_dir }}
+      shell: cmd
       run: |
-        @echo off
-        echo Setting up VC++ environment...
-        CALL "%vc_vars%"
-        echo Configuring CMake...
-        CALL "%qt_cmake%" -G "%cmake_gen%" -S "%qx_src_dir%" -B "%qx_build_dir%"
-        echo Changing to build directory...
-        cd /D "%qx_build_dir%"
-        echo Building Qx debug...
+        echo "Setup C++ Build Environment..."
+        CALL "${{ env.vs_dir }}\Common7\Tools\VsDevCmd.bat" -arch=amd64
+        echo "Configure CMake using Qt wrapper..."
+        CALL "${{ env.qt_cmake }}" -G "${{ env.cmake_gen }}" -S "${{ env.qx_src_dir}}" -B "${{ env.qx_build_dir }}"  
+        echo "Changing to build directory..."
+        cd "%qx_build_dir%"
+        echo "Building Qx debug..."
         cmake --build . --target all --config Debug
-        echo Building Qx release...
+        echo "Building Qx release..."
         cmake --build . --target all --config Release
-        echo Building Qx docs...
-        cmake --build . --target docs --config Release
-        echo Installing Qx Debug
+        echo "Building Qx docs..."
+        cmake --build . --target qx_docs --config Release
+        echo "Installing Qx Debug"
         cmake --build . --target install --config Debug
-        echo Installing Qx Release/Docs...
+        echo "Installing Qx Release/Docs..."
         cmake --build . --target install --config Release
-        echo Packaging Qx...
+        echo "Packaging Qx..."
         cpack -C "Debug;Release"
-        echo Build complete.
+        echo "Build complete."
     - name: Get Qx artifact name
       id: get_artifact_name
       run: echo "::set-output name=${{ env.artifact_output_var }}::$((Get-ChildItem -Path "${{ env.qx_package_path }}" -Filter *.zip)[0].BaseName)"

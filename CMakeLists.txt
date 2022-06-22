@@ -10,18 +10,21 @@ endif()
 # by find_package/macro calls in dependencies (stupid)
 set(TRUE_CMAKE_MINIMUM_REQUIRED ${CMAKE_MINIMUM_REQUIRED_VERSION})
 
+# Configuration options
+option(QX_DOCS_TARGET "Build Qx documentation" OFF)
+
 # Project
 # NOTE: For versions stick to w.x.y.z, where z is generally
 # avoided and only used for hotfixes. DON'T USE TRAILING
-# NUMBERS IN VERSIONS
-set(QX_BASE_VERSION 0.2) # Required for CI/CD
+# ZEROS IN VERSIONS
+set(QX_BASE_VERSION 0.3) # Required for CI/CD
 project(Qx
     VERSION ${QX_BASE_VERSION}
     LANGUAGES CXX
     DESCRIPTION "Qt Extensions Library"
 )
-string(TOLOWER ${PROJECT_NAME} PROJ_NAME_LC)
-string(TOUPPER ${PROJECT_NAME} PROJ_NAME_UC)
+string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LC)
+string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UC)
 
 # C++
 set(CMAKE_CXX_STANDARD 20)
@@ -38,7 +41,7 @@ add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060000)
 # Add local modules
 set(PROJ_SCRIPTS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 list(APPEND CMAKE_MODULE_PATH "${PROJ_SCRIPTS_PATH}/module")
-include(Utility)
+include(Qx/Utility)
 
 # General Variables
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -47,6 +50,27 @@ else()
   set(TARGET_ARCH x86)
 endif()
 get_proper_system_name(PROPER_SYSTEM_NAME)
+
+#--------------Top Level Project Setup-------------
+
+if(${PROJECT_IS_TOP_LEVEL})
+    message(STATUS "NOTE: ${PROJECT_NAME} is being configured as a top-level project")
+
+    # Install (override the CMake default, but not a user set value)
+    if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+        set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/out/install"
+               CACHE PATH "Project install path" FORCE
+        )
+    endif()
+
+    # Clean install when clean target is ran
+    set_directory_properties(PROPERTIES ADDITIONAL_CLEAN_FILES "${CMAKE_INSTALL_PREFIX}")
+else()
+    message(STATUS "NOTE: ${PROJECT_NAME} is being configured as a sub-project")
+
+    # Keep install components out of 'all' target
+    set(SUB_PROJ_EXCLUDE_FROM_ALL "EXCLUDE_FROM_ALL")
+endif()
 
 #--------------------Setup Paths-------------------
 
@@ -65,19 +89,15 @@ set(DOC_BUILD_PATH "${CMAKE_CURRENT_BINARY_DIR}/doc")
 set(DOC_GENERATED_PATH "${CMAKE_CURRENT_BINARY_DIR}/docin")
 
 # Install
-set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/out/install")
 set(HEADER_INSTALL_SUFFIX "include")
 
 # Package
-set(PACKAGE_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/out/dist")
+set(PACKAGE_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/out/dist")
 
 #------------Set Global Build Rules----------------
 
-# Clean install when clean target is ran
-set_directory_properties(PROPERTIES ADDITIONAL_CLEAN_FILES "${CMAKE_INSTALL_PREFIX}")
-
 # Versioning
-include(VerboseVersioning)
+include(Qx/VerboseVersioning)
 setup_verbose_versioning(PROJECT_VERSION_VERBOSE)
 
 ################# Common Build #################
@@ -109,14 +129,8 @@ endif()
 #================= Top Level Build =========================
 
 # Find Qt package
-include(BetterFindQt6)
+include(Qx/BetterFindQt6)
 find_qt6_package(REQUIRED COMPONENTS ${QT_FIND_COMPONENTS})
-
-# Find Doxygen package
-find_package(Doxygen
-             COMPONENTS dot
-             OPTIONAL_COMPONENTS mscgen dia
-)
 
 #--------------------Package Config-----------------------
 
@@ -143,7 +157,18 @@ endforeach()
 
 #================ Build Documentation ======================
 
-if(DOXYGEN_FOUND)
+if(QX_DOCS_TARGET)
+    # Find Doxygen package
+    find_package(Doxygen
+                 COMPONENTS dot
+                 OPTIONAL_COMPONENTS mscgen dia
+    )
+
+    # Require Doxygen
+    if(NOT DOXYGEN_FOUND)
+        message(FATAL_ERROR "Doxygen not available, documentation cannot not be built!")
+    endif()
+
     # Configure files
     configure_file("${FILE_TEMPLATES_PATH}/doc_mainpage.md.in"
         "${DOC_GENERATED_PATH}/mainpage.md"
@@ -184,43 +209,49 @@ if(DOXYGEN_FOUND)
     endforeach()
 
     # Determine Qt related doc paths
-    include(QtDocsHelper)
+    include(Qx/QtDocsHelper)
     configure_qt_doc_link(${Qt6_PREFIX_PATH})
 
     # Set Doxygen parameters
     include(${DOC_SCRIPTS_PATH}/doxyconf.cmake)
 
     # Add Doxygen target
-    doxygen_add_docs(docs
+    doxygen_add_docs(qx_docs
         ${DOC_INPUT_LIST}
     )
 
-    message(STATUS "Doxygen configured. Build target 'docs' to build the documentation.")
-else()
-    message(WARNING "Doxygen not available, documentation cannot not be built.")
+    message(STATUS "Doxygen configured. Build target 'qx_docs' to build the documentation.")
 endif()
 
 #================= Top Level Install =======================
+
+set(TOP_LEVEL_INSTALL_COMPONENT ${PROJECT_NAME_LC})
 
 # Install Package Config
 install(FILES
     "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}Config.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}ConfigVersion.cmake"
+    COMPONENT ${TOP_LEVEL_INSTALL_COMPONENT}
     DESTINATION cmake
+    ${SUB_PROJ_EXCLUDE_FROM_ALL} # "EXCLUDE_FROM_ALL" if project is not top-level
 )
 
 # Install README and LICENSE
 install(FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/README.md"
     "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE"
+    COMPONENT ${TOP_LEVEL_INSTALL_COMPONENT}
     DESTINATION .
+    ${SUB_PROJ_EXCLUDE_FROM_ALL} # "EXCLUDE_FROM_ALL" if project is not top-level
 )
 
 # Install Docs if available
 install(DIRECTORY ${DOC_BUILD_PATH}
+    COMPONENT ${PROJECT_NAME_LC}_docs
     DESTINATION .
     CONFIGURATIONS Release
     OPTIONAL
+    ${SUB_PROJ_EXCLUDE_FROM_ALL} # "EXCLUDE_FROM_ALL" if project is not top-level
 )
 
 #====================== CPack ==============================

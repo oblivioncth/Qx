@@ -122,7 +122,7 @@ VersionNumber VersionNumber::commonPrefix(const VersionNumber& v1, const Version
 
 /*!
  *  Constructs a VersionNumber from a specially formatted @a string of non-negative decimal delimited by a
- *  period (@c {.}).
+ *  period `(.)`.
  *
  *  Once the numerical segments have been parsed, the remainder of the string is considered to be the suffix string.
  *  The start index of that string will be stored in @a suffixIndex if it is not null.

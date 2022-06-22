@@ -32,19 +32,7 @@ set(COMPONENT_PUBLIC_LINKS
     Qt6::Gui
 )
 
-# Inter-project Dependencies
-set(COMPONENT_SIBLING_DEPENDS
-    Core
-    Windows
-)
-
-# Qt Component Dependencies
-set(COMPONENT_QT_DEPENDS
-    Core
-    Gui
-)
-
 #=============== Component Handler =======================
-include(ComponentHelper)
+include(Qx/ComponentHelper)
 register_qx_component()
 

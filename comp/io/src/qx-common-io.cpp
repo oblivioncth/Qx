@@ -484,7 +484,7 @@ IoOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const
     {
         fileTextStream >> currentChar;
 
-        if(Char::compare(currentChar, *queryIt, query.caseSensitivity()))
+        if(Char::compare(currentChar, *queryIt, query.caseSensitivity()) == 0)
         {
             if(possibleMatch.isNull())
                 possibleMatch = currentPos;
@@ -1143,6 +1143,8 @@ IoOpReport deleteTextFromFile(QFile& textFile, TextPos startPos, TextPos endPos)
 }
 
 /*!
+ *  @overload
+ *
  *  Returns @c true if @a directory contains files in accordance with @a iteratorFlags; otherwise returns @c false.
  *
  *  @warning This also returns false if the directory doesn't exist.
@@ -1156,8 +1158,6 @@ bool dirContainsFiles(QDir directory, QDirIterator::IteratorFlags iteratorFlags)
 }
 
 /*!
- *  @overload
- *
  *  Sets @a returnBuffer to @c true if @a directory contains files in accordance with @a iteratorFlags; otherwise sets it to
  *  @c false.
  *
@@ -1178,6 +1178,87 @@ IoOpReport dirContainsFiles(bool& returnBuffer, QDir directory, QDirIterator::It
         returnBuffer = dirContainsFiles(directory, iteratorFlags); // Use reportless function
         return IoOpReport(IO_OP_INSPECT, IO_SUCCESS, directory);
     }
+}
+
+/*!
+ *  Fills @a returnBuffer with a list of QFileInfo objects for all the files and directories in @a directory, limited according
+ *  to the name and attribute filters previously set with QDir::setNameFilters() and QDir::setFilter(), while sort flags are ignored.
+ *
+ *  The name filter and file attribute filter can be overridden using the @a nameFilters and @a filters arguments respectively.
+ *
+ *  Directory traversal rules can be further refined via @a iteratorFlags.
+ *
+ *  Returns a report containing details of operation success or failure.
+ *
+ *  @sa QDir::entryInfoList
+ */
+IoOpReport dirContentInfoList(QFileInfoList& returnBuffer, QDir directory, QStringList nameFilters,
+                              QDir::Filters filters, QDirIterator::IteratorFlags flags)
+{
+    // Empty buffer
+    returnBuffer = QFileInfoList();
+
+    // Handle overrides
+    if(nameFilters.isEmpty())
+        nameFilters = directory.nameFilters();
+    if(filters == QDir::NoFilter)
+        filters = directory.filter();
+
+    // Check directory
+    IoOpResultType dirCheckResult = directoryCheck(directory);
+    if(dirCheckResult != IO_SUCCESS)
+        return IoOpReport(IO_OP_ENUMERATE, dirCheckResult, directory);
+
+
+    // Construct directory iterator
+    QDirIterator listIterator(directory.path(), nameFilters, filters, flags);
+
+    while(listIterator.hasNext())
+    {
+        listIterator.next();
+        returnBuffer.append(listIterator.fileInfo());
+    }
+
+    return IoOpReport(IO_OP_ENUMERATE, IO_SUCCESS, directory);
+}
+
+/*!
+ *  Fills @a returnBuffer with a list of names for all the files and directories in @a directory, limited according
+ *  to the name and attribute filters previously set with QDir::setNameFilters() and QDir::setFilter(), while sort flags are ignored.
+ *
+ *  The name filter and file attribute filter can be overridden using the @a nameFilters and @a filters arguments respectively.
+ *
+ *  Directory traversal rules can be further refined via @a iteratorFlags.
+ *
+ *  Returns a report containing details of operation success or failure.
+ *
+ *  @sa QDir::entryList
+ */
+IoOpReport dirContentList(QStringList& returnBuffer, QDir directory, QStringList nameFilters,
+                              QDir::Filters filters, QDirIterator::IteratorFlags flags)
+{
+    // Empty buffer
+    returnBuffer = QStringList();
+
+    // Handle overrides
+    if(nameFilters.isEmpty())
+        nameFilters = directory.nameFilters();
+    if(filters == QDir::NoFilter)
+        filters = directory.filter();
+
+    // Check directory
+    IoOpResultType dirCheckResult = directoryCheck(directory);
+    if(dirCheckResult != IO_SUCCESS)
+        return IoOpReport(IO_OP_ENUMERATE, dirCheckResult, directory);
+
+
+    // Construct directory iterator
+    QDirIterator listIterator(directory.path(), nameFilters, filters, flags);
+
+    while(listIterator.hasNext())
+        returnBuffer.append(listIterator.next());
+
+    return IoOpReport(IO_OP_ENUMERATE, IO_SUCCESS, directory);
 }
 
 /*!

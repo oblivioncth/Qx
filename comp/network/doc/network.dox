@@ -11,5 +11,5 @@
  *  @note Qx must be built using a build of Qt with SSL support enabled in order for this component
  *  to handle secure connections (e.g. HTTPS).
  *
- *  @note It is recommended to configure Qt with @c -ssl on Linux and -schannel on Windows.
+ *  @note It is recommended to configure Qt with @c -ssl on Linux and @c -schannel on Windows.
  */

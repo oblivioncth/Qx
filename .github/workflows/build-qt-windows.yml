@@ -78,7 +78,7 @@ jobs:
         echo Building QDoc dependencies...
         cmake --build . --target qtbase qtdeclarative qttools --parallel
         echo Building Qt docs...
-        cmake --build . --target docs
+        cmake --build . --target qx_docs
         echo Build finished
     - name: Copy docs into actual build
       run: Copy-Item -Path "${{ env.qt_doc_build_dir }}/doc" -Destination "${{ env.qt_doc_install_dir }}/doc" -Recurse

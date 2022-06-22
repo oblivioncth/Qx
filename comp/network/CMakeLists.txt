@@ -8,14 +8,14 @@ set(COMPONENT_LIB_TYPE STATIC)
 set(COMPONENT_INCLUDE_HEADERS
     qx-common-network.h
     qx-networkreplyerror.h
-    qx-syncdownloadmanager.h
+    qx-downloadmanager.h
 )
 
 # Source Files
 set(COMPONENT_IMPL
     qx-common-network.cpp
     qx-networkreplyerror.cpp
-    qx-syncdownloadmanager.cpp
+    qx-downloadmanager.cpp
 )
 
 # Links
@@ -26,19 +26,7 @@ set(COMPONENT_PUBLIC_LINKS
     Qx::Io
 )
 
-# Inter-project Dependencies
-set(COMPONENT_SIBLING_DEPENDS
-    Core
-    Io
-)
-
-# Qt Component Dependencies
-set(COMPONENT_QT_DEPENDS
-    Core
-    Network
-)
-
 #=============== Component Handler =======================
-include(ComponentHelper)
+include(Qx/ComponentHelper)
 register_qx_component()
 

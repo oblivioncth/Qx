@@ -19,5 +19,5 @@ set(COMPONENT_DOC_ONLY
 )
 
 #=============== Component Handler =======================
-include(ComponentHelper)
+include(Qx/ComponentHelper)
 register_qx_component()

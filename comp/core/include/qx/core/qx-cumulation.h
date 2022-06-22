@@ -17,6 +17,7 @@ class Cumulation
 //-Instance Variables----------------------------------------------------------------------------------------------
 private:
     QHash<K, V> mComponents;
+    QHash<K, V> mScalers;
     V mTotal;
 
 //-Constructor----------------------------------------------------------------------------------------------
@@ -26,31 +27,152 @@ public:
     {}
 
 //-Instance Functions----------------------------------------------------------------------------------------------
-public:
-    void clear()
+private:
+    template<typename N>
+        requires std::integral<N>
+    N sMean() const
     {
-        mComponents.clear();
-        mTotal = 0;
+        return !mComponents.isEmpty() ? std::round(static_cast<double>(mTotal)/mComponents.count()) : 0;
+    }
+
+    template<typename N>
+        requires std::floating_point<N>
+    N sMean() const
+    {
+        return !mComponents.isEmpty() ? mTotal/mComponents.count() : 0;
+    }
+
+    void basicInsert(K component, V value, V scaler)
+    {
+        mTotal += value * scaler;
+        mComponents[component] = value;
+        mScalers[component] = scaler;
+    }
+
+public:
+    void insert(K component, V value, V scaler = 1)
+    {
+        // If replacing an existing value, remove its portion from the running total if its not the same
+        if(mComponents.contains(component))
+        {
+            const V& curVal = mComponents[component];
+            const V& curScal = mScalers[component];
+
+            // Remove old component portion from running total if different
+            if(curVal != value || curScal != scaler)
+                mTotal -= curVal * curScal;
+            else
+                return;
+        }
+
+        // Insert/replace
+        basicInsert(component, value, scaler);
+    }
+
+    void setValue(K component, V value)
+    {
+        if(mComponents.contains(component))
+        {
+            V& curVal = mComponents[component];
+            if(value != curVal)
+            {
+                const V& scaler = mScalers[component];
+                mTotal += (value * scaler) - (curVal * scaler);
+                curVal = value;
+            }
+        }
+        else
+            basicInsert(component, value, 1);
+    }
+
+    void setScaler(K component, V scaler)
+    {
+        if(mComponents.contains(component))
+        {
+            V& curScaler = mScalers[component];
+            if(scaler != curScaler)
+            {
+                const V& value = mComponents[component];
+                mTotal += (value * scaler) - (value * curScaler);
+                curScaler = scaler;
+            }
+        }
+        else
+            basicInsert(component, 0, scaler);
+    }
+
+    void increase(K component, V amount)
+    {
+        if(mComponents.contains(component))
+        {
+            mTotal += amount * mScalers[component];
+            mComponents[component] += amount;
+        }
+        else
+            basicInsert(component, amount, 1);
+    }
+
+    void reduce(K component, V amount)
+    {
+        if(mComponents.contains(component))
+        {
+            mTotal -= amount * mScalers[component];
+            mComponents[component] -= amount;
+        }
+        else
+            basicInsert(component, -amount, 1);
+    }
+
+    V increment(K component)
+    {
+        if(mComponents.contains(component))
+        {
+            mTotal += mScalers[component];
+            mComponents[component]++;
+        }
+        else
+            basicInsert(component, 1, 1);
+
+        return mTotal;
+    }
+
+    V decrement(K component)
+    {
+        if(mComponents.contains(component))
+        {
+            mTotal -= mScalers[component];
+            mComponents[component]--;
+        }
+        else
+            basicInsert(component, -1, 1);
+
+        return mTotal;
     }
 
     void remove(K component)
     {
         if(mComponents.contains(component))
         {
-            mTotal -= mComponents.value(component);
+            mTotal -= (mComponents[component] * mScalers[component]);
             mComponents.remove(component);
+            mScalers.remove(component);
         }
     }
 
-    void setValue(K component, V value)
+    void clear()
     {
-        mTotal += value - (mComponents.contains(component) ? mComponents.value(component) : 0);
-        mComponents[component] = value;
+        mComponents.clear();
+        mScalers.clear();
+        mTotal = 0;
     }
 
     bool contains(K component) const { return mComponents.contains(component); }
     V value(K component) const { return mComponents.value(component); }
     V total() const { return mTotal; }
+
+    qsizetype count() const { return mComponents.count(); }
+    bool isEmpty() const { return mComponents.isEmpty(); }
+    V mean() const { return sMean<V>(); }
 };	
 
 }
