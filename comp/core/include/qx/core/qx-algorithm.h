@@ -139,10 +139,10 @@ static T constrainedDiv(T a, T b, T max = std::numeric_limits<T>::max())
 
 template<typename T>
 	requires std::integral<T>
-static T roundToNearestMultiple(T num, T mult)
+static T roundToNearestMultiple(T num, std::make_unsigned<T> mult)
 {
 	// Ignore negative multiples
-	mult = std::abs(mult);
+    //mult = std::abs(mult);
 
 	if(mult == 0)
 		return 0;
