@@ -25,6 +25,12 @@ namespace Qx
  */
 
 /*!
+ *  @fn template<typename T> requires arithmetic<T> static T distance(T x, T y)
+ *
+ *  Returns the absolute distance between @a x and @a y.
+ */
+
+/*!
  *  @fn template <typename T> requires std::signed_integral<T> static T constrainedAdd(T a, T b, T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max())
  *
  *  Returns the result of adding signed integers @a a and @a b, bounded between @a min and @a max inclusive.
