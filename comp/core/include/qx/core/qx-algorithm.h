@@ -22,6 +22,10 @@ template<typename T>
     requires arithmetic<T>
 static bool isEven(T num) { return !isOdd(num); }
 
+template<typename T>
+    requires arithmetic<T>
+static T distance(T x, T y) { return std::max(x,y) - std::min(x,y); }
+
 // Thanks to the following for all constrained arithmetic functions:
 // https://wiki.sei.cmu.edu/confluence/pages/viewpage.action?pageId=87152052
 template <typename T>
