@@ -18,7 +18,9 @@ jobs:
     if: github.ref_name != 'master'
     runs-on: ubuntu-latest
     steps:
-      - name: DEBUG
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
         run: echo "$GITHUB_CONTEXT"
       - name: Label bugfix PR
         if: startsWith(github.head_ref, 'refs/heads/bugfix/')
