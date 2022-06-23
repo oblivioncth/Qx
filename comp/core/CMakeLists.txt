@@ -33,6 +33,7 @@ set(COMPONENT_PRIVATE_HEADERS
 
 # Source Files
 set(COMPONENT_IMPL
+    qx-algorithm.cpp
     qx-bitarray.cpp
     qx-char.cpp
     qx-datetime.cpp
@@ -52,7 +53,6 @@ set(COMPONENT_DOC_ONLY
     qx-regularexpression.dox
     qx-bytearray.dox
     qx-index.dox
-    qx-algorithm.dox
     qx-iostream.dox
     qx-list.dox
     qx-traverser.dox
