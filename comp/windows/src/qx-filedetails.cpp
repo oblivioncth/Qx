@@ -7,6 +7,9 @@
 // Qt Includes
 #include <QFileInfo>
 
+// Extra-component Includes
+#include <qx/core/qx-datetime.h>
+
 namespace Qx
 {
 
@@ -262,7 +265,11 @@ FileDetails FileDetails::readFileDetails(QString filePath)
                             // Get file sub-type
                             workingFileDetails.mFileSubtype = fixedFileInfo->dwFileSubtype;
 
-                            // TODO: DWORD dwFileDateMS and DWORD dwFileDateLS a currently unused
+                            // Get file date
+                            quint64 fdMS = static_cast<quint64>(fixedFileInfo->dwFileDateMS) << 32;
+                            quint64 fdLS = static_cast<quint64>(fixedFileInfo->dwFileDateLS);
+
+                            workingFileDetails.mFileDate = DateTime::fromMSFileTime(fdMS & fdLS);
                         }
                     }
                 }
