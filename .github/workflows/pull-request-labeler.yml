@@ -18,6 +18,8 @@ jobs:
     if: github.ref_name != 'master'
     runs-on: ubuntu-latest
     steps:
+      - name: DEBUG
+        run: echo "$GITHUB_CONTEXT"
       - name: Label bugfix PR
         if: startsWith(github.head_ref, 'refs/heads/bugfix/')
         uses: actions-ecosystem/action-add-labels@v1
