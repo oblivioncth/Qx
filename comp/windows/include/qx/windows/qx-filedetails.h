@@ -101,6 +101,7 @@ public:
     DWORD fileOs();
     DWORD fileType();
     DWORD fileSubType();
+    QDateTime fileDate();
     const StringTable stringTable(int index = 0);
     const StringTable stringTable(Translation translation);
 };
