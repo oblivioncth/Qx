@@ -7,6 +7,9 @@
 // Qt Includes
 #include <QFileInfo>
 
+// Extra-component Includes
+#include <qx/core/qx-datetime.h>
+
 namespace Qx
 {
 
@@ -262,7 +265,13 @@ FileDetails FileDetails::readFileDetails(QString filePath)
                             // Get file sub-type
                             workingFileDetails.mFileSubtype = fixedFileInfo->dwFileSubtype;
 
-                            // TODO: DWORD dwFileDateMS and DWORD dwFileDateLS a currently unused
+                            // Get file date
+                            quint64 fdMS = static_cast<quint64>(fixedFileInfo->dwFileDateMS) << 32;
+                            quint64 fdLS = static_cast<quint64>(fixedFileInfo->dwFileDateLS);
+
+                            workingFileDetails.mFileDate = (fdMS && fdLS) ?
+                                                           DateTime::fromMSFileTime(fdMS | fdLS) :
+                                                           QDateTime();
                         }
                     }
                 }
@@ -407,6 +416,14 @@ DWORD FileDetails::fileType() { return mFileType; }
  *  VS_FIXEDFILEINFO</a> documentation for this values associated macros and their descriptions.
  */
 DWORD FileDetails::fileSubType() { return mFileSubtype; }
+
+/*!
+ *  Returns the file's binary creation date and time stamp.
+ *
+ *  @note While originally intended for the above purpose, in practice this value is almost always null
+ *  and ignored.
+ */
+QDateTime FileDetails::fileDate() { return mFileDate; }
 
 /*!
  *  Returns the string table at index @a index.
