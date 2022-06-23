@@ -139,7 +139,7 @@ unsigned long long abs(unsigned long long n) { return n; }
  *
  *  Returns the multiple of @a mult that @a num is closest to.
  *
- *  Negative values for @a mult are treated as their positive equivalent.
+ *  The sign of the result will always be the same sign as @a num, regardless of the sign of @a mult.
  */
 
 /*!

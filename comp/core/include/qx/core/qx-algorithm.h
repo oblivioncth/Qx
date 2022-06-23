@@ -149,11 +149,11 @@ static T constrainedDiv(T a, T b, T max = std::numeric_limits<T>::max())
 }
 
 template<typename T>
-	requires std::integral<T>
+    requires std::integral<T>
 static T roundToNearestMultiple(T num, T mult)
 {
-	// Ignore negative multiples
-	mult = std::abs(mult);
+    // Ensure mult is positive
+    mult = Qx::abs(mult);
 
 	if(mult == 0)
 		return 0;
@@ -161,11 +161,11 @@ static T roundToNearestMultiple(T num, T mult)
 	if(mult == 1)
 		return num;
 
-	T towardsZero = (num / mult) * mult;
-	T awayFromZero = num < 0 ? constrainedSub(towardsZero, mult) : constrainedAdd(towardsZero, mult);
+    T towardsZero = (num / mult) * mult;
+    T awayFromZero = num < 0 ? constrainedSub(towardsZero, mult) : constrainedAdd(towardsZero, mult);
 
 	// Return of closest the two directions
-	return (abs(num) - abs(towardsZero) >= abs(awayFromZero) - abs(num))? awayFromZero : towardsZero;
+    return (distance(towardsZero, num) <= distance(awayFromZero, num)) ? towardsZero : awayFromZero;
 }
 
 template <typename T>
