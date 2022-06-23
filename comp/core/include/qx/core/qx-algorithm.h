@@ -10,6 +10,13 @@
 namespace Qx
 {
 //-Namespace Functions----------------------------------------------------------------------------------------------------
+int abs(int n);
+unsigned int abs(unsigned int n);
+long abs(long n);
+unsigned long abs(unsigned long n);
+long long abs (long long n);
+unsigned long long abs(unsigned long long n);
+
 template<typename T>
     requires std::integral<T>
 T lengthOfRange(T start, T end) { return (end - start) + 1; }
