@@ -23,21 +23,21 @@ T lengthOfRange(T start, T end) { return (end - start) + 1; }
 
 template<typename T>
     requires arithmetic<T>
-static bool isOdd(T num) { return num % 2; }
+bool isOdd(T num) { return num % 2; }
 
 template<typename T>
     requires arithmetic<T>
-static bool isEven(T num) { return !isOdd(num); }
+bool isEven(T num) { return !isOdd(num); }
 
 template<typename T>
     requires arithmetic<T>
-static T distance(T x, T y) { return std::max(x,y) - std::min(x,y); }
+T distance(T x, T y) { return std::max(x,y) - std::min(x,y); }
 
 // Thanks to the following for all constrained arithmetic functions:
 // https://wiki.sei.cmu.edu/confluence/pages/viewpage.action?pageId=87152052
 template <typename T>
 	requires std::signed_integral<T>
-static T constrainedAdd(T a, T b, T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max())
+T constrainedAdd(T a, T b, T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max())
 {
 	if((b >= 0) && (a > (max - b)))
 		return max; // Overflow
@@ -49,7 +49,7 @@ static T constrainedAdd(T a, T b, T min = std::numeric_limits<T>::min(), T max =
 
 template <typename T>
 	requires std::unsigned_integral<T>
-static T constrainedAdd(T a, T b, T max = std::numeric_limits<T>::max())
+T constrainedAdd(T a, T b, T max = std::numeric_limits<T>::max())
 {
 	if(max - a < b)
 		return max; // Overflow
@@ -59,7 +59,7 @@ static T constrainedAdd(T a, T b, T max = std::numeric_limits<T>::max())
 
 template <typename T>
 	requires std::signed_integral<T>
-static T constrainedSub(T a, T b, T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max())
+T constrainedSub(T a, T b, T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max())
 {
 	if(b >= 0 && a < min + b)
 		return min; // Underflow
@@ -71,7 +71,7 @@ static T constrainedSub(T a, T b, T min = std::numeric_limits<T>::min(), T max =
 
 template <typename T>
 	requires std::unsigned_integral<T>
-static T constrainedSub(T a, T b, T min = 0)
+T constrainedSub(T a, T b, T min = 0)
 {
 	if(a < b)
 		return min; // Underflow
@@ -81,7 +81,7 @@ static T constrainedSub(T a, T b, T min = 0)
 
 template<typename T>
 	requires std::signed_integral<T>
-static T constrainedMult(T a, T b, T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max())
+T constrainedMult(T a, T b, T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max())
 {
 	if(a > 0)
 	{
@@ -103,7 +103,7 @@ static T constrainedMult(T a, T b, T min = std::numeric_limits<T>::min(), T max 
 
 template<typename T>
 	requires std::unsigned_integral<T>
-static T constrainedMult(T a, T b, T max = std::numeric_limits<T>::max())
+T constrainedMult(T a, T b, T max = std::numeric_limits<T>::max())
 {
 	if(a > max / b)
 		return max; // Overflow
@@ -113,7 +113,7 @@ static T constrainedMult(T a, T b, T max = std::numeric_limits<T>::max())
 
 template<typename T>
 	requires std::signed_integral<T>
-static T constrainedDiv(T a, T b, T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max())
+T constrainedDiv(T a, T b, T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max())
 {
 	if(b == 0)
 		throw std::logic_error("Divide by zero");
@@ -135,7 +135,7 @@ static T constrainedDiv(T a, T b, T min = std::numeric_limits<T>::min(), T max =
 
 template<typename T>
 	requires std::unsigned_integral<T>
-static T constrainedDiv(T a, T b, T max = std::numeric_limits<T>::max())
+T constrainedDiv(T a, T b, T max = std::numeric_limits<T>::max())
 {
 	if(b == 0)
 		throw std::logic_error("Divide by zero");
@@ -150,7 +150,7 @@ static T constrainedDiv(T a, T b, T max = std::numeric_limits<T>::max())
 
 template<typename T>
     requires std::integral<T>
-static T roundToNearestMultiple(T num, T mult)
+T roundToNearestMultiple(T num, T mult)
 {
     // Ensure mult is positive
     mult = Qx::abs(mult);
@@ -170,7 +170,7 @@ static T roundToNearestMultiple(T num, T mult)
 
 template <typename T>
 	requires std::integral<T>
-static T ceilPowOfTwo(T num)
+T ceilPowOfTwo(T num)
 {
 	// Return if num already is power of 2
 	if (num && !(num & (num - 1)))
@@ -186,7 +186,7 @@ static T ceilPowOfTwo(T num)
 
 template <typename T>
 	requires std::integral<T>
-static T floorPowOfTwo(T num)
+T floorPowOfTwo(T num)
 {
 	// Return if num already is power of 2
 	if (num && !(num & (num - 1)))
@@ -203,7 +203,7 @@ static T floorPowOfTwo(T num)
 
 template <typename T>
 	requires std::integral<T>
-static T roundPowOfTwo(T num)
+T roundPowOfTwo(T num)
 {
    T above = ceilPowOfTwo(num);
    T below = floorPowOfTwo(num);
