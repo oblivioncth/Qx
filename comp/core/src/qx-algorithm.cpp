@@ -1,8 +1,51 @@
+// Unit Includes
+#include "qx/core/qx-algorithm.h"
+
+// Standard Library Includes
+#include <cmath>
+
 namespace Qx
 {
 /*! @addtogroup qx-core
  *  @{
  */
+
+//-Namespace Functions----------------------------------------------------------------------------------------------------
+/*!
+ *  Returns the absolute value of @a n; equivalent to @c std::abs(n) .
+ */
+int abs(int n) { return std::abs(n); }
+
+/*!
+ *  @overload
+ *
+ *  Returns the absolute value of @a n; equivalent to @c n.
+ *
+ *  This overload allows @c abs to be used in templates without the need to specialize solely because of signedness
+ */
+unsigned int abs(unsigned int n) { return n; }
+
+/*!
+ *  @overload
+ *  @copydoc abs(int n)
+ */
+long abs(long n) { return std::abs(n); }
+
+/*!
+ *  @copydoc abs(unsigned int n)
+ */
+unsigned long abs(unsigned long n) { return n; }
+
+/*!
+ *  @overload
+ *  @copydoc abs(int n)
+ */
+long long abs (long long n) { return std::abs(n); }
+
+/*!
+ *  @copydoc abs(unsigned int n)
+ */
+unsigned long long abs(unsigned long long n) { return n; }
 
 /*!
  *  @fn template<typename T> requires std::integral<T> T lengthOfRange(T start, T end)
@@ -22,6 +65,12 @@ namespace Qx
  *  @fn template<typename T> requires arithmetic<T> static bool isEven(T num)
  *
  *  Returns @c true if @a num is even; otherwise returns @c false.
+ */
+
+/*!
+ *  @fn template<typename T> requires arithmetic<T> static T distance(T x, T y)
+ *
+ *  Returns the absolute distance between @a x and @a y.
  */
 
 /*!
@@ -90,7 +139,7 @@ namespace Qx
  *
  *  Returns the multiple of @a mult that @a num is closest to.
  *
- *  Negative values for @a mult are treated as their positive equivalent.
+ *  The sign of the result will always be the same sign as @a num, regardless of the sign of @a mult.
  */
 
 /*!

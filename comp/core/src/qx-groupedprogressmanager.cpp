@@ -18,7 +18,7 @@ namespace Qx
  *  A GroupedProgressManager is used to convert the relative percent completion of an arbitrary number of
  *  progress groups into a total completion value in accordance with their weights.
  *
- *  The weighting of each progress group can be used to limit a group's contribution to overall progress to a
+ *  The weighting of each progress group can be used to limit a group's contribution towards overall progress to a
  *  certain proportion, regardless of that individual group's number of steps.
  *
  *  @snippet qx-groupedprogressmanager.cpp 0

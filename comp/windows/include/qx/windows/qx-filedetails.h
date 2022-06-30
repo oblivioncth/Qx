@@ -4,6 +4,7 @@
 // Qt Includes
 #include <QString>
 #include <QHash>
+#include <QDateTime>
 
 // Intra-component Includes
 #include "qx/windows/qx-windefs.h"
@@ -71,6 +72,7 @@ private:
     DWORD mFileOs;
     DWORD mFileType;
     DWORD mFileSubtype;
+    QDateTime mFileDate;
     QList<StringTable> mStringTables;
     QHash<Translation, int> mLangCodePageMap;
 
@@ -99,6 +101,7 @@ public:
     DWORD fileOs();
     DWORD fileType();
     DWORD fileSubType();
+    QDateTime fileDate();
     const StringTable stringTable(int index = 0);
     const StringTable stringTable(Translation translation);
 };

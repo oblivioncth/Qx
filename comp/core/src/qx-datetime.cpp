@@ -48,7 +48,7 @@ namespace Qx
  *  <a href="https://devblogs.microsoft.com/oldnewthing/20040825-00/?p=38053">Why can’t you treat a FILETIME as an __int64?</a>
  *
  */
-QDateTime DateTime::fromMSFileTime(qint64 fileTime)
+QDateTime DateTime::fromMSFileTime(quint64 fileTime)
 {
     /* The first and last datetimes representable by a FILETIME structure are January 1 1970 0:00:00 and Dec 31 30827 23:59:59
      * respectively (sort of, see https://stackoverflow.com/questions/9999393/latest-possible-filetime/18188484), which are
@@ -56,13 +56,17 @@ QDateTime DateTime::fromMSFileTime(qint64 fileTime)
      */
 
     // Round to nearest multiple of 10,000 first to better account for precision loss than simply truncating
-    fileTime = roundToNearestMultiple(fileTime, qint64(10000));
+    fileTime = roundToNearestMultiple(fileTime, quint64(10000));
 
     // Convert FILETIME 100ns count to ms (incurs tolerable precision loss)
-    qint64 msFileTime = fileTime/10000;
+    quint64 msFileTime = fileTime/10000;
 
-    // Offset to Unix epoch time, if underflow would occur use min
-    qint64 msEpochTime = constrainedSub(msFileTime, FILETIME_EPOCH_OFFSET_MS);
+    /* Offset to Unix epoch time, if underflow would occur use min.
+     * The cast to qint64 here is safe due to the supported date ranges, but in addition the above
+     * division, as a reduction in magnitude by 4 orders will make the highest possible input
+     * value safely convertible to unsigned without overflow
+     */
+    qint64 msEpochTime = constrainedSub(static_cast<qint64>(msFileTime), FILETIME_EPOCH_OFFSET_MS);
 
     // Convert to QDateTime and return
     return QDateTime::fromMSecsSinceEpoch(msEpochTime);

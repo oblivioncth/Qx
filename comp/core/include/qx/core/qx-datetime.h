@@ -15,7 +15,7 @@ private:
 
 //-Class Functions----------------------------------------------------------------------------------------------
 public:
-    static QDateTime fromMSFileTime(qint64 fileTime);
+    static QDateTime fromMSFileTime(quint64 fileTime);
 };
 
 }
