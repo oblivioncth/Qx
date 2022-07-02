@@ -93,11 +93,13 @@ jobs:
     - name: Build/Install Qx
       working-directory: ${{ env.qx_src_dir }}
       shell: cmd
+      env:
+        doxygen_root: C:\Program Files\doxygen # Required because of #42
       run: |
         echo "Setup C++ Build Environment..."
         CALL "${{ env.vs_dir }}\Common7\Tools\VsDevCmd.bat" -arch=amd64
         echo "Configure CMake using Qt wrapper..."
-        CALL "${{ env.qt_cmake }}" -G "${{ env.cmake_gen }}" -S "${{ env.qx_src_dir}}" -B "${{ env.qx_build_dir }}" -D QX_DOCS_TARGET=ON
+        CALL "${{ env.qt_cmake }}" -G "${{ env.cmake_gen }}" -S "${{ env.qx_src_dir}}" -B "${{ env.qx_build_dir }}" -D QX_DOCS_TARGET=ON -D Doxygen_ROOT="${{ env.doxygen_root }}"
         echo "Changing to build directory..."
         cd "%qx_build_dir%"
         echo "Building Qx debug..."

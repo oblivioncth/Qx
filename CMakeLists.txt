@@ -159,7 +159,7 @@ endforeach()
 
 if(QX_DOCS_TARGET)
     # Find Doxygen package
-    find_package(Doxygen
+    find_package(Doxygen 1.9.4
                  COMPONENTS dot
                  OPTIONAL_COMPONENTS mscgen dia
     )
