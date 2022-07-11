@@ -239,6 +239,19 @@ IoOpReport::IoOpReport(IoOpType op, IoOpResultType res, const QDir& tar) :
 
 
 //-Instance Functions--------------------------------------------------------------------------------------------
+//Private:
+void IoOpReport::parseOutcome()
+{
+    if(mResult == IO_SUCCESS)
+        mOutcome = SUCCESS_TEMPLATE.arg(SUCCESS_VERBS.value(mOperation), TARGET_TYPES.value(mTargetType), QDir::toNativeSeparators(mTarget));
+    else
+    {
+        mOutcome = ERROR_TEMPLATE.arg(ERROR_VERBS.value(mOperation), TARGET_TYPES.value(mTargetType), QDir::fromNativeSeparators(mTarget));
+        mOutcomeInfo = ERROR_INFO.value(mResult);
+    }
+
+}
+
 //Public:
 /*!
  *  Returns the type of operation.
@@ -280,17 +293,19 @@ bool IoOpReport::wasSuccessful() const { return mResult == IO_SUCCESS; }
  */
 bool IoOpReport::isNull() const { return mNull; }
 
-//Private:
-void IoOpReport::parseOutcome()
+/*!
+ *  Returns a GenericError that describes the outcome of the IO operation.
+ *
+ *  An invalid (non-error) GenericError is returned if the report describes a successful operation.
+ *
+ *  @sa outcome(), and outcomeInfo().
+ */
+GenericError IoOpReport::toGenericError() const
 {
-    if(mResult == IO_SUCCESS)
-        mOutcome = SUCCESS_TEMPLATE.arg(SUCCESS_VERBS.value(mOperation), TARGET_TYPES.value(mTargetType), QDir::toNativeSeparators(mTarget));
+    if(wasSuccessful())
+        return GenericError();
     else
-    {
-        mOutcome = ERROR_TEMPLATE.arg(ERROR_VERBS.value(mOperation), TARGET_TYPES.value(mTargetType), QDir::fromNativeSeparators(mTarget));
-        mOutcomeInfo = ERROR_INFO.value(mResult);
-    }
-
+        return GenericError(GenericError::Error, outcome(), outcomeInfo());
 }
 
 }
