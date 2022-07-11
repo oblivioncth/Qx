@@ -66,7 +66,7 @@ QDataStream::FloatingPointPrecision FileStreamWriter::floatingPointPrecision() c
 /*!
  *  Resets the status of the file stream writer.
  *
- *  @sa QDataStream::Status, and status().
+ *  @sa status().
  */
 void FileStreamWriter::resetStatus() { mStreamWriter.resetStatus(); }
 

@@ -28,6 +28,31 @@ public:
 
 //-Instance Functions------------------------------------------------------------------------------------------------
 public:
+    // Stock functions
+    QStringConverter::Encoding encoding() const;
+    void flush();
+    bool generateByteOrderMark() const;
+    int integerBase() const;
+    QLocale locale() const;
+    QTextStream::NumberFlags numberFlags() const;
+    QTextStream::RealNumberNotation realNumberNotation() const;
+    int realNumberPrecision() const;
+    void reset();
+    void resetStatus();
+    void setEncoding(QStringConverter::Encoding encoding);
+    void setGenerateByteOrderMark(bool generate);
+    void setIntegerBase(int base);
+    void setLocale(const QLocale& locale);
+    void setNumberFlags(QTextStream::NumberFlags flags);
+    void setRealNumberNotation(QTextStream::RealNumberNotation notation);
+    void setRealNumberPrecision(int precision);
+    IoOpReport status() const;
+
+    template<typename T>
+        requires defines_left_shift_for<QTextStream, T>
+    TextStreamWriter& operator<<(T d) { mStreamWriter << d; return *this; }
+
+    // New functions
     IoOpReport openFile();
     IoOpReport writeLine(QString line, bool ensureLineStart = true);
     IoOpReport writeText(QString text);
