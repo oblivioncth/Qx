@@ -7,6 +7,9 @@
 #include <QFile>
 #include <QDir>
 
+// Inter-project Includes
+#include "qx/core/qx-genericerror.h"
+
 namespace Qx
 {
 	
@@ -96,6 +99,7 @@ public:
     QString outcomeInfo() const;
     bool wasSuccessful() const;
     bool isNull() const;
+    GenericError toGenericError() const;
 };
 
 }
