@@ -42,12 +42,12 @@ set(DOXYGEN_PREDEFINED
 set(DOXYGEN_VERBATIM_VARS DOXYGEN_ALIASES)
 
 # Link to Qt docs
-if(DEFINED QT_DOCS_DIR)
+if(QT_DOCS_DIR)
     include(${DOC_SCRIPTS_PATH}/qttags.cmake)
 endif()
 
 # Setup Qt Creator Help File
-if(DEFINED QT_HELP_GEN_PATH)
+if(QT_HELP_GEN_PATH)
     set(DOXYGEN_GENERATE_QHP YES)
     set(DOXYGEN_QCH_FILE "../${PROJECT_NAME}.qch")
     set(DOXYGEN_QHG_LOCATION ${QT_HELP_GEN_PATH})
