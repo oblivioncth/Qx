@@ -20,7 +20,7 @@ namespace Qx
  *
  *  Most member functions are the same or slightly modified versions of those from QTextStream.
  *
- *  @sa FileStreamWriter
+ *  @sa TextStreamReader and FileStreamWriter
  */
 
 //-Constructor---------------------------------------------------------------------------------------------------
@@ -208,7 +208,7 @@ IoOpReport TextStreamWriter::status() const
 /*!
  *  Opens the text file associated with the text stream writer and returns an operation report.
  *
- *  This function must be called before any data is written, unless the file already open
+ *  This function must be called before any data is written, unless the file is already open
  *  in a mode that supports writing before the stream was constructed.
  */
 IoOpReport TextStreamWriter::openFile()

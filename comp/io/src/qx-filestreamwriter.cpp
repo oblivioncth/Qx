@@ -148,7 +148,7 @@ QFile* FileStreamWriter::file() { return mTargetFile; }
 /*!
  *  Opens the file associated with the file stream writer and returns an operation report.
  *
- *  This function must be called before any data is written, unless the file already open
+ *  This function must be called before any data is written, unless the file is already open
  *  in a mode that supports writing before the stream was constructed.
  */
 IoOpReport FileStreamWriter::openFile()
