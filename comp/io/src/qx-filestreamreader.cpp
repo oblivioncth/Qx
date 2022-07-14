@@ -20,7 +20,7 @@ namespace Qx
  *
  *  Most member functions are the same or slightly modified versions of those from QDataStream.
  *
- *  @sa FileStreamWriter
+ *  @sa FileStreamWriter and TextStreamReader
  */
 
 //-Constructor---------------------------------------------------------------------------------------------------
@@ -65,7 +65,7 @@ IoOpReport FileStreamReader::readRawData(QByteArray& data, int len)
     // Allocate buffer
     data.resize(len);
 
-    // Read data,
+    // Read data
     int bytesRead = mStreamReader.readRawData(data.data(), len);
 
     // Check for error, treat size mismatch as error since it data length should be known for a file device.
@@ -169,7 +169,7 @@ QFile* FileStreamReader::file() { return mSourceFile; }
 /*!
  *  Opens the file associated with the file stream reader and returns an operation report.
  *
- *  This function must be called before any data is read, unless the file already open
+ *  This function must be called before any data is read, unless the file is already open
  *  in a mode that supports reading before the stream was constructed.
  */
 IoOpReport FileStreamReader::openFile()

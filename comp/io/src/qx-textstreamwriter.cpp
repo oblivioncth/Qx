@@ -20,7 +20,7 @@ namespace Qx
  *
  *  Most member functions are the same or slightly modified versions of those from QTextStream.
  *
- *  @sa FileStreamWriter
+ *  @sa TextStreamReader and FileStreamWriter
  */
 
 //-Constructor---------------------------------------------------------------------------------------------------
@@ -53,7 +53,7 @@ TextStreamWriter::TextStreamWriter(QFile* file, WriteMode writeMode, WriteOption
 /*!
  *  Returns the encoding that is current assigned to the stream.
  *
- *  @sa setEncoding(), and local().
+ *  @sa setEncoding(), and locale().
  */
 QStringConverter::Encoding TextStreamWriter::encoding() const { return mStreamWriter.encoding(); }
 
@@ -208,7 +208,7 @@ IoOpReport TextStreamWriter::status() const
 /*!
  *  Opens the text file associated with the text stream writer and returns an operation report.
  *
- *  This function must be called before any data is written, unless the file already open
+ *  This function must be called before any data is written, unless the file is already open
  *  in a mode that supports writing before the stream was constructed.
  */
 IoOpReport TextStreamWriter::openFile()

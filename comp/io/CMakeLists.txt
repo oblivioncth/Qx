@@ -13,6 +13,7 @@ set(COMPONENT_INCLUDE_HEADERS
     qx-textpos.h
     qx-textquery.h
     qx-textstream.h
+    qx-textstreamreader.h
     qx-textstreamwriter.h
 )
 
@@ -30,6 +31,7 @@ set(COMPONENT_IMPL
     qx-textpos.cpp
     qx-textquery.cpp
     qx-textstream.cpp
+    qx-textstreamreader.cpp
     qx-textstreamwriter.cpp
 )
 
