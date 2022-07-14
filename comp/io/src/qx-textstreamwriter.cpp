@@ -53,7 +53,7 @@ TextStreamWriter::TextStreamWriter(QFile* file, WriteMode writeMode, WriteOption
 /*!
  *  Returns the encoding that is current assigned to the stream.
  *
- *  @sa setEncoding(), and local().
+ *  @sa setEncoding(), and locale().
  */
 QStringConverter::Encoding TextStreamWriter::encoding() const { return mStreamWriter.encoding(); }
 
