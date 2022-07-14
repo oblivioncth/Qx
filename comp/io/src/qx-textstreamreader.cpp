@@ -240,7 +240,7 @@ IoOpReport TextStreamReader::status() const
 }
 
 /*!
- *  @fn template<typename T> requires defines_left_shift_for<QTextStream, T> TextStreamReader& TextStreamReader::operator<<(T d)
+ *  @fn template<typename T> requires defines_right_shift_for<QTextStream, T&> TextStreamReader& TextStreamReader::operator>>(T& d)
  *
  *  Reads the data type @c T into @a d, and returns a reference to the stream.
  *
