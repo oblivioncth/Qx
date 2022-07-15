@@ -167,6 +167,13 @@ IoOpReport FileStreamReader::status()
 QFile* FileStreamReader::file() { return mSourceFile; }
 
 /*!
+ *  Returns @c true if the stream's current status indicates that an error has occurred; otherwise, returns @c false.
+ *
+ *  Equivalent to `!status().wasSuccessful()`.
+ */
+bool FileStreamReader::hasError() { return status().wasSuccessful(); }
+
+/*!
  *  Opens the file associated with the file stream reader and returns an operation report.
  *
  *  This function must be called before any data is read, unless the file is already open

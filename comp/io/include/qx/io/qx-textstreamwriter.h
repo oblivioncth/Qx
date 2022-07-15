@@ -53,9 +53,10 @@ public:
     TextStreamWriter& operator<<(T d) { mStreamWriter << d; return *this; }
 
     // New functions
-    IoOpReport openFile();
+    bool hasError();
     IoOpReport writeLine(QString line, bool ensureLineStart = true);
     IoOpReport writeText(QString text);
+    IoOpReport openFile();
     void closeFile();
 };	
 

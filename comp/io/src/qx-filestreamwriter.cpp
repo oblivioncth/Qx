@@ -146,6 +146,13 @@ IoOpReport FileStreamWriter::writeRawData(const QByteArray& data)
 QFile* FileStreamWriter::file() { return mTargetFile; }
 
 /*!
+ *  Returns @c true if the stream's current status indicates that an error has occurred; otherwise, returns @c false.
+ *
+ *  Equivalent to `!status().wasSuccessful()`.
+ */
+bool FileStreamWriter::hasError() { return status().wasSuccessful(); }
+
+/*!
  *  Opens the file associated with the file stream writer and returns an operation report.
  *
  *  This function must be called before any data is written, unless the file is already open
