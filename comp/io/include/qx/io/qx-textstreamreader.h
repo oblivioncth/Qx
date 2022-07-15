@@ -52,6 +52,7 @@ public:
     TextStreamReader& operator>>(T& d) { mStreamReader >> d; return *this; }
 
     // New functions
+    bool hasError();
     IoOpReport openFile();
     void closeFile();
 };

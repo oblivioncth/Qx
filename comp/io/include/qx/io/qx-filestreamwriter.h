@@ -42,6 +42,7 @@ public:
     QFile* file();
 
     // New functions
+    bool hasError();
     IoOpReport openFile();
     void closeFile();
 };

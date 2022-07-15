@@ -206,50 +206,11 @@ IoOpReport TextStreamWriter::status() const
  */
 
 /*!
- *  Opens the text file associated with the text stream writer and returns an operation report.
+ *  Returns @c true if the stream's current status indicates that an error has occurred; otherwise, returns @c false.
  *
- *  This function must be called before any data is written, unless the file is already open
- *  in a mode that supports writing before the stream was constructed.
+ *  Equivalent to `!status().wasSuccessful()`.
  */
-IoOpReport TextStreamWriter::openFile()
-{
-    // Perform write preparations
-    bool existingFile;
-    IoOpReport prepResult = writePrep(existingFile, *mTargetFile, mWriteOptions);
-    if(!prepResult.wasSuccessful())
-        return prepResult;
-
-    // If file exists and mode is append, test if it starts on a new line
-    if(mWriteMode == Append && existingFile)
-    {
-        IoOpReport inspectResult = textFileEndsWithNewline(mAtLineStart, *mTargetFile);
-        if(!inspectResult.wasSuccessful())
-            return IoOpReport(IO_OP_WRITE, inspectResult.result(), *mTargetFile);
-    }
-
-    // Attempt to open file
-    QIODevice::OpenMode om = QIODevice::WriteOnly | QIODevice::Text;
-    om |= mWriteMode == Truncate ? QIODevice::Truncate : QIODevice::Append;
-    if(mWriteOptions.testFlag(Unbuffered))
-        om |= QIODevice::Unbuffered;
-
-    IoOpResultType openResult = parsedOpen(*mTargetFile, om);
-    if(openResult != IO_SUCCESS)
-        return IoOpReport(IO_OP_WRITE, openResult, *mTargetFile);
-
-    // Set data stream IO device
-    mStreamWriter.setDevice(mTargetFile);
-
-    // Write line break if needed
-    if(!mAtLineStart && mWriteOptions.testFlag(EnsureBreak))
-    {
-        mStreamWriter << ENDL;
-        mAtLineStart = true;
-    }
-
-    // Return no error
-    return IoOpReport(IO_OP_WRITE, IO_SUCCESS, *mTargetFile);
-}
+bool TextStreamWriter::hasError() { return status().wasSuccessful(); }
 
 /*!
  *  Writes @a line to the stream followed by a line break and returns the streams @ref status.
@@ -300,6 +261,52 @@ IoOpReport TextStreamWriter::writeText(QString text)
     }
     else
         return IoOpReport(IO_OP_WRITE, IO_ERR_FILE_NOT_OPEN, *mTargetFile);
+}
+
+/*!
+ *  Opens the text file associated with the text stream writer and returns an operation report.
+ *
+ *  This function must be called before any data is written, unless the file is already open
+ *  in a mode that supports writing before the stream was constructed.
+ */
+IoOpReport TextStreamWriter::openFile()
+{
+    // Perform write preparations
+    bool existingFile;
+    IoOpReport prepResult = writePrep(existingFile, *mTargetFile, mWriteOptions);
+    if(!prepResult.wasSuccessful())
+        return prepResult;
+
+    // If file exists and mode is append, test if it starts on a new line
+    if(mWriteMode == Append && existingFile)
+    {
+        IoOpReport inspectResult = textFileEndsWithNewline(mAtLineStart, *mTargetFile);
+        if(!inspectResult.wasSuccessful())
+            return IoOpReport(IO_OP_WRITE, inspectResult.result(), *mTargetFile);
+    }
+
+    // Attempt to open file
+    QIODevice::OpenMode om = QIODevice::WriteOnly | QIODevice::Text;
+    om |= mWriteMode == Truncate ? QIODevice::Truncate : QIODevice::Append;
+    if(mWriteOptions.testFlag(Unbuffered))
+        om |= QIODevice::Unbuffered;
+
+    IoOpResultType openResult = parsedOpen(*mTargetFile, om);
+    if(openResult != IO_SUCCESS)
+        return IoOpReport(IO_OP_WRITE, openResult, *mTargetFile);
+
+    // Set data stream IO device
+    mStreamWriter.setDevice(mTargetFile);
+
+    // Write line break if needed
+    if(!mAtLineStart && mWriteOptions.testFlag(EnsureBreak))
+    {
+        mStreamWriter << ENDL;
+        mAtLineStart = true;
+    }
+
+    // Return no error
+    return IoOpReport(IO_OP_WRITE, IO_SUCCESS, *mTargetFile);
 }
 
 /*!
