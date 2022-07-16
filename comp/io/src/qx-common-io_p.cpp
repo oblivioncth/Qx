@@ -39,6 +39,16 @@ const QHash<QDataStream::Status, IoOpResultType> DATA_STRM_STAT_MAP = {
 };
 
 //-Component Private Functions-------------------------------------------------------------------------------------------------
+Existance existanceReqFromWriteOptions(WriteOptions wo)
+{
+    if(wo.testFlag(WriteOption::ExistingOnly))
+        return Existance::Exist;
+    else if(wo.testFlag(WriteOption::NewOnly))
+        return Existance::NotExist;
+    else
+        return Existance::Either;
+}
+
 IoOpResultType parsedOpen(QFile& file, QIODevice::OpenMode openMode)
 {
 	if(file.open(openMode))
@@ -47,17 +57,23 @@ IoOpResultType parsedOpen(QFile& file, QIODevice::OpenMode openMode)
 		return FILE_DEV_ERR_MAP.value(file.error());
 }
 
-IoOpResultType fileCheck(const QFile& file)
+IoOpResultType fileCheck(const QFile* file, Existance existanceRequirement)
 {
-	if(file.exists())
+    if(!file)
+        return IO_ERR_NULL;
+    else if(file->exists())
 	{
-		if(QFileInfo(file).isFile())
+        if(existanceRequirement == Existance::NotExist)
+            return IO_ERR_EXISTS;
+        else if(QFileInfo(*file).isFile())
 			return IO_SUCCESS;
 		else
-			return IO_ERR_NOT_A_FILE;
+            return IO_ERR_WRONG_TYPE;
 	}
-	else
-		return IO_ERR_FILE_DNE;
+    else if(existanceRequirement == Existance::Exist)
+        return IO_ERR_DNE;
+    else
+        return IO_SUCCESS;
 }
 
 IoOpResultType directoryCheck(QDir& dir)
@@ -67,10 +83,10 @@ IoOpResultType directoryCheck(QDir& dir)
 		if(QFileInfo(dir.absolutePath()).isDir())
 			return IO_SUCCESS;
 		else
-			return IO_ERR_NOT_A_DIR;
+            return IO_ERR_WRONG_TYPE;
 	}
 	else
-		return IO_ERR_DIR_DNE;
+        return IO_ERR_DNE;
 }
 
 IoOpReport handlePathCreation(const QFile& file, bool createPaths)
@@ -79,35 +95,29 @@ IoOpReport handlePathCreation(const QFile& file, bool createPaths)
 	QDir filePath(QFileInfo(file).absolutePath());
 	IoOpResultType dirCheckResult = directoryCheck(filePath);
 
-	if(dirCheckResult == IO_ERR_NOT_A_DIR || (dirCheckResult == IO_ERR_DIR_DNE && !createPaths))
+    if(dirCheckResult == IO_ERR_WRONG_TYPE || (dirCheckResult == IO_ERR_DNE && !createPaths))
 		return IoOpReport(IO_OP_WRITE, dirCheckResult, file);
-	else if(dirCheckResult == IO_ERR_DIR_DNE)
+    else if(dirCheckResult == IO_ERR_DNE)
 	{
 		if(!QDir().mkpath(filePath.absolutePath()))
-			return IoOpReport(IO_OP_WRITE, IO_ERR_CANT_MAKE_DIR, file);
+            return IoOpReport(IO_OP_WRITE, IO_ERR_CANT_CREATE, file);
 	}
 
 	return IoOpReport(IO_OP_WRITE, IO_SUCCESS, file);
 }
 
-IoOpReport writePrep(bool& fileExists, QFile& file, WriteOptions writeOptions)
+IoOpReport writePrep(bool& fileExists, QFile* file, WriteOptions writeOptions)
 {
 	// Check file
-	IoOpResultType fileCheckResult = fileCheck(file);
-	fileExists = fileCheckResult == IO_SUCCESS;
-
-	if(fileCheckResult == IO_ERR_NOT_A_FILE)
-		return IoOpReport(IO_OP_WRITE, IO_ERR_NOT_A_FILE, file);
-	else if(fileCheckResult == IO_ERR_FILE_DNE && writeOptions.testFlag(ExistingOnly))
-		return IoOpReport(IO_OP_WRITE, IO_ERR_FILE_DNE, file);
-	else if(fileExists && writeOptions.testFlag(NewOnly))
-		return IoOpReport(IO_OP_WRITE, IO_ERR_FILE_EXISTS, file);
+    IoOpResultType fileCheckResult = fileCheck(file, existanceReqFromWriteOptions(writeOptions));
+    if(fileCheckResult != IO_SUCCESS)
+        return IoOpReport(IO_OP_WRITE, fileCheckResult, file);
 
 	// Create Path if required
-	if(!fileExists)
+    if(!QFile::exists(file->fileName()))
 	{
 		// Make folders if wanted and necessary
-		IoOpReport pathCreationResult = handlePathCreation(file, writeOptions.testFlag(CreatePath));
+        IoOpReport pathCreationResult = handlePathCreation(*file, writeOptions.testFlag(CreatePath));
 		if(!pathCreationResult.wasSuccessful())
 			return pathCreationResult;
 	}

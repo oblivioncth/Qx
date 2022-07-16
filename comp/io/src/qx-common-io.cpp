@@ -170,7 +170,7 @@ bool fileIsEmpty(const QFile& file) { return file.size() == 0; }
 IoOpReport fileIsEmpty(bool& returnBuffer, const QFile& file)
 {
     // Check file
-    IoOpResultType fileCheckResult = fileCheck(file);
+    IoOpResultType fileCheckResult = fileCheck(&file, Existance::Exist);
     if(fileCheckResult != IO_SUCCESS)
     {
         // File doesn't exist
@@ -227,7 +227,7 @@ IoOpReport textFileEndsWithNewline(bool& returnBuffer, QFile& textFile)
     returnBuffer = false;
 
     // Check file
-    IoOpResultType fileCheckResult = fileCheck(textFile);
+    IoOpResultType fileCheckResult = fileCheck(&textFile, Existance::Exist);
     if(fileCheckResult != IO_SUCCESS)
         return IoOpReport(IO_OP_INSPECT, fileCheckResult, textFile);
 
@@ -280,7 +280,7 @@ IoOpReport textFileLayout(QList<int>& returnBuffer, QFile& textFile, bool ignore
     returnBuffer.clear();
 
     // Check file
-    IoOpResultType fileCheckResult = fileCheck(textFile);
+    IoOpResultType fileCheckResult = fileCheck(&textFile, Existance::Exist);
     if(fileCheckResult != IO_SUCCESS)
         return IoOpReport(IO_OP_ENUMERATE, fileCheckResult, textFile);
 
@@ -325,7 +325,7 @@ IoOpReport textFileLineCount(int& returnBuffer, QFile& textFile, bool ignoreTrai
     returnBuffer = 0;
 
     // Check file
-    IoOpResultType fileCheckResult = fileCheck(textFile);
+    IoOpResultType fileCheckResult = fileCheck(&textFile, Existance::Exist);
     if(fileCheckResult != IO_SUCCESS)
         return IoOpReport(IO_OP_ENUMERATE, fileCheckResult, textFile);
 
@@ -428,7 +428,7 @@ IoOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const
         return IoOpReport(IO_OP_INSPECT, IO_SUCCESS, textFile);
 
     // Check file
-    IoOpResultType fileCheckResult = fileCheck(textFile);
+    IoOpResultType fileCheckResult = fileCheck(&textFile, Existance::Exist);
     if(fileCheckResult != IO_SUCCESS)
         return IoOpReport(IO_OP_INSPECT, fileCheckResult, textFile);
 
@@ -567,7 +567,7 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
     returnBuffer = QString();
 
     // Check file
-    IoOpResultType fileCheckResult = fileCheck(textFile);
+    IoOpResultType fileCheckResult = fileCheck(&textFile, Existance::Exist);
     if(fileCheckResult != IO_SUCCESS)
         return IoOpReport(IO_OP_READ, fileCheckResult, textFile);
 
@@ -682,7 +682,7 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
     returnBuffer = QString();
 
     // Check file
-    IoOpResultType fileCheckResult = fileCheck(textFile);
+    IoOpResultType fileCheckResult = fileCheck(&textFile, Existance::Exist);
     if(fileCheckResult != IO_SUCCESS)
         return IoOpReport(IO_OP_READ, fileCheckResult, textFile);
 
@@ -813,7 +813,7 @@ IoOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, Index32 
      returnBuffer = QStringList();
 
      // Check file
-     IoOpResultType fileCheckResult = fileCheck(textFile);
+     IoOpResultType fileCheckResult = fileCheck(&textFile, Existance::Exist);
      if(fileCheckResult != IO_SUCCESS)
          return IoOpReport(IO_OP_READ, fileCheckResult, textFile);
 
@@ -901,7 +901,7 @@ IoOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode wri
 
     // Perform write preparations
     bool existingFile;
-    IoOpReport prepResult = writePrep(existingFile, textFile, writeOptions);
+    IoOpReport prepResult = writePrep(existingFile, &textFile, writeOptions);
     if(!prepResult.wasSuccessful())
         return prepResult;
 
@@ -1081,7 +1081,7 @@ IoOpReport deleteTextFromFile(QFile& textFile, TextPos startPos, TextPos endPos)
         //TODO: create exception class that prints error and stashes the exception properly
 
     // Check file
-    IoOpResultType fileCheckResult = fileCheck(textFile);
+    IoOpResultType fileCheckResult = fileCheck(&textFile, Existance::Exist);
     if(fileCheckResult != IO_SUCCESS)
         return IoOpReport(IO_OP_READ, fileCheckResult, textFile);
 
@@ -1275,7 +1275,7 @@ IoOpReport calculateFileChecksum(QString& returnBuffer, QFile& file, QCryptograp
     returnBuffer = QString();
 
     // Check file
-    IoOpResultType fileCheckResult = fileCheck(file);
+    IoOpResultType fileCheckResult = fileCheck(&file, Existance::Exist);
     if(fileCheckResult != IO_SUCCESS)
         return IoOpReport(IO_OP_READ, fileCheckResult, file);
 
@@ -1347,7 +1347,7 @@ IoOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, Index64 star
     returnBuffer.clear();
 
     // Check file
-    IoOpResultType fileCheckResult = fileCheck(file);
+    IoOpResultType fileCheckResult = fileCheck(&file, Existance::Exist);
     if(fileCheckResult != IO_SUCCESS)
         return IoOpReport(IO_OP_READ, fileCheckResult, file);
 
@@ -1418,7 +1418,7 @@ IoOpReport writeBytesToFile(QFile& file, const QByteArray& bytes, WriteMode writ
 
     // Perform write preparations
     bool existingFile;
-    IoOpReport prepResult = writePrep(existingFile, file, writeOptions);
+    IoOpReport prepResult = writePrep(existingFile, &file, writeOptions);
     if(!prepResult.wasSuccessful())
         return prepResult;
 

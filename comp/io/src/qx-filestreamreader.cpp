@@ -182,9 +182,9 @@ bool FileStreamReader::hasError() { return status().wasSuccessful(); }
 IoOpReport FileStreamReader::openFile()
 {
     // Check file
-    IoOpResultType fileCheckResult = fileCheck(*mSourceFile);
+    IoOpResultType fileCheckResult = fileCheck(mSourceFile, Existance::Exist);
 
-    if(fileCheckResult == IO_ERR_NOT_A_FILE)
+    if(fileCheckResult != IO_SUCCESS)
         return IoOpReport(IO_OP_WRITE, fileCheckResult, *mSourceFile);
 
     // Attempt to open file
