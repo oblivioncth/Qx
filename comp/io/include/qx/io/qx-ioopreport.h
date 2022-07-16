@@ -29,6 +29,7 @@ class IoOpReport
 {
 //-Class Members----------------------------------------------------------------------------------------------------
 private:
+    static const inline QString NULL_TARGET = "<NULL>";
     static const inline QStringList TARGET_TYPES  = {"file", "directory"};
     static const inline QString SUCCESS_TEMPLATE = R"(Successfully %1 %2 "%3")";
     static const inline QString ERROR_TEMPLATE = R"(Error while %1 %2 "%3")";
@@ -84,7 +85,9 @@ private:
 public:
     IoOpReport();
     IoOpReport(IoOpType op, IoOpResultType res, const QFile& tar);
+    IoOpReport(IoOpType op, IoOpResultType res, const QFile* tar);
     IoOpReport(IoOpType op, IoOpResultType res, const QDir& tar);
+    IoOpReport(IoOpType op, IoOpResultType res, const QDir* tar);
 
 //-Instance Functions----------------------------------------------------------------------------------------------
 private:

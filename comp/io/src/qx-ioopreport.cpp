@@ -219,6 +219,28 @@ IoOpReport::IoOpReport(IoOpType op, IoOpResultType res, const QFile& tar) :
 }
 
 /*!
+ *  @overload
+ *
+ *  Creates an IO operation report for a file target. If @a tar is @c nulltpr, the resultant
+ *  report will note that the file was null.
+ *
+ *  @param op The type of operation
+ *  @param res The type of result.
+ *  @param tar The target file.
+ *
+ *  @note @a tar is only used for descriptive purposes and the pointer is not kept
+ */
+IoOpReport::IoOpReport(IoOpType op, IoOpResultType res, const QFile* tar) :
+    mNull(false),
+    mOperation(op),
+    mResult(res),
+    mTargetType(IO_FILE),
+    mTarget(tar ? tar->fileName() : NULL_TARGET)
+{
+    parseOutcome();
+}
+
+/*!
  *  Creates an IO operation report for a directory target.
  *
  *  @param op The type of operation
@@ -233,6 +255,28 @@ IoOpReport::IoOpReport(IoOpType op, IoOpResultType res, const QDir& tar) :
      mResult(res),
      mTargetType(IO_DIR),
      mTarget(tar.absolutePath())
+{
+    parseOutcome();
+}
+
+/*!
+ *  @overload
+ *
+ *  Creates an IO operation report for a directory target. If @a tar is @c nulltpr, the resultant
+ *  report will note that the directory was null.
+ *
+ *  @param op The type of operation
+ *  @param res The type of result.
+ *  @param tar The target directory.
+ *
+ *  @note @a tar is only used for descriptive purposes and the pointer is not kept
+ */
+IoOpReport::IoOpReport(IoOpType op, IoOpResultType res, const QDir* tar) :
+     mNull(false),
+     mOperation(op),
+     mResult(res),
+     mTargetType(IO_DIR),
+     mTarget(tar ? tar->absolutePath() : NULL_TARGET)
 {
     parseOutcome();
 }
