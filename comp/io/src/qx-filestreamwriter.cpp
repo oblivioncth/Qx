@@ -162,7 +162,7 @@ IoOpReport FileStreamWriter::openFile()
 {
     // Perform write preparations
     bool fileExists;
-    IoOpReport prepResult = writePrep(fileExists, *mTargetFile, mWriteOptions);
+    IoOpReport prepResult = writePrep(fileExists, mTargetFile, mWriteOptions);
     if(!prepResult.wasSuccessful())
         return prepResult;
 

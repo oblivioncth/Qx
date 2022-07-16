@@ -13,17 +13,21 @@ namespace Qx
 {
 /*! @cond */
 
+//-Component Private Enums -------------------------------------------------------------------------------------------------
+enum class Existance {Exist, NotExist, Either};
+
 //-Component Private Variables ---------------------------------------------------------------------------------------------
 extern const QHash<QFileDevice::FileError, IoOpResultType> FILE_DEV_ERR_MAP;
 extern const QHash<QTextStream::Status, IoOpResultType> TXT_STRM_STAT_MAP;
 extern const QHash<QDataStream::Status, IoOpResultType> DATA_STRM_STAT_MAP;
 
 //-Component Private Functions-----------------------------------------------------------------------------------------------------
+Existance existanceReqFromWriteOptions(WriteOptions wo);
 IoOpResultType parsedOpen(QFile& file, QIODevice::OpenMode openMode);
-IoOpResultType fileCheck(const QFile& file);
+IoOpResultType fileCheck(const QFile* file, Existance existanceRequirement);
 IoOpResultType directoryCheck(QDir& dir);
 IoOpReport handlePathCreation(const QFile& file, bool createPaths);
-IoOpReport writePrep(bool& fileExists, QFile& file, WriteOptions writeOptions);
+IoOpReport writePrep(bool& fileExists, QFile* file, WriteOptions writeOptions);
 void matchAppendConditionParams(WriteMode& writeMode, TextPos& startPos);
 
 template<typename T>

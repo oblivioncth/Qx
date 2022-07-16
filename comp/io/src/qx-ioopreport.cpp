@@ -54,13 +54,8 @@ namespace Qx
  */
 
 /*!
- *  @var IoOpType IoOpType::IO_ERR_NOT_A_FILE
- *  The operation target exists, but is not a file as expected.
- */
-
-/*!
- *  @var IoOpType IoOpType::IO_ERR_NOT_A_DIR
- *  The operation target exists, but is not a directory as expected.
+ *  @var IoOpType IoOpType::IO_ERR_WRONG_TYPE
+ *  The operation target exists, but is of the wrong type.
  */
 
 /*!
@@ -124,23 +119,23 @@ namespace Qx
  */
 
 /*!
- *  @var IoOpType IoOpType::IO_ERR_FILE_DNE
- *  The target file does not exist.
+ *  @var IoOpType IoOpType::IO_ERR_DNE
+ *  The target does not exist.
  */
 
 /*!
- *  @var IoOpType IoOpType::IO_ERR_DIR_DNE
- *  The target directory does not exist.
+ *  @var IoOpType IoOpType::IO_ERR_NULL
+ *  The specified target was null.
  */
 
 /*!
- *  @var IoOpType IoOpType::IO_ERR_FILE_EXISTS
- *  The file's destination is already occupied.
+ *  @var IoOpType IoOpType::IO_ERR_EXISTS
+ *  The target path is already occupied.
  */
 
 /*!
- *  @var IoOpType IoOpType::IO_ERR_CANT_MAKE_DIR
- *  A directory could not be created.
+ *  @var IoOpType IoOpType::IO_ERR_CANT_CREATE
+ *  The target could not be created.
  */
 
 /*!
@@ -221,8 +216,8 @@ IoOpReport::IoOpReport(IoOpType op, IoOpResultType res, const QFile& tar) :
 /*!
  *  @overload
  *
- *  Creates an IO operation report for a file target. If @a tar is @c nulltpr, the resultant
- *  report will note that the file was null.
+ *  Creates an IO operation report for a file target. If @a tar is @c nulltpr, @a res is
+ *  ignored and the resultant report will indicate a null file error.
  *
  *  @param op The type of operation
  *  @param res The type of result.
@@ -234,9 +229,16 @@ IoOpReport::IoOpReport(IoOpType op, IoOpResultType res, const QFile* tar) :
     mNull(false),
     mOperation(op),
     mResult(res),
-    mTargetType(IO_FILE),
-    mTarget(tar ? tar->fileName() : NULL_TARGET)
+    mTargetType(IO_FILE)
 {
+    if(tar)
+        mTarget = tar->fileName();
+    else
+    {
+        mTarget = NULL_TARGET;
+        mResult = IO_ERR_NULL;
+    }
+
     parseOutcome();
 }
 
@@ -262,8 +264,8 @@ IoOpReport::IoOpReport(IoOpType op, IoOpResultType res, const QDir& tar) :
 /*!
  *  @overload
  *
- *  Creates an IO operation report for a directory target. If @a tar is @c nulltpr, the resultant
- *  report will note that the directory was null.
+ *  Creates an IO operation report for a directory target. If @a tar is @c nulltpr, @a res is
+ *  ignored and the resultant report will indicate a null directory error.
  *
  *  @param op The type of operation
  *  @param res The type of result.
@@ -275,9 +277,16 @@ IoOpReport::IoOpReport(IoOpType op, IoOpResultType res, const QDir* tar) :
      mNull(false),
      mOperation(op),
      mResult(res),
-     mTargetType(IO_DIR),
-     mTarget(tar ? tar->absolutePath() : NULL_TARGET)
+     mTargetType(IO_DIR)
 {
+    if(tar)
+        mTarget = tar->absolutePath();
+    else
+    {
+        mTarget = NULL_TARGET;
+        mResult = IO_ERR_NULL;
+    }
+
     parseOutcome();
 }
 
@@ -286,14 +295,16 @@ IoOpReport::IoOpReport(IoOpType op, IoOpResultType res, const QDir* tar) :
 //Private:
 void IoOpReport::parseOutcome()
 {
+    QString typeString = TARGET_TYPE_STRINGS.value(mTargetType);
+
     if(mResult == IO_SUCCESS)
-        mOutcome = SUCCESS_TEMPLATE.arg(SUCCESS_VERBS.value(mOperation), TARGET_TYPES.value(mTargetType), QDir::toNativeSeparators(mTarget));
+        mOutcome = SUCCESS_TEMPLATE.arg(SUCCESS_VERBS.value(mOperation), typeString, QDir::toNativeSeparators(mTarget));
     else
     {
-        mOutcome = ERROR_TEMPLATE.arg(ERROR_VERBS.value(mOperation), TARGET_TYPES.value(mTargetType), QDir::fromNativeSeparators(mTarget));
-        mOutcomeInfo = ERROR_INFO.value(mResult);
+        mOutcome = ERROR_TEMPLATE.arg(ERROR_VERBS.value(mOperation), typeString, QDir::fromNativeSeparators(mTarget));
+        QString infoTemplate = ERROR_INFO.value(mResult);
+        mOutcomeInfo = infoTemplate.replace(TYPE_MACRO, typeString);
     }
-
 }
 
 //Public:

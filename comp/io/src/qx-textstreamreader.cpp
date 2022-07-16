@@ -264,9 +264,9 @@ bool TextStreamReader::hasError() { return status().wasSuccessful(); }
 IoOpReport TextStreamReader::openFile()
 {
     // Check file
-    IoOpResultType fileCheckResult = fileCheck(*mSourceFile);
+    IoOpResultType fileCheckResult = fileCheck(mSourceFile, Existance::Either);
 
-    if(fileCheckResult == IO_ERR_NOT_A_FILE)
+    if(fileCheckResult != IO_SUCCESS)
         return IoOpReport(IO_OP_WRITE, fileCheckResult, *mSourceFile);
 
     // Attempt to open file
