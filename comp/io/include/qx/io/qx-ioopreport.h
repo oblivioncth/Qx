@@ -84,9 +84,9 @@ private:
     IoOpType mOperation;
     IoOpResultType mResult;
     IoOpTargetType mTargetType;
-    QString mTarget = QString();
-    QString mOutcome = QString();
-    QString mOutcomeInfo = QString();
+    QString mTarget;
+    QString mOutcome;
+    QString mOutcomeInfo;
 
 //-Constructor-------------------------------------------------------------------------------------------------------
 public:
@@ -107,7 +107,7 @@ public:
     QString target() const;
     QString outcome() const;
     QString outcomeInfo() const;
-    bool wasSuccessful() const;
+    bool isFailure() const;
     bool isNull() const;
     GenericError toGenericError() const;
 };

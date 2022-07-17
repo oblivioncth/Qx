@@ -312,7 +312,7 @@ void AsyncDownloadManager::startDownload(DownloadTask task)
 
     // Open file
     IoOpReport streamOpen = fileWriter->openFile();
-    if(!streamOpen.wasSuccessful())
+    if(streamOpen.isFailure())
     {
         forceFinishProgress(task);
         recordFinishedDownload(DownloadOpReport::failedDownload(task, streamOpen.outcome() + ": " + streamOpen.outcomeInfo()));
@@ -655,7 +655,7 @@ void AsyncDownloadManager::readyReadHandler()
     std::shared_ptr<FileStreamWriter> writer = mActiveWriters[senderNetworkReply];
     IoOpReport wr = writer->writeRawData(senderNetworkReply->readAll());
 
-    if(!wr.wasSuccessful())
+    if(wr.isFailure())
     {
         // Close and delete file, finished handler will use this info to create correct report
         writer->file()->remove(); // Closes file first

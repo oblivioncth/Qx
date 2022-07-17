@@ -267,7 +267,7 @@ bool enforceSingleInstance()
     QFile selfEXE(QCoreApplication::applicationFilePath());
     QString selfHash;
 
-    if(!calculateFileChecksum(selfHash, selfEXE, QCryptographicHash::Sha256).wasSuccessful())
+    if(calculateFileChecksum(selfHash, selfEXE, QCryptographicHash::Sha256).isFailure())
         return false;
 
     // Attempt to create unique mutex

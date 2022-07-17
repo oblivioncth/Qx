@@ -251,9 +251,9 @@ IoOpReport TextStreamReader::status() const
 /*!
  *  Returns @c true if the stream's current status indicates that an error has occurred; otherwise, returns @c false.
  *
- *  Equivalent to `!status().wasSuccessful()`.
+ *  Equivalent to `status().isFailure()`.
  */
-bool TextStreamReader::hasError() { return status().wasSuccessful(); }
+bool TextStreamReader::hasError() { return status().isFailure(); }
 
 /*!
  *  Opens the text file associated with the text stream reader and returns an operation report.

@@ -377,7 +377,7 @@ IoOpReport textFileAbsolutePosition(TextPos& textPos, QFile& textFile, bool igno
     // Get file layout
     QList<int> textLayout;
     IoOpReport layoutCheck = textFileLayout(textLayout, textFile, ignoreTrailingEmpty);
-    if(!layoutCheck.wasSuccessful())
+    if(layoutCheck.isFailure())
         return layoutCheck;
 
     // Return null pos if text file is empty
@@ -447,7 +447,7 @@ IoOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const
     if(trueStartPos != TextPos::START)
     {
         IoOpReport translate = textFileAbsolutePosition(trueStartPos, textFile, readOptions.testFlag(IgnoreTrailingBreak));
-        if(!translate.wasSuccessful())
+        if(translate.isFailure())
             return IoOpReport(IO_OP_INSPECT, translate.result(), textFile);
 
         // Return if position is outside bounds
@@ -902,7 +902,7 @@ IoOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode wri
     // Perform write preparations
     bool existingFile;
     IoOpReport prepResult = writePrep(existingFile, &textFile, writeOptions);
-    if(!prepResult.wasSuccessful())
+    if(prepResult.isFailure())
         return prepResult;
 
     // Ensure file is closed upon return
@@ -919,7 +919,7 @@ IoOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode wri
         {
             bool onNewLine;
             IoOpReport inspectResult = textFileEndsWithNewline(onNewLine, textFile);
-            if(!inspectResult.wasSuccessful())
+            if(inspectResult.isFailure())
                 return IoOpReport(IO_OP_WRITE, inspectResult.result(), textFile);
             needsNewLine = !onNewLine;
         }
@@ -970,7 +970,7 @@ IoOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode wri
         // Fill beforeNew
         TextPos beforeEnd = TextPos(startPos.line(), startPos.character() - 1);
         IoOpReport readBefore = readTextFromFile(beforeNew, textFile, TextPos::START, beforeEnd);
-        if(!readBefore.wasSuccessful())
+        if(readBefore.isFailure())
             return readBefore;
 
         // Pad beforeNew if required
@@ -1007,7 +1007,7 @@ IoOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode wri
         {
             // This will return a null string if there is no afterNew anyway, even without padding enabled
             IoOpReport readAfter = readTextFromFile(afterNew, textFile, startPos);
-            if(!readAfter.wasSuccessful())
+            if(readAfter.isFailure())
                 return readAfter;
         }
 
@@ -1315,7 +1315,7 @@ IoOpReport fileMatchesChecksum(bool& returnBuffer, QFile& file, QString checksum
     QString fileChecksum;
     IoOpReport checksumReport = calculateFileChecksum(fileChecksum, file, hashAlgorithm);
 
-    if(!checksumReport.wasSuccessful())
+    if(checksumReport.isFailure())
         return checksumReport;
 
     // Compare
@@ -1419,7 +1419,7 @@ IoOpReport writeBytesToFile(QFile& file, const QByteArray& bytes, WriteMode writ
     // Perform write preparations
     bool existingFile;
     IoOpReport prepResult = writePrep(existingFile, &file, writeOptions);
-    if(!prepResult.wasSuccessful())
+    if(prepResult.isFailure())
         return prepResult;
 
     // Post data for Inserts and Overwrites
@@ -1429,7 +1429,7 @@ IoOpReport writeBytesToFile(QFile& file, const QByteArray& bytes, WriteMode writ
     if(existingFile && writeMode == Insert)
     {
         Qx::IoOpReport readAfter = Qx::readBytesFromFile(afterNew, file, startPos);
-        if(!readAfter.wasSuccessful())
+        if(readAfter.isFailure())
             return readAfter;
     }
 
