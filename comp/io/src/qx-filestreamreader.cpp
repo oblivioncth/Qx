@@ -169,9 +169,9 @@ QFile* FileStreamReader::file() { return mSourceFile; }
 /*!
  *  Returns @c true if the stream's current status indicates that an error has occurred; otherwise, returns @c false.
  *
- *  Equivalent to `!status().wasSuccessful()`.
+ *  Equivalent to `status().isFailure()`.
  */
-bool FileStreamReader::hasError() { return status().wasSuccessful(); }
+bool FileStreamReader::hasError() { return status().isFailure(); }
 
 /*!
  *  Opens the file associated with the file stream reader and returns an operation report.

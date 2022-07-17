@@ -185,13 +185,17 @@ namespace Qx
 //Public:
 /*!
  *  Creates a null IO operation report.
+ *
+ *  @sa isNull() and isFailure().
  */
 IoOpReport::IoOpReport() :
     mNull(true),
     mOperation(IO_OP_ENUMERATE),
     mResult(IO_SUCCESS),
     mTargetType(IO_FILE),
-    mTarget(QString())
+    mTarget(),
+    mOutcome(),
+    mOutcomeInfo()
 {}
 
 /*!
@@ -339,9 +343,11 @@ QString IoOpReport::outcome() const { return mOutcome; }
 QString IoOpReport::outcomeInfo() const { return mOutcomeInfo; }
 
 /*!
- *  Returns @c true if the operation was successful; otherwise returns @c false.
+ *  Returns @c true if the described operation failed; otherwise returns @c false.
+ *
+ *  A null IoOpReport is not considered to describe a failure.
  */
-bool IoOpReport::wasSuccessful() const { return mResult == IO_SUCCESS; }
+bool IoOpReport::isFailure() const { return mResult != IO_SUCCESS; }
 
 /*!
  *  Returns @c true if the report is null; otherwise returns @c false.
@@ -357,7 +363,7 @@ bool IoOpReport::isNull() const { return mNull; }
  */
 GenericError IoOpReport::toGenericError() const
 {
-    if(wasSuccessful())
+    if(isFailure())
         return GenericError();
     else
         return GenericError(GenericError::Error, outcome(), outcomeInfo());

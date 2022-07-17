@@ -208,9 +208,9 @@ IoOpReport TextStreamWriter::status() const
 /*!
  *  Returns @c true if the stream's current status indicates that an error has occurred; otherwise, returns @c false.
  *
- *  Equivalent to `!status().wasSuccessful()`.
+ *  Equivalent to `status().isFailure()`.
  */
-bool TextStreamWriter::hasError() { return status().wasSuccessful(); }
+bool TextStreamWriter::hasError() { return status().isFailure(); }
 
 /*!
  *  Writes @a line to the stream followed by a line break and returns the streams @ref status.
@@ -274,14 +274,14 @@ IoOpReport TextStreamWriter::openFile()
     // Perform write preparations
     bool existingFile;
     IoOpReport prepResult = writePrep(existingFile, mTargetFile, mWriteOptions);
-    if(!prepResult.wasSuccessful())
+    if(prepResult.isFailure())
         return prepResult;
 
     // If file exists and mode is append, test if it starts on a new line
     if(mWriteMode == Append && existingFile)
     {
         IoOpReport inspectResult = textFileEndsWithNewline(mAtLineStart, *mTargetFile);
-        if(!inspectResult.wasSuccessful())
+        if(inspectResult.isFailure())
             return IoOpReport(IO_OP_WRITE, inspectResult.result(), *mTargetFile);
     }
 

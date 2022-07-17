@@ -118,7 +118,7 @@ IoOpReport writePrep(bool& fileExists, QFile* file, WriteOptions writeOptions)
 	{
 		// Make folders if wanted and necessary
         IoOpReport pathCreationResult = handlePathCreation(*file, writeOptions.testFlag(CreatePath));
-		if(!pathCreationResult.wasSuccessful())
+        if(pathCreationResult.isFailure())
 			return pathCreationResult;
 	}
 

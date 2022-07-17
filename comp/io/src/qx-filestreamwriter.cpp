@@ -148,9 +148,9 @@ QFile* FileStreamWriter::file() { return mTargetFile; }
 /*!
  *  Returns @c true if the stream's current status indicates that an error has occurred; otherwise, returns @c false.
  *
- *  Equivalent to `!status().wasSuccessful()`.
+ *  Equivalent to `status().isFailure()`.
  */
-bool FileStreamWriter::hasError() { return status().wasSuccessful(); }
+bool FileStreamWriter::hasError() { return status().isFailure(); }
 
 /*!
  *  Opens the file associated with the file stream writer and returns an operation report.
@@ -163,7 +163,7 @@ IoOpReport FileStreamWriter::openFile()
     // Perform write preparations
     bool fileExists;
     IoOpReport prepResult = writePrep(fileExists, mTargetFile, mWriteOptions);
-    if(!prepResult.wasSuccessful())
+    if(prepResult.isFailure())
         return prepResult;
 
     // Attempt to open file
