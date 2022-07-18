@@ -20,17 +20,78 @@ namespace Qx
  *
  *  Most member functions are the same or slightly modified versions of those from QDataStream.
  *
+ *  The file on which to operate is specified as a path and the underlying handle is managed by the stream.
+ *
  *  @sa FileStreamWriter and TextStreamReader
  */
 
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
 /*!
- *  Constructs a file stream reader that is linked to @a file.
+ *  Constructs a file stream reader with no file set.
+ *
+ *  @sa setFilePath().
  */
-FileStreamReader::FileStreamReader(QFile* file) : mSourceFile(file) {}
+FileStreamReader::FileStreamReader() :
+    mFile(nullptr)
+{}
+
+/*!
+ *  Constructs a file stream reader that is linked to the file at @a filePath.
+ *
+ *  @sa filePath() and setFilePath().
+ */
+FileStreamReader::FileStreamReader(const QString& filePath) { setFile(filePath); }
+
+//-Destructor-------------------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  Destroys the file stream reader, along with closing and deleting the underlying file, if present.
+ */
+FileStreamReader::~FileStreamReader() { unsetFile(); }
 
 //-Instance Functions--------------------------------------------------------------------------------------------
+//Private:
+IoOpReport FileStreamReader::statusFromNative()
+{
+    return IoOpReport(IoOpType::IO_OP_READ, DATA_STRM_STAT_MAP.value(mStreamReader.status()), mFile);
+}
+
+IoOpReport FileStreamReader::preReadErrorCheck()
+{
+    if(hasError())
+        return mStatus;
+    else if(!mFile)
+    {
+        mStatus = NULL_FILE_REPORT;
+        return mStatus;
+    }
+    else if(!mFile->isOpen())
+    {
+        mStatus = IoOpReport(IO_OP_READ, IO_ERR_FILE_NOT_OPEN, mFile);
+        return mStatus;
+    }
+    else
+        return IoOpReport();
+}
+
+void FileStreamReader::setFile(const QString& filePath)
+{
+    if(!filePath.isNull())
+    {
+        mFile = new QFile(filePath);
+        mStreamReader.setDevice(mFile);
+    }
+}
+
+void FileStreamReader::unsetFile()
+{
+    if(mFile)
+        delete mFile;
+    mFile = nullptr;
+    mStreamReader.setDevice(mFile);
+}
+
 //Public:
 /*!
  *  Returns @c true if the reader has reached the end of the file; otherwise returns @c false
@@ -62,6 +123,14 @@ QDataStream::FloatingPointPrecision FileStreamReader::floatingPointPrecision() c
  */
 IoOpReport FileStreamReader::readRawData(QByteArray& data, int len)
 {
+    IoOpReport check = preReadErrorCheck();
+
+    if(check.isFailure())
+    {
+        data.resize(0);
+        return check;
+    }
+
     // Allocate buffer
     data.resize(len);
 
@@ -72,23 +141,36 @@ IoOpReport FileStreamReader::readRawData(QByteArray& data, int len)
     if(bytesRead == -1)
     {
         mStreamReader.setStatus(QDataStream::Status::ReadCorruptData);
-        return IoOpReport(IO_OP_READ, IoOpResultType::IO_ERR_READ, *mSourceFile);
+        mStatus = IoOpReport(IO_OP_READ, IoOpResultType::IO_ERR_READ, mFile);
+        return mStatus;
     }
     else if(bytesRead != len)
     {
         mStreamReader.setStatus(QDataStream::Status::ReadPastEnd);
-        return IoOpReport(IO_OP_READ, DATA_STRM_STAT_MAP.value(mStreamReader.status()), *mSourceFile);
+        mStatus = statusFromNative();
+        return mStatus;
     }
     else
-        return IoOpReport(IO_OP_READ, IO_SUCCESS, *mSourceFile);
+    {
+        mStatus = IoOpReport(IO_OP_READ, IO_SUCCESS, mFile);
+        return mStatus;
+    }
 }
 
 /*!
  *  Resets the status of the file stream reader.
  *
- *  @sa QDataStream::Status, and status().
+ *  @note
+ *  If an error occurs while reading the stream will ignore all further read attempts and hold its
+ *  current status until this function is called.
+ *
+ *  @sa status().
  */
-void FileStreamReader::resetStatus() { mStreamReader.resetStatus(); }
+void FileStreamReader::resetStatus()
+{
+    mStatus = IoOpReport();
+    mStreamReader.resetStatus();
+}
 
 /*!
  *  Sets the serialization byte order to @a bo.
@@ -124,6 +206,11 @@ void FileStreamReader::setFloatingPointPrecision(QDataStream::FloatingPointPreci
  */
 IoOpReport FileStreamReader::skipRawData(int len)
 {
+    IoOpReport check = preReadErrorCheck();
+
+    if(check.isFailure())
+        return check;
+
     // Skip data,
     int bytesSkipped = mStreamReader.skipRawData(len);
 
@@ -131,26 +218,29 @@ IoOpReport FileStreamReader::skipRawData(int len)
     if(bytesSkipped == -1)
     {
         mStreamReader.setStatus(QDataStream::Status::ReadCorruptData);
-        return IoOpReport(IO_OP_READ, IoOpResultType::IO_ERR_READ, *mSourceFile);
+        mStatus = IoOpReport(IO_OP_READ, IoOpResultType::IO_ERR_READ, mFile);
+        return mStatus;
     }
     else if(bytesSkipped != len)
     {
         mStreamReader.setStatus(QDataStream::Status::ReadPastEnd);
-        return IoOpReport(IO_OP_READ, DATA_STRM_STAT_MAP.value(mStreamReader.status()), *mSourceFile);
+        mStatus = statusFromNative();
+        return mStatus;
     }
     else
-        return IoOpReport(IO_OP_READ, IO_SUCCESS, *mSourceFile);
+    {
+        mStatus = IoOpReport(IO_OP_READ, IO_SUCCESS, mFile);
+        return mStatus;
+    }
 }
 
 /*!
  *  Returns the status of the file stream reader.
  *
- *  @sa QDataStream::Status
+ *  The status is a report of the last read operation performed by FileStreamReader. If no read operation has
+ *  been performed since the stream was constructed or resetStatus() was last called the report will be null.
  */
-IoOpReport FileStreamReader::status()
-{
-    return IoOpReport(IoOpType::IO_OP_READ, DATA_STRM_STAT_MAP.value(mStreamReader.status()), *mSourceFile);
-}
+IoOpReport FileStreamReader::status() const { return mStatus; }
 
 /*!
 *  @fn template<typename T> requires defines_right_shift_for<QDataStream, T&> FileStreamReader& FileStreamReader::operator>>(T& d)
@@ -162,49 +252,69 @@ IoOpReport FileStreamReader::status()
 */
 
 /*!
- *  Returns the file associated with the file stream reader.
+ *  Links the stream to the file at @a filePath, which can be a null QString to unset the current
+ *  file. If a file was already set to the stream, it will be closed as it is replaced.
+ *
+ *  The file must be opened through the stream before it can be used.
+ *
+ *  @sa filePath() and openFile().
  */
-QFile* FileStreamReader::file() { return mSourceFile; }
+void FileStreamReader::setFilePath(const QString& filePath)
+{
+    unsetFile();
+    setFile(filePath);
+}
+
+/*!
+ *  Returns the path of the file associated with the stream, if present.
+ *
+ *  If no file is assigned the path will be null.
+ *
+ *  @sa setFilePath().
+ */
+QString FileStreamReader::filePath() const { return mFile ? mFile->fileName() : QString(); }
 
 /*!
  *  Returns @c true if the stream's current status indicates that an error has occurred; otherwise, returns @c false.
  *
  *  Equivalent to `status().isFailure()`.
  */
-bool FileStreamReader::hasError() { return status().isFailure(); }
+bool FileStreamReader::hasError() const { return mStatus.isFailure(); }
 
 /*!
  *  Opens the file associated with the file stream reader and returns an operation report.
  *
- *  This function must be called before any data is read, unless the file is already open
- *  in a mode that supports reading before the stream was constructed.
+ *  This function must be called before any data is read after a file is assigned to the stream.
  */
 IoOpReport FileStreamReader::openFile()
 {
     // Check file
-    IoOpResultType fileCheckResult = fileCheck(mSourceFile, Existance::Exist);
+    IoOpResultType fileCheckResult = fileCheck(mFile, Existance::Exist); // Accounts for no file assigned
 
     if(fileCheckResult != IO_SUCCESS)
-        return IoOpReport(IO_OP_WRITE, fileCheckResult, *mSourceFile);
+        return IoOpReport(IO_OP_WRITE, fileCheckResult, mFile);
 
     // Attempt to open file
-    IoOpResultType openResult = parsedOpen(*mSourceFile, QIODevice::ReadOnly);
+    IoOpResultType openResult = parsedOpen(*mFile, QIODevice::ReadOnly);
     if(openResult != IO_SUCCESS)
-        return IoOpReport(IO_OP_WRITE, openResult, *mSourceFile);
-
-    // Set data stream IO device
-    mStreamReader.setDevice(mSourceFile);
+        return IoOpReport(IO_OP_WRITE, openResult, mFile);
 
     // Return no error
-    return IoOpReport(IO_OP_WRITE, IO_SUCCESS, *mSourceFile);
+    return IoOpReport(IO_OP_WRITE, IO_SUCCESS, mFile);
 }
 
 /*!
- *  Closes the file associated with the file stream reader.
- *
- *  This function should be called when the stream is no longer needed, unless the file should
- *  remain open for use elsewhere.
+ *  Closes the file associated with the file stream reader, if present.
  */
-void FileStreamReader::closeFile() { mSourceFile->close(); }
+void FileStreamReader::closeFile()
+{
+    if(mFile)
+        mFile->close();
+}
+
+/*!
+ * Returns @c true if the file managed by the stream is open; otherwise, returns @c false.
+ */
+bool FileStreamReader::fileIsOpen() const { return mFile && mFile->isOpen(); }
 
 }

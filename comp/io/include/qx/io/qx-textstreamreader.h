@@ -14,16 +14,32 @@ namespace Qx
 
 class TextStreamReader
 {
+//-Class Variables------------------------------------------------------------------------------------------------
+private:
+    static inline const IoOpReport NULL_FILE_REPORT = IoOpReport(IO_OP_READ, IO_ERR_NULL, static_cast<QFile*>(nullptr));
+
 //-Instance Variables------------------------------------------------------------------------------------------------
 private:
+    QFile* mFile;
     QTextStream mStreamReader;
-    QFile* mSourceFile;
+    IoOpReport mStatus;
 
 //-Constructor-------------------------------------------------------------------------------------------------------
 public:
-    TextStreamReader(QFile* file);
+    TextStreamReader();
+    TextStreamReader(const QString& filePath);
+
+//-Destructor-------------------------------------------------------------------------------------------------------
+public:
+    ~TextStreamReader();
 
 //-Instance Functions------------------------------------------------------------------------------------------------
+private:
+    IoOpReport statusFromNative();
+    IoOpReport preReadErrorCheck();
+    void setFile(const QString& filePath);
+    void unsetFile();
+
 public:
     // Stock functions
     bool atEnd() const;
@@ -49,12 +65,27 @@ public:
 
     template<typename T>
         requires defines_right_shift_for<QTextStream, T&>
-    TextStreamReader& operator>>(T& d) { mStreamReader >> d; return *this; }
+    TextStreamReader& operator>>(T& d)
+    {
+        IoOpReport check = preReadErrorCheck();
+
+        if(!check.isFailure())
+        {
+            mStreamReader >> d;
+            mStatus = statusFromNative();
+        }
+
+        return *this;
+    }
+
+    QString filePath() const;
+    void setFilePath(const QString& filePath);
 
     // New functions
-    bool hasError();
+    bool hasError() const;
     IoOpReport openFile();
     void closeFile();
+    bool fileIsOpen() const;
 };
 
 }

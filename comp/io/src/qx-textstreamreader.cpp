@@ -20,17 +20,76 @@ namespace Qx
  *
  *  Most member functions are the same or slightly modified versions of those from QDataStream.
  *
- *  @sa FileStreamWriter
+ *  The file on which to operate is specified as a path and the underlying handle is managed by the stream.
+ *
+ *  @sa TextStreamWriter and FileStreamWriter
  */
 
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
 /*!
- *  Constructs a text stream reader that is linked to @a file.
+ *  Constructs text stream reader with no file set.
+ *
+ *  @sa setFilePath().
  */
-TextStreamReader::TextStreamReader(QFile* file) : mSourceFile(file) {}
+TextStreamReader::TextStreamReader() {}
+
+/*!
+ *  Constructs a text stream reader that is linked to the file at @a filePath.
+ *
+ *  @sa filePath() and setFilePath().
+ */
+TextStreamReader::TextStreamReader(const QString& filePath) { setFile(filePath); }
+
+//-Destructor-------------------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  Destroys the text stream reader, along with closing and deleting the underlying file, if present.
+ */
+TextStreamReader::~TextStreamReader() { unsetFile(); }
 
 //-Instance Functions--------------------------------------------------------------------------------------------
+//Private:
+IoOpReport TextStreamReader::statusFromNative()
+{
+    return IoOpReport(IoOpType::IO_OP_READ, TXT_STRM_STAT_MAP.value(mStreamReader.status()), mFile);
+}
+
+IoOpReport TextStreamReader::preReadErrorCheck()
+{
+    if(hasError())
+        return mStatus;
+    else if(!mFile)
+    {
+        mStatus = NULL_FILE_REPORT;
+        return mStatus;
+    }
+    else if(!mFile->isOpen())
+    {
+        mStatus = IoOpReport(IO_OP_READ, IO_ERR_FILE_NOT_OPEN, mFile);
+        return mStatus;
+    }
+    else
+        return IoOpReport();
+}
+
+void TextStreamReader::setFile(const QString& filePath)
+{
+    if(!filePath.isNull())
+    {
+        mFile = new QFile(filePath);
+        mStreamReader.setDevice(mFile);
+    }
+}
+
+void TextStreamReader::unsetFile()
+{
+    if(mFile)
+        delete mFile;
+    mFile = nullptr;
+    mStreamReader.setDevice(mFile);
+}
+
 //Public:
 /*!
  *  Returns @c true if the reader has reached the end of the file; otherwise returns @c false
@@ -80,7 +139,17 @@ qint64 TextStreamReader::pos() const { return mStreamReader.pos(); }
  *
  *  @sa readAll(), readLine().
  */
-QString	TextStreamReader::read(qint64 maxlen) { return mStreamReader.read(maxlen); }
+QString	TextStreamReader::read(qint64 maxlen)
+{
+    IoOpReport check = preReadErrorCheck();
+
+    if(check.isFailure())
+        return QString();
+
+    QString str = mStreamReader.read(maxlen);
+    mStatus = statusFromNative();
+    return str;
+}
 
 /*!
  *  Reads the entire content of the stream, and returns it as a QString. Avoid this function when working
@@ -90,7 +159,17 @@ QString	TextStreamReader::read(qint64 maxlen) { return mStreamReader.read(maxlen
  *
  *  @sa readLine().
  */
-QString	TextStreamReader::readAll() { return mStreamReader.readAll(); }
+QString	TextStreamReader::readAll()
+{
+    IoOpReport check = preReadErrorCheck();
+
+    if(check.isFailure())
+        return QString();
+
+    QString str = mStreamReader.readAll();
+    mStatus = statusFromNative();
+    return str;
+}
 
 /*!
  *  Reads one line of text from the stream, and returns it as a QString. The maximum allowed line length
@@ -107,7 +186,17 @@ QString	TextStreamReader::readAll() { return mStreamReader.readAll(); }
  *
  *  See also readAll() and QIODevice::readLine().
  */
-QString	TextStreamReader::readLine(qint64 maxlen) { return mStreamReader.readLine(maxlen); }
+QString	TextStreamReader::readLine(qint64 maxlen)
+{
+    IoOpReport check = preReadErrorCheck();
+
+    if(check.isFailure())
+        return QString();
+
+    QString str = mStreamReader.readLine(maxlen);
+    mStatus = statusFromNative();
+    return str;
+}
 
 /*!
  *  Reads one line of text from the stream into @a line and returns an operation report.
@@ -131,7 +220,15 @@ QString	TextStreamReader::readLine(qint64 maxlen) { return mStreamReader.readLin
  */
 IoOpReport TextStreamReader::readLineInto(QString* line, qint64 maxlen)
 {
-    // Read data
+    IoOpReport check = preReadErrorCheck();
+
+    if(check.isFailure())
+    {
+        if(line)
+            line->clear();
+        return check;
+    }
+
     bool readSucceeded = mStreamReader.readLineInto(line, maxlen);
 
     // Check for read past end error and general read failure error
@@ -140,16 +237,21 @@ IoOpReport TextStreamReader::readLineInto(QString* line, qint64 maxlen)
         if(atEnd())
         {
             mStreamReader.setStatus(QTextStream::Status::ReadPastEnd);
-            return IoOpReport(IO_OP_READ, TXT_STRM_STAT_MAP.value(mStreamReader.status()), *mSourceFile);
+            mStatus = IoOpReport(IO_OP_READ, TXT_STRM_STAT_MAP.value(mStreamReader.status()), mFile);
+            return mStatus;
         }
         else
         {
             mStreamReader.setStatus(QTextStream::Status::ReadCorruptData);
-            return IoOpReport(IO_OP_READ, IoOpResultType::IO_ERR_READ, *mSourceFile);
+            mStatus = IoOpReport(IO_OP_READ, IoOpResultType::IO_ERR_READ, mFile);
+            return mStatus;
         }
     }
     else
-        return IoOpReport(IO_OP_READ, IO_SUCCESS, *mSourceFile);
+    {
+        mStatus = IoOpReport(IO_OP_READ, IO_SUCCESS, mFile);
+        return mStatus;
+    }
 }
 
 /*!
@@ -168,9 +270,17 @@ void TextStreamReader::reset() { return mStreamReader.reset(); }
 /*!
  *  Resets the status of the text stream.
  *
+ *  @note
+ *  If an error occurs while reading the stream will ignore all further read attempts and hold its
+ *  current status until this function is called.
+ *
  *  @sa status().
  */
-void TextStreamReader::resetStatus() { return mStreamReader.resetStatus(); }
+void TextStreamReader::resetStatus()
+{
+    mStatus = IoOpReport();
+    mStreamReader.resetStatus();
+}
 
 /*!
  *  If @a enabled is @c true, QTextStream will attempt to detect Unicode encoding by peeking into the stream data
@@ -227,17 +337,24 @@ void TextStreamReader::setRealNumberNotation(QTextStream::RealNumberNotation not
  *
  *  @sa operator>>().
  */
-void TextStreamReader::skipWhiteSpace() { mStreamReader.skipWhiteSpace(); }
+void TextStreamReader::skipWhiteSpace()
+{
+    IoOpReport check = preReadErrorCheck();
+
+    if(check.isFailure())
+        return;
+
+    mStreamReader.skipWhiteSpace();
+    mStatus = statusFromNative();
+}
 
 /*!
  *  Returns the status of the text stream reader.
  *
- *  @sa resetStatus().
+ *  The status is a report of the last read operation performed by TextStreamReader. If no read operation has
+ *  been performed since the stream was constructed or resetStatus() was last called the report will be null.
  */
-IoOpReport TextStreamReader::status() const
-{
-    return IoOpReport(IoOpType::IO_OP_READ, TXT_STRM_STAT_MAP.value(mStreamReader.status()), *mSourceFile);
-}
+IoOpReport TextStreamReader::status() const { return mStatus; }
 
 /*!
  *  @fn template<typename T> requires defines_right_shift_for<QTextStream, T&> TextStreamReader& TextStreamReader::operator>>(T& d)
@@ -253,40 +370,64 @@ IoOpReport TextStreamReader::status() const
  *
  *  Equivalent to `status().isFailure()`.
  */
-bool TextStreamReader::hasError() { return status().isFailure(); }
+bool TextStreamReader::hasError() const { return mStatus.isFailure(); }
 
 /*!
- *  Opens the text file associated with the text stream reader and returns an operation report.
+ *  Links the stream to the file at @a filePath, which can be a null QString to unset the current
+ *  file. If a file was already set to the stream, it will be closed as it is replaced.
  *
- *  This function must be called before any data is read, unless the file is already open
- *  in a mode that supports reading before the stream was constructed.
+ *  The file must be opened through the stream before it can be used.
+ *
+ *  @sa filePath() and openFile().
+ */
+void TextStreamReader::setFilePath(const QString& filePath)
+{
+    unsetFile();
+    setFile(filePath);
+}
+
+/*!
+ *  Returns the path of the file associated with the stream, if present.
+ *
+ *  If no file is assigned the path will be null.
+ *
+ *  @sa setFilePath().
+ */
+QString TextStreamReader::filePath() const { return mFile ? mFile->fileName() : QString(); }
+
+/*!
+ *  Opens the file associated with the text stream reader and returns an operation report.
+ *
+ *  This function must be called before any data is read after a file is assigned to the stream.
  */
 IoOpReport TextStreamReader::openFile()
 {
     // Check file
-    IoOpResultType fileCheckResult = fileCheck(mSourceFile, Existance::Either);
+    IoOpResultType fileCheckResult = fileCheck(mFile, Existance::Either); // Accounts for no file assigned
 
     if(fileCheckResult != IO_SUCCESS)
-        return IoOpReport(IO_OP_WRITE, fileCheckResult, *mSourceFile);
+        return IoOpReport(IO_OP_WRITE, fileCheckResult, mFile);
 
     // Attempt to open file
-    IoOpResultType openResult = parsedOpen(*mSourceFile, QIODevice::ReadOnly);
+    IoOpResultType openResult = parsedOpen(*mFile, QIODevice::ReadOnly);
     if(openResult != IO_SUCCESS)
-        return IoOpReport(IO_OP_WRITE, openResult, *mSourceFile);
-
-    // Set data stream IO device
-    mStreamReader.setDevice(mSourceFile);
+        return IoOpReport(IO_OP_WRITE, openResult, mFile);
 
     // Return no error
-    return IoOpReport(IO_OP_WRITE, IO_SUCCESS, *mSourceFile);
+    return IoOpReport(IO_OP_WRITE, IO_SUCCESS, mFile);
 }
 
 /*!
- *  Closes the text file associated with the text stream reader.
- *
- *  This function should be called when the stream is no longer needed, unless the file should
- *  remain open for use elsewhere.
+ *  Closes the text file associated with the text stream reader, if present.
  */
-void TextStreamReader::closeFile() { mSourceFile->close(); }
+void TextStreamReader::closeFile()
+{
+    if(mFile)
+        mFile->close();
+}
 
+/*!
+ * Returns @c true if the file managed by the stream is open; otherwise, returns @c false.
+ */
+bool TextStreamReader::fileIsOpen() const { return mFile && mFile->isOpen(); }
 }
