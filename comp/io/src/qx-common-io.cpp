@@ -15,6 +15,10 @@
  *  @brief The qx-common-io header file provides various types, variables, and functions related to file IO.
  *
  *  Most functions in this file return an IoOpReport that details the success or failure of their actions.
+ *
+ *  @note All functions in this header that require a file to be opened handle the opening and closing of the
+ *  file automatically. The file will be reopened in the correct mode if it is already opened, and the file
+ *  will always be closed when the function returns.
  */
 
 namespace Qx
@@ -231,6 +235,10 @@ IoOpReport textFileEndsWithNewline(bool& returnBuffer, QFile& textFile)
     if(fileCheckResult != IO_SUCCESS)
         return IoOpReport(IO_OP_INSPECT, fileCheckResult, textFile);
 
+    // Close file if it's already open
+    if(textFile.isOpen())
+        textFile.close();
+
     // Return false is file is empty
     if(fileIsEmpty(textFile))
     {
@@ -284,6 +292,10 @@ IoOpReport textFileLayout(QList<int>& returnBuffer, QFile& textFile, bool ignore
     if(fileCheckResult != IO_SUCCESS)
         return IoOpReport(IO_OP_ENUMERATE, fileCheckResult, textFile);
 
+    // Close file if it's already open
+    if(textFile.isOpen())
+        textFile.close();
+
     // If file is empty return immediately
     if(fileIsEmpty(textFile))
         return IoOpReport(IO_OP_ENUMERATE, IO_SUCCESS, textFile);
@@ -328,6 +340,10 @@ IoOpReport textFileLineCount(int& returnBuffer, QFile& textFile, bool ignoreTrai
     IoOpResultType fileCheckResult = fileCheck(&textFile, Existance::Exist);
     if(fileCheckResult != IO_SUCCESS)
         return IoOpReport(IO_OP_ENUMERATE, fileCheckResult, textFile);
+
+    // Close file if it's already open
+    if(textFile.isOpen())
+        textFile.close();
 
     // If file is empty return immediately
     if(fileIsEmpty(textFile))
@@ -431,6 +447,10 @@ IoOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const
     IoOpResultType fileCheckResult = fileCheck(&textFile, Existance::Exist);
     if(fileCheckResult != IO_SUCCESS)
         return IoOpReport(IO_OP_INSPECT, fileCheckResult, textFile);
+
+    // Close file if it's already open
+    if(textFile.isOpen())
+        textFile.close();
 
     // Query tracking
     TextPos trueStartPos = query.startPosition();
@@ -571,6 +591,10 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
     if(fileCheckResult != IO_SUCCESS)
         return IoOpReport(IO_OP_READ, fileCheckResult, textFile);
 
+    // Close file if it's already open
+    if(textFile.isOpen())
+        textFile.close();
+
     // Return null string if file is empty or 0 characters are to be read
     if(fileIsEmpty(textFile) || count == 0)
         return IoOpReport(IO_OP_READ, IO_SUCCESS, textFile);
@@ -685,6 +709,10 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
     IoOpResultType fileCheckResult = fileCheck(&textFile, Existance::Exist);
     if(fileCheckResult != IO_SUCCESS)
         return IoOpReport(IO_OP_READ, fileCheckResult, textFile);
+
+    // Close file if it's already open
+    if(textFile.isOpen())
+        textFile.close();
 
     // Return null string if file is empty
     if(fileIsEmpty(textFile))
@@ -817,6 +845,10 @@ IoOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, Index32 
      if(fileCheckResult != IO_SUCCESS)
          return IoOpReport(IO_OP_READ, fileCheckResult, textFile);
 
+     // Close file if it's already open
+     if(textFile.isOpen())
+         textFile.close();
+
      // Return null list if file is empty
      if(fileIsEmpty(textFile))
          return IoOpReport(IO_OP_READ, IO_SUCCESS, textFile);
@@ -904,6 +936,10 @@ IoOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode wri
     IoOpReport prepResult = writePrep(existingFile, &textFile, writeOptions);
     if(prepResult.isFailure())
         return prepResult;
+
+    // Close file if it's already open
+    if(textFile.isOpen())
+        textFile.close();
 
     // Ensure file is closed upon return
     QScopeGuard fileGuard([&textFile](){ if(textFile.isOpen()) textFile.close(); });
@@ -1084,6 +1120,10 @@ IoOpReport deleteTextFromFile(QFile& textFile, TextPos startPos, TextPos endPos)
     IoOpResultType fileCheckResult = fileCheck(&textFile, Existance::Exist);
     if(fileCheckResult != IO_SUCCESS)
         return IoOpReport(IO_OP_READ, fileCheckResult, textFile);
+
+    // Close file if it's already open
+    if(textFile.isOpen())
+        textFile.close();
 
     // Text to keep
     QString beforeDeletion;
@@ -1279,6 +1319,10 @@ IoOpReport calculateFileChecksum(QString& returnBuffer, QFile& file, QCryptograp
     if(fileCheckResult != IO_SUCCESS)
         return IoOpReport(IO_OP_READ, fileCheckResult, file);
 
+    // Close file if it's already open
+    if(file.isOpen())
+        file.close();
+
     // Attempt to open file
     IoOpResultType openResult = parsedOpen(file, QIODevice::ReadOnly);
     if(openResult != IO_SUCCESS)
@@ -1351,6 +1395,10 @@ IoOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, Index64 star
     if(fileCheckResult != IO_SUCCESS)
         return IoOpReport(IO_OP_READ, fileCheckResult, file);
 
+    // Close file if it's already open
+    if(file.isOpen())
+        file.close();
+
     // Attempt to open file
     IoOpResultType openResult = parsedOpen(file, QIODevice::ReadOnly);
     if(openResult != IO_SUCCESS)
@@ -1421,6 +1469,10 @@ IoOpReport writeBytesToFile(QFile& file, const QByteArray& bytes, WriteMode writ
     IoOpReport prepResult = writePrep(existingFile, &file, writeOptions);
     if(prepResult.isFailure())
         return prepResult;
+
+    // Close file if it's already open
+    if(file.isOpen())
+        file.close();
 
     // Post data for Inserts and Overwrites
     QByteArray afterNew;
