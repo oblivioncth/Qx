@@ -16,16 +16,32 @@ namespace Qx
 
 class FileStreamReader // Specialized wrapper for QDataStream
 {
+//-Class Variables------------------------------------------------------------------------------------------------
+private:
+    static inline const IoOpReport NULL_FILE_REPORT = IoOpReport(IO_OP_READ, IO_ERR_NULL, static_cast<QFile*>(nullptr));
+
 //-Instance Variables------------------------------------------------------------------------------------------------
 private:
+    QFile* mFile;
     QDataStream mStreamReader;
-    QFile* mSourceFile;
+    IoOpReport mStatus;
 
 //-Constructor-------------------------------------------------------------------------------------------------------
 public:
-    FileStreamReader(QFile* file);
+    FileStreamReader();
+    FileStreamReader(const QString& filePath);
+
+//-Destructor-------------------------------------------------------------------------------------------------------
+public:
+    ~FileStreamReader();
 
 //-Instance Functions------------------------------------------------------------------------------------------------
+private:
+    IoOpReport statusFromNative();
+    IoOpReport preReadErrorCheck();
+    void setFile(const QString& filePath);
+    void unsetFile();
+
 public:
     // Stock functions
     bool atEnd() const;
@@ -36,18 +52,31 @@ public:
     void setByteOrder(QDataStream::ByteOrder bo);
     void setFloatingPointPrecision(QDataStream::FloatingPointPrecision precision);
     IoOpReport skipRawData(int len);
-    IoOpReport status();
+    IoOpReport status() const ;
 
     template<typename T>
         requires defines_right_shift_for<QDataStream, T&>
-    FileStreamReader& operator>>(T& d) { mStreamReader >> d; return *this; }
+    FileStreamReader& operator>>(T& d)
+    {
+        IoOpReport check = preReadErrorCheck();
 
-    QFile* file();
+        if(!check.isFailure())
+        {
+            mStreamReader >> d;
+            mStatus = statusFromNative();
+        }
+
+        return *this;
+    }
+
+    QString filePath() const;
+    void setFilePath(const QString& filePath);
 
     // New functions
-    bool hasError();
+    bool hasError() const;
     IoOpReport openFile();
     void closeFile();
+    bool fileIsOpen() const;
 };	
 
 }

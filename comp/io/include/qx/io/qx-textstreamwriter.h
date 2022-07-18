@@ -14,19 +14,35 @@ namespace Qx
 
 class TextStreamWriter
 {
+//-Class Variables------------------------------------------------------------------------------------------------
+private:
+    static inline const IoOpReport NULL_FILE_REPORT = IoOpReport(IO_OP_WRITE, IO_ERR_NULL, static_cast<QFile*>(nullptr));
+
 //-Instance Variables------------------------------------------------------------------------------------------------
 private:
+    QFile* mFile;
     QTextStream mStreamWriter;
-    QFile* mTargetFile;
     WriteMode mWriteMode;
     WriteOptions mWriteOptions;
     bool mAtLineStart;
+    IoOpReport mStatus;
 
 //-Constructor-------------------------------------------------------------------------------------------------------
 public:
-    TextStreamWriter(QFile* file, WriteMode writeMode = Append, WriteOptions writeOptions = NoWriteOptions);
+    TextStreamWriter(WriteMode writeMode = Append, WriteOptions writeOptions = NoWriteOptions);
+    TextStreamWriter(const QString& filePath, WriteMode writeMode = Append, WriteOptions writeOptions = NoWriteOptions);
+
+//-Destructor-------------------------------------------------------------------------------------------------------
+public:
+    ~TextStreamWriter();
 
 //-Instance Functions------------------------------------------------------------------------------------------------
+private:
+    IoOpReport statusFromNative();
+    IoOpReport preWriteErrorCheck();
+    void setFile(const QString& filePath);
+    void unsetFile();
+
 public:
     // Stock functions
     QStringConverter::Encoding encoding() const;
@@ -50,14 +66,29 @@ public:
 
     template<typename T>
         requires defines_left_shift_for<QTextStream, T>
-    TextStreamWriter& operator<<(T d) { mStreamWriter << d; return *this; }
+    TextStreamWriter& operator<<(T d)
+    {
+        IoOpReport check = preWriteErrorCheck();
+
+        if(!check.isFailure())
+        {
+            mStreamWriter << d;
+            mStatus = statusFromNative();
+        }
+
+        return *this;
+    }
+
+    QString filePath() const;
+    void setFilePath(const QString& filePath);
 
     // New functions
-    bool hasError();
+    bool hasError() const;
     IoOpReport writeLine(QString line, bool ensureLineStart = true);
     IoOpReport writeText(QString text);
     IoOpReport openFile();
     void closeFile();
+    bool fileIsOpen() const;
 };	
 
 }
