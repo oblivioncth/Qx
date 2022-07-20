@@ -46,20 +46,26 @@ private:
 public:
     // Stock functions
     QStringConverter::Encoding encoding() const;
+    QTextStream::FieldAlignment	fieldAlignment() const;
+    int	fieldWidth() const;
     void flush();
     bool generateByteOrderMark() const;
     int integerBase() const;
     QLocale locale() const;
     QTextStream::NumberFlags numberFlags() const;
+    QChar padChar() const;
     QTextStream::RealNumberNotation realNumberNotation() const;
     int realNumberPrecision() const;
     void reset();
     void resetStatus();
     void setEncoding(QStringConverter::Encoding encoding);
+    void setFieldAlignment(QTextStream::FieldAlignment mode);
+    void setFieldWidth(int width);
     void setGenerateByteOrderMark(bool generate);
     void setIntegerBase(int base);
     void setLocale(const QLocale& locale);
     void setNumberFlags(QTextStream::NumberFlags flags);
+    void setPadChar(QChar ch);
     void setRealNumberNotation(QTextStream::RealNumberNotation notation);
     void setRealNumberPrecision(int precision);
     IoOpReport status() const;

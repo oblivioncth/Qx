@@ -135,6 +135,20 @@ void TextStreamWriter::unsetFile()
 QStringConverter::Encoding TextStreamWriter::encoding() const { return mStreamWriter.encoding(); }
 
 /*!
+ *  Returns the current field alignment.
+ *
+ *  @sa setFieldAlignment() and fieldWidth().
+ */
+QTextStream::FieldAlignment	TextStreamWriter::fieldAlignment() const { return mStreamWriter.fieldAlignment(); }
+
+/*!
+ *  Returns the current field width.
+ *
+ *  @sa setFieldWidth().
+ */
+int	TextStreamWriter::fieldWidth() const { return mStreamWriter.fieldWidth(); }
+
+/*!
  *  Flushes any buffered data waiting to be written to the device.
  *
  *  If the stream was constructed with WriteOption::Unbuffered, this function does nothing.
@@ -171,6 +185,13 @@ QLocale TextStreamWriter::locale() const { return mStreamWriter.locale(); }
  *  @sa setNumberFlags(), integerBase(), and realNumberNotation().
  */
 QTextStream::NumberFlags TextStreamWriter::numberFlags() const { return mStreamWriter.numberFlags(); }
+
+/*!
+ *  Returns the current pad character.
+ *
+ *  @sa setPadChar() and setFieldWidth().
+ */
+QChar TextStreamWriter::padChar() const { return mStreamWriter.padChar(); }
 
 /*!
  *  Returns the current real number notation.
@@ -216,6 +237,26 @@ void TextStreamWriter::resetStatus()
 void TextStreamWriter::setEncoding(QStringConverter::Encoding encoding) { mStreamWriter.setEncoding(encoding); }
 
 /*!
+ *  Sets the field alignment to mode. When used together with setFieldWidth(), this function allows you to
+ *  generate formatted output with text aligned to the left, to the right or center aligned.
+ *
+ *  @sa fieldAlignment() and setFieldWidth().
+ */
+void TextStreamWriter::setFieldAlignment(QTextStream::FieldAlignment mode) { mStreamWriter.setFieldAlignment(mode); }
+
+/*!
+ *  Sets the current field width to width. If width is 0 (the default), the field width is equal to the
+ *  length of the generated text.
+ *
+ *  @note The field width applies to every element appended to this stream after this function has been
+ *  called (e.g., it also pads endl). This behavior is different from similar classes in the STL, where
+ *  the field width only applies to the next element.
+ *
+ *  @sa fieldWidth() and setPadChar().
+ */
+void TextStreamWriter::setFieldWidth(int width) { mStreamWriter.setFieldWidth(width); }
+
+/*!
  *  If @a generate is @c true and a UTF encoding is used, QTextStream will insert the BOM (Byte Order Mark) before
  *  any data has been written to the device. If @a generate is @c false, no BOM will be inserted. This function must
  *  be called before any data is written. Otherwise, it does nothing.
@@ -251,6 +292,14 @@ void TextStreamWriter::setLocale(const QLocale& locale) { mStreamWriter.setLocal
  *  @sa numberFlags(), setIntegerBase(), and setRealNumberNotation().
  */
 void TextStreamWriter::setNumberFlags(QTextStream::NumberFlags flags) { mStreamWriter.setNumberFlags(flags); }
+
+/*!
+ *  Sets the pad character to ch. The default value is the ASCII space character (' '), or QChar(0x20).
+ *  This character is used to fill in the space in fields when generating text.
+ *
+ *  @sa padChar(), setFieldWidth() and QTextStream::setPadChar().
+ */
+void TextStreamWriter::setPadChar(QChar ch) { mStreamWriter.setPadChar(ch); }
 
 /*!
  *  Sets the real number notation to @a notation. When generating numbers, TextStreamWriter uses this value to detect
