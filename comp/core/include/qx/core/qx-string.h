@@ -53,6 +53,9 @@ public:
     }
 
     static QString join(QSet<QString> set, QString separator = "", QString prefix = ""); // Overload for T = QString
+
+    static QString trimLeading(const QStringView string);
+    static QString trimTrailing(const QStringView string);
 };
 
 }
