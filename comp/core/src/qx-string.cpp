@@ -94,4 +94,54 @@ QString String::join(QSet<QString> set, QString separator, QString prefix) // Ov
     return join(set, [](const QString& str)->const QString&{ return str; }, separator, prefix);
 }	
 
+/*!
+ *  Returns a copy of @a string with all whitespace at the beginning of the string removed.
+ *
+ *  Whitespace means any character for which QChar::isSpace() returns @c true. This includes the ASCII
+ *  characters `\t`, `\n`, `\v`, `\f`, `\r`, and ` `.
+ *
+ *  Internal whitespace is unaffected.
+ *
+ *  @sa trimTrailing() and QString::trimmed().
+ */
+QString String::trimLeading(const QStringView string)
+{
+    auto newBegin = string.cbegin();
+    auto end = string.cend();
+
+    // Get to first non-whitespace character from left
+    while (newBegin < end && (*newBegin).isSpace())
+        newBegin++;
+
+    if(newBegin == string.cbegin())
+        return string.toString();
+    else
+        return QStringView(newBegin, end).toString();
+}
+
+/*!
+ *  Returns a copy of @a string with all whitespace at the end of the string removed.
+ *
+ *  Whitespace means any character for which QChar::isSpace() returns @c true. This includes the ASCII
+ *  characters `\t`, `\n`, `\v`, `\f`, `\r`, and ` `.
+ *
+ *  Internal whitespace is unaffected.
+ *
+ *  @sa trimLeading() and QString::trimmed().
+ */
+QString String::trimTrailing(const QStringView string)
+{
+    auto begin = string.cbegin();
+    auto newEnd = string.cend();
+
+    // Get to first non-whitespace character from right
+    while(newEnd > begin && (*(newEnd - 1)).isSpace())
+        newEnd--;
+
+    if(newEnd == string.cend())
+        return string.toString();
+    else
+        return QStringView(begin, newEnd).toString();
+}
+
 }
