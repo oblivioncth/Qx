@@ -207,7 +207,7 @@ IoOpReport::IoOpReport() :
  *
  *  @note @a tar is only used for descriptive purposes and the reference is not kept
  */
-IoOpReport::IoOpReport(IoOpType op, IoOpResultType res, const QFile& tar) :
+IoOpReport::IoOpReport(IoOpType op, IoOpResultType res, const QFileDevice& tar) :
     mNull(false),
     mOperation(op),
     mResult(res),
@@ -229,7 +229,7 @@ IoOpReport::IoOpReport(IoOpType op, IoOpResultType res, const QFile& tar) :
  *
  *  @note @a tar is only used for descriptive purposes and the pointer is not kept
  */
-IoOpReport::IoOpReport(IoOpType op, IoOpResultType res, const QFile* tar) :
+IoOpReport::IoOpReport(IoOpType op, IoOpResultType res, const QFileDevice* tar) :
     mNull(false),
     mOperation(op),
     mResult(res),

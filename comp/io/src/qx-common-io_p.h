@@ -23,11 +23,11 @@ extern const QHash<QDataStream::Status, IoOpResultType> DATA_STRM_STAT_MAP;
 
 //-Component Private Functions-----------------------------------------------------------------------------------------------------
 Existance existanceReqFromWriteOptions(WriteOptions wo);
-IoOpResultType parsedOpen(QFile& file, QIODevice::OpenMode openMode);
-IoOpResultType fileCheck(const QFile* file, Existance existanceRequirement);
-IoOpResultType directoryCheck(QDir& dir);
-IoOpReport handlePathCreation(const QFile& file, bool createPaths);
-IoOpReport writePrep(bool& fileExists, QFile* file, WriteOptions writeOptions);
+IoOpResultType parsedOpen(QFileDevice* file, QIODevice::OpenMode openMode);
+IoOpResultType fileCheck(const QFileDevice* file, Existance existanceRequirement);
+IoOpResultType directoryCheck(const QDir& dir);
+IoOpReport handlePathCreation(const QFileDevice* file, bool createPaths);
+IoOpReport writePrep(bool& fileExists, const QFileDevice* file, WriteOptions writeOptions);
 void matchAppendConditionParams(WriteMode& writeMode, TextPos& startPos);
 
 template<typename T>
@@ -39,7 +39,6 @@ void matchAppendConditionParams(WriteMode& writeMode, Index<T>& startPos)
     else if(writeMode == Append)
         startPos = Index<T>::LAST;
 }
-	
 /*! @endcond */
 }
 
