@@ -1093,8 +1093,6 @@ namespace
  *  @param[in] startPos The position from which to begin writing. This argument is ignored if writeMode is WriteMode::Append.
  *  @param[in] writeOptions Options modifying how the file is written.
  *  @return A report containing details of operation success or failure.
- *
- *  @note The output list will not contain any end-of-line characters.
  */
 IoOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode writeMode, TextPos startPos, WriteOptions writeOptions)
 {
