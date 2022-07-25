@@ -295,7 +295,7 @@ IoOpReport FileStreamReader::openFile()
         return IoOpReport(IO_OP_WRITE, fileCheckResult, mFile);
 
     // Attempt to open file
-    IoOpResultType openResult = parsedOpen(*mFile, QIODevice::ReadOnly);
+    IoOpResultType openResult = parsedOpen(mFile, QIODevice::ReadOnly);
     if(openResult != IO_SUCCESS)
         return IoOpReport(IO_OP_WRITE, openResult, mFile);
 

@@ -91,8 +91,8 @@ private:
 //-Constructor-------------------------------------------------------------------------------------------------------
 public:
     IoOpReport();
-    IoOpReport(IoOpType op, IoOpResultType res, const QFile& tar);
-    IoOpReport(IoOpType op, IoOpResultType res, const QFile* tar);
+    IoOpReport(IoOpType op, IoOpResultType res, const QFileDevice& tar);
+    IoOpReport(IoOpType op, IoOpResultType res, const QFileDevice* tar);
     IoOpReport(IoOpType op, IoOpResultType res, const QDir& tar);
     IoOpReport(IoOpType op, IoOpResultType res, const QDir* tar);
 

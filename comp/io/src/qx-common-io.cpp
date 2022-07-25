@@ -248,7 +248,7 @@ IoOpReport textFileEndsWithNewline(bool& returnBuffer, QFile& textFile)
     else
     {
         // Attempt to open file
-        IoOpResultType openResult = parsedOpen(textFile, QIODevice::ReadOnly | QIODevice::Text);
+        IoOpResultType openResult = parsedOpen(&textFile, QIODevice::ReadOnly | QIODevice::Text);
         if(openResult != IO_SUCCESS)
             return IoOpReport(IO_OP_INSPECT, openResult, textFile);
 
@@ -301,7 +301,7 @@ IoOpReport textFileLayout(QList<int>& returnBuffer, QFile& textFile, bool ignore
         return IoOpReport(IO_OP_ENUMERATE, IO_SUCCESS, textFile);
 
     // Attempt to open file
-    IoOpResultType openResult = parsedOpen(textFile, QIODevice::ReadOnly);
+    IoOpResultType openResult = parsedOpen(&textFile, QIODevice::ReadOnly);
     if(openResult != IO_SUCCESS)
         return IoOpReport(IO_OP_ENUMERATE, openResult, textFile);
 
@@ -350,7 +350,7 @@ IoOpReport textFileLineCount(int& returnBuffer, QFile& textFile, bool ignoreTrai
         return IoOpReport(IO_OP_ENUMERATE, IO_SUCCESS, textFile);
 
     // Attempt to open file
-    IoOpResultType openResult = parsedOpen(textFile, QIODevice::ReadOnly);
+    IoOpResultType openResult = parsedOpen(&textFile, QIODevice::ReadOnly);
     if(openResult != IO_SUCCESS)
         return IoOpReport(IO_OP_ENUMERATE, openResult, textFile);
 
@@ -476,7 +476,7 @@ IoOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const
     }
 
     // Attempt to open file
-    IoOpResultType openResult = parsedOpen(textFile, QIODevice::ReadOnly | QIODevice::Text);
+    IoOpResultType openResult = parsedOpen(&textFile, QIODevice::ReadOnly | QIODevice::Text);
     if(openResult != IO_SUCCESS)
         return IoOpReport(IO_OP_INSPECT, openResult, textFile);
 
@@ -601,7 +601,7 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
     else
     {
         // Attempt to open file
-        IoOpResultType openResult = parsedOpen(textFile, QIODevice::ReadOnly | QIODevice::Text);
+        IoOpResultType openResult = parsedOpen(&textFile, QIODevice::ReadOnly | QIODevice::Text);
         if(openResult != IO_SUCCESS)
             return IoOpReport(IO_OP_READ, openResult, textFile);
 
@@ -720,7 +720,7 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
     else
     {
         // Attempt to open file
-        IoOpResultType openResult = parsedOpen(textFile, QIODevice::ReadOnly | QIODevice::Text);
+        IoOpResultType openResult = parsedOpen(&textFile, QIODevice::ReadOnly | QIODevice::Text);
         if(openResult != IO_SUCCESS)
             return IoOpReport(IO_OP_READ, openResult, textFile);
 
@@ -855,7 +855,7 @@ IoOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, Index32 
      else
      {
          // Attempt to open file
-         IoOpResultType openResult = parsedOpen(textFile, QIODevice::ReadOnly | QIODevice::Text);
+         IoOpResultType openResult = parsedOpen(&textFile, QIODevice::ReadOnly | QIODevice::Text);
          if(openResult != IO_SUCCESS)
              return IoOpReport(IO_OP_READ, openResult, textFile);
 
@@ -903,6 +903,187 @@ IoOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, Index32 
      }
 }
 
+namespace
+{
+    IoOpReport pWriteStringToFile(QFileDevice* textFile, const QString& text, WriteMode& writeMode, TextPos& startPos, const WriteOptions& writeOptions)
+    {
+        /* TODO: Memory usage can be improved for inserts/overwrites by reading lines until at target lines, then reading characters
+         * one by one until at target char - 1 and noting the position. Then like normal read in the afterText, then return to the
+         * marked position and just start writing from there. The file may need to be truncated first depending on QTextStream's behavior
+         * (it seems it may default to writing to end regardless of where read cursor was) and special handling would be required for when
+         * a LF is discovered before the target char - 1 point is reached. This may also work for things like text deletion
+         */
+
+        // Ensure position is valid
+        if(startPos.isNull())
+            throw std::invalid_argument("Error: The start position cannot be null!");
+
+        // File for use with other public functions
+        QFile auxFile(textFile->fileName());
+
+        // Match append condition parameters
+        matchAppendConditionParams(writeMode, startPos);
+
+        // Perform write preparations
+        bool existingFile;
+        IoOpReport prepResult = writePrep(existingFile, textFile, writeOptions);
+        if(prepResult.isFailure())
+            return prepResult;
+
+        // Construct TextStream
+        QTextStream textStream(textFile);
+
+        if(writeMode == Append)
+        {
+            // Check if line break is needed if file exists
+            bool needsNewLine = false;
+            if(existingFile && writeOptions.testFlag(EnsureBreak))
+            {
+                bool onNewLine;
+                IoOpReport inspectResult = textFileEndsWithNewline(onNewLine, auxFile);
+                if(inspectResult.isFailure())
+                    return IoOpReport(IO_OP_WRITE, inspectResult.result(), textFile);
+                needsNewLine = !onNewLine;
+            }
+
+            // Attempt to open file
+            QIODevice::OpenMode om = QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text;
+            if(writeOptions.testFlag(Unbuffered))
+                om |= QIODevice::Unbuffered;
+            IoOpResultType openResult = parsedOpen(textFile, om);
+            if(openResult != IO_SUCCESS)
+                return IoOpReport(IO_OP_WRITE, openResult, textFile);
+
+            // Write line break if needed
+            if(needsNewLine)
+                textStream << ENDL;
+
+            // Write main text
+            textStream << text;
+        }
+        else if(!existingFile || writeMode == Truncate)
+        {
+            // Attempt to open file
+            QIODevice::OpenMode om = QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text;
+            if(writeOptions.testFlag(Unbuffered))
+                om |= QIODevice::Unbuffered;
+            IoOpResultType openResult = parsedOpen(textFile, om);
+            if(openResult != IO_SUCCESS)
+                return IoOpReport(IO_OP_WRITE, openResult, textFile);
+
+            // Pad if required
+            if(writeOptions.testFlag(Pad))
+            {
+                for(int i = 0; i < *startPos.line(); ++i)
+                    textStream << ENDL;
+                for(int i = 0; i < *startPos.character(); ++i)
+                    textStream << " ";
+            }
+
+            // Write main text
+            textStream << text;
+        }
+        else
+        {
+            // Construct output buffers
+            QString beforeNew;
+            QString afterNew;
+
+            // Fill beforeNew
+            TextPos beforeEnd = TextPos(startPos.line(), startPos.character() - 1);
+            IoOpReport readBefore = readTextFromFile(beforeNew, auxFile, TextPos::START, beforeEnd);
+            if(readBefore.isFailure())
+                return readBefore;
+
+            // Pad beforeNew if required
+            bool padded = false;
+            if(writeOptions.testFlag(Pad))
+            {
+                if(!startPos.line().isLast())
+                {
+                    int lineCount = beforeNew.count(ENDL) + 1;
+                    int linesNeeded = std::max(*startPos.line() - lineCount, 0);
+                    beforeNew += QString(ENDL).repeated(linesNeeded);
+
+                    if(linesNeeded > 0)
+                        padded = true;
+                }
+                if(!startPos.character().isLast())
+                {
+                    int lastLineCharCount = beforeNew.count() - (beforeNew.lastIndexOf(ENDL) + 1);
+                    int charNeeded = std::max(*startPos.character() - lastLineCharCount, 0);
+                    beforeNew += QString(" ").repeated(charNeeded);
+
+                    if(charNeeded > 0)
+                        padded = true;
+                }
+            }
+
+            // Ensure line break if required
+            if(!padded && writeOptions.testFlag(EnsureBreak))
+                if(*beforeNew.rbegin() != ENDL)
+                    beforeNew += ENDL;
+
+            // Fill afterNew, unless padding occurred, in which case there will be no afterNew
+            if(!padded)
+            {
+                // This will return a null string if there is no afterNew anyway, even without padding enabled
+                IoOpReport readAfter = readTextFromFile(afterNew, auxFile, startPos);
+                if(readAfter.isFailure())
+                    return readAfter;
+            }
+
+            // If overwriting, truncate afterNew to create an effective overwrite
+            if(writeMode == Overwrite && !afterNew.isEmpty())
+            {
+                int newTextLines = text.count(ENDL) + 1;
+                int lastNewLineLength = text.count() - (text.lastIndexOf(ENDL) + 1);
+
+                // Find start and end of last line to remove
+                int lineCount = 0;
+                qint64 lastLf = -1;
+                qint64 nextLf = -1;
+
+                for(; lineCount == 0 || (lineCount != newTextLines && nextLf != -1); ++lineCount)
+                {
+                    // Shift indices back 1
+                    lastLf = nextLf;
+
+                    // Find next line feed char
+                    nextLf = afterNew.indexOf(ENDL, lastLf + 1);
+                }
+
+                // If afterNew text has less lines than new text, discard all of it
+                if(lineCount < newTextLines)
+                    afterNew.clear();
+                else
+                {
+                    // Determine last overwritten line start, end, and length
+                    qint64 lastLineStart = lastLf + 1;
+                    qint64 lastLineEnd = (nextLf == -1 ? afterNew.count(): nextLf) - 1;
+                    qint64 lastLineLength = lengthOfRange(lastLineStart, lastLineEnd);
+
+                    // Keep portion of last line that is past replacement last line
+                    afterNew = afterNew.mid(lastLineEnd + 1 - std::max(lastLineLength - lastNewLineLength, qint64(0)));
+                }
+            }
+            // Attempt to open file
+            QIODevice::OpenMode om = QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text;
+            if(writeOptions.testFlag(Unbuffered))
+                om |= QIODevice::Unbuffered;
+            IoOpResultType openResult = parsedOpen(textFile, om);
+            if(openResult != IO_SUCCESS)
+                return IoOpReport(IO_OP_WRITE, openResult, textFile);
+
+            // Write all text;
+            textStream << beforeNew << text << afterNew;
+        }
+
+        // Return stream status
+        return IoOpReport(IO_OP_WRITE, TXT_STRM_STAT_MAP.value(textStream.status()), textFile);
+    }
+}
+
 /*!
  *  Writes the given text to @a textFile.
  *
@@ -917,184 +1098,41 @@ IoOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, Index32 
  */
 IoOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode writeMode, TextPos startPos, WriteOptions writeOptions)
 {
-    /* TODO: Memory usage can be improved for inserts/overwrites by reading lines until at target lines, then reading characters
-     * one by one until at target char - 1 and noting the position. Then like normal read in the afterText, then return to the
-     * marked position and just start writing from there. The file may need to be truncated first depending on QTextStream's behavior
-     * (it seems it may default to writing to end regardless of where read cursor was) and special handling would be required for when
-     * a LF is discovered before the target char - 1 point is reached. This may also work for things like text deletion
-     */
-
-    // Ensure position is valid
-    if(startPos.isNull())
-        throw std::invalid_argument("Error: The start position cannot be null!");
-
-    // Match append condition parameters
-    matchAppendConditionParams(writeMode, startPos);
-
-    // Perform write preparations
-    bool existingFile;
-    IoOpReport prepResult = writePrep(existingFile, &textFile, writeOptions);
-    if(prepResult.isFailure())
-        return prepResult;
-
     // Close file if it's already open
     if(textFile.isOpen())
         textFile.close();
 
-    // Ensure file is closed upon return
-    QScopeGuard fileGuard([&textFile](){ if(textFile.isOpen()) textFile.close(); });
+    // Perform write
+    IoOpReport res = pWriteStringToFile(&textFile, text, writeMode, startPos, writeOptions);
 
-    // Construct TextStream
-    QTextStream textStream(&textFile);
+    // Close file if required
+    if(textFile.isOpen())
+        textFile.close();
 
-    if(writeMode == Append)
+    return res;
+}
+
+/*!
+ *  @overload
+ */
+IoOpReport writeStringToFile(QSaveFile& textFile, const QString& text, WriteMode writeMode, TextPos startPos, WriteOptions writeOptions)
+{
+    // Close file if it's already open
+    if(textFile.isOpen())
+        textFile.commit();
+
+    // Perform write
+    IoOpReport res = pWriteStringToFile(&textFile, text, writeMode, startPos, writeOptions);
+
+    // Close file if required
+    if(textFile.isOpen())
     {
-        // Check if line break is needed if file exists
-        bool needsNewLine = false;
-        if(existingFile && writeOptions.testFlag(EnsureBreak))
-        {
-            bool onNewLine;
-            IoOpReport inspectResult = textFileEndsWithNewline(onNewLine, textFile);
-            if(inspectResult.isFailure())
-                return IoOpReport(IO_OP_WRITE, inspectResult.result(), textFile);
-            needsNewLine = !onNewLine;
-        }
-
-        // Attempt to open file
-        QIODevice::OpenMode om = QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text;
-        if(writeOptions.testFlag(Unbuffered))
-            om |= QIODevice::Unbuffered;
-        IoOpResultType openResult = parsedOpen(textFile, om);
-        if(openResult != IO_SUCCESS)
-            return IoOpReport(IO_OP_WRITE, openResult, textFile);
-
-        // Write line break if needed
-        if(needsNewLine)
-            textStream << ENDL;
-
-        // Write main text
-        textStream << text;
-    }
-    else if(!existingFile || writeMode == Truncate)
-    {
-        // Attempt to open file
-        QIODevice::OpenMode om = QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text;
-        if(writeOptions.testFlag(Unbuffered))
-            om |= QIODevice::Unbuffered;
-        IoOpResultType openResult = parsedOpen(textFile, om);
-        if(openResult != IO_SUCCESS)
-            return IoOpReport(IO_OP_WRITE, openResult, textFile);
-
-        // Pad if required
-        if(writeOptions.testFlag(Pad))
-        {
-            for(int i = 0; i < *startPos.line(); ++i)
-                textStream << ENDL;
-            for(int i = 0; i < *startPos.character(); ++i)
-                textStream << " ";
-        }
-
-        // Write main text
-        textStream << text;
-    }
-    else
-    {
-        // Construct output buffers
-        QString beforeNew;
-        QString afterNew;
-
-        // Fill beforeNew
-        TextPos beforeEnd = TextPos(startPos.line(), startPos.character() - 1);
-        IoOpReport readBefore = readTextFromFile(beforeNew, textFile, TextPos::START, beforeEnd);
-        if(readBefore.isFailure())
-            return readBefore;
-
-        // Pad beforeNew if required
-        bool padded = false;
-        if(writeOptions.testFlag(Pad))
-        {
-            if(!startPos.line().isLast())
-            {
-                int lineCount = beforeNew.count(ENDL) + 1;
-                int linesNeeded = std::max(*startPos.line() - lineCount, 0);
-                beforeNew += QString(ENDL).repeated(linesNeeded);
-
-                if(linesNeeded > 0)
-                    padded = true;
-            }
-            if(!startPos.character().isLast())
-            {
-                int lastLineCharCount = beforeNew.count() - (beforeNew.lastIndexOf(ENDL) + 1);
-                int charNeeded = std::max(*startPos.character() - lastLineCharCount, 0);
-                beforeNew += QString(" ").repeated(charNeeded);
-
-                if(charNeeded > 0)
-                    padded = true;
-            }
-        }
-
-        // Ensure line break if required
-        if(!padded && writeOptions.testFlag(EnsureBreak))
-            if(*beforeNew.rbegin() != ENDL)
-                beforeNew += ENDL;
-
-        // Fill afterNew, unless padding occurred, in which case there will be no afterNew
-        if(!padded)
-        {
-            // This will return a null string if there is no afterNew anyway, even without padding enabled
-            IoOpReport readAfter = readTextFromFile(afterNew, textFile, startPos);
-            if(readAfter.isFailure())
-                return readAfter;
-        }
-
-        // If overwriting, truncate afterNew to create an effective overwrite
-        if(writeMode == Overwrite && !afterNew.isEmpty())
-        {
-            int newTextLines = text.count(ENDL) + 1;
-            int lastNewLineLength = text.count() - (text.lastIndexOf(ENDL) + 1);
-
-            // Find start and end of last line to remove
-            int lineCount = 0;
-            qint64 lastLf = -1;
-            qint64 nextLf = -1;
-
-            for(; lineCount == 0 || (lineCount != newTextLines && nextLf != -1); ++lineCount)
-            {
-                // Shift indices back 1
-                lastLf = nextLf;
-
-                // Find next line feed char
-                nextLf = afterNew.indexOf(ENDL, lastLf + 1);
-            }
-
-            // If afterNew text has less lines than new text, discard all of it
-            if(lineCount < newTextLines)
-                afterNew.clear();
-            else
-            {
-                // Determine last overwritten line start, end, and length
-                qint64 lastLineStart = lastLf + 1;
-                qint64 lastLineEnd = (nextLf == -1 ? afterNew.count(): nextLf) - 1;
-                qint64 lastLineLength = lengthOfRange(lastLineStart, lastLineEnd);
-
-                // Keep portion of last line that is past replacement last line
-                afterNew = afterNew.mid(lastLineEnd + 1 - std::max(lastLineLength - lastNewLineLength, qint64(0)));
-            }
-        }
-        // Attempt to open file
-        QIODevice::OpenMode om = QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text;
-        if(writeOptions.testFlag(Unbuffered))
-            om |= QIODevice::Unbuffered;
-        IoOpResultType openResult = parsedOpen(textFile, om);
-        if(openResult != IO_SUCCESS)
-            return IoOpReport(IO_OP_WRITE, openResult, textFile);
-
-        // Write all text;
-        textStream << beforeNew << text << afterNew;
+        if(res.isFailure())
+            textFile.cancelWriting();
+        textFile.commit();
     }
 
-    // Return stream status
-    return IoOpReport(IO_OP_WRITE, TXT_STRM_STAT_MAP.value(textStream.status()), textFile);
+    return res;
 }
 
 /*!
@@ -1160,7 +1198,7 @@ IoOpReport deleteTextFromFile(QFile& textFile, TextPos startPos, TextPos endPos)
         return IoOpReport(IO_OP_WRITE, transientReport.result(), textFile);
 
     // Attempt to open file
-    IoOpResultType openResult = parsedOpen(textFile, QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text);
+    IoOpResultType openResult = parsedOpen(&textFile, QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text);
     if(openResult != IO_SUCCESS)
         return IoOpReport(IO_OP_WRITE, openResult, textFile);
 
@@ -1324,7 +1362,7 @@ IoOpReport calculateFileChecksum(QString& returnBuffer, QFile& file, QCryptograp
         file.close();
 
     // Attempt to open file
-    IoOpResultType openResult = parsedOpen(file, QIODevice::ReadOnly);
+    IoOpResultType openResult = parsedOpen(&file, QIODevice::ReadOnly);
     if(openResult != IO_SUCCESS)
         return IoOpReport(IO_OP_READ, openResult, file);
 
@@ -1400,7 +1438,7 @@ IoOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, Index64 star
         file.close();
 
     // Attempt to open file
-    IoOpResultType openResult = parsedOpen(file, QIODevice::ReadOnly);
+    IoOpResultType openResult = parsedOpen(&file, QIODevice::ReadOnly);
     if(openResult != IO_SUCCESS)
         return IoOpReport(IO_OP_READ, openResult, file);
 
@@ -1445,6 +1483,87 @@ IoOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, Index64 star
     return IoOpReport(IO_OP_READ, IO_SUCCESS, file);
 }
 
+namespace
+{
+    IoOpReport pWriteBytesToFile(QFileDevice* file, const QByteArray& bytes, WriteMode writeMode, Index64 startPos, const WriteOptions& writeOptions)
+    {
+        // Ensure start position is valid
+        if(startPos.isNull())
+            throw std::invalid_argument("Error: The start position cannot be null!");
+
+        // File for use with other public functions
+        QFile auxFile(file->fileName());
+
+        // Match append condition parameters
+        matchAppendConditionParams(writeMode, startPos);
+
+        // Perform write preparations
+        bool existingFile;
+        IoOpReport prepResult = writePrep(existingFile, file, writeOptions);
+        if(prepResult.isFailure())
+            return prepResult;
+
+        // Close file if it's already open
+        if(file->isOpen())
+            file->close();
+
+        // Post data for Inserts and Overwrites
+        QByteArray afterNew;
+
+        // Get post data if required
+        if(existingFile && writeMode == Insert)
+        {
+            Qx::IoOpReport readAfter = Qx::readBytesFromFile(afterNew, auxFile, startPos);
+            if(readAfter.isFailure())
+                return readAfter;
+        }
+
+        // Attempt to open file
+        QIODevice::OpenMode om = QIODevice::ReadWrite; // WriteOnly implies truncate which isn't always wanted here
+        if(writeOptions.testFlag(Unbuffered))
+            om |= QIODevice::Unbuffered;
+        if(writeMode == Append)
+            om |= QIODevice::Append;
+        else if(writeMode == Truncate)
+            om |= QIODevice::Truncate;
+
+        IoOpResultType openResult = parsedOpen(file, om);
+        if(openResult != IO_SUCCESS)
+            return IoOpReport(IO_OP_WRITE, openResult, file);
+
+        // Ensure file is closed upon return
+        QScopeGuard fileGuard([&file](){ file->close(); });
+
+        // Adjust startPos to bounds if not padding
+        if((writeMode == Insert || writeMode == Overwrite) &&
+           !writeOptions.testFlag(Pad) && startPos > file->size())
+            startPos = file->size();
+
+        // Seek to start point
+        file->seek(*startPos);
+
+        // Write data
+        qint64 written = file->write(bytes);
+        if(written == -1)
+            return IoOpReport(IO_OP_WRITE, FILE_DEV_ERR_MAP.value(file->error()), file);
+        else if(written != bytes.size())
+            return IoOpReport(IO_OP_WRITE, IO_ERR_WRITE, file);
+
+        // Write after new data
+        if(!afterNew.isEmpty())
+        {
+            written = file->write(afterNew);
+            if(written == -1)
+                return IoOpReport(IO_OP_WRITE, FILE_DEV_ERR_MAP.value(file->error()), file);
+            else if(written != afterNew.size())
+                return IoOpReport(IO_OP_WRITE, IO_ERR_WRITE, file);
+        }
+
+        // Return file status
+        return IoOpReport(IO_OP_WRITE, FILE_DEV_ERR_MAP.value(file->error()), file);
+    }
+}
+
 /*!
  *  Writes the given bytes to @a file.
  *
@@ -1457,77 +1576,37 @@ IoOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, Index64 star
  */
 IoOpReport writeBytesToFile(QFile& file, const QByteArray& bytes, WriteMode writeMode, Index64 startPos, WriteOptions writeOptions)
 {
-    // Ensure start position is valid
-    if(startPos.isNull())
-        throw std::invalid_argument("Error: The start position cannot be null!");
-
-    // Match append condition parameters
-    matchAppendConditionParams(writeMode, startPos);
-
-    // Perform write preparations
-    bool existingFile;
-    IoOpReport prepResult = writePrep(existingFile, &file, writeOptions);
-    if(prepResult.isFailure())
-        return prepResult;
-
     // Close file if it's already open
     if(file.isOpen())
         file.close();
 
-    // Post data for Inserts and Overwrites
-    QByteArray afterNew;
+    // Perform write
+    IoOpReport res = pWriteBytesToFile(&file, bytes, writeMode, startPos, writeOptions);
 
-    // Get post data if required
-    if(existingFile && writeMode == Insert)
-    {
-        Qx::IoOpReport readAfter = Qx::readBytesFromFile(afterNew, file, startPos);
-        if(readAfter.isFailure())
-            return readAfter;
-    }
+    // Close file if required
+    if(file.isOpen())
+        file.close();
 
-    // Attempt to open file
-    QIODevice::OpenMode om = QIODevice::ReadWrite; // WriteOnly implies truncate which isn't always wanted here
-    if(writeOptions.testFlag(Unbuffered))
-        om |= QIODevice::Unbuffered;
-    if(writeMode == Append)
-        om |= QIODevice::Append;
-    else if(writeMode == Truncate)
-        om |= QIODevice::Truncate;
+    return res;
+}
 
-    IoOpResultType openResult = parsedOpen(file, om);
-    if(openResult != IO_SUCCESS)
-        return IoOpReport(IO_OP_WRITE, openResult, file);
+/*!
+ *  @overload
+ */
+IoOpReport writeBytesToFile(QSaveFile& file, const QByteArray& bytes, WriteMode writeMode, Index64 startPos, WriteOptions writeOptions)
+{
+    // Close file if it's already open
+    if(file.isOpen())
+        file.commit();
 
-    // Ensure file is closed upon return
-    QScopeGuard fileGuard([&file](){ file.close(); });
+    // Perform write
+    IoOpReport res = pWriteBytesToFile(&file, bytes, writeMode, startPos, writeOptions);
 
-    // Adjust startPos to bounds if not padding
-    if((writeMode == Insert || writeMode == Overwrite) &&
-       !writeOptions.testFlag(Pad) && startPos > file.size())
-        startPos = file.size();
+    // Close file if required
+    if(file.isOpen())
+        file.commit();
 
-    // Seek to start point
-    file.seek(*startPos);
-
-    // Write data
-    qint64 written = file.write(bytes);
-    if(written == -1)
-        return IoOpReport(IO_OP_WRITE, FILE_DEV_ERR_MAP.value(file.error()), file);
-    else if(written != bytes.size())
-        return IoOpReport(IO_OP_WRITE, IO_ERR_WRITE, file);
-
-    // Write after new data
-    if(!afterNew.isEmpty())
-    {
-        written = file.write(afterNew);
-        if(written == -1)
-            return IoOpReport(IO_OP_WRITE, FILE_DEV_ERR_MAP.value(file.error()), file);
-        else if(written != afterNew.size())
-            return IoOpReport(IO_OP_WRITE, IO_ERR_WRITE, file);
-    }
-
-    // Return file status
-    return IoOpReport(IO_OP_WRITE, FILE_DEV_ERR_MAP.value(file.error()), file);
+    return res;
 }
 
 }

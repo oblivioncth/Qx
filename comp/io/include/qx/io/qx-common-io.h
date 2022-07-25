@@ -5,6 +5,7 @@
 #include <QFlags>
 #include <QChar>
 #include <QFile>
+#include <QSaveFile>
 #include <QDirIterator>
 #include <QCryptographicHash>
 
@@ -60,6 +61,7 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
 IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos = TextPos::START, TextPos endPos = TextPos::END, ReadOptions readOptions = NoReadOptions);
 IoOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, Index32 startLine = 0, Index32 endLine = Index32::LAST, ReadOptions readOptions = NoReadOptions);
 IoOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode writeMode = Truncate, TextPos startPos = TextPos::START, WriteOptions writeOptions = NoWriteOptions);
+IoOpReport writeStringToFile(QSaveFile& textFile, const QString& text, WriteMode writeMode = Truncate, TextPos startPos = TextPos::START, WriteOptions writeOptions = NoWriteOptions);
 IoOpReport deleteTextFromFile(QFile& textFile, TextPos startPos, TextPos endPos);
 
 // Directory:
@@ -77,7 +79,7 @@ IoOpReport fileMatchesChecksum(bool& returnBuffer, QFile& file, QString checksum
 // Binary Based
 IoOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, Index64 startPos = 0, Index64 endPos = Index64::LAST);
 IoOpReport writeBytesToFile(QFile& file, const QByteArray& bytes, WriteMode writeMode = Truncate, Index64 startPos = 0, WriteOptions writeOptions = NoWriteOptions);
-
+IoOpReport writeBytesToFile(QSaveFile& file, const QByteArray& bytes, WriteMode writeMode = Truncate, Index64 startPos = 0, WriteOptions writeOptions = NoWriteOptions);
 }
 
 #endif // QX_IO_COMMON_H

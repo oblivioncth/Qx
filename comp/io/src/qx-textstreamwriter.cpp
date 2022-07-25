@@ -446,7 +446,7 @@ IoOpReport TextStreamWriter::openFile()
     if(mWriteOptions.testFlag(Unbuffered))
         om |= QIODevice::Unbuffered;
 
-    IoOpResultType openResult = parsedOpen(*mFile, om);
+    IoOpResultType openResult = parsedOpen(mFile, om);
     if(openResult != IO_SUCCESS)
         return IoOpReport(IO_OP_WRITE, openResult, mFile);
 
