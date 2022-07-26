@@ -24,10 +24,10 @@ extern const QHash<QDataStream::Status, IoOpResultType> DATA_STRM_STAT_MAP;
 //-Component Private Functions-----------------------------------------------------------------------------------------------------
 Existance existanceReqFromWriteOptions(WriteOptions wo);
 IoOpResultType parsedOpen(QFileDevice* file, QIODevice::OpenMode openMode);
-IoOpResultType fileCheck(const QFileDevice* file, Existance existanceRequirement);
-IoOpResultType directoryCheck(const QDir& dir);
-IoOpReport handlePathCreation(const QFileDevice* file, bool createPaths);
-IoOpReport writePrep(bool& fileExists, const QFileDevice* file, WriteOptions writeOptions);
+IoOpResultType fileCheck(const QFileInfo& fileInfo, Existance existanceRequirement);
+IoOpResultType directoryCheck(const QFileInfo& dirInfo);
+IoOpReport handlePathCreation(const QFileInfo& fileInfo, bool createPaths);
+IoOpReport writePrep(const QFileInfo& fileInfo, WriteOptions writeOptions);
 void matchAppendConditionParams(WriteMode& writeMode, TextPos& startPos);
 
 template<typename T>

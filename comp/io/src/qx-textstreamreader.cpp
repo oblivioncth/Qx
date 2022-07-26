@@ -403,7 +403,11 @@ QString TextStreamReader::filePath() const { return mFile ? mFile->fileName() : 
 IoOpReport TextStreamReader::openFile()
 {
     // Check file
-    IoOpResultType fileCheckResult = fileCheck(mFile, Existance::Either); // Accounts for no file assigned
+    if(!mFile)
+        return IoOpReport(IO_OP_WRITE, IO_ERR_NULL, mFile);
+
+    QFileInfo fileInfo(*mFile);
+    IoOpResultType fileCheckResult = fileCheck(fileInfo, Existance::Either);
 
     if(fileCheckResult != IO_SUCCESS)
         return IoOpReport(IO_OP_WRITE, fileCheckResult, mFile);

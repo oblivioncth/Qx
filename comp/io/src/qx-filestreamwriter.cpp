@@ -270,8 +270,11 @@ bool FileStreamWriter::hasError() const { return mStatus.isFailure(); }
 IoOpReport FileStreamWriter::openFile()
 {
     // Perform write preparations
-    bool fileExists;
-    IoOpReport prepResult = writePrep(fileExists, mFile, mWriteOptions);
+    if(!mFile)
+        return IoOpReport(IO_OP_WRITE, IO_ERR_NULL, mFile);
+
+    QFileInfo fileInfo(*mFile);
+    IoOpReport prepResult = writePrep(fileInfo, mWriteOptions);
     if(prepResult.isFailure())
         return prepResult;
 

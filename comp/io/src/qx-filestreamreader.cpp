@@ -289,8 +289,11 @@ bool FileStreamReader::hasError() const { return mStatus.isFailure(); }
 IoOpReport FileStreamReader::openFile()
 {
     // Check file
-    IoOpResultType fileCheckResult = fileCheck(mFile, Existance::Exist); // Accounts for no file assigned
+    if(!mFile)
+        return IoOpReport(IO_OP_WRITE, IO_ERR_NULL, mFile);
 
+    QFileInfo fileInfo(*mFile);
+    IoOpResultType fileCheckResult = fileCheck(fileInfo, Existance::Exist);
     if(fileCheckResult != IO_SUCCESS)
         return IoOpReport(IO_OP_WRITE, fileCheckResult, mFile);
 

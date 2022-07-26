@@ -427,13 +427,16 @@ QString TextStreamWriter::filePath() const { return mFile ? mFile->fileName() : 
 IoOpReport TextStreamWriter::openFile()
 {
     // Perform write preparations
-    bool existingFile;
-    IoOpReport prepResult = writePrep(existingFile, mFile, mWriteOptions);
+    if(!mFile)
+        return IoOpReport(IO_OP_WRITE, IO_ERR_NULL, mFile);
+
+    QFileInfo fileInfo(*mFile);
+    IoOpReport prepResult = writePrep(fileInfo, mWriteOptions);
     if(prepResult.isFailure())
         return prepResult;
 
     // If file exists and mode is append, test if it starts on a new line
-    if(mWriteMode == Append && existingFile)
+    if(mWriteMode == Append && fileInfo.exists())
     {
         IoOpReport inspectResult = textFileEndsWithNewline(mAtLineStart, *mFile);
         if(inspectResult.isFailure())
