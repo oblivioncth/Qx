@@ -75,6 +75,24 @@ VersionNumber::VersionNumber() : QVersionNumber() {}
 //Public:
 
 /*!
+ *  Returns a version number that contains the first @a n segments of this version number, or all segments if
+ *  there are less than @a n available.
+ *
+ *  @sa commonPrefix().
+ */
+VersionNumber VersionNumber::first(qsizetype n)
+{
+    if(n < 0)
+        n = 0;
+
+    QList<int> segs = segments();
+    if(n < segs.size())
+        segs.resize(n);
+
+    return VersionNumber(segs);
+}
+
+/*!
  *  Returns the nano version number, that is, the fourth segment. This function is equivalent to segmentAt(3).
  *  If this VersionNumber object is null, this function returns 0.
  *

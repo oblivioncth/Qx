@@ -22,6 +22,7 @@ public:
 
 //-Member Functions--------------------------------------------------------------------------------------------
 public:
+    VersionNumber first(qsizetype n);
     int nanoVersion();
     VersionNumber normalized(qsizetype min = 0);
 
