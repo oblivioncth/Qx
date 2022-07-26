@@ -140,9 +140,11 @@ size_t qHash(const FileDetails::Translation& key, size_t seed) noexcept
  *  A string representation of the file's version.
  *
  *  Generally this is equivalent to:
- *  \code{.cpp}
+ *  @code{.cpp}
  *  fileDetails.fileVersion().toString();
- *  \endcode
+ *  @endcode
+ *
+ *  @sa FileDetails::fileVersion().
  */
 
 /*!
@@ -175,9 +177,11 @@ size_t qHash(const FileDetails::Translation& key, size_t seed) noexcept
  *  A string representation of the version of the product the file is associated with.
  *
  *  Generally this is equivalent to:
- *  \code{.cpp}
+ *  @code{.cpp}
  *  fileDetails.productVersion().toString();
- *  \endcode
+ *  @endcode
+ *
+ *  @sa FileDetails::productVersion().
  */
 
 /*!
@@ -373,11 +377,24 @@ VersionNumber FileDetails::metaStructVersion() { return mMetaStructVersion; }
 
 /*!
  *  Returns the version of the file.
+ *
+ *  @note This value is retrieved from the binary encoded version information of the file and always
+ *  features four segments; therefore, it may different from what is seen within the file's @e Details pane,
+ *  which is taken from its primary StringTable.
+ *
+ *  @sa StringTable::fileVersion().
+ *
  */
 VersionNumber FileDetails::fileVersion() { return mFileVersion; }
 
 /*!
  *  Returns the version of the product the file is associated with.
+ *
+ *  @note This value is retrieved from the binary encoded version information of the file and always
+ *  features four segments; therefore, it may different from what is seen within the file's @e Details pane,
+ *  which is taken from its primary StringTable.
+ *
+ *  @sa StringTable::productVersion().
  */
 VersionNumber FileDetails::productVersion() { return mProductVersion; }
 
