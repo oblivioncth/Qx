@@ -23,7 +23,7 @@ public:
 //-Member Functions--------------------------------------------------------------------------------------------
 public:
     int nanoVersion();
-    VersionNumber normalized(int min = 0);
+    VersionNumber normalized(qsizetype min = 0);
 
 //-Class Functions---------------------------------------------------------------------------------------------
 public:

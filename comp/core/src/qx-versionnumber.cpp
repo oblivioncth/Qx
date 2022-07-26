@@ -91,8 +91,11 @@ int VersionNumber::nanoVersion() { return segmentAt(3); }
  *
  *  @snippet qx-versionnumber.cpp 0
  */
-VersionNumber VersionNumber::normalized(int min)
+VersionNumber VersionNumber::normalized(qsizetype min)
 {
+    if(min < 0)
+        min = 0;
+
     // Find last trailing zero
     int i;
     for (i = segmentCount(); i > min; --i)
