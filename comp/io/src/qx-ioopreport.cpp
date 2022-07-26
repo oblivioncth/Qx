@@ -220,8 +220,9 @@ IoOpReport::IoOpReport(IoOpType op, IoOpResultType res, const QFileDevice& tar) 
 /*!
  *  @overload
  *
- *  Creates an IO operation report for a file target. If @a tar is @c nulltpr, @a res is
- *  ignored and the resultant report will indicate a null file error.
+ *  Creates an IO operation report for a file target.
+ *  If @a tar is @c nulltpr, @a res is ignored and the resultant report will indicate
+ *  a null file error.
  *
  *  @param op The type of operation
  *  @param res The type of result.
@@ -268,8 +269,10 @@ IoOpReport::IoOpReport(IoOpType op, IoOpResultType res, const QDir& tar) :
 /*!
  *  @overload
  *
- *  Creates an IO operation report for a directory target. If @a tar is @c nulltpr, @a res is
- *  ignored and the resultant report will indicate a null directory error.
+ *  Creates an IO operation report for a directory target.
+ *
+ *  If @a tar is @c nulltpr, @a res is ignored and the resultant report will indicate
+ *  a null directory error.
  *
  *  @param op The type of operation
  *  @param res The type of result.
@@ -294,6 +297,39 @@ IoOpReport::IoOpReport(IoOpType op, IoOpResultType res, const QDir* tar) :
     parseOutcome();
 }
 
+/*!
+ *  @overload
+ *
+ *  Creates an IO operation report for a target described by @a tar.
+ *
+ *  The target type is automatically determined. If the target path is empty, @a res
+ *  is ignored and the resultant report will indicate a null file/directory error.
+ *
+ *  @param op The type of operation
+ *  @param res The type of result.
+ *  @param tar A QFileInfo object that contains the target path.
+ *
+ *  @note @a tar is only used for descriptive purposes and the reference is not kept
+ */
+IoOpReport::IoOpReport(IoOpType op, IoOpResultType res, const QFileInfo& tar) :
+    mNull(false),
+    mOperation(op),
+    mResult(res)
+{
+    if(tar.filePath().isEmpty())
+    {
+        mTargetType = IO_FILE;
+        mTarget = NULL_TARGET;
+        mResult = IO_ERR_NULL;
+    }
+    else
+    {
+        mTargetType = tar.isDir() ? IO_DIR : IO_FILE; // Defaults to file
+        mTarget = tar.absoluteFilePath();
+    }
+
+    parseOutcome();
+}
 
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Private:

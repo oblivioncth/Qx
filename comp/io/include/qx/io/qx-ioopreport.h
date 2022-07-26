@@ -95,6 +95,7 @@ public:
     IoOpReport(IoOpType op, IoOpResultType res, const QFileDevice* tar);
     IoOpReport(IoOpType op, IoOpResultType res, const QDir& tar);
     IoOpReport(IoOpType op, IoOpResultType res, const QDir* tar);
+    IoOpReport(IoOpType op, IoOpResultType res, const QFileInfo& tar);
 
 //-Instance Functions----------------------------------------------------------------------------------------------
 private:
