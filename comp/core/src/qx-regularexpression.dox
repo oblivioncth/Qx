@@ -42,4 +42,32 @@ namespace Qx
  *
  *  Matches text that only contains Latin letters.
  */
+
+/*!
+ *  @var QRegularExpression RegularExpression::SEMANTIC_VERSION
+ *
+ *  Matches text that denotes a semantic version in accordance with the
+ *  <a href="https://semver.org/spec/v2.0.0.html">Semantic Version 2.0.0</a> specification.
+ *
+ *  The resulting match is valid for VersionNumber::fromString().
+ *
+ *  Provides the following capture groups:
+ *  @li major
+ *  @li minor
+ *  @li patch
+ *  @li prerelease
+ *  @li buildmetadata
+ *
+ *  @note Unlike the officially recommended regular expression, this one does not use @c ^ or @c $
+ *  so that the semantic version section of a larger string may be matched.
+ *
+ *  @sa VersionNumber.
+ */
+
+/*!
+ *  @var QRegularExpression RegularExpression::LONG_SEMANTIC_VERSION
+ *
+ *  Same as @ref SEMANTIC_VERSION except that 4 digits are expected instead of 3, with the fourth
+ *  digit corresponding to the additional capture group 'revision'.
+ */
 }
