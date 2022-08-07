@@ -35,6 +35,8 @@ public:
             mValue = value;
             mSet = true;
         }
+
+        return *this;
     }
 };
 
