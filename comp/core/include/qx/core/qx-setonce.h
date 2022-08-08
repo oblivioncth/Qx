@@ -14,12 +14,14 @@ class SetOnce
 //-Instance Members----------------------------------------------------------------------------------------------------
 private:
     bool mSet;
+    T mDefaultValue;
     T mValue;
 
 //-Constructor-------------------------------------------------------------------------------------------------------
 public:
     SetOnce(T initial) :
         mSet(false),
+        mDefaultValue(initial),
         mValue(initial)
     {}
 
@@ -28,9 +30,15 @@ public:
     bool isSet() const { return mSet; }
     const T& value() const { return mValue; }
 
+    void reset()
+    {
+        mSet = false;
+        mValue = mDefaultValue;
+    }
+
     SetOnce<T>& operator=(const T& value)
     {
-        if(!mSet && mValue != value)
+        if(!mSet && mDefaultValue != value)
         {
             mValue = value;
             mSet = true;

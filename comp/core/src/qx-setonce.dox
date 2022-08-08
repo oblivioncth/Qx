@@ -37,10 +37,22 @@ namespace Qx
  */
 
 /*!
+ * @fn template<typename T> void SetOnce<T>::reset()
+ *
+ *  Resets the container to its initial state.
+ *
+ *  The containers value will revert to the value specified in its constructor and will be considered unset.
+ *
+ *  @sa operator=().
+ */
+
+/*!
  * @fn template<typename T> SetOnce<T>& SetOnce<T>::operator=(const T& value)
  *
  *  Sets the value of the container to @a value, if it is different from its initial value.
  *
- *  Once the containers value has been set it cannot be changed again
+ *  Once the containers value has been set it cannot be changed again until it is reset.
+ *
+ *  @sa reset().
  */
 }
