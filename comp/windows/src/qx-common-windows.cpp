@@ -235,6 +235,75 @@ QString processNameById(DWORD processID)
 }
 
 /*!
+ *  Returns a list of thread IDs, sorted by creation time (oldest to newest), for all threads
+ *  associated with the process specified by PID @a processId.
+ *
+ *  The returned list will be empty in the event of an error.
+ *
+ *  @note While likely, it is not guaranteed that the first ID in the list is that of the process'
+ *  main/original thread.
+ *
+ *  @sa processIdByName().
+ */
+QList<DWORD> processThreadIds(DWORD processId)
+{
+    // Take a snapshot of all running threads
+    HANDLE hThreadSnap = CreateToolhelp32Snapshot( TH32CS_SNAPTHREAD, 0 );
+    if(hThreadSnap == INVALID_HANDLE_VALUE)
+        return {};
+
+    // Make sure snapshot gets cleaned up
+    QScopeGuard snapshotCloser([&hThreadSnap]() { CloseHandle(hThreadSnap); });
+
+    // Thread descriptor (must manually initialize size for some reason)
+    THREADENTRY32 threadDescriptor;
+    threadDescriptor.dwSize = sizeof(THREADENTRY32);
+
+    // Retrieve info on first thread
+    if(!Thread32First(hThreadSnap, &threadDescriptor))
+        return {};
+
+    // Thread Map (used to auto sort by creation time)
+    QMap<quint64, DWORD> threadMap;
+
+    // Check each thread for those associated with process
+    do
+    {
+        if(threadDescriptor.th32OwnerProcessID == processId)
+        {
+            DWORD threadId = threadDescriptor.th32ThreadID;
+
+            // Time (Initialize to max value to ensure threads with unknown start times are place at the end of the list)
+            quint64 startTime = std::numeric_limits<quint64>::max();
+
+            // Get thread handle
+            HANDLE threadHandle = OpenThread(THREAD_QUERY_INFORMATION, false, threadId);
+            if(threadHandle != NULL)
+            {
+                FILETIME dummyFt;
+                FILETIME nativeCreationTime;
+                if(GetThreadTimes(threadHandle, &nativeCreationTime, &dummyFt, &dummyFt, &dummyFt))
+                {
+                    // Determine full file time
+                    quint64 ftMS = static_cast<quint64>(nativeCreationTime.dwHighDateTime) << 32;
+                    quint64 ftLS = static_cast<quint64>(nativeCreationTime.dwLowDateTime);
+                    startTime = ftMS | ftLS;
+                }
+
+                // Close thread handle
+                CloseHandle(threadHandle);
+            }
+
+            // Add ID to map
+            threadMap[startTime] = threadId;
+        }
+    }
+    while( Thread32Next(hThreadSnap, &threadDescriptor));
+
+    return threadMap.values();
+}
+
+/*!
  *  Returns @c true if the process with the image (executable) @a processName is currently running;
  *  otherwise returns @c false.
  */
