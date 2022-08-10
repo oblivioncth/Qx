@@ -402,6 +402,118 @@ Qx::GenericError processIsElevated(bool& elevated, DWORD processId)
     return res;
 }
 
+namespace {
+static BOOL QT_WIN_CALLBACK cleanKill(HWND hWindow, LPARAM processId)
+{
+    /* This compares target process ID to the process ID of the owner of each window
+     * since EnumWindows loops through all open windows, sending the close signal
+     * to windows that belong to the target ID. When this function returns FALSE,
+     * the invocation of EnumWindows that triggered this function will also return
+     * FALSE, and GetLastError can be used to there to obtain error information.
+     *
+     * For this reason this function returns false upon any failure so that the caller
+     * can immediately obtain said error info before it is potentially overwritten.
+     */
+    DWORD windowOwnerProcessId = 0;
+    DWORD targetProcessId = DWORD(processId);
+    GetWindowThreadProcessId(hWindow, &windowOwnerProcessId);
+    if (windowOwnerProcessId == targetProcessId)
+        if(!PostMessage(hWindow, WM_CLOSE, 0, 0))
+            return FALSE;
+
+    return TRUE;
+}
+}
+
+/*!
+ *  Closes the process referenced by @a processHandle.
+ *
+ *  The closure is performed by signaling all top-level windows of the process to close via `WM_CLOSE`,
+ *  which allows for the process to first perform cleanup or potentially prompt the user to save their
+ *  work.
+ *
+ *  If the operation fails the returned error object will contain the cause.
+ *
+ *  @parblock
+ *  @note This function is not guaranteed to end the specified process.
+ *
+ *  @note If the process has no windows (i.e. a console application), is designed to remain running with no
+ *  windows open, or otherwise doesn't process the WM_CLOSE message it will remain running. Additionally,
+ *  in the event the process presents a dialog upon receiving this signal it will continue running until
+ *  the user dismisses the dialog.
+ *  @endparblock
+ *
+ *  @note
+ *  The handle must be valid.
+ *
+ *  @sa forceKillProcess(), and QProcess::terminate();
+ */
+Qx::GenericError cleanKillProcess(HANDLE processHandle)
+{
+    // Ensure handle isn't null (doesn't assure validity)
+    if(!processHandle)
+        return translateHresult(E_HANDLE);
+
+    return cleanKillProcess(GetProcessId(processHandle));
+}
+
+/*!
+ *  @overload
+ *
+ *  Closes the process specified by @a processId.
+ */
+Qx::GenericError cleanKillProcess(DWORD processId)
+{
+    // Try to notify process to close
+    if(!EnumWindows(cleanKill, (LPARAM)processId)) // Tells all top-level windows of the process to close
+        return getLastError();
+
+    return GenericError();
+}
+
+/*!
+ *  Forcefully closes the process referenced by @a processHandle.
+ *
+ *  The closure is performed by invoking `TerminateProcess()` on the process which results
+ *  in an immediate, unclean shutdown with an exit code of @c 0xFFFF if it succeeds.
+ *
+ *  If the operation fails the returned error object will contain the cause.
+ *
+ *  @note
+ *  The handle must be valid and have been opened with the `PROCESS_TERMINATE` access right.
+ *
+ *  @sa cleanKillProcess(), and QProcess::kill();
+ */
+Qx::GenericError forceKillProcess(HANDLE processHandle)
+{
+    if(!TerminateProcess(processHandle, 0xFFFF))
+        return getLastError();
+
+    return GenericError();
+}
+
+/*!
+ *  @overload
+ *
+ *  Forcefully closes the process specified by @a processId.
+ */
+Qx::GenericError forceKillProcess(DWORD processId)
+{
+    // Open handle
+    HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, processId);
+    if(!hProcess)
+        return getLastError();
+
+    // Try kill
+    GenericError res = forceKillProcess(hProcess);
+
+    // Cleanup Handle
+    CloseHandle(hProcess);
+
+    // Return result
+    return res;
+}
+
 /*!
  *  This function is used to limit a particular application such that only one running instance is
  *  allowed at one time via a mutex. Call this function early in your program, at the point at which

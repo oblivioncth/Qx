@@ -56,6 +56,11 @@ Qx::GenericError processIsElevated(bool& elevated);
 Qx::GenericError processIsElevated(bool& elevated, HANDLE processHandle);
 Qx::GenericError processIsElevated(bool& elevated, DWORD processId);
 
+Qx::GenericError cleanKillProcess(HANDLE processHandle);
+Qx::GenericError cleanKillProcess(DWORD processId);
+Qx::GenericError forceKillProcess(HANDLE processHandle);
+Qx::GenericError forceKillProcess(DWORD processId);
+
 bool enforceSingleInstance();
 bool enforceSingleInstance(QString uniqueAppId);
 
