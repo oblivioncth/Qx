@@ -37,6 +37,17 @@ struct ShortcutProperties
 // Processes
 DWORD processIdByName(QString processName);
 QString processNameById(DWORD processID);
+QList<DWORD> processThreadIds(DWORD processId);
+
+/* TODO : DWORD processMainThreadId(DWORD processId);
+ *
+ * The best way known so far to figure this out is to use processThreadIds as a baseline and while checking
+ * the threads, use NtQueryInformationThread to get their start addresses and find the one that matches
+ * the processes start address from its PE modules header. GetModuleInformation seems to be the key.
+ *
+ * See https://docs.microsoft.com/en-us/windows/win32/psapi/module-information
+ */
+
 bool processIsRunning(QString processName);
 bool processIsRunning(DWORD processID);
 
