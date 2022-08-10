@@ -330,7 +330,7 @@ bool processIsRunning(DWORD processID) { return processNameById(processID).isNul
  *  elevated by an administrator (i.e. "Run as administrator"), or if UAC is disabled
  *  and the process was started by a user who is a member of the 'Administrators' group.
  */
-Qx::GenericError processIsElevated(bool& elevated)
+GenericError processIsElevated(bool& elevated)
 {
     HANDLE hThisProcess = GetCurrentProcess(); // Self handle doesn't need to be closed
     return processIsElevated(elevated, hThisProcess);
@@ -345,7 +345,7 @@ Qx::GenericError processIsElevated(bool& elevated)
  *  @note The handle must be valid and have been opened with the `PROCESS_QUERY_LIMITED_INFORMATION`
  *  access permission.
  */
-Qx::GenericError processIsElevated(bool& elevated, HANDLE processHandle)
+GenericError processIsElevated(bool& elevated, HANDLE processHandle)
 {
     // Default to false
     elevated = false;
@@ -373,7 +373,7 @@ Qx::GenericError processIsElevated(bool& elevated, HANDLE processHandle)
     elevated = elevationInfo.TokenIsElevated;
 
     // Return success
-    return Qx::GenericError();
+    return GenericError();
 }
 
 /*!
@@ -382,7 +382,7 @@ Qx::GenericError processIsElevated(bool& elevated, HANDLE processHandle)
  *  Sets @a elevated to true if the process specified by @a processId is running with elevated
  *  privileges; otherwise, sets it to false.
  */
-Qx::GenericError processIsElevated(bool& elevated, DWORD processId)
+GenericError processIsElevated(bool& elevated, DWORD processId)
 {
     // Default to false
     elevated = false;
@@ -448,7 +448,7 @@ static BOOL QT_WIN_CALLBACK cleanKill(HWND hWindow, LPARAM processId)
  *
  *  @sa forceKillProcess(), and QProcess::terminate();
  */
-Qx::GenericError cleanKillProcess(HANDLE processHandle)
+GenericError cleanKillProcess(HANDLE processHandle)
 {
     // Ensure handle isn't null (doesn't assure validity)
     if(!processHandle)
@@ -462,7 +462,7 @@ Qx::GenericError cleanKillProcess(HANDLE processHandle)
  *
  *  Closes the process specified by @a processId.
  */
-Qx::GenericError cleanKillProcess(DWORD processId)
+GenericError cleanKillProcess(DWORD processId)
 {
     // Try to notify process to close
     if(!EnumWindows(cleanKill, (LPARAM)processId)) // Tells all top-level windows of the process to close
@@ -484,7 +484,7 @@ Qx::GenericError cleanKillProcess(DWORD processId)
  *
  *  @sa cleanKillProcess(), and QProcess::kill();
  */
-Qx::GenericError forceKillProcess(HANDLE processHandle)
+GenericError forceKillProcess(HANDLE processHandle)
 {
     if(!TerminateProcess(processHandle, 0xFFFF))
         return getLastError();
@@ -497,7 +497,7 @@ Qx::GenericError forceKillProcess(HANDLE processHandle)
  *
  *  Forcefully closes the process specified by @a processId.
  */
-Qx::GenericError forceKillProcess(DWORD processId)
+GenericError forceKillProcess(DWORD processId)
 {
     // Open handle
     HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, processId);
@@ -561,7 +561,7 @@ bool enforceSingleInstance(QString uniqueAppId)
 /*!
  *  Returns the HRESULT value @a res as a generic error.
  */
-Qx::GenericError translateHresult(HRESULT res)
+GenericError translateHresult(HRESULT res)
 {
     BitArray resBits = BitArray::fromInteger(res);
 
@@ -571,19 +571,19 @@ Qx::GenericError translateHresult(HRESULT res)
 
     // Check for success
     if(!resBits.testBit(31))
-        return Qx::GenericError();
+        return GenericError();
 
     // Create com error instance from result
     _com_error comError(res);
 
     // Return translated error
-    return Qx::GenericError(GenericError::Error, QString::fromWCharArray(comError.ErrorMessage()));
+    return GenericError(GenericError::Error, QString::fromWCharArray(comError.ErrorMessage()));
 }
 
 /*!
  *  Returns the NTSTATUS value @a stat as a generic error.
  */
-Qx::GenericError translateNtstatus(NTSTATUS stat)
+GenericError translateNtstatus(NTSTATUS stat)
 {
     BitArray statBits = BitArray::fromInteger(stat);
 
@@ -593,7 +593,7 @@ Qx::GenericError translateNtstatus(NTSTATUS stat)
 
     // Check for success
     if(severity == 0x00)
-        return Qx::GenericError();
+        return GenericError();
 
     // Get handle to ntdll.dll.
     HMODULE hNtDll = LoadLibrary(L"NTDLL.DLL");
@@ -616,7 +616,7 @@ Qx::GenericError translateNtstatus(NTSTATUS stat)
         return GenericError::UNKNOWN_ERROR;
 
     // Return translated error
-    return Qx::GenericError(severity == 0x03 ? GenericError::Error : GenericError::Warning, QString::fromWCharArray(formatedBuffer));
+    return GenericError(severity == 0x03 ? GenericError::Error : GenericError::Warning, QString::fromWCharArray(formatedBuffer));
 }
 
 /*!
@@ -624,7 +624,7 @@ Qx::GenericError translateNtstatus(NTSTATUS stat)
  *
  *  @sa <a href="https://docs.microsoft.com/en-us/windows/win32/api/errhandlingapi/nf-errhandlingapi-getlasterror">GetLastError</a>
  */
-Qx::GenericError getLastError()
+GenericError getLastError()
 {
     DWORD error = GetLastError();
     return translateHresult(HRESULT_FROM_WIN32(error));
@@ -634,7 +634,7 @@ Qx::GenericError getLastError()
  *  Creates a shortcut on the user's filesystem at the path @a shortcutPath, with the given
  *  shortcut properties @a sp.
  */
-Qx::GenericError createShortcut(QString shortcutPath, ShortcutProperties sp)
+GenericError createShortcut(QString shortcutPath, ShortcutProperties sp)
 {
     // Check for basic argument validity
     if(sp.target.isEmpty() || shortcutPath.isEmpty() || sp.iconIndex < 0)

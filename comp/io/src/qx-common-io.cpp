@@ -312,7 +312,7 @@ IoOpReport textFileLayout(QList<int>& returnBuffer, QFile& textFile, bool ignore
     QScopeGuard fileGuard([&textFile](){ textFile.close(); });
 
     // Create Text Stream
-    Qx::TextStream fileTextStream(&textFile);
+    TextStream fileTextStream(&textFile);
 
     // Count lines
     while(!fileTextStream.atEnd())
@@ -362,7 +362,7 @@ IoOpReport textFileLineCount(int& returnBuffer, QFile& textFile, bool ignoreTrai
     QScopeGuard fileGuard([&textFile](){ textFile.close(); });
 
     // Create Text Stream
-    Qx::TextStream fileTextStream(&textFile);
+    TextStream fileTextStream(&textFile);
 
     // Count lines
     for(; !fileTextStream.atEnd(); ++returnBuffer)
@@ -616,7 +616,7 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
 
         //Last line tracker and text stream
         QString lastLine;
-        Qx::TextStream fileTextStream(&textFile);
+        TextStream fileTextStream(&textFile);
 
         if(startPos.line().isLast()) // Range of last line desired
         {
@@ -736,7 +736,7 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
 
         // Last line tracker and text stream
         QString lastLine;
-        Qx::TextStream fileTextStream(&textFile);
+        TextStream fileTextStream(&textFile);
 
         // Cover each possible range type
         if(startPos == TextPos::START && endPos == TextPos::END) // Whole file is desired
@@ -870,7 +870,7 @@ IoOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, Index32 
          // Ensure file is closed upon return
          QScopeGuard fileGuard([&textFile](){ textFile.close(); });
 
-         Qx::TextStream fileTextStream(&textFile);
+         TextStream fileTextStream(&textFile);
 
          if(startLine.isLast()) // Last line is desired
          {
@@ -1525,7 +1525,7 @@ namespace
         // Get post data if required
         if(fileInfo.exists() && writeMode == Insert)
         {
-            Qx::IoOpReport readAfter = Qx::readBytesFromFile(afterNew, auxFile, startPos);
+            IoOpReport readAfter = readBytesFromFile(afterNew, auxFile, startPos);
             if(readAfter.isFailure())
                 return readAfter;
         }

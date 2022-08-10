@@ -52,25 +52,25 @@ QList<DWORD> processThreadIds(DWORD processId);
 bool processIsRunning(QString processName);
 bool processIsRunning(DWORD processID);
 
-Qx::GenericError processIsElevated(bool& elevated);
-Qx::GenericError processIsElevated(bool& elevated, HANDLE processHandle);
-Qx::GenericError processIsElevated(bool& elevated, DWORD processId);
+GenericError processIsElevated(bool& elevated);
+GenericError processIsElevated(bool& elevated, HANDLE processHandle);
+GenericError processIsElevated(bool& elevated, DWORD processId);
 
-Qx::GenericError cleanKillProcess(HANDLE processHandle);
-Qx::GenericError cleanKillProcess(DWORD processId);
-Qx::GenericError forceKillProcess(HANDLE processHandle);
-Qx::GenericError forceKillProcess(DWORD processId);
+GenericError cleanKillProcess(HANDLE processHandle);
+GenericError cleanKillProcess(DWORD processId);
+GenericError forceKillProcess(HANDLE processHandle);
+GenericError forceKillProcess(DWORD processId);
 
 bool enforceSingleInstance();
 bool enforceSingleInstance(QString uniqueAppId);
 
 // Error codes
-Qx::GenericError translateHresult(HRESULT res);
-Qx::GenericError translateNtstatus(NTSTATUS stat);
-Qx::GenericError getLastError();
+GenericError translateHresult(HRESULT res);
+GenericError translateNtstatus(NTSTATUS stat);
+GenericError getLastError();
 
 // Filesystem
-Qx::GenericError createShortcut(QString shortcutPath, ShortcutProperties sp);
+GenericError createShortcut(QString shortcutPath, ShortcutProperties sp);
 
 }
 
