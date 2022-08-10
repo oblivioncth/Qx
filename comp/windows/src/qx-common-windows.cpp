@@ -423,6 +423,17 @@ Qx::GenericError translateNtstatus(NTSTATUS stat)
 }
 
 /*!
+ *  Returns the calling threads last error code value as a generic error.
+ *
+ *  @sa <a href="https://docs.microsoft.com/en-us/windows/win32/api/errhandlingapi/nf-errhandlingapi-getlasterror">GetLastError</a>
+ */
+Qx::GenericError getLastError()
+{
+    DWORD error = GetLastError();
+    return translateHresult(HRESULT_FROM_WIN32(error));
+}
+
+/*!
  *  Creates a shortcut on the user's filesystem at the path @a shortcutPath, with the given
  *  shortcut properties @a sp.
  */

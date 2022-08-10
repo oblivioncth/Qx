@@ -57,6 +57,7 @@ bool enforceSingleInstance(QString uniqueAppId);
 // Error codes
 Qx::GenericError translateHresult(HRESULT res);
 Qx::GenericError translateNtstatus(NTSTATUS stat);
+Qx::GenericError getLastError();
 
 // Filesystem
 Qx::GenericError createShortcut(QString shortcutPath, ShortcutProperties sp);
