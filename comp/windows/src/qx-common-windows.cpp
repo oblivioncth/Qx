@@ -174,7 +174,7 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
  *
  *  @sa processNameById().
  */
-DWORD processIdByName(QString processName)
+DWORD processId(QString processName)
 {
     // Find process ID by name
     DWORD processID = 0;
@@ -207,7 +207,7 @@ DWORD processIdByName(QString processName)
  *
  *  @sa processIdByName().
  */
-QString processNameById(DWORD processID)
+QString processName(DWORD processID)
 {
     // Find process name by ID
     QString processName = QString();
@@ -304,10 +304,43 @@ QList<DWORD> processThreadIds(DWORD processId)
 }
 
 /*!
+ *  Returns @c true if the process referred to by @a processName is currently running;
+ *  otherwise returns @c false.
+ *
+ *  @note The handle must be valid and have been opened with the `PROCESS_QUERY_INFORMATION` or
+ *  `PROCESS_QUERY_LIMITED_INFORMATION`access right.
+ */
+bool processIsRunning(HANDLE processHandle)
+{
+    DWORD exitCode;
+    if(!GetExitCodeProcess(processHandle, &exitCode))
+        return false;
+
+    if(exitCode != STILL_ACTIVE)
+        return false;
+    else
+    {
+        /* Due to a design oversight, it's possible for a process to return the value
+         * associated with STILL_ACTIVE as its exit code, which would make it look
+         * like it's still running here when it isn't, so a different method must be
+         * used to double check
+         */
+
+         // Zero timeout means check if "signaled" (i.e. dead) state immediately
+         if(WaitForSingleObject(processHandle, 0) == WAIT_TIMEOUT)
+             return true;
+         else
+             return false;
+    }
+}
+
+/*!
+ *  @overload
+ *
  *  Returns @c true if the process with the image (executable) @a processName is currently running;
  *  otherwise returns @c false.
  */
-bool processIsRunning(QString processName) { return processIdByName(processName); }
+bool processIsRunning(QString processName) { return processId(processName); }
 
 /*!
  *  @overload
@@ -315,7 +348,7 @@ bool processIsRunning(QString processName) { return processIdByName(processName)
  *  Returns @c true if the process with the PID @a processID is currently running;
  *  otherwise returns @c false.
  */
-bool processIsRunning(DWORD processID) { return processNameById(processID).isNull(); }
+bool processIsRunning(DWORD processID) { return processName(processID).isNull(); }
 
 /*!
  *  Sets @a elevated to true if the current process is running with elevated privileges; otherwise,
