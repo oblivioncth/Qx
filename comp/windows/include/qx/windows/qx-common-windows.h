@@ -48,8 +48,13 @@ QList<DWORD> processThreadIds(DWORD processId);
  * See https://docs.microsoft.com/en-us/windows/win32/psapi/module-information
  */
 
+// TODO: error check these functions like processIsElevated
 bool processIsRunning(QString processName);
 bool processIsRunning(DWORD processID);
+
+Qx::GenericError processIsElevated(bool& elevated);
+Qx::GenericError processIsElevated(bool& elevated, HANDLE processHandle);
+Qx::GenericError processIsElevated(bool& elevated, DWORD processId);
 
 bool enforceSingleInstance();
 bool enforceSingleInstance(QString uniqueAppId);

@@ -318,6 +318,91 @@ bool processIsRunning(QString processName) { return processIdByName(processName)
 bool processIsRunning(DWORD processID) { return processNameById(processID).isNull(); }
 
 /*!
+ *  Sets @a elevated to true if the current process is running with elevated privileges; otherwise,
+ *  sets it to false.
+ *
+ *  If the operation fails the returned error object will contain the cause and @a elevated will
+ *  be set to false.
+ *
+ *  @note Here 'elevated' is used in the context of Windows UAC (User Account Control).
+ *
+ *  @note A process is considered elevated if UAC is enabled and the process was
+ *  elevated by an administrator (i.e. "Run as administrator"), or if UAC is disabled
+ *  and the process was started by a user who is a member of the 'Administrators' group.
+ */
+Qx::GenericError processIsElevated(bool& elevated)
+{
+    HANDLE hThisProcess = GetCurrentProcess(); // Self handle doesn't need to be closed
+    return processIsElevated(elevated, hThisProcess);
+}
+
+/*!
+ *  @overload
+ *
+ *  Sets @a elevated to true if the process referenced by @a processHandle is running with elevated
+ *  privileges; otherwise, sets it to false.
+ *
+ *  @note The handle must be valid and have been opened with the `PROCESS_QUERY_LIMITED_INFORMATION`
+ *  access permission.
+ */
+Qx::GenericError processIsElevated(bool& elevated, HANDLE processHandle)
+{
+    // Default to false
+    elevated = false;
+
+    // Ensure handle isn't null (doesn't assure validity)
+    if(!processHandle)
+        return translateHresult(E_HANDLE);
+
+    // Get access token for process
+    HANDLE hToken;
+    if(!OpenProcessToken(processHandle, TOKEN_QUERY, &hToken))
+        return getLastError();
+
+    // Ensure token handle is cleaned up
+    QScopeGuard hTokenCleaner([&hToken]() { CloseHandle(hToken); });
+
+    // Get elevation information
+    TOKEN_ELEVATION elevationInfo = { 0 };
+    DWORD infoBufferSize; // The next function fills this as a double check
+    if(!GetTokenInformation(hToken, TokenElevation, &elevationInfo, sizeof(elevationInfo), &infoBufferSize ) )
+        return getLastError();
+    assert(infoBufferSize == sizeof(elevationInfo));
+
+    // Set return buffer
+    elevated = elevationInfo.TokenIsElevated;
+
+    // Return success
+    return Qx::GenericError();
+}
+
+/*!
+ *  @overload
+ *
+ *  Sets @a elevated to true if the process specified by @a processId is running with elevated
+ *  privileges; otherwise, sets it to false.
+ */
+Qx::GenericError processIsElevated(bool& elevated, DWORD processId)
+{
+    // Default to false
+    elevated = false;
+
+    // Get handle of process ID
+    HANDLE hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processId);
+    if(!hProcess)
+        return getLastError();
+
+    // Check elevation
+    GenericError res = processIsElevated(elevated, hProcess);
+
+    // Cleanup handle
+    CloseHandle(hProcess);
+
+    // Return result
+    return res;
+}
+
+/*!
  *  This function is used to limit a particular application such that only one running instance is
  *  allowed at one time via a mutex. Call this function early in your program, at the point at which
  *  you want additional instances to terminate, and check the result:
