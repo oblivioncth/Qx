@@ -26,9 +26,20 @@
 /*!
  *  @typedef HRESULT
  *  Same as @ref LONG
+ *
+ *  Used to hold the results of Win32 related operations.
  */
 
 /*!
  *  @typedef NTSTATUS
  *  Same as @ref LONG
+ *
+ *  Used to hold the results of WinNT related operations
+ */
+
+/*!
+ *  @typedef HANDLE
+ *  A void pointer.
+ *
+ *  Used as a reference to a Windows object.
  */
