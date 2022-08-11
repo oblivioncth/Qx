@@ -593,6 +593,8 @@ bool enforceSingleInstance(QString uniqueAppId)
 
 /*!
  *  Returns the HRESULT value @a res as a generic error.
+ *
+ *  Only the primary info portion of the error is filled.
  */
 GenericError translateHresult(HRESULT res)
 {
@@ -615,6 +617,8 @@ GenericError translateHresult(HRESULT res)
 
 /*!
  *  Returns the NTSTATUS value @a stat as a generic error.
+ *
+ *  Only the primary info portion of the error is filled.
  */
 GenericError translateNtstatus(NTSTATUS stat)
 {
