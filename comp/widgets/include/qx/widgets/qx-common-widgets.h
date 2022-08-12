@@ -11,7 +11,8 @@
 namespace Qx
 {
 //-Namespace Functions-------------------------------------------------------------------------------------------------
-int postError(GenericError error,
+void postError(GenericError error);
+int postBlockingError(GenericError error,
               QMessageBox::StandardButtons choices = QMessageBox::Ok,
               QMessageBox::StandardButton defChoice = QMessageBox::NoButton);
 

@@ -12,9 +12,14 @@ set(COMPONENT_INCLUDE_HEADERS
     qx-treeinputdialog.h
 )
 
+set(COMPONENT_PRIVATE_HEADERS
+    qx-common-widgets_p.h
+)
+
 # Source Files
 set(COMPONENT_IMPL
     qx-common-widgets.cpp
+    qx-common-widgets_p.cpp
     qx-logindialog.cpp
     qx-standarditemmodel.cpp
     qx-treeinputdialog.cpp

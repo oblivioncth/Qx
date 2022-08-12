@@ -1,5 +1,6 @@
 // Unit Includes
 #include "qx/widgets/qx-common-widgets.h"
+#include "qx-common-widgets_p.h"
 
 /*!
  *  @file qx-common-widgets.h
@@ -16,11 +17,6 @@ namespace Qx
 /*!
  *  Displays @a error using a QMessageBox.
  *
- *  @param error The error to display.
- *  @param choices The different option buttons to display.
- *  @param defChoice The default button that is selected.
- *  @return The value of the selected button.
- *
  *  As an example, this code:
  *  @snippet qx-common-widgets.cpp 0
  *
@@ -28,41 +24,41 @@ namespace Qx
  *
  *  @image{inline} html qx-common-widgets-0.png
  *
- *  @note This function only works with QMessageBox::StandardButton, not with custom buttons.
+ *  @note This function does not block and returns immediately. The QMessageBox object is automatically deleted
+ *  after it is closed.
+ *
+ *  @sa postBlockingError().
  */
-int postError(GenericError error, QMessageBox::StandardButtons choices, QMessageBox::StandardButton defChoice)
+void postError(GenericError error)
 {
-    // Determine icon
-    QMessageBox::Icon icon;
+    // Prepare dialog
+    QMessageBox* genericErrorMessage = new QMessageBox();
+    prepareErrorPostBox(error, *genericErrorMessage);
+    genericErrorMessage->setAttribute(Qt::WA_DeleteOnClose); // Prevents memory leak
 
-    switch(error.errorLevel())
-    {
-        case GenericError::Warning:
-            icon = QMessageBox::Warning;
-            break;
+    // Show dialog
+    genericErrorMessage->show();
+}
 
-        case GenericError::Error:
-            icon = QMessageBox::Critical;
-            break;
-
-        case GenericError::Critical:
-            icon = QMessageBox::Critical;
-            break;
-    }
-
+/*!
+ *  Displays @a error using a QMessageBox, blocks until it's closed, and finally returns the button that was selected.
+ *
+ *  @param error The error to display.
+ *  @param choices The different option buttons to display.
+ *  @param defChoice The default button that is selected.
+ *  @return The value of the selected button.
+ *
+ *  @note This function only works with QMessageBox::StandardButton, not with custom buttons.
+ *
+ *  @sa postError().
+ */
+int postBlockingError(GenericError error, QMessageBox::StandardButtons choices, QMessageBox::StandardButton defChoice)
+{
     // Prepare dialog
     QMessageBox genericErrorMessage;
-    genericErrorMessage.setText(error.primaryInfo());
+    prepareErrorPostBox(error, genericErrorMessage);
     genericErrorMessage.setStandardButtons(choices);
     genericErrorMessage.setDefaultButton(defChoice);
-    genericErrorMessage.setIcon(icon);
-
-    if(!error.caption().isEmpty())
-        genericErrorMessage.setWindowTitle(error.caption());
-    if(!error.secondaryInfo().isEmpty())
-        genericErrorMessage.setInformativeText(error.secondaryInfo());
-    if(!error.detailedInfo().isEmpty())
-        genericErrorMessage.setDetailedText(error.detailedInfo());
 
     // Show dialog and return user response
     return genericErrorMessage.exec();
