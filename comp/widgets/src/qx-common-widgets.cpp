@@ -15,7 +15,7 @@ namespace Qx
 //-Namespace Functions-------------------------------------------------------------------------------------------------
 
 /*!
- *  Displays @a error using a QMessageBox.
+ *  Displays @a error using a QMessageBox with an @c OK button.
  *
  *  As an example, this code:
  *  @snippet qx-common-widgets.cpp 0
@@ -34,6 +34,8 @@ void postError(GenericError error)
     // Prepare dialog
     QMessageBox* genericErrorMessage = new QMessageBox();
     prepareErrorPostBox(error, *genericErrorMessage);
+    genericErrorMessage->setStandardButtons(QMessageBox::Ok);
+    genericErrorMessage->setDefaultButton(QMessageBox::Ok);
     genericErrorMessage->setAttribute(Qt::WA_DeleteOnClose); // Prevents memory leak
 
     // Show dialog
