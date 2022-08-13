@@ -1,20 +1,18 @@
-#ifndef QX_FILESTREAMREADER_H
-#define QX_FILESTREAMREADER_H
+#ifndef QX_TEXTSTREAMREADER_H
+#define QX_TEXTSTREAMREADER_H
 
 // Qt Includes
-#include <QDataStream>
+#include <QTextStream>
 #include <QFile>
 
 // Intra-component Includes
+#include "qx/io/qx-common-io.h"
 #include "qx/io/qx-ioopreport.h"
-
-// Extra-component Includes
-#include "qx/utility/qx-concepts.h"
 
 namespace Qx
 {
 
-class FileStreamReader // Specialized wrapper for QDataStream
+class TextStreamReader
 {
 //-Class Variables------------------------------------------------------------------------------------------------
 private:
@@ -23,17 +21,17 @@ private:
 //-Instance Variables------------------------------------------------------------------------------------------------
 private:
     QFile* mFile;
-    QDataStream mStreamReader;
+    QTextStream mStreamReader;
     IoOpReport mStatus;
 
 //-Constructor-------------------------------------------------------------------------------------------------------
 public:
-    FileStreamReader();
-    FileStreamReader(const QString& filePath);
+    TextStreamReader();
+    TextStreamReader(const QString& filePath);
 
 //-Destructor-------------------------------------------------------------------------------------------------------
 public:
-    ~FileStreamReader();
+    ~TextStreamReader();
 
 //-Instance Functions------------------------------------------------------------------------------------------------
 private:
@@ -45,18 +43,29 @@ private:
 public:
     // Stock functions
     bool atEnd() const;
-    QDataStream::ByteOrder byteOrder() const;
-    QDataStream::FloatingPointPrecision floatingPointPrecision() const;
-    IoOpReport readRawData(QByteArray& data, int len);
+    bool autoDetectUnicode() const;
+    QStringConverter::Encoding encoding() const;
+    int integerBase() const;
+    QLocale locale() const;
+    qint64 pos() const;
+    QString	read(qint64 maxlen);
+    QString	readAll();
+    QString	readLine(qint64 maxlen = 0);
+    IoOpReport readLineInto(QString* line, qint64 maxlen = 0);
+    QTextStream::RealNumberNotation realNumberNotation() const;
+    void reset();
     void resetStatus();
-    void setByteOrder(QDataStream::ByteOrder bo);
-    void setFloatingPointPrecision(QDataStream::FloatingPointPrecision precision);
-    IoOpReport skipRawData(int len);
-    IoOpReport status() const ;
+    void setAutoDetectUnicode(bool enabled);
+    void setEncoding(QStringConverter::Encoding encoding);
+    void setIntegerBase(int base);
+    void setLocale(const QLocale& locale);
+    void setRealNumberNotation(QTextStream::RealNumberNotation notation);
+    void skipWhiteSpace();
+    IoOpReport status() const;
 
     template<typename T>
-        requires defines_right_shift_for<QDataStream, T&>
-    FileStreamReader& operator>>(T& d)
+        requires defines_right_shift_for<QTextStream, T&>
+    TextStreamReader& operator>>(T& d)
     {
         IoOpReport check = preReadErrorCheck();
 
@@ -77,8 +86,7 @@ public:
     IoOpReport openFile();
     void closeFile();
     bool fileIsOpen() const;
-};	
+};
 
 }
-
-#endif // QX_FILESTREAMREADER_H
+#endif // QX_TEXTSTREAMREADER_H

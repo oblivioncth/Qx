@@ -39,81 +39,94 @@ const QHash<QDataStream::Status, IoOpResultType> DATA_STRM_STAT_MAP = {
 };
 
 //-Component Private Functions-------------------------------------------------------------------------------------------------
-IoOpResultType parsedOpen(QFile& file, QIODevice::OpenMode openMode)
+Existance existanceReqFromWriteOptions(WriteOptions wo)
 {
-	if(file.open(openMode))
+    if(wo.testFlag(WriteOption::ExistingOnly))
+        return Existance::Exist;
+    else if(wo.testFlag(WriteOption::NewOnly))
+        return Existance::NotExist;
+    else
+        return Existance::Either;
+}
+
+IoOpResultType parsedOpen(QFileDevice* file, QIODevice::OpenMode openMode)
+{
+    if(file->open(openMode))
 		return IO_SUCCESS;
 	else
-		return FILE_DEV_ERR_MAP.value(file.error());
+        return FILE_DEV_ERR_MAP.value(file->error());
 }
 
-IoOpResultType fileCheck(const QFile& file)
+IoOpResultType fileCheck(const QFileInfo& fileInfo, Existance existanceRequirement)
 {
-	if(file.exists())
+    if(fileInfo.filePath().isEmpty())
+        return IO_ERR_NULL;
+
+    if(fileInfo.exists())
 	{
-		if(QFileInfo(file).isFile())
+        if(!fileInfo.isFile())
+           return IO_ERR_WRONG_TYPE;
+        else if(existanceRequirement == Existance::NotExist)
+            return IO_ERR_EXISTS;
+        else
+			return IO_SUCCESS;
+	}
+    else if(existanceRequirement == Existance::Exist)
+        return IO_ERR_DNE;
+    else
+        return IO_SUCCESS;
+}
+
+IoOpResultType directoryCheck(const QFileInfo& dirInfo)
+{
+    if(dirInfo.filePath().isEmpty())
+        return IO_ERR_NULL;
+
+    if(dirInfo.exists())
+	{
+        if(dirInfo.isDir())
 			return IO_SUCCESS;
 		else
-			return IO_ERR_NOT_A_FILE;
+            return IO_ERR_WRONG_TYPE;
 	}
 	else
-		return IO_ERR_FILE_DNE;
+        return IO_ERR_DNE;
 }
 
-IoOpResultType directoryCheck(QDir& dir)
-{
-	if(dir.exists())
-	{
-		if(QFileInfo(dir.absolutePath()).isDir())
-			return IO_SUCCESS;
-		else
-			return IO_ERR_NOT_A_DIR;
-	}
-	else
-		return IO_ERR_DIR_DNE;
-}
-
-IoOpReport handlePathCreation(const QFile& file, bool createPaths)
+IoOpReport handlePathCreation(const QFileInfo& fileInfo, bool createPaths)
 {
 	// Make folders if wanted and necessary
-	QDir filePath(QFileInfo(file).absolutePath());
-	IoOpResultType dirCheckResult = directoryCheck(filePath);
+    QDir fileDir = fileInfo.absoluteDir();
 
-	if(dirCheckResult == IO_ERR_NOT_A_DIR || (dirCheckResult == IO_ERR_DIR_DNE && !createPaths))
-		return IoOpReport(IO_OP_WRITE, dirCheckResult, file);
-	else if(dirCheckResult == IO_ERR_DIR_DNE)
-	{
-		if(!QDir().mkpath(filePath.absolutePath()))
-			return IoOpReport(IO_OP_WRITE, IO_ERR_CANT_MAKE_DIR, file);
-	}
+    if(!fileDir.exists())
+    {
+        if(createPaths && !fileDir.mkpath("."))
+            return IoOpReport(IO_OP_WRITE, IO_ERR_CANT_CREATE, fileInfo);
+        else
+            return IoOpReport(IO_OP_WRITE, IO_ERR_DNE, fileInfo);
+    }
 
-	return IoOpReport(IO_OP_WRITE, IO_SUCCESS, file);
+    return IoOpReport(IO_OP_WRITE, IO_SUCCESS, fileInfo);
 }
 
-IoOpReport writePrep(bool& fileExists, QFile& file, WriteOptions writeOptions)
+IoOpReport writePrep(const QFileInfo& fileInfo, WriteOptions writeOptions)
 {
 	// Check file
-	IoOpResultType fileCheckResult = fileCheck(file);
-	fileExists = fileCheckResult == IO_SUCCESS;
-
-	if(fileCheckResult == IO_ERR_NOT_A_FILE)
-		return IoOpReport(IO_OP_WRITE, IO_ERR_NOT_A_FILE, file);
-	else if(fileCheckResult == IO_ERR_FILE_DNE && writeOptions.testFlag(ExistingOnly))
-		return IoOpReport(IO_OP_WRITE, IO_ERR_FILE_DNE, file);
-	else if(fileExists && writeOptions.testFlag(NewOnly))
-		return IoOpReport(IO_OP_WRITE, IO_ERR_FILE_EXISTS, file);
+    IoOpResultType fileCheckResult = fileCheck(fileInfo, existanceReqFromWriteOptions(writeOptions));
+    if(fileCheckResult != IO_SUCCESS)
+        return IoOpReport(IO_OP_WRITE, fileCheckResult, fileInfo);
 
 	// Create Path if required
-	if(!fileExists)
+    if(!fileInfo.exists())
 	{
 		// Make folders if wanted and necessary
-		IoOpReport pathCreationResult = handlePathCreation(file, writeOptions.testFlag(CreatePath));
-		if(!pathCreationResult.wasSuccessful())
+        IoOpReport pathCreationResult = handlePathCreation(fileInfo, writeOptions.testFlag(CreatePath));
+        if(pathCreationResult.isFailure())
 			return pathCreationResult;
 	}
 
 	// Return success
-	return IoOpReport(IO_OP_WRITE, IO_SUCCESS, file);
+    return IoOpReport(IO_OP_WRITE, IO_SUCCESS, fileInfo);
 }
 
 void matchAppendConditionParams(WriteMode& writeMode, TextPos& startPos)

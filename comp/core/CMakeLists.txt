@@ -24,6 +24,7 @@ set(COMPONENT_INCLUDE_HEADERS
     qx-progressgroup.h
     qx-versionnumber.h
     qx-regularexpression.h
+    qx-setonce.h
     qx-string.h
     qx-traverser.h
 )
@@ -58,6 +59,7 @@ set(COMPONENT_DOC_ONLY
     qx-traverser.dox
     qx-cumulation.dox
     qx-array.dox
+    qx-setonce.dox
 )
 
 # Links

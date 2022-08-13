@@ -17,7 +17,7 @@ option(QX_DOCS_TARGET "Build Qx documentation" OFF)
 # NOTE: For versions stick to w.x.y.z, where z is generally
 # avoided and only used for hotfixes. DON'T USE TRAILING
 # ZEROS IN VERSIONS
-set(QX_BASE_VERSION 0.3.0.3) # Required for CI/CD
+set(QX_BASE_VERSION 0.3.1) # Required for CI/CD
 project(Qx
     VERSION ${QX_BASE_VERSION}
     LANGUAGES CXX
@@ -159,15 +159,9 @@ endforeach()
 
 if(QX_DOCS_TARGET)
     # Find Doxygen package
-    find_package(Doxygen 1.9.4
+    find_package(Doxygen 1.9.4 REQUIRED
                  COMPONENTS dot
-                 OPTIONAL_COMPONENTS mscgen dia
     )
-
-    # Require Doxygen
-    if(NOT DOXYGEN_FOUND)
-        message(FATAL_ERROR "Doxygen not available, documentation cannot not be built!")
-    endif()
 
     # Configure files
     configure_file("${FILE_TEMPLATES_PATH}/doc_mainpage.md.in"

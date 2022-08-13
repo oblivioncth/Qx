@@ -209,7 +209,7 @@ TaskbarButton::TaskbarButton(QObject *parent) :
     {
         mTaskbarInterface = nullptr;
 
-        const GenericError err = Qx::translateHresult(hresult);
+        const GenericError err = translateHresult(hresult);
         QString errStr;
         QTextStream es(&errStr);
         es << err;
@@ -220,7 +220,7 @@ TaskbarButton::TaskbarButton(QObject *parent) :
         mTaskbarInterface->Release();
         mTaskbarInterface = nullptr;
 
-        const GenericError err = Qx::translateHresult(hresult);
+        const GenericError err = translateHresult(hresult);
         QString errStr;
         QTextStream es(&errStr);
         es << err;
@@ -458,7 +458,7 @@ void TaskbarButton::setProgressRange(int progressMinimum, int progressMaximum)
 /*!
  *  Sets the display state of the taskbar button's progress indicator.
  */
-void TaskbarButton::setProgressState(Qx::TaskbarButton::ProgressState progressState)
+void TaskbarButton::setProgressState(TaskbarButton::ProgressState progressState)
 {
     if(progressState == mProgressState)
         return;
@@ -494,7 +494,7 @@ void TaskbarButton::resetProgress() { setProgressValue(mProgressMinimum); }
  */
 
 /*!
- *  @fn void TaskbarButton::progressStateChanged(Qx::TaskbarButton::ProgressState progressState)
+ *  @fn void TaskbarButton::progressStateChanged(TaskbarButton::ProgressState progressState)
  *
  *  This signal is emitted whenever the taskbar button's progress display state changes.
  */

@@ -54,13 +54,8 @@ namespace Qx
  */
 
 /*!
- *  @var IoOpType IoOpType::IO_ERR_NOT_A_FILE
- *  The operation target exists, but is not a file as expected.
- */
-
-/*!
- *  @var IoOpType IoOpType::IO_ERR_NOT_A_DIR
- *  The operation target exists, but is not a directory as expected.
+ *  @var IoOpType IoOpType::IO_ERR_WRONG_TYPE
+ *  The operation target exists, but is of the wrong type.
  */
 
 /*!
@@ -124,23 +119,23 @@ namespace Qx
  */
 
 /*!
- *  @var IoOpType IoOpType::IO_ERR_FILE_DNE
- *  The target file does not exist.
+ *  @var IoOpType IoOpType::IO_ERR_DNE
+ *  The target does not exist.
  */
 
 /*!
- *  @var IoOpType IoOpType::IO_ERR_DIR_DNE
- *  The target directory does not exist.
+ *  @var IoOpType IoOpType::IO_ERR_NULL
+ *  The specified target was null.
  */
 
 /*!
- *  @var IoOpType IoOpType::IO_ERR_FILE_EXISTS
- *  The file's destination is already occupied.
+ *  @var IoOpType IoOpType::IO_ERR_EXISTS
+ *  The target path is already occupied.
  */
 
 /*!
- *  @var IoOpType IoOpType::IO_ERR_CANT_MAKE_DIR
- *  A directory could not be created.
+ *  @var IoOpType IoOpType::IO_ERR_CANT_CREATE
+ *  The target could not be created.
  */
 
 /*!
@@ -190,13 +185,17 @@ namespace Qx
 //Public:
 /*!
  *  Creates a null IO operation report.
+ *
+ *  @sa isNull() and isFailure().
  */
 IoOpReport::IoOpReport() :
     mNull(true),
     mOperation(IO_OP_ENUMERATE),
     mResult(IO_SUCCESS),
     mTargetType(IO_FILE),
-    mTarget(QString())
+    mTarget(),
+    mOutcome(),
+    mOutcomeInfo()
 {}
 
 /*!
@@ -208,13 +207,43 @@ IoOpReport::IoOpReport() :
  *
  *  @note @a tar is only used for descriptive purposes and the reference is not kept
  */
-IoOpReport::IoOpReport(IoOpType op, IoOpResultType res, const QFile& tar) :
+IoOpReport::IoOpReport(IoOpType op, IoOpResultType res, const QFileDevice& tar) :
     mNull(false),
     mOperation(op),
     mResult(res),
     mTargetType(IO_FILE),
     mTarget(tar.fileName())
 {
+    parseOutcome();
+}
+
+/*!
+ *  @overload
+ *
+ *  Creates an IO operation report for a file target.
+ *  If @a tar is @c nulltpr, @a res is ignored and the resultant report will indicate
+ *  a null file error.
+ *
+ *  @param op The type of operation
+ *  @param res The type of result.
+ *  @param tar The target file.
+ *
+ *  @note @a tar is only used for descriptive purposes and the pointer is not kept
+ */
+IoOpReport::IoOpReport(IoOpType op, IoOpResultType res, const QFileDevice* tar) :
+    mNull(false),
+    mOperation(op),
+    mResult(res),
+    mTargetType(IO_FILE)
+{
+    if(tar)
+        mTarget = tar->fileName();
+    else
+    {
+        mTarget = NULL_TARGET;
+        mResult = IO_ERR_NULL;
+    }
+
     parseOutcome();
 }
 
@@ -237,8 +266,87 @@ IoOpReport::IoOpReport(IoOpType op, IoOpResultType res, const QDir& tar) :
     parseOutcome();
 }
 
+/*!
+ *  @overload
+ *
+ *  Creates an IO operation report for a directory target.
+ *
+ *  If @a tar is @c nulltpr, @a res is ignored and the resultant report will indicate
+ *  a null directory error.
+ *
+ *  @param op The type of operation
+ *  @param res The type of result.
+ *  @param tar The target directory.
+ *
+ *  @note @a tar is only used for descriptive purposes and the pointer is not kept
+ */
+IoOpReport::IoOpReport(IoOpType op, IoOpResultType res, const QDir* tar) :
+     mNull(false),
+     mOperation(op),
+     mResult(res),
+     mTargetType(IO_DIR)
+{
+    if(tar)
+        mTarget = tar->absolutePath();
+    else
+    {
+        mTarget = NULL_TARGET;
+        mResult = IO_ERR_NULL;
+    }
+
+    parseOutcome();
+}
+
+/*!
+ *  @overload
+ *
+ *  Creates an IO operation report for a target described by @a tar.
+ *
+ *  The target type is automatically determined. If the target path is empty, @a res
+ *  is ignored and the resultant report will indicate a null file/directory error.
+ *
+ *  @param op The type of operation
+ *  @param res The type of result.
+ *  @param tar A QFileInfo object that contains the target path.
+ *
+ *  @note @a tar is only used for descriptive purposes and the reference is not kept
+ */
+IoOpReport::IoOpReport(IoOpType op, IoOpResultType res, const QFileInfo& tar) :
+    mNull(false),
+    mOperation(op),
+    mResult(res)
+{
+    if(tar.filePath().isEmpty())
+    {
+        mTargetType = IO_FILE;
+        mTarget = NULL_TARGET;
+        mResult = IO_ERR_NULL;
+    }
+    else
+    {
+        mTargetType = tar.isDir() ? IO_DIR : IO_FILE; // Defaults to file
+        mTarget = tar.absoluteFilePath();
+    }
+
+    parseOutcome();
+}
 
 //-Instance Functions--------------------------------------------------------------------------------------------
+//Private:
+void IoOpReport::parseOutcome()
+{
+    QString typeString = TARGET_TYPE_STRINGS.value(mTargetType);
+
+    if(mResult == IO_SUCCESS)
+        mOutcome = SUCCESS_TEMPLATE.arg(SUCCESS_VERBS.value(mOperation), typeString, QDir::toNativeSeparators(mTarget));
+    else
+    {
+        mOutcome = ERROR_TEMPLATE.arg(ERROR_VERBS.value(mOperation), typeString, QDir::fromNativeSeparators(mTarget));
+        QString infoTemplate = ERROR_INFO.value(mResult);
+        mOutcomeInfo = infoTemplate.replace(TYPE_MACRO, typeString);
+    }
+}
+
 //Public:
 /*!
  *  Returns the type of operation.
@@ -271,26 +379,30 @@ QString IoOpReport::outcome() const { return mOutcome; }
 QString IoOpReport::outcomeInfo() const { return mOutcomeInfo; }
 
 /*!
- *  Returns @c true if the operation was successful; otherwise returns @c false.
+ *  Returns @c true if the described operation failed; otherwise returns @c false.
+ *
+ *  A null IoOpReport is not considered to describe a failure.
  */
-bool IoOpReport::wasSuccessful() const { return mResult == IO_SUCCESS; }
+bool IoOpReport::isFailure() const { return mResult != IO_SUCCESS; }
 
 /*!
  *  Returns @c true if the report is null; otherwise returns @c false.
  */
 bool IoOpReport::isNull() const { return mNull; }
 
-//Private:
-void IoOpReport::parseOutcome()
+/*!
+ *  Returns a GenericError that describes the outcome of the IO operation.
+ *
+ *  An invalid (non-error) GenericError is returned if the report describes a successful operation.
+ *
+ *  @sa outcome(), and outcomeInfo().
+ */
+GenericError IoOpReport::toGenericError() const
 {
-    if(mResult == IO_SUCCESS)
-        mOutcome = SUCCESS_TEMPLATE.arg(SUCCESS_VERBS.value(mOperation), TARGET_TYPES.value(mTargetType), QDir::toNativeSeparators(mTarget));
+    if(isFailure())
+        return GenericError();
     else
-    {
-        mOutcome = ERROR_TEMPLATE.arg(ERROR_VERBS.value(mOperation), TARGET_TYPES.value(mTargetType), QDir::fromNativeSeparators(mTarget));
-        mOutcomeInfo = ERROR_INFO.value(mResult);
-    }
-
+        return GenericError(GenericError::Error, outcome(), outcomeInfo());
 }
 
 }

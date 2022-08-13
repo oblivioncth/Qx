@@ -301,18 +301,15 @@ void AsyncDownloadManager::pushDownloadsUntilFinished()
 
 void AsyncDownloadManager::startDownload(DownloadTask task)
 {
-    // Create file handle
-    QFile* file = new QFile(task.dest, this); // Parent constructor ensures deletion when 'this' is deleted
-
     // Create stream writer
     WriteOptions wo = WriteOption::CreatePath;
     if(!mOverwrite)
         wo |= WriteOption::NewOnly;
-    std::shared_ptr<FileStreamWriter> fileWriter = std::make_shared<FileStreamWriter>(file, WriteMode::Truncate, wo);
+    std::shared_ptr<FileStreamWriter> fileWriter = std::make_shared<FileStreamWriter>(task.dest, WriteMode::Truncate, wo);
 
     // Open file
     IoOpReport streamOpen = fileWriter->openFile();
-    if(!streamOpen.wasSuccessful())
+    if(streamOpen.isFailure())
     {
         forceFinishProgress(task);
         recordFinishedDownload(DownloadOpReport::failedDownload(task, streamOpen.outcome() + ": " + streamOpen.outcomeInfo()));
@@ -655,10 +652,11 @@ void AsyncDownloadManager::readyReadHandler()
     std::shared_ptr<FileStreamWriter> writer = mActiveWriters[senderNetworkReply];
     IoOpReport wr = writer->writeRawData(senderNetworkReply->readAll());
 
-    if(!wr.wasSuccessful())
+    if(wr.isFailure())
     {
         // Close and delete file, finished handler will use this info to create correct report
-        writer->file()->remove(); // Closes file first
+        writer->closeFile();
+        QFile::remove(writer->filePath());
 
         if(mStopOnError)
             stopOnError();
@@ -776,7 +774,7 @@ void AsyncDownloadManager::downloadFinishedHandler(QNetworkReply* reply)
         QNetworkReply::NetworkError error = reply->error();
         bool abortLike = error == QNetworkReply::OperationCanceledError;
         bool timeout = abortLike && mStatus != Status::StoppingOnError && mStatus != Status::Aborting;
-        bool writeError = abortLike && !fileWriter->file()->isOpen();
+        bool writeError = abortLike && !fileWriter->fileIsOpen();
 
         // Handle this error
         forceFinishProgress(task);
@@ -809,7 +807,6 @@ void AsyncDownloadManager::downloadFinishedHandler(QNetworkReply* reply)
 
     // Cleanup writer
     fileWriter->closeFile();
-    delete fileWriter->file();
 
     // Remove from active writers
     mActiveWriters.remove(reply);

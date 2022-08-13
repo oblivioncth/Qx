@@ -77,7 +77,7 @@ namespace Qx
  * @typedef StringTraverser
  * @ingroup qx-core
  *
- * A convenience synonym for Traverser<QString>
+ * A convenience synonym for @ref Qx::Traverser<QString>
  */
 }
 

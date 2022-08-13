@@ -174,7 +174,7 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
  *
  *  @sa processNameById().
  */
-DWORD processIdByName(QString processName)
+DWORD processId(QString processName)
 {
     // Find process ID by name
     DWORD processID = 0;
@@ -207,7 +207,7 @@ DWORD processIdByName(QString processName)
  *
  *  @sa processIdByName().
  */
-QString processNameById(DWORD processID)
+QString processName(DWORD processID)
 {
     // Find process name by ID
     QString processName = QString();
@@ -235,10 +235,112 @@ QString processNameById(DWORD processID)
 }
 
 /*!
+ *  Returns a list of thread IDs, sorted by creation time (oldest to newest), for all threads
+ *  associated with the process specified by PID @a processId.
+ *
+ *  The returned list will be empty in the event of an error.
+ *
+ *  @note While likely, it is not guaranteed that the first ID in the list is that of the process'
+ *  main/original thread.
+ *
+ *  @sa processIdByName().
+ */
+QList<DWORD> processThreadIds(DWORD processId)
+{
+    // Take a snapshot of all running threads
+    HANDLE hThreadSnap = CreateToolhelp32Snapshot( TH32CS_SNAPTHREAD, 0 );
+    if(hThreadSnap == INVALID_HANDLE_VALUE)
+        return {};
+
+    // Make sure snapshot gets cleaned up
+    QScopeGuard snapshotCloser([&hThreadSnap]() { CloseHandle(hThreadSnap); });
+
+    // Thread descriptor (must manually initialize size for some reason)
+    THREADENTRY32 threadDescriptor;
+    threadDescriptor.dwSize = sizeof(THREADENTRY32);
+
+    // Retrieve info on first thread
+    if(!Thread32First(hThreadSnap, &threadDescriptor))
+        return {};
+
+    // Thread Map (used to auto sort by creation time)
+    QMap<quint64, DWORD> threadMap;
+
+    // Check each thread for those associated with process
+    do
+    {
+        if(threadDescriptor.th32OwnerProcessID == processId)
+        {
+            DWORD threadId = threadDescriptor.th32ThreadID;
+
+            // Time (Initialize to max value to ensure threads with unknown start times are place at the end of the list)
+            quint64 startTime = std::numeric_limits<quint64>::max();
+
+            // Get thread handle
+            HANDLE threadHandle = OpenThread(THREAD_QUERY_INFORMATION, false, threadId);
+            if(threadHandle != NULL)
+            {
+                FILETIME dummyFt;
+                FILETIME nativeCreationTime;
+                if(GetThreadTimes(threadHandle, &nativeCreationTime, &dummyFt, &dummyFt, &dummyFt))
+                {
+                    // Determine full file time
+                    quint64 ftMS = static_cast<quint64>(nativeCreationTime.dwHighDateTime) << 32;
+                    quint64 ftLS = static_cast<quint64>(nativeCreationTime.dwLowDateTime);
+                    startTime = ftMS | ftLS;
+                }
+
+                // Close thread handle
+                CloseHandle(threadHandle);
+            }
+
+            // Add ID to map
+            threadMap[startTime] = threadId;
+        }
+    }
+    while( Thread32Next(hThreadSnap, &threadDescriptor));
+
+    return threadMap.values();
+}
+
+/*!
+ *  Returns @c true if the process referred to by @a processName is currently running;
+ *  otherwise returns @c false.
+ *
+ *  @note The handle must be valid and have been opened with the `PROCESS_QUERY_INFORMATION` or
+ *  `PROCESS_QUERY_LIMITED_INFORMATION`access right.
+ */
+bool processIsRunning(HANDLE processHandle)
+{
+    DWORD exitCode;
+    if(!GetExitCodeProcess(processHandle, &exitCode))
+        return false;
+
+    if(exitCode != STILL_ACTIVE)
+        return false;
+    else
+    {
+        /* Due to a design oversight, it's possible for a process to return the value
+         * associated with STILL_ACTIVE as its exit code, which would make it look
+         * like it's still running here when it isn't, so a different method must be
+         * used to double check
+         */
+
+         // Zero timeout means check if "signaled" (i.e. dead) state immediately
+         if(WaitForSingleObject(processHandle, 0) == WAIT_TIMEOUT)
+             return true;
+         else
+             return false;
+    }
+}
+
+/*!
+ *  @overload
+ *
  *  Returns @c true if the process with the image (executable) @a processName is currently running;
  *  otherwise returns @c false.
  */
-bool processIsRunning(QString processName) { return processIdByName(processName); }
+bool processIsRunning(QString processName) { return processId(processName); }
 
 /*!
  *  @overload
@@ -246,7 +348,204 @@ bool processIsRunning(QString processName) { return processIdByName(processName)
  *  Returns @c true if the process with the PID @a processID is currently running;
  *  otherwise returns @c false.
  */
-bool processIsRunning(DWORD processID) { return processNameById(processID).isNull(); }
+bool processIsRunning(DWORD processID) { return processName(processID).isNull(); }
+
+/*!
+ *  Sets @a elevated to true if the current process is running with elevated privileges; otherwise,
+ *  sets it to false.
+ *
+ *  If the operation fails the returned error object will contain the cause and @a elevated will
+ *  be set to false.
+ *
+ *  @note Here 'elevated' is used in the context of Windows UAC (User Account Control).
+ *
+ *  @note A process is considered elevated if UAC is enabled and the process was
+ *  elevated by an administrator (i.e. "Run as administrator"), or if UAC is disabled
+ *  and the process was started by a user who is a member of the 'Administrators' group.
+ */
+GenericError processIsElevated(bool& elevated)
+{
+    HANDLE hThisProcess = GetCurrentProcess(); // Self handle doesn't need to be closed
+    return processIsElevated(elevated, hThisProcess);
+}
+
+/*!
+ *  @overload
+ *
+ *  Sets @a elevated to true if the process referenced by @a processHandle is running with elevated
+ *  privileges; otherwise, sets it to false.
+ *
+ *  @note The handle must be valid and have been opened with the `PROCESS_QUERY_LIMITED_INFORMATION`
+ *  access permission.
+ */
+GenericError processIsElevated(bool& elevated, HANDLE processHandle)
+{
+    // Default to false
+    elevated = false;
+
+    // Ensure handle isn't null (doesn't assure validity)
+    if(!processHandle)
+        return translateHresult(E_HANDLE);
+
+    // Get access token for process
+    HANDLE hToken;
+    if(!OpenProcessToken(processHandle, TOKEN_QUERY, &hToken))
+        return getLastError();
+
+    // Ensure token handle is cleaned up
+    QScopeGuard hTokenCleaner([&hToken]() { CloseHandle(hToken); });
+
+    // Get elevation information
+    TOKEN_ELEVATION elevationInfo = { 0 };
+    DWORD infoBufferSize; // The next function fills this as a double check
+    if(!GetTokenInformation(hToken, TokenElevation, &elevationInfo, sizeof(elevationInfo), &infoBufferSize ) )
+        return getLastError();
+    assert(infoBufferSize == sizeof(elevationInfo));
+
+    // Set return buffer
+    elevated = elevationInfo.TokenIsElevated;
+
+    // Return success
+    return GenericError();
+}
+
+/*!
+ *  @overload
+ *
+ *  Sets @a elevated to true if the process specified by @a processId is running with elevated
+ *  privileges; otherwise, sets it to false.
+ */
+GenericError processIsElevated(bool& elevated, DWORD processId)
+{
+    // Default to false
+    elevated = false;
+
+    // Get handle of process ID
+    HANDLE hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processId);
+    if(!hProcess)
+        return getLastError();
+
+    // Check elevation
+    GenericError res = processIsElevated(elevated, hProcess);
+
+    // Cleanup handle
+    CloseHandle(hProcess);
+
+    // Return result
+    return res;
+}
+
+namespace {
+static BOOL QT_WIN_CALLBACK cleanKill(HWND hWindow, LPARAM processId)
+{
+    /* This compares target process ID to the process ID of the owner of each window
+     * since EnumWindows loops through all open windows, sending the close signal
+     * to windows that belong to the target ID. When this function returns FALSE,
+     * the invocation of EnumWindows that triggered this function will also return
+     * FALSE, and GetLastError can be used to there to obtain error information.
+     *
+     * For this reason this function returns false upon any failure so that the caller
+     * can immediately obtain said error info before it is potentially overwritten.
+     */
+    DWORD windowOwnerProcessId = 0;
+    DWORD targetProcessId = DWORD(processId);
+    GetWindowThreadProcessId(hWindow, &windowOwnerProcessId);
+    if (windowOwnerProcessId == targetProcessId)
+        if(!PostMessage(hWindow, WM_CLOSE, 0, 0))
+            return FALSE;
+
+    return TRUE;
+}
+}
+
+/*!
+ *  Closes the process referenced by @a processHandle.
+ *
+ *  The closure is performed by signaling all top-level windows of the process to close via `WM_CLOSE`,
+ *  which allows for the process to first perform cleanup or potentially prompt the user to save their
+ *  work.
+ *
+ *  If the operation fails the returned error object will contain the cause.
+ *
+ *  @parblock
+ *  @note This function is not guaranteed to end the specified process.
+ *
+ *  @note If the process has no windows (i.e. a console application), is designed to remain running with no
+ *  windows open, or otherwise doesn't process the WM_CLOSE message it will remain running. Additionally,
+ *  in the event the process presents a dialog upon receiving this signal it will continue running until
+ *  the user dismisses the dialog.
+ *  @endparblock
+ *
+ *  @note
+ *  The handle must be valid.
+ *
+ *  @sa forceKillProcess(), and QProcess::terminate();
+ */
+GenericError cleanKillProcess(HANDLE processHandle)
+{
+    // Ensure handle isn't null (doesn't assure validity)
+    if(!processHandle)
+        return translateHresult(E_HANDLE);
+
+    return cleanKillProcess(GetProcessId(processHandle));
+}
+
+/*!
+ *  @overload
+ *
+ *  Closes the process specified by @a processId.
+ */
+GenericError cleanKillProcess(DWORD processId)
+{
+    // Try to notify process to close
+    if(!EnumWindows(cleanKill, (LPARAM)processId)) // Tells all top-level windows of the process to close
+        return getLastError();
+
+    return GenericError();
+}
+
+/*!
+ *  Forcefully closes the process referenced by @a processHandle.
+ *
+ *  The closure is performed by invoking `TerminateProcess()` on the process which results
+ *  in an immediate, unclean shutdown with an exit code of @c 0xFFFF if it succeeds.
+ *
+ *  If the operation fails the returned error object will contain the cause.
+ *
+ *  @note
+ *  The handle must be valid and have been opened with the `PROCESS_TERMINATE` access right.
+ *
+ *  @sa cleanKillProcess(), and QProcess::kill();
+ */
+GenericError forceKillProcess(HANDLE processHandle)
+{
+    if(!TerminateProcess(processHandle, 0xFFFF))
+        return getLastError();
+
+    return GenericError();
+}
+
+/*!
+ *  @overload
+ *
+ *  Forcefully closes the process specified by @a processId.
+ */
+GenericError forceKillProcess(DWORD processId)
+{
+    // Open handle
+    HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, processId);
+    if(!hProcess)
+        return getLastError();
+
+    // Try kill
+    GenericError res = forceKillProcess(hProcess);
+
+    // Cleanup Handle
+    CloseHandle(hProcess);
+
+    // Return result
+    return res;
+}
 
 /*!
  *  This function is used to limit a particular application such that only one running instance is
@@ -267,7 +566,7 @@ bool enforceSingleInstance()
     QFile selfEXE(QCoreApplication::applicationFilePath());
     QString selfHash;
 
-    if(!calculateFileChecksum(selfHash, selfEXE, QCryptographicHash::Sha256).wasSuccessful())
+    if(calculateFileChecksum(selfHash, selfEXE, QCryptographicHash::Sha256).isFailure())
         return false;
 
     // Attempt to create unique mutex
@@ -294,8 +593,10 @@ bool enforceSingleInstance(QString uniqueAppId)
 
 /*!
  *  Returns the HRESULT value @a res as a generic error.
+ *
+ *  Only the primary info portion of the error is filled.
  */
-Qx::GenericError translateHresult(HRESULT res)
+GenericError translateHresult(HRESULT res)
 {
     BitArray resBits = BitArray::fromInteger(res);
 
@@ -305,19 +606,21 @@ Qx::GenericError translateHresult(HRESULT res)
 
     // Check for success
     if(!resBits.testBit(31))
-        return Qx::GenericError();
+        return GenericError();
 
     // Create com error instance from result
     _com_error comError(res);
 
     // Return translated error
-    return Qx::GenericError(GenericError::Error, QString::fromWCharArray(comError.ErrorMessage()));
+    return GenericError(GenericError::Error, QString::fromWCharArray(comError.ErrorMessage()));
 }
 
 /*!
  *  Returns the NTSTATUS value @a stat as a generic error.
+ *
+ *  Only the primary info portion of the error is filled.
  */
-Qx::GenericError translateNtstatus(NTSTATUS stat)
+GenericError translateNtstatus(NTSTATUS stat)
 {
     BitArray statBits = BitArray::fromInteger(stat);
 
@@ -327,7 +630,7 @@ Qx::GenericError translateNtstatus(NTSTATUS stat)
 
     // Check for success
     if(severity == 0x00)
-        return Qx::GenericError();
+        return GenericError();
 
     // Get handle to ntdll.dll.
     HMODULE hNtDll = LoadLibrary(L"NTDLL.DLL");
@@ -350,14 +653,25 @@ Qx::GenericError translateNtstatus(NTSTATUS stat)
         return GenericError::UNKNOWN_ERROR;
 
     // Return translated error
-    return Qx::GenericError(severity == 0x03 ? GenericError::Error : GenericError::Warning, QString::fromWCharArray(formatedBuffer));
+    return GenericError(severity == 0x03 ? GenericError::Error : GenericError::Warning, QString::fromWCharArray(formatedBuffer));
+}
+
+/*!
+ *  Returns the calling threads last error code value as a generic error.
+ *
+ *  @sa <a href="https://docs.microsoft.com/en-us/windows/win32/api/errhandlingapi/nf-errhandlingapi-getlasterror">GetLastError</a>
+ */
+GenericError getLastError()
+{
+    DWORD error = GetLastError();
+    return translateHresult(HRESULT_FROM_WIN32(error));
 }
 
 /*!
  *  Creates a shortcut on the user's filesystem at the path @a shortcutPath, with the given
  *  shortcut properties @a sp.
  */
-Qx::GenericError createShortcut(QString shortcutPath, ShortcutProperties sp)
+GenericError createShortcut(QString shortcutPath, ShortcutProperties sp)
 {
     // Check for basic argument validity
     if(sp.target.isEmpty() || shortcutPath.isEmpty() || sp.iconIndex < 0)
