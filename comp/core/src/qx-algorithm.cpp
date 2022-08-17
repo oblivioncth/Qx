@@ -4,12 +4,15 @@
 // Standard Library Includes
 #include <cmath>
 
-namespace Qx
-{
-/*! @addtogroup qx-core
- *  @{
+/*!
+ *  @file qx-algorithm.h
+ *  @ingroup qx-core
+ *
+ *  @brief The qx-algorithm header file provides various mathematical functions.
  */
 
+namespace Qx
+{
 //-Namespace Functions----------------------------------------------------------------------------------------------------
 /*!
  *  Returns the absolute value of @a n; equivalent to @c std::abs(n) .
@@ -159,6 +162,4 @@ unsigned long long abs(unsigned long long n) { return n; }
  *
  *  Returns the power of two that is closest to @a num.
  */
-
-/*! @}*/
 }
