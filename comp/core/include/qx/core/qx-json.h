@@ -37,6 +37,8 @@ public:
     static GenericError checkedKeyRetrieval(QJsonObject& valueBuffer, QJsonObject jObject, const QString& key);
 
     static QList<QJsonValue> findAllValues(const QJsonValue& rootValue, const QString& key);
+
+    static QString asString(const QJsonValue& value);
 };	
 
 }

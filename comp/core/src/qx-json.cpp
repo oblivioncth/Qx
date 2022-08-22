@@ -6,6 +6,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonValue>
+#include <QJsonDocument>
 
 namespace Qx
 {
@@ -163,6 +164,34 @@ QList<QJsonValue> Json::findAllValues(const QJsonValue& rootValue, const QString
     QList<QJsonValue> hits;
     recursiveValueFinder(hits, rootValue, key);
     return hits;
+}
+
+/*!
+ *  Returns the JSON string representation of @a value regardless of its type.
+ *
+ *  If @a value is an object or array, the returned string will be in the compact format.
+ */
+QString Json::asString(const QJsonValue& value)
+{
+    QJsonValue::Type valueType = value.type();
+    if(valueType == QJsonValue::Type::Array)
+    {
+        QJsonDocument formatter(value.toArray());
+        return formatter.toJson(QJsonDocument::Compact);
+    }
+    else if(valueType == QJsonValue::Type::Object)
+    {
+        QJsonDocument formatter(value.toObject());
+        return formatter.toJson(QJsonDocument::Compact);
+    }
+    else if(valueType == QJsonValue::Type::Bool)
+        return value.toBool() ? "true" : "false";
+    else if(valueType == QJsonValue::Type::Double)
+        return QString::number(value.toDouble());
+    else if(valueType == QJsonValue::Type::String)
+        return value.toString();
+    else // Covers Null & Undefined
+        return QString();
 }
 
 }
