@@ -3,6 +3,7 @@
 
 // Standard Library Includes
 #include <stdexcept>
+#include <unordered_set>
 
 // Extra-component Includes
 #include "qx/utility/qx-concepts.h"
@@ -28,6 +29,24 @@ bool isOdd(T num) { return num % 2; }
 template<typename T>
     requires arithmetic<T>
 bool isEven(T num) { return !isOdd(num); }
+
+template <class InputIt>
+    requires std::input_iterator<InputIt> && std::equality_comparable<InputIt>
+bool containsDuplicates(InputIt begin, InputIt end)
+{
+    // Get type that iterator is of
+    using T = typename std::iterator_traits<InputIt >::value_type;
+
+    // Place values into unordered set
+    std::unordered_set<T> values(begin, end);
+
+    // Count values in original container
+    std::size_t size = std::distance(begin,end);
+
+    // Container has duplicates if set size is smaller than the the original container,
+    // since sets don't allow for duplicates
+    return size != values.size();
+}
 
 template<typename T>
     requires arithmetic<T>
