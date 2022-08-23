@@ -8,7 +8,7 @@
  *  @file qx-algorithm.h
  *  @ingroup qx-core
  *
- *  @brief The qx-algorithm header file provides various mathematical functions.
+ *  @brief The qx-algorithm header file provides various mathematical/algorithmic functions.
  */
 
 namespace Qx
@@ -66,6 +66,12 @@ unsigned long long abs(unsigned long long n) { return n; }
 
 /*!
  *  @fn template<typename T> requires arithmetic<T> static bool isEven(T num)
+ *
+ *  Returns @c true if there are duplicate elements in the range [@a first, @a last); otherwise returns @c false.
+ */
+
+/*!
+ *  @fn template <class InputIt> requires std::input_iterator<InputIt> && std::equality_comparable<InputIt> bool containsDuplicates(InputIt begin, InputIt end)
  *
  *  Returns @c true if @a num is even; otherwise returns @c false.
  */
