@@ -10,6 +10,9 @@
 #include <QHash>
 #include <QSet>
 
+namespace Qx
+{
+
 class Base85Encoding
 {
 //-Class Enum-----------------------------------------------------------------------------------------------------------
@@ -221,4 +224,5 @@ public:
 
 };
 
+}
 #endif // QX_BASE85_H

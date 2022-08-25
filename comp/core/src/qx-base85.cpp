@@ -5,6 +5,8 @@
 #include "qx/core/qx-algorithm.h"
 #include "qx/core/qx-bytearray.h"
 
+namespace Qx
+{
 //===============================================================================================================
 // Base85Encoding
 //===============================================================================================================
@@ -999,3 +1001,5 @@ QString Base85::toString() { return QString::fromLatin1(mEncoded); }
  *  Returns a reference to the encoded data.
  */
 const QByteArray& Base85::encodedData() const { return mEncoded; }
+
+}
