@@ -32,8 +32,8 @@ namespace Qx
  *  standard ASCII characters are formally allowed.
  *
  *  There are further restrictions on which characters may be used in an encoding for technical
- *  reasons. Whitespace characters, specifically @c 0x09 ('\t'), @c 0x0A ('\\n'), @c 0x0B ('\v'), @c 0x0C ('\f'),
- *  @c 0x0D ('\r') and @c 0x20 (' '), are always ignored while decoding a Base85 string, and as such cannot be
+ *  reasons. Whitespace characters, specifically @c 0x09 ('\\t'), @c 0x0A ('\\n'), @c 0x0B ('\\v'), @c 0x0C ('\\f'),
+ *  @c 0x0D ('\\r') and @c 0x20 (' '), are always ignored while decoding a Base85 string, and as such cannot be
  *  part of a character set. Additionally, ASCII control characters (@c 0x00 - @c 0x1F and @c 0x7F) may evidently
  *  be interpreted by commands by many parsers, making their use in a character set impractical without extreme
  *  care.
@@ -307,7 +307,7 @@ void Base85Encoding::evaluateValidity()
  *  if the encoding uses them.
  *
  *  The only characters that are strictly illegal for Base85 encoding are the whitespace characters,
- *  @c 0x09 ('\t'), @c 0x0A ('\\n'), @c 0x0B ('\v'), @c 0x0C ('\f'), @c 0x0D ('\r') and @c 0x20 (' ').
+ *  @c 0x09 ('\\t'), @c 0x0A ('\\n'), @c 0x0B ('\\v'), @c 0x0C ('\\f'), @c 0x0D ('\\r') and @c 0x20 (' ').
  *
  *  @sa characterIsLegal(), zeroGroupCharacter(), and spaceGroupCharacter().
  */
