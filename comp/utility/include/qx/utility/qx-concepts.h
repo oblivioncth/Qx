@@ -488,6 +488,10 @@ concept traverseable = std::bidirectional_iterator<typename K::const_iterator> &
 template<class K, typename T>
 concept static_castable_to = requires(K klass) {{ static_cast<T>(klass) };};
 
+// Grouping
+template<class K, class ... L>
+concept any_of = (std::same_as<K, L> || ...);
+
 }
 
 #endif // QX_CONCEPTS_H
