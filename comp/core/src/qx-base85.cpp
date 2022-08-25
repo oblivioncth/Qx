@@ -934,4 +934,21 @@ QString Base85::toString() { return QString::fromLatin1(mEncoded); }
  */
 const QByteArray& Base85::encodedData() const { return mEncoded; }
 
+
+/*!
+ *  Returns @c true if this Base85 string and @a other Base85 string are the same; otherwise,
+ *  returns @c false.
+ */
+bool Base85::operator==(const Base85& other) const
+{
+    return (this->mEncoding == other.mEncoding || *(this->mEncoding) == *(other.mEncoding)) &&
+           this->mEncoded == other.mEncoded;
+}
+
+/*!
+ *  Returns @c true if this Base85 string and @a other Base85 string are not the same; otherwise,
+ *  returns @c false.
+ */
+bool Base85::operator!=(const Base85& other) const { return !(*this == other); }
+
 }

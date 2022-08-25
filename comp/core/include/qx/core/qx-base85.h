@@ -333,6 +333,8 @@ public:
     QString toString();
     const QByteArray& encodedData() const;
 
+    bool operator==(const Base85& other) const;
+    bool operator!=(const Base85& other) const;
 };
 
 }
