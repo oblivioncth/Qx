@@ -12,11 +12,11 @@ class Char
 //-Class Functions----------------------------------------------------------------------------------------------
 public:
     static bool isHexNumber(QChar hexNum);
-    bool isSpace(const QChar& ch);
-    bool isSpace(char chr);
-    bool isSpace(unsigned char ch);
-    bool isSpace(signed char ch);
-    bool isSpace(wchar_t ch);
+    static bool isSpace(const QChar& ch);
+    static bool isSpace(char chr);
+    static bool isSpace(unsigned char ch);
+    static bool isSpace(signed char ch);
+    static bool isSpace(wchar_t ch);
     static int compare(QChar cOne, QChar cTwo, Qt::CaseSensitivity cs = Qt::CaseSensitive);
 };
 
