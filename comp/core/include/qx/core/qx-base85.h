@@ -130,8 +130,6 @@ public:
 
 class Base85ParseError
 {
-    friend class Base85;
-
 //-Class Enum-----------------------------------------------------------------------------------------------------------
 public:
     enum ParseError{
@@ -160,7 +158,7 @@ private:
     qsizetype mOffset;
 
 //-Constructor-------------------------------------------------------------------------------------------------
-private:
+public:
     Base85ParseError();
     Base85ParseError(ParseError error, qsizetype offset);
 
@@ -234,7 +232,7 @@ private:
 
         // Parse
         Base85ParseError parseError = parseExternal(base85, externallyEncoded);
-        if(parseError.mError != Base85ParseError::NoError)
+        if(parseError.error() != Base85ParseError::NoError)
             externallyEncoded = Base85(); // Null on error
 
         // Set error return if present

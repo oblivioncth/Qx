@@ -544,12 +544,18 @@ bool Base85Encoding::operator!=(const Base85Encoding& other) const { return !(*t
  */
 
 //-Constructor--------------------------------------------------------------------------------------------------
-//Private:
+//Public:
+/*!
+ *  Constructs a parse error report set to ParseError::NoError.
+ */
 Base85ParseError::Base85ParseError() :
     mError(ParseError::NoError),
     mOffset(-1)
 {}
 
+/*!
+ *  Constructs a parse error report set to @a error, with offset @a offset.
+ */
 Base85ParseError::Base85ParseError(ParseError error, qsizetype offset) :
     mError(error),
     mOffset(offset)
