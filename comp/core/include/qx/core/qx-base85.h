@@ -3,6 +3,7 @@
 
 // Standard Library Includes
 #include <array>
+#include <unordered_map>
 
 // Qt Includes
 #include <QString>
@@ -25,13 +26,13 @@ public:
 private:
     // Character Sets
     static constexpr std::array<char, 85> CHAR_SET_DEFAULT = [](){
-        auto arr = decltype(CHAR_SET_DEFAULT){}; // Same type as var being initialized
+        std::array<char, 85> arr;
         arr.fill(0);
         return arr;
     }();
     static constexpr std::array<char, 85> CHAR_SET_ORIGINAL = [](){
         char asciiValue = 0x21; // Original set starts at '!'
-        auto arr = decltype(CHAR_SET_ORIGINAL){}; // Same type as var being initialized
+        std::array<char, 85> arr;
         for(auto itr = arr.begin(); itr != arr.end(); itr++)
             *itr = asciiValue++; // Insert current char, then increment to the next one
         return arr;
@@ -62,7 +63,7 @@ private:
     static constexpr char SPACE_GROUP_CHAR_ORIGINAL = 'y';
 
     // Encodings
-    static QHash<StandardEncoding, std::unique_ptr<Base85Encoding>> smStdEncodings;
+    static std::unordered_map<StandardEncoding, std::unique_ptr<Base85Encoding>> smStdEncodings;
 
     // Characters
     static inline const QSet<char> ILLEGAL_CHAR_SET = {'\x09', '\x0A', '\x0B', '\x0C', '\x0D', '\x20'};
@@ -164,8 +165,6 @@ public:
 
 class Base85
 {
-
-
 //-Class Variables------------------------------------------------------------------------------------------------------
 private:
     // Padding

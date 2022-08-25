@@ -206,7 +206,7 @@ const Base85Encoding* Base85Encoding::encodingFromStandard(StandardEncoding enc)
         switch(enc)
         {
             case StandardEncoding::Btoa:
-                smStdEncodings.emplace(enc, std::make_shared<Base85Encoding>());
+                smStdEncodings.emplace(enc, std::make_unique<Base85Encoding>());
                 encoding = smStdEncodings[enc].get();
                 encoding->mValid = true;
                 encoding->mCharSet = CHAR_SET_ORIGINAL;
@@ -217,7 +217,7 @@ const Base85Encoding* Base85Encoding::encodingFromStandard(StandardEncoding enc)
                 break;
 
             case StandardEncoding::Btoa_4_2:
-                smStdEncodings.emplace(enc, std::make_shared<Base85Encoding>());
+                smStdEncodings.emplace(enc, std::make_unique<Base85Encoding>());
                 encoding = smStdEncodings[enc].get();
                 encoding->mValid = true;
                 encoding->mCharSet = CHAR_SET_ORIGINAL;
@@ -228,7 +228,7 @@ const Base85Encoding* Base85Encoding::encodingFromStandard(StandardEncoding enc)
                 break;
 
             case StandardEncoding::Adobe:
-                smStdEncodings.emplace(enc, std::make_shared<Base85Encoding>());
+                smStdEncodings.emplace(enc, std::make_unique<Base85Encoding>());
                 encoding = smStdEncodings[enc].get();
                 encoding->mValid = true;
                 encoding->mCharSet = CHAR_SET_ORIGINAL;
@@ -239,7 +239,7 @@ const Base85Encoding* Base85Encoding::encodingFromStandard(StandardEncoding enc)
                 break;
 
             case StandardEncoding::Z85:
-                smStdEncodings.emplace(enc, std::make_shared<Base85Encoding>());
+                smStdEncodings.emplace(enc, std::make_unique<Base85Encoding>());
                 encoding = smStdEncodings[enc].get();
                 encoding->mValid = true;
                 encoding->mCharSet = CHAR_SET_Z85;
@@ -250,7 +250,7 @@ const Base85Encoding* Base85Encoding::encodingFromStandard(StandardEncoding enc)
                 break;
 
             case StandardEncoding::Rfc_1924:
-                smStdEncodings.emplace(enc, std::make_shared<Base85Encoding>());
+                smStdEncodings.emplace(enc, std::make_unique<Base85Encoding>());
                 encoding = smStdEncodings[enc].get();
                 encoding->mValid = true;
                 encoding->mCharSet = CHAR_SET_RFC_1924;
