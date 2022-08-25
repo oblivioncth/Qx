@@ -205,7 +205,74 @@ private:
     static QByteArray encodeFrame(const QByteArray& frame, const Base85Encoding* encoding);
     static void decodeData(const QByteArray& data, QByteArray& decodedData, const Base85Encoding* encoding);
     static QByteArray decodeFrame(const QByteArray& frame, const Base85Encoding* encoding);
-    static Base85ParseError parseExternalString(const QString& base85, Base85& externallyEncoded);
+
+    template<typename EncDataType>
+    static Base85ParseError parseExternal(EncDataType base85, Base85& externallyEncoded)
+    {
+        const Base85Encoding* encooding = externallyEncoded.encoding();
+
+        //-Check for Padding---------------------------------------------------------------
+        // Determine shortcut characters vs regular characters (assume encoding is correct at this point)
+        QSet<QChar> shortcutChars;
+        if(encooding->usesZeroGroupShortcut())
+            shortcutChars.insert(encooding->zeroGroupCharacter().value());
+        if(encooding->usesSpaceGroupShortcut())
+            shortcutChars.insert(encooding->spaceGroupCharacter().value());
+
+        int shortcutCount = shortcutChars.isEmpty() ? 0 :
+            std::count_if(base85.cbegin(), base85.cend(), [&shortcutChars](const QChar& c){ return shortcutChars.contains(c); });
+        int nonShortcutCount = base85.size() - shortcutCount;
+
+        // Determine if string relies on padding
+        bool needsPadding = nonShortcutCount % 5 > 0;
+
+        // Fail if padding is required but the encoding does not support it.
+        if(needsPadding && !encooding->isHandlePadding())
+            return Base85ParseError(Base85ParseError::PaddingRequired, 0);
+
+        //-Setup for Validation-----------------------------------------------------
+
+        QByteArray* encodedData = &externallyEncoded.mEncoded;
+        encodedData->reserve(base85.size());
+
+        // Validate each character one-by-one and append to internal data
+        bool valid = true; // Assume string is valid Base85 unless an issue is found
+        int frameIdx = 0;
+        for(qsizetype i = 0; i < base85.size(); i++)
+        {
+            const QChar& ch = base85[i];
+
+            // White space is to be ignored, if char is whitespace, skip it
+            if(ch.isSpace())
+                continue;
+
+            // Ensure character can fit in one byte (ASCII/extended-ASCII)
+            if(ch.unicode() > 255)
+                return Base85ParseError(Base85ParseError::NonANSI, i);
+
+            // Ensure character belongs to encoding
+            char asciiChar = ch.toLatin1();
+            if(!encooding->containsCharacter(asciiChar))
+                return Base85ParseError(Base85ParseError::CharacterSetMismatch, i);
+
+            // Check if character is a shortcut char, and if so is appropriately used
+            bool isShortcut = shortcutChars.contains(ch);
+            if(isShortcut && frameIdx != 0) // Can only be used at start of frame
+                return Base85ParseError(Base85ParseError::ShortcutMidFrame, i);
+
+            // Add validated character
+            encodedData->append(asciiChar);
+
+            // Handle frame index counter
+            if(isShortcut || frameIdx == 4)
+                frameIdx = 0;
+            else
+                frameIdx++;
+        }
+
+        // Return success
+        return Base85ParseError();
+    }
 
 public:
     static Base85 fromEncodedString(const QString& base85, const Base85Encoding* enc, Base85ParseError* error = nullptr);
