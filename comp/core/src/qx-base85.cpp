@@ -42,10 +42,15 @@ namespace Qx
  *  @par Extensions:
  *  @parblock
  *  <table>
- *  <tr><th>Extension    <th> Effect                                                                                             <th> Controlled By
- *  <tr><td>Zero Group   <td> All @c 0 binary frames will be encoded as a single special character                               <td> x
- *  <tr><td>Space Group  <td> All 'space' (@c 0x20) binary frames will be encoded as a single special character                  <td> x
- *  <tr><td>Padding      <td> Allows for and enables the automatic handling of padding during encoding/decoding where necessary  <td> x
+ *  <tr><th>Extension    <th> Effect   <th> Controlled By
+ *  <tr><td>Zero Group   <td> All @c zero (@c 0x00000000) binary frames will be encoded as a single special character
+ *                                     <td> setZeroGroupCharacter()\n
+ *                                          resetZeroGroupCharacter()
+ *  <tr><td>Space Group  <td> All 'space' (@c 0x20202020) binary frames will be encoded as a single special character
+ *                                     <td> setSpaceGroupCharacter()\n
+ *                                          resetSpaceGroupCharacter()
+ *  <tr><td>Padding      <td> Allows for and enables the automatic handling of padding during encoding/decoding where necessary
+ *                                     <td> setHandlePadding()
  *  </table>
  *  @endparblock
  *
