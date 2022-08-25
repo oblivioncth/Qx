@@ -92,12 +92,12 @@ public:
 
 //-Class Functions---------------------------------------------------------------------------------------------------------
 private:
-    const QHash<char, int>& decodeMapOriginalSet();
-    const QHash<char, int>& decodeMapZ85Set();
-    const QHash<char, int>& decodeMapRfc1924Set();
+    static const QHash<char, int>& decodeMapOriginalSet();
+    static const QHash<char, int>& decodeMapZ85Set();
+    static const QHash<char, int>& decodeMapRfc1924Set();
 public:
-    bool characterIsLegal(char ch);
-    const Base85Encoding* encodingFromStandard(StandardEncoding enc);
+    static bool characterIsLegal(char ch);
+    static const Base85Encoding* encodingFromStandard(StandardEncoding enc);
 
 //-Instance Functions---------------------------------------------------------------------------------------------------------
 private:
