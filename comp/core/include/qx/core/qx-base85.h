@@ -66,7 +66,7 @@ private:
     static constexpr char SPACE_GROUP_CHAR_ORIGINAL = 'y';
 
     // Encodings
-    static std::unordered_map<StandardEncoding, std::unique_ptr<Base85Encoding>> smStdEncodings;
+    static QHash<StandardEncoding, Base85Encoding> smStdEncodings;
 
     // Characters
     static inline const QSet<char> ILLEGAL_CHAR_SET = {'\x09', '\x0A', '\x0B', '\x0C', '\x0D', '\x20'};

@@ -200,7 +200,7 @@ bool Base85Encoding::characterIsLegal(char ch) { return !ILLEGAL_CHAR_SET.contai
 const Base85Encoding* Base85Encoding::encodingFromStandard(StandardEncoding enc)
 {
     if(smStdEncodings.contains(enc))
-        return smStdEncodings[enc].get();
+        return &smStdEncodings[enc];
     else
     {
         Base85Encoding* encoding = nullptr;
@@ -208,8 +208,7 @@ const Base85Encoding* Base85Encoding::encodingFromStandard(StandardEncoding enc)
         switch(enc)
         {
             case StandardEncoding::Btoa:
-                smStdEncodings.emplace(enc, std::make_unique<Base85Encoding>());
-                encoding = smStdEncodings[enc].get();
+                encoding = &(*smStdEncodings.emplace(enc));
                 encoding->mValid = true;
                 encoding->mCharSet = CHAR_SET_ORIGINAL;
                 encoding->mDecodeMap = decodeMapOriginalSet();
@@ -219,8 +218,7 @@ const Base85Encoding* Base85Encoding::encodingFromStandard(StandardEncoding enc)
                 break;
 
             case StandardEncoding::Btoa_4_2:
-                smStdEncodings.emplace(enc, std::make_unique<Base85Encoding>());
-                encoding = smStdEncodings[enc].get();
+                encoding = &(*smStdEncodings.emplace(enc, Base85Encoding()));
                 encoding->mValid = true;
                 encoding->mCharSet = CHAR_SET_ORIGINAL;
                 encoding->mDecodeMap = decodeMapOriginalSet();
@@ -230,8 +228,7 @@ const Base85Encoding* Base85Encoding::encodingFromStandard(StandardEncoding enc)
                 break;
 
             case StandardEncoding::Adobe:
-                smStdEncodings.emplace(enc, std::make_unique<Base85Encoding>());
-                encoding = smStdEncodings[enc].get();
+                encoding = &(*smStdEncodings.emplace(enc));
                 encoding->mValid = true;
                 encoding->mCharSet = CHAR_SET_ORIGINAL;
                 encoding->mDecodeMap = decodeMapOriginalSet();
@@ -241,8 +238,7 @@ const Base85Encoding* Base85Encoding::encodingFromStandard(StandardEncoding enc)
                 break;
 
             case StandardEncoding::Z85:
-                smStdEncodings.emplace(enc, std::make_unique<Base85Encoding>());
-                encoding = smStdEncodings[enc].get();
+                encoding = &(*smStdEncodings.emplace(enc));
                 encoding->mValid = true;
                 encoding->mCharSet = CHAR_SET_Z85;
                 encoding->mDecodeMap = decodeMapZ85Set();
@@ -252,8 +248,7 @@ const Base85Encoding* Base85Encoding::encodingFromStandard(StandardEncoding enc)
                 break;
 
             case StandardEncoding::Rfc_1924:
-                smStdEncodings.emplace(enc, std::make_unique<Base85Encoding>());
-                encoding = smStdEncodings[enc].get();
+                encoding = &(*smStdEncodings.emplace(enc));
                 encoding->mValid = true;
                 encoding->mCharSet = CHAR_SET_RFC_1924;
                 encoding->mDecodeMap = decodeMapRfc1924Set();
