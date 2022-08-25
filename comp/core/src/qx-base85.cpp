@@ -822,6 +822,117 @@ QByteArray Base85::decodeFrame(const QByteArray& frame, const Base85Encoding* en
 char Base85::charToLatin1(char ch) { return ch; }
 char Base85::charToLatin1(QChar ch) { return ch.toLatin1(); }
 
+/* NOTE: Template definitions here work because the standard states:
+ *
+ * "The definition of a
+ * non-exported function template, a non-exported member function template, or a non-exported
+ * member function or static data member of a class template shall be present in every
+ * translation unit in which it is explicitly instantiated."
+ *
+ * Because the templates are only used within this source file (translation unit) and the
+ * definitions are obviously available here, the above holds true.
+ */
+template<typename D>
+    requires Qx::any_of<D, QString, QByteArrayView>
+Base85 Base85::fromExternal(D base85, const Base85Encoding* enc, Base85ParseError* error)
+{
+    // Ensure encoding is valid
+    if(!enc->isValid())
+    {
+        if(error)
+            *error = Base85ParseError(Base85ParseError::InvalidEncoding, 0);
+        return Base85();
+    }
+
+    // Setup object
+    Base85 externallyEncoded;
+    externallyEncoded.mEncoding = enc;
+
+    // Parse
+    Base85ParseError parseError = parseExternal(base85, externallyEncoded);
+    if(parseError.error() != Base85ParseError::NoError)
+        externallyEncoded = Base85(); // Null on error
+
+    // Set error return if present
+    if(error)
+        *error = parseError;
+
+    // Return object
+    return externallyEncoded;
+}
+
+template<typename D, typename C>
+    requires Qx::any_of<D, QString, QByteArrayView>
+Base85ParseError Base85::parseExternal(D base85, Base85& externallyEncoded)
+{
+    const Base85Encoding* encooding = externallyEncoded.encoding();
+
+    //-Check for Padding---------------------------------------------------------------
+    // Determine shortcut characters vs regular characters (assume encoding is correct at this point)
+    QSet<C> shortcutChars;
+    if(encooding->usesZeroGroupShortcut())
+        shortcutChars.insert(encooding->zeroGroupCharacter().value());
+    if(encooding->usesSpaceGroupShortcut())
+        shortcutChars.insert(encooding->spaceGroupCharacter().value());
+
+    int shortcutCount = shortcutChars.isEmpty() ? 0 :
+        std::count_if(base85.cbegin(), base85.cend(), [&shortcutChars](const C& c){ return shortcutChars.contains(c); });
+    int nonShortcutCount = base85.size() - shortcutCount;
+
+    // Determine if string relies on padding
+    bool needsPadding = nonShortcutCount % 5 > 0;
+
+    // Fail if padding is required but the encoding does not support it.
+    if(needsPadding && !encooding->isHandlePadding())
+        return Base85ParseError(Base85ParseError::PaddingRequired, 0);
+
+    //-Setup for Validation-----------------------------------------------------
+
+    QByteArray* encodedData = &externallyEncoded.mEncoded;
+    encodedData->reserve(base85.size());
+
+    // Validate each character one-by-one and append to internal data
+    int frameIdx = 0;
+    for(qsizetype i = 0; i < base85.size(); i++)
+    {
+        const C& ch = base85[i];
+
+        // White space is to be ignored, if char is whitespace, skip it
+        if(Qx::Char::isSpace(ch))
+            continue;
+
+        // Only matters for input type that contains QChar
+        if constexpr(std::is_same_v<C, QChar>)
+        {
+            // Ensure character can fit in one byte (ASCII/extended-ASCII)
+            if(ch.unicode() > 255)
+                return Base85ParseError(Base85ParseError::NonANSI, i);
+        }
+
+        // Ensure character belongs to encoding
+        char asciiChar = charToLatin1(ch); // Ensures char is Latin1, covers QChar
+        if(!encooding->containsCharacter(asciiChar))
+            return Base85ParseError(Base85ParseError::CharacterSetMismatch, i);
+
+        // Check if character is a shortcut char, and if so is appropriately used
+        bool isShortcut = shortcutChars.contains(ch);
+        if(isShortcut && frameIdx != 0) // Can only be used at start of frame
+            return Base85ParseError(Base85ParseError::ShortcutMidFrame, i);
+
+        // Add validated character
+        encodedData->append(asciiChar);
+
+        // Handle frame index counter
+        if(isShortcut || frameIdx == 4)
+            frameIdx = 0;
+        else
+            frameIdx++;
+    }
+
+    // Return success
+    return Base85ParseError();
+}
+
 //Public:
 /*!
  *  Parses @a base85 as a Base85 string that was encoded with @a enc and creates a Base85
