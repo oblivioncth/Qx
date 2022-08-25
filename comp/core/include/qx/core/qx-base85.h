@@ -207,6 +207,34 @@ private:
     static QByteArray decodeFrame(const QByteArray& frame, const Base85Encoding* encoding);
 
     template<typename EncDataType>
+    static Base85 fromExternal(EncDataType base85, const Base85Encoding* enc, Base85ParseError* error)
+    {
+        // Ensure encoding is valid
+        if(!enc->isValid())
+        {
+            if(error)
+                *error = Base85ParseError(Base85ParseError::InvalidEncoding, 0);
+            return Base85();
+        }
+
+        // Setup object
+        Base85 externallyEncoded;
+        externallyEncoded.mEncoding = enc;
+
+        // Parse
+        Base85ParseError parseError = parseExternal(base85, externallyEncoded);
+        if(parseError.mError != Base85ParseError::NoError)
+            externallyEncoded = Base85(); // Null on error
+
+        // Set error return if present
+        if(error)
+            *error = parseError;
+
+        // Return object
+        return externallyEncoded;
+    }
+
+    template<typename EncDataType>
     static Base85ParseError parseExternal(EncDataType base85, Base85& externallyEncoded)
     {
         const Base85Encoding* encooding = externallyEncoded.encoding();
@@ -276,6 +304,7 @@ private:
 
 public:
     static Base85 fromEncodedString(const QString& base85, const Base85Encoding* enc, Base85ParseError* error = nullptr);
+    static Base85 fromEncodedData(QByteArrayView base85, const Base85Encoding* enc, Base85ParseError* error = nullptr);
     static Base85 encode(const QByteArray& data, const Base85Encoding* enc);
 
 //-Instance Functions---------------------------------------------------------------------------------------------------------

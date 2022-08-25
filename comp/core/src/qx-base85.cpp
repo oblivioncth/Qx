@@ -830,29 +830,12 @@ QByteArray Base85::decodeFrame(const QByteArray& frame, const Base85Encoding* en
  */
 Base85 Base85::fromEncodedString(const QString& base85, const Base85Encoding* enc, Base85ParseError* error)
 {
-    // Ensure encoding is valid
-    if(!enc->isValid())
-    {
-        if(error)
-            *error = Base85ParseError(Base85ParseError::InvalidEncoding, 0);
-        return Base85();
-    }
+    return fromExternal(base85, enc, error);
+}
 
-    // Setup object
-    Base85 externallyEncoded;
-    externallyEncoded.mEncoding = enc;
-
-    // Parse
-    Base85ParseError parseError = parseExternal(base85, externallyEncoded);
-    if(parseError.mError != Base85ParseError::NoError)
-        externallyEncoded = Base85(); // Null on error
-
-    // Set error return if present
-    if(error)
-        *error = parseError;
-
-    // Return object
-    return externallyEncoded;
+Base85 Base85::fromEncodedData(QByteArrayView base85, const Base85Encoding* enc, Base85ParseError* error)
+{
+    return fromExternal(base85, enc, error);
 }
 
 
