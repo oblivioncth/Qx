@@ -1,9 +1,14 @@
 #ifndef QX_BASE85_H
 #define QX_BASE85_H
 
+// Inner-component Includes
+#include "qx/core/qx-char.h"
+
+// Extra-component Includes
+#include "qx/utility/qx-concepts.h"
+
 // Standard Library Includes
 #include <array>
-#include <unordered_map>
 
 // Qt Includes
 #include <QString>
@@ -206,8 +211,14 @@ private:
     static void decodeData(const QByteArray& data, QByteArray& decodedData, const Base85Encoding* encoding);
     static QByteArray decodeFrame(const QByteArray& frame, const Base85Encoding* encoding);
 
-    template<typename EncDataType>
-    static Base85 fromExternal(EncDataType base85, const Base85Encoding* enc, Base85ParseError* error)
+    // External parse helpers
+    static char charToLatin1(char ch);
+    static char charToLatin1(QChar ch);
+
+    // External parse
+    template<typename D>
+        requires Qx::any_of<D, QString, QByteArrayView>
+    static Base85 fromExternal(D base85, const Base85Encoding* enc, Base85ParseError* error)
     {
         // Ensure encoding is valid
         if(!enc->isValid())
@@ -234,21 +245,22 @@ private:
         return externallyEncoded;
     }
 
-    template<typename EncDataType>
-    static Base85ParseError parseExternal(EncDataType base85, Base85& externallyEncoded)
+    template<typename D, typename C = typename std::iterator_traits<typename D::const_iterator>::value_type>
+        requires Qx::any_of<D, QString, QByteArrayView>
+    static Base85ParseError parseExternal(D base85, Base85& externallyEncoded)
     {
         const Base85Encoding* encooding = externallyEncoded.encoding();
 
         //-Check for Padding---------------------------------------------------------------
         // Determine shortcut characters vs regular characters (assume encoding is correct at this point)
-        QSet<QChar> shortcutChars;
+        QSet<C> shortcutChars;
         if(encooding->usesZeroGroupShortcut())
             shortcutChars.insert(encooding->zeroGroupCharacter().value());
         if(encooding->usesSpaceGroupShortcut())
             shortcutChars.insert(encooding->spaceGroupCharacter().value());
 
         int shortcutCount = shortcutChars.isEmpty() ? 0 :
-            std::count_if(base85.cbegin(), base85.cend(), [&shortcutChars](const QChar& c){ return shortcutChars.contains(c); });
+            std::count_if(base85.cbegin(), base85.cend(), [&shortcutChars](const C& c){ return shortcutChars.contains(c); });
         int nonShortcutCount = base85.size() - shortcutCount;
 
         // Determine if string relies on padding
@@ -264,22 +276,25 @@ private:
         encodedData->reserve(base85.size());
 
         // Validate each character one-by-one and append to internal data
-        bool valid = true; // Assume string is valid Base85 unless an issue is found
         int frameIdx = 0;
         for(qsizetype i = 0; i < base85.size(); i++)
         {
-            const QChar& ch = base85[i];
+            const C& ch = base85[i];
 
             // White space is to be ignored, if char is whitespace, skip it
-            if(ch.isSpace())
+            if(Qx::Char::isSpace(ch))
                 continue;
 
-            // Ensure character can fit in one byte (ASCII/extended-ASCII)
-            if(ch.unicode() > 255)
-                return Base85ParseError(Base85ParseError::NonANSI, i);
+            // Only matters for input type that contains QChar
+            if constexpr(std::is_same_v<C, QChar>)
+            {
+                // Ensure character can fit in one byte (ASCII/extended-ASCII)
+                if(ch.unicode() > 255)
+                    return Base85ParseError(Base85ParseError::NonANSI, i);
+            }
 
             // Ensure character belongs to encoding
-            char asciiChar = ch.toLatin1();
+            char asciiChar = charToLatin1(ch); // Ensures char is Latin1, covers QChar
             if(!encooding->containsCharacter(asciiChar))
                 return Base85ParseError(Base85ParseError::CharacterSetMismatch, i);
 
@@ -303,8 +318,8 @@ private:
     }
 
 public:
-    static Base85 fromEncodedString(const QString& base85, const Base85Encoding* enc, Base85ParseError* error = nullptr);
-    static Base85 fromEncodedData(QByteArrayView base85, const Base85Encoding* enc, Base85ParseError* error = nullptr);
+    static Base85 fromString(const QString& base85, const Base85Encoding* enc, Base85ParseError* error = nullptr);
+    static Base85 fromData(QByteArrayView base85, const Base85Encoding* enc, Base85ParseError* error = nullptr);
     static Base85 encode(const QByteArray& data, const Base85Encoding* enc);
 
 //-Instance Functions---------------------------------------------------------------------------------------------------------

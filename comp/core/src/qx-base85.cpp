@@ -813,6 +813,9 @@ QByteArray Base85::decodeFrame(const QByteArray& frame, const Base85Encoding* en
     return Qx::ByteArray::fromPrimitive<quint32>(frameValue, QSysInfo::BigEndian);
 }
 
+char Base85::charToLatin1(char ch) { return ch; }
+char Base85::charToLatin1(QChar ch) { return ch.toLatin1(); }
+
 //Public:
 /*!
  *  Parses @a base85 as a Base85 string that was encoded with @a enc and creates a Base85
@@ -826,18 +829,26 @@ QByteArray Base85::decodeFrame(const QByteArray& frame, const Base85Encoding* en
  *  @warning The caller must be able to guarantee that @a enc will not be deleted as long as
  *  the Base85 exists and may have its methods used.
  *
- *  @sa toString(), Base85ParseError, and isNull().
+ *  @sa toString(), fromData(), Base85ParseError, and isNull().
  */
-Base85 Base85::fromEncodedString(const QString& base85, const Base85Encoding* enc, Base85ParseError* error)
+Base85 Base85::fromString(const QString& base85, const Base85Encoding* enc, Base85ParseError* error)
 {
     return fromExternal(base85, enc, error);
 }
 
-Base85 Base85::fromEncodedData(QByteArrayView base85, const Base85Encoding* enc, Base85ParseError* error)
+/*!
+ *  @overload
+ *
+ *  Parses the binary data @a base85 as a Base85 string that was encoded with @a enc and creates
+ *  a Base85 object from it. Any whitespace within the original string will not be present in the
+ *  resultant object.
+ *
+ *  @sa fromString(), Base85ParseError, isNull(), and @a encodedData().
+ */
+Base85 Base85::fromData(QByteArrayView base85, const Base85Encoding* enc, Base85ParseError* error)
 {
     return fromExternal(base85, enc, error);
 }
-
 
 /*!
  *  Encodes @a data as a Base85 string in accordance with the specific encoding @a enc and
@@ -846,7 +857,7 @@ Base85 Base85::fromEncodedData(QByteArrayView base85, const Base85Encoding* enc,
  *  @warning The caller must be able to guarantee that @a enc will not be deleted as long as
  *  the Base85 exists and may have its methods used.
  *
- *  @sa decode(), fromEncodedString(), and Base85Encoding::isValid().
+ *  @sa decode(), fromString(), and Base85Encoding::isValid().
  */
 Base85 Base85::encode(const QByteArray& data, const Base85Encoding* enc)
 {
@@ -872,16 +883,22 @@ Base85 Base85::encode(const QByteArray& data, const Base85Encoding* enc)
 //Public:
 /*!
  *  Returns @c true if the encoded string is null; otherwise, returns @c false.
+ *
+ *  @sa isEmpty().
  */
 bool Base85::isNull() { return mEncoded.isNull(); }
 
 /*!
  *  Returns @c true if the encoded string is empty; otherwise, returns @c false.
+ *
+ *  @sa isNull().
  */
 bool Base85::isEmpty() { return mEncoded.isEmpty(); }
 
 /*!
  *  Returns a pointer to the encoding used to create this Base85.
+ *
+ *  @sa Base85Encoding.
  */
 const Base85Encoding* Base85::encoding() const { return mEncoding; }
 
@@ -905,11 +922,15 @@ QByteArray Base85::decode()
 
 /*!
  *  Returns the UTF-16 equivalent of the encoded data.
+ *
+ *  @sa fromString().
  */
 QString Base85::toString() { return QString::fromLatin1(mEncoded); }
 
 /*!
  *  Returns a reference to the encoded data.
+ *
+ *  @sa toString().
  */
 const QByteArray& Base85::encodedData() const { return mEncoded; }
 
