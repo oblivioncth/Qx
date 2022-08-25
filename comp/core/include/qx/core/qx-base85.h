@@ -175,7 +175,6 @@ class Base85
 private:
     // Padding
     static constexpr char ENCODE_PAD_CHAR = '\0';
-    static constexpr char DECODE_PAD_CHAR = 'u';
 
     // Shortcut Frames
     static inline const QByteArray ZERO_GROUP_FRAME = QByteArrayLiteral("\x00\x00\x00\x00");

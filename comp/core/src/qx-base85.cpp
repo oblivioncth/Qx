@@ -789,9 +789,16 @@ void Base85::decodeData(const QByteArray& data, QByteArray& decodedData, const B
         // Set buffer to chunk
         inputFrameBuffer = data.sliced(chunkStartIdx, chunkSize);
 
-        // Pad chunk if necessary
+        /* Pad chunk if necessary. characterAt(84) is used because while in the original
+         * character set the padding character is 'u', what actually matters is that the
+         * value '84' (the last index) is used when decoding the padding characters in
+         * order for padding to be handled correctly. So while that's 'u' for the original
+         * character set, it may be different for other sets. The use of  characterPosition()
+         * in decodeFrame() ensures that the padding character we put in here will be "converted"
+         * to the value '84' there.
+         */
         int padding = 5 - inputFrameBuffer.size();
-        inputFrameBuffer.append(padding, DECODE_PAD_CHAR);
+        inputFrameBuffer.append(padding, encoding->characterAt(84));
 
         // Decode frame
         decodedData.append(decodeFrame(inputFrameBuffer, encoding));
