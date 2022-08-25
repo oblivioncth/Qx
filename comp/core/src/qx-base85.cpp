@@ -1056,7 +1056,8 @@ const QByteArray& Base85::encodedData() const { return mEncoded; }
  */
 bool Base85::operator==(const Base85& other) const
 {
-    return (this->mEncoding == other.mEncoding || *(this->mEncoding) == *(other.mEncoding)) &&
+    return (this->mEncoding == other.mEncoding ||
+               (this->mEncoding && other.mEncoding && *(this->mEncoding) == *(other.mEncoding))) &&
            this->mEncoded == other.mEncoded;
 }
 
