@@ -665,12 +665,11 @@ void Base85::encodeData(const QByteArray& data, Base85& encodedObject)
     // Move over input data in chunks
     for(int chunkStartIdx = 0; chunkStartIdx < data.size(); chunkStartIdx += 4)
     {
-        // Determine chunk end index (accounts for padding)
-        int presumedChunkEndIdx = chunkStartIdx + 4;
-        int chunkEndIdx = presumedChunkEndIdx <= maxIndex ? presumedChunkEndIdx : maxIndex;
+        // Determine chunk size (accounts for padding)
+        int chunkSize = std::min(4, Qx::lengthOfRange(chunkStartIdx, maxIndex));
 
         // Set buffer to chunk
-        inputFrameBuffer = data.sliced(chunkStartIdx, chunkEndIdx);
+        inputFrameBuffer = data.sliced(chunkStartIdx, chunkSize);
 
         // Pad chunk if necessary
         int padding = 4 - inputFrameBuffer.size();
@@ -784,12 +783,11 @@ void Base85::decodeData(const QByteArray& data, QByteArray& decodedData, const B
             continue;
         }
 
-        // Determine chunk end index (accounts for padding)
-        int presumedChunkEndIdx = chunkStartIdx + 5;
-        int chunkEndIdx = presumedChunkEndIdx <= maxIndex ? presumedChunkEndIdx : maxIndex;
+        // Determine chunk size (accounts for padding)
+        int chunkSize = std::min(5, Qx::lengthOfRange(chunkStartIdx, maxIndex));
 
         // Set buffer to chunk
-        inputFrameBuffer = data.sliced(chunkStartIdx, chunkEndIdx);
+        inputFrameBuffer = data.sliced(chunkStartIdx, chunkSize);
 
         // Pad chunk if necessary
         int padding = 5 - inputFrameBuffer.size();
