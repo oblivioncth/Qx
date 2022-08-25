@@ -604,6 +604,11 @@ qsizetype Base85ParseError::offset() const { return mOffset; }
  *  encoding uses ASCII characters @c 0x21 ('!') through @c 0x75 ('u'), though it is possible to use other
  *  characters that aren't necessarily sequential.
  *
+ *  @note
+ *  Base85 strings with prefix/suffix markets (e.g. "xbtoa Begin", "xbtoa End", "~>") are not supported. They
+ *  must be handled independently of the actual payload when creating a Base85 instance from a pre-encoded
+ *  string, and they will not be added to encoded strings created with encode().
+ *
  *  @sa Base85Encoding, <a href="https://en.wikipedia.org/wiki/Ascii85">Ascii85 (on Wikipedia)</a>.
  */
 
