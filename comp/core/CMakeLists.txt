@@ -8,6 +8,7 @@ set(COMPONENT_LIB_TYPE STATIC)
 set(COMPONENT_INCLUDE_HEADERS
     qx-algorithm.h
     qx-array.h
+    qx-base85.h
     qx-bitarray.h
     qx-bytearray.h
     qx-char.h
@@ -35,6 +36,7 @@ set(COMPONENT_PRIVATE_HEADERS
 # Source Files
 set(COMPONENT_IMPL
     qx-algorithm.cpp
+    qx-base85.cpp
     qx-bitarray.cpp
     qx-char.cpp
     qx-datetime.cpp
