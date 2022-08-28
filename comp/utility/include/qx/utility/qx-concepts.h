@@ -200,19 +200,19 @@ concept defines_or = defines_or_for<K, K>;
 
 // Member Access Operators
 template<class K, typename T, typename R>
-concept defines_subscript_for_s = requires(K klass, T type, R ret) {{ klass[type] } -> std::same_as<R&>;};
+concept defines_subscript_for_s = requires(K klass, T type) {{ klass[type] } -> std::same_as<R&>;};
 
 template<class K, typename T>
 concept defines_subscript_for = requires(K klass, T type) {{ klass[type] };};
 
 template<class K, typename R>
-concept defines_indirection_s = requires(K klass, R ret) {{ *klass } -> std::same_as<R&>;};
+concept defines_indirection_s = requires(K klass) {{ *klass } -> std::same_as<R&>;};
 
 template<class K>
 concept defines_indirection = requires(K klass) {{ *klass };};
 
 template<class K, typename R>
-concept defines_address_of_s = requires(K klass, R ret) {{ &klass } -> std::same_as<R*>;};
+concept defines_address_of_s = requires(K klass) {{ &klass } -> std::same_as<R*>;};
 
 template<class K>
 concept defines_address_of = requires(K klass) {{ &klass };};
@@ -223,14 +223,14 @@ concept defines_address_of = requires(K klass) {{ &klass };};
  */
 
 template<class K, typename T, typename R>
-concept defines_ptr_to_member_ptr_for_s = requires(K klass, T type, R ret) {{ klass->*type } -> std::same_as<R&>;};
+concept defines_ptr_to_member_ptr_for_s = requires(K klass, T type) {{ klass->*type } -> std::same_as<R&>;};
 
 template<class K, typename T>
 concept defines_ptr_to_member_ptr_for = requires(K klass, T type) {{ klass->*type };};
 
 // Other Operators
 template<class K, typename... Types, typename R>
-concept defines_call_for_s = requires(K klass, Types... args, R type) {{ klass(args...) } -> std::same_as<R>;};
+concept defines_call_for_s = requires(K klass, Types... args) {{ klass(args...) } -> std::same_as<R>;};
 
 template<class K, typename... Types>
 concept defines_call_for = requires(K klass, Types... args) {{ klass(args...) };};
