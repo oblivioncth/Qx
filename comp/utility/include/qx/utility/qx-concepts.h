@@ -199,7 +199,7 @@ template<class K>
 concept defines_or = defines_or_for<K, K>;
 
 // Member Access Operators
-template<class K, typename T, typename R>
+template<class K, typename R, typename T>
 concept defines_subscript_for_s = requires(K klass, T type) {{ klass[type] } -> std::same_as<R&>;};
 
 template<class K, typename T>
@@ -222,21 +222,21 @@ concept defines_address_of = requires(K klass) {{ &klass };};
  * concept defines_member_ptr_s = requires(K klass, R ret) {{ klass-> } -> std::same_as<R*>;};
  */
 
-template<class K, typename T, typename R>
+template<class K, typename R, typename T>
 concept defines_ptr_to_member_ptr_for_s = requires(K klass, T type) {{ klass->*type } -> std::same_as<R&>;};
 
 template<class K, typename T>
 concept defines_ptr_to_member_ptr_for = requires(K klass, T type) {{ klass->*type };};
 
 // Other Operators
-template<class K, typename... Types, typename R>
+template<class K, typename R, typename... Types>
 concept defines_call_for_s = requires(K klass, Types... args) {{ klass(args...) } -> std::same_as<R>;};
 
 template<class K, typename... Types>
 concept defines_call_for = requires(K klass, Types... args) {{ klass(args...) };};
 
 template<class K, typename R>
-concept defines_call_s = defines_call_for<K, void, R>;
+concept defines_call_s = defines_call_for<K, R>;
 
 template<class K>
 concept defines_call = defines_call_for<K>;
