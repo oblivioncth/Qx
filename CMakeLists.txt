@@ -26,6 +26,7 @@ project(Qx
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LC)
 string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UC)
 
+
 # C++
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -41,7 +42,13 @@ add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060000)
 # Add local modules
 set(PROJ_SCRIPTS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 list(APPEND CMAKE_MODULE_PATH "${PROJ_SCRIPTS_PATH}/module")
-include(Qx/Utility)
+
+# Get helper scripts
+include(Qx/FetchOBCMake)
+fetch_ob_cmake("v0.1")
+
+# Include utility functions
+include(OB/Utility)
 
 # General Variables
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -95,7 +102,7 @@ set(PACKAGE_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/out/dist")
 #------------Set Global Build Rules----------------
 
 # Versioning
-include(Qx/VerboseVersioning)
+include(OB/VerboseVersioning)
 setup_verbose_versioning(PROJECT_VERSION_VERBOSE)
 
 ################# Common Build #################
@@ -127,7 +134,7 @@ endif()
 #================= Top Level Build =========================
 
 # Find Qt package
-include(Qx/BetterFindQt6)
+include(OB/BetterFindQt6)
 find_qt6_package(REQUIRED COMPONENTS ${QT_FIND_COMPONENTS})
 
 #--------------------Package Config-----------------------
@@ -201,7 +208,7 @@ if(QX_DOCS_TARGET)
     endforeach()
 
     # Determine Qt related doc paths
-    include(Qx/QtDocsHelper)
+    include(OB/QtDocsHelper)
     configure_qt_doc_link(${Qt6_PREFIX_PATH})
 
     # Set Doxygen parameters
