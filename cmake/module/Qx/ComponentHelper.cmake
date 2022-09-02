@@ -173,7 +173,7 @@ macro(register_qx_component)
     )
     install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME_LC}/${COMPONENT_NAME_LC}.h"
         COMPONENT ${COMPONENT_TARGET_NAME}
-        DESTINATION "${HEADER_INSTALL_SUFFIX}/${COMPONENT_NAME_LC}/${PROJECT_NAME_LC}"
+        DESTINATION "include/${COMPONENT_NAME_LC}/${PROJECT_NAME_LC}"
         ${SUB_PROJ_EXCLUDE_FROM_ALL} # "EXCLUDE_FROM_ALL" if project is not top-level
     )
 
