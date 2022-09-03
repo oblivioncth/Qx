@@ -3,6 +3,7 @@
 
 // Standard Library Includes
 #include <stdexcept>
+#include <unordered_set>
 
 // Extra-component Includes
 #include "qx/utility/qx-concepts.h"
@@ -28,6 +29,24 @@ bool isOdd(T num) { return num % 2; }
 template<typename T>
     requires arithmetic<T>
 bool isEven(T num) { return !isOdd(num); }
+
+template <class InputIt>
+    requires std::input_iterator<InputIt> && std::equality_comparable<InputIt>
+bool containsDuplicates(InputIt begin, InputIt end)
+{
+    // Get type that iterator is of
+    using T = typename std::iterator_traits<InputIt >::value_type;
+
+    // Place values into unordered set
+    std::unordered_set<T> values(begin, end);
+
+    // Count values in original container
+    std::size_t size = std::distance(begin,end);
+
+    // Container has duplicates if set size is smaller than the the original container,
+    // since sets don't allow for duplicates
+    return size != values.size();
+}
 
 template<typename T>
     requires arithmetic<T>
@@ -150,22 +169,57 @@ T constrainedDiv(T a, T b, T max = std::numeric_limits<T>::max())
 
 template<typename T>
     requires std::integral<T>
-T roundToNearestMultiple(T num, T mult)
+T ceilNearestMultiple(T num, T mult)
 {
     // Ensure mult is positive
     mult = Qx::abs(mult);
 
-	if(mult == 0)
-		return 0;
+    if(mult == 0)
+        return 0;
 
-	if(mult == 1)
-		return num;
+    if(mult == 1 || mult == num)
+        return num;
 
-    T towardsZero = (num / mult) * mult;
-    T awayFromZero = num < 0 ? constrainedSub(towardsZero, mult) : constrainedAdd(towardsZero, mult);
+    if(num < 0)
+        return (num / mult) * mult;
+    else
+    {
+        T previousMultiple = (num / mult) * mult;
+        return previousMultiple == num ? num : constrainedAdd(previousMultiple, mult);
+    }
+}
 
-	// Return of closest the two directions
-    return (distance(towardsZero, num) <= distance(awayFromZero, num)) ? towardsZero : awayFromZero;
+template<typename T>
+    requires std::integral<T>
+T floorNearestMultiple(T num, T mult)
+{
+    // Ensure mult is positive
+    mult = Qx::abs(mult);
+
+    if(mult == 0)
+        return 0;
+
+    if(mult == 1 || mult == num)
+        return num;
+
+    if(num > 0)
+        return (num / mult) * mult;
+    else
+    {
+        T nextMultiple = (num / mult) * mult;
+        return nextMultiple == num ? num : constrainedSub(nextMultiple, mult);
+    }
+}
+
+template<typename T>
+    requires std::integral<T>
+T roundToNearestMultiple(T num, T mult)
+{
+    T above = ceilNearestMultiple(num, mult);
+    T below = floorNearestMultiple(num, mult);
+
+    // Return of closest the two directions
+    return above - num <= num - below ? above : below;
 }
 
 template <typename T>

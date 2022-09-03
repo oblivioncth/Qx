@@ -10,7 +10,7 @@ set(QT_DOC_MODULES
 	qtgui
 	qtnetwork
 	qtsql
-        qtsvg
+    qtsvg
 	qtwidgets
 	qtxml
 )

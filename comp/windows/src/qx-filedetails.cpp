@@ -36,7 +36,7 @@ namespace Qx
  *  This class also features the static member function readFileDetails() that can be used to acquire the details
  *  of a given file.
  *
- *  @sa , <a href="https://docs.microsoft.com/en-us/windows/win32/menurc/versioninfo-resource">VERSIONINFO resource</a>
+ *  @sa <a href="https://docs.microsoft.com/en-us/windows/win32/menurc/versioninfo-resource">VERSIONINFO resource</a>
  *  <a href="https://docs.microsoft.com/en-us/windows/win32/api/winver/nf-winver-getfileversioninfow">GetFileVersionInfoW</a>,
  *  <a href="https://docs.microsoft.com/en-us/windows/win32/api/winver/nf-winver-verqueryvaluew">VerQueryValue</a>.
  */

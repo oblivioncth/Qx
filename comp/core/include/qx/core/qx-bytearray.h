@@ -6,6 +6,7 @@
 
 // Qt Includes
 #include <QByteArray>
+#include <QtEndian>
 
 // Extra-component Includes
 #include "qx/utility/qx-concepts.h"

@@ -21,7 +21,7 @@ namespace Qx
  *  can be null, providing further clarity for the 'none' case.
  *
  *  To minimize unintentional interactions, Index<T> only has comparison and arithmetic operators defined for when
- *  both operands instances of the class and the underlying raw value must otherwise be accessed explicitly with
+ *  both operands are instances of the class and the underlying raw value must otherwise be accessed explicitly with
  *  Index<T>::operator*().
  *
  *  @par Arithmetic:

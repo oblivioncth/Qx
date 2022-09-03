@@ -4,12 +4,15 @@
 // Standard Library Includes
 #include <cmath>
 
-namespace Qx
-{
-/*! @addtogroup qx-core
- *  @{
+/*!
+ *  @file qx-algorithm.h
+ *  @ingroup qx-core
+ *
+ *  @brief The qx-algorithm header file provides various mathematical/algorithmic functions.
  */
 
+namespace Qx
+{
 //-Namespace Functions----------------------------------------------------------------------------------------------------
 /*!
  *  Returns the absolute value of @a n; equivalent to @c std::abs(n) .
@@ -63,6 +66,12 @@ unsigned long long abs(unsigned long long n) { return n; }
 
 /*!
  *  @fn template<typename T> requires arithmetic<T> static bool isEven(T num)
+ *
+ *  Returns @c true if there are duplicate elements in the range [@a first, @a last); otherwise returns @c false.
+ */
+
+/*!
+ *  @fn template <class InputIt> requires std::input_iterator<InputIt> && std::equality_comparable<InputIt> bool containsDuplicates(InputIt begin, InputIt end)
  *
  *  Returns @c true if @a num is even; otherwise returns @c false.
  */
@@ -135,6 +144,24 @@ unsigned long long abs(unsigned long long n) { return n; }
  */
 
 /*!
+ *  @fn template<typename T> requires std::integral<T> static T ceilNearestMultiple(T num, T mult)
+ *
+ *  Returns the next (i.e. higher) multiple of @a mult after @a num, or @a num if it is already
+ *  a multiple of @a mult.
+ *
+ *  The sign of the result will always be the same sign as @a num, regardless of the sign of @a mult.
+ */
+
+/*!
+ *  @fn template<typename T> requires std::integral<T> static T floorNearestMultiple(T num, T mult)
+ *
+ *  Returns the previous (i.e. lower) multiple of @a mult after @a num, or @a num if it is already
+ *  a multiple of @a mult.
+ *
+ *  The sign of the result will always be the same sign as @a num, regardless of the sign of @a mult.
+ */
+
+/*!
  *  @fn template<typename T> requires std::integral<T> static T roundToNearestMultiple(T num, T mult)
  *
  *  Returns the multiple of @a mult that @a num is closest to.
@@ -145,13 +172,15 @@ unsigned long long abs(unsigned long long n) { return n; }
 /*!
  *  @fn template <typename T> requires std::integral<T> static T ceilPowOfTwo(T num)
  *
- *  Returns the next (i.e. higher) power of two after @a num.
+ *  Returns the next (i.e. higher) power of two after @a num, or @a num if it is
+ *  already a power of two.
  */
 
 /*!
  *  @fn template <typename T> requires std::integral<T> static T floorPowOfTwo(T num)
  *
- *  Returns the previous (i.e. lower) power of two before @a num.
+ *  Returns the previous (i.e. lower) power of two before @a num, or @a num if it is
+ *  already a power of two.
  */
 
 /*!
@@ -159,6 +188,4 @@ unsigned long long abs(unsigned long long n) { return n; }
  *
  *  Returns the power of two that is closest to @a num.
  */
-
-/*! @}*/
 }

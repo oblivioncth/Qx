@@ -17,7 +17,7 @@ option(QX_DOCS_TARGET "Build Qx documentation" OFF)
 # NOTE: For versions stick to w.x.y.z, where z is generally
 # avoided and only used for hotfixes. DON'T USE TRAILING
 # ZEROS IN VERSIONS
-set(QX_BASE_VERSION 0.3.1) # Required for CI/CD
+set(QX_BASE_VERSION 0.3.2) # Required for CI/CD
 project(Qx
     VERSION ${QX_BASE_VERSION}
     LANGUAGES CXX
@@ -25,6 +25,7 @@ project(Qx
 )
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LC)
 string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UC)
+
 
 # C++
 set(CMAKE_CXX_STANDARD 20)
@@ -41,7 +42,13 @@ add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060000)
 # Add local modules
 set(PROJ_SCRIPTS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 list(APPEND CMAKE_MODULE_PATH "${PROJ_SCRIPTS_PATH}/module")
-include(Qx/Utility)
+
+# Get helper scripts
+include(Qx/FetchOBCMake)
+fetch_ob_cmake("v0.1")
+
+# Include utility functions
+include(OB/Utility)
 
 # General Variables
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -88,8 +95,6 @@ set(COMPONENTS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/comp")
 set(DOC_BUILD_PATH "${CMAKE_CURRENT_BINARY_DIR}/doc")
 set(DOC_GENERATED_PATH "${CMAKE_CURRENT_BINARY_DIR}/docin")
 
-# Install
-set(HEADER_INSTALL_SUFFIX "include")
 
 # Package
 set(PACKAGE_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/out/dist")
@@ -97,7 +102,7 @@ set(PACKAGE_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/out/dist")
 #------------Set Global Build Rules----------------
 
 # Versioning
-include(Qx/VerboseVersioning)
+include(OB/VerboseVersioning)
 setup_verbose_versioning(PROJECT_VERSION_VERBOSE)
 
 ################# Common Build #################
@@ -129,7 +134,7 @@ endif()
 #================= Top Level Build =========================
 
 # Find Qt package
-include(Qx/BetterFindQt6)
+include(OB/BetterFindQt6)
 find_qt6_package(REQUIRED COMPONENTS ${QT_FIND_COMPONENTS})
 
 #--------------------Package Config-----------------------
@@ -203,7 +208,7 @@ if(QX_DOCS_TARGET)
     endforeach()
 
     # Determine Qt related doc paths
-    include(Qx/QtDocsHelper)
+    include(OB/QtDocsHelper)
     configure_qt_doc_link(${Qt6_PREFIX_PATH})
 
     # Set Doxygen parameters
