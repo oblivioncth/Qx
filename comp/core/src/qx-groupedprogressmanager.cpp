@@ -91,6 +91,9 @@ void GroupedProgressManager::updateValue()
         mCurrentValue = newValue;
         emit valueChanged(mCurrentValue);
     }
+
+    // Notify that a group's progress was changed regardless of if it changed total progress
+    emit progressUpdated(mCurrentValue);
 }
 
 //Public:
@@ -177,11 +180,33 @@ quint64 GroupedProgressManager::maximum() const { return UNIFIED_MAXIMUM; }
 
 //-Slots------------------------------------------------------------------------------------------------------------
 //Private:
-void GroupedProgressManager::childValueChanged() { updateValue(); }
-void GroupedProgressManager::childMaximumChanged() { updateValue(); }
+void GroupedProgressManager::childValueChanged(quint64 value)
+{
+    // Get child
+    ProgressGroup* group = qobject_cast<ProgressGroup*>(sender());
+
+    // Update manager
+    updateValue();
+
+    // Emit child specific change
+    emit groupValueChanged(group, value);
+}
+
+void GroupedProgressManager::childMaximumChanged(quint64 maximum)
+{
+    // Get child
+    ProgressGroup* group = qobject_cast<ProgressGroup*>(sender());
+
+    // Update manager
+    updateValue();
+
+    // Emit child specific change
+    emit groupMaximumChanged(group, maximum);
+}
 
 void GroupedProgressManager::childWeightChanged()
 {
+    // Update manager
     updateRelativePortions();
     updateValue();
 }
@@ -196,6 +221,45 @@ void GroupedProgressManager::childWeightChanged()
  *  @note Since this value is recalculated every time a progress group is added to the manager, in manner
  *  that may result the value going up and down, it is recommended to not connect this signal to an
  *  observer until the manager has been fully initialized for a given use.
+ *
+ *  @sa progressUpdated(), and groupValueChanged().
  */
 
+/*!
+ *  @fn void GroupedProgressManager::progressUpdated(quint64 currentValue)
+ *
+ *  This signal is emitted whenever the progress of any group handled by the manager changes,
+ *  even if the change was too small to affect the weighted sum of the manager itself.
+ *
+ *  @a currentValue will contain the current value of the manager, which may not differ from the
+ *  last time this signal was emitted.
+ *
+ *  This is useful if you need to be notified when progress has changed by any amount whatsoever.
+ *
+ *  @note Since this value is recalculated every time a progress group is added to the manager, in manner
+ *  that may result the value going up and down, it is recommended to not connect this signal to an
+ *  observer until the manager has been fully initialized for a given use.
+ *
+ *  @sa valueChanged().
+ */
+
+
+/*!
+ *  @fn void GroupedProgressManager::groupValueChanged(Qx::ProgressGroup* group, quint64 value)
+ *
+ *  This signal is emitted whenever a managed group's value changes. The @a group parameter will contain
+ *  a pointer to the group whose value changed, while @a value will contain the new value.
+ *
+ *  @sa ProgressGroup::valueChanged().
+ */
+
+/*!
+ *  @fn void GroupedProgressManager::groupMaximumChanged(Qx::ProgressGroup* group, quint64 maximum)
+ *
+ *  This signal is emitted whenever a managed group's maximum value changes. The @a group parameter
+ *  will contain a pointer to the group whose maximum changed, while @a maximum will contain the new
+ *  maximum.
+ *
+ *  @sa ProgressGroup::maximumChanged().
+ */
 }
