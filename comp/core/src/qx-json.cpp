@@ -153,6 +153,126 @@ GenericError Json::checkedKeyRetrieval(QJsonObject& valueBuffer, QJsonObject jOb
 }
 
 /*!
+ *  Safely transforms the provided JSON Array into a list of values of its underlying type.
+ *
+ *  This assumes that the array is homogeneous.
+ *
+ *  @param[out] valueBuffer The return buffer for the retrieved value.
+ *  @param[in] jArray The JSON Object to retrieve a value from.
+ *
+ *  If array contains a value that does not match the return value buffer's type,
+ *  the returned error object will specify such; otherwise, an invalid error is returned.
+ *
+ *  @a valueBuffer is set to an empty list in the event of an error.
+ */
+GenericError Json::checkedArrayConversion(QList<bool>& valueBuffer, QJsonArray jArray)
+{
+    // Reset buffer
+    valueBuffer.clear();
+
+    for(const QJsonValue& value : jArray)
+    {
+        if(value.isBool())
+            valueBuffer.append(value.toBool());
+        else
+        {
+            valueBuffer.clear();
+            return GenericError(GenericError::Error, ERR_CONVERTING_ARRAY.arg(TYPE_STR_BOOL), ERR_VALUE_TYPE_MISMATCH.arg(TYPE_STR_BOOL));
+        }
+    }
+
+    return GenericError();
+}
+
+/*!
+ *  @overload
+ */
+GenericError Json::checkedArrayConversion(QList<double>& valueBuffer, QJsonArray jArray)
+{
+    // Reset buffer
+    valueBuffer.clear();
+
+    for(const QJsonValue& value : jArray)
+    {
+        if(value.isDouble())
+            valueBuffer.append(value.toDouble());
+        else
+        {
+            valueBuffer.clear();
+            return GenericError(GenericError::Error, ERR_CONVERTING_ARRAY.arg(TYPE_STR_DOUBLE), ERR_VALUE_TYPE_MISMATCH.arg(TYPE_STR_DOUBLE));
+        }
+    }
+
+    return GenericError();
+}
+
+/*!
+ *  @overload
+ */
+GenericError Json::checkedArrayConversion(QList<QString>& valueBuffer, QJsonArray jArray)
+{
+    // Reset buffer
+    valueBuffer.clear();
+
+    for(const QJsonValue& value : jArray)
+    {
+        if(value.isString())
+            valueBuffer.append(value.toString());
+        else
+        {
+            valueBuffer.clear();
+            return GenericError(GenericError::Error, ERR_CONVERTING_ARRAY.arg(TYPE_STR_STRING), ERR_VALUE_TYPE_MISMATCH.arg(TYPE_STR_STRING));
+        }
+    }
+
+    return GenericError();
+}
+
+/*!
+ *  @overload
+ */
+GenericError Json::checkedArrayConversion(QList<QJsonArray>& valueBuffer, QJsonArray jArray)
+{
+    // Reset buffer
+    valueBuffer.clear();
+
+    for(const QJsonValue& value : jArray)
+    {
+        if(value.isArray())
+            valueBuffer.append(value.toArray());
+        else
+        {
+            valueBuffer.clear();
+            return GenericError(GenericError::Error, ERR_CONVERTING_ARRAY.arg(TYPE_STR_ARRAY), ERR_VALUE_TYPE_MISMATCH.arg(TYPE_STR_ARRAY));
+        }
+    }
+
+    return GenericError();
+}
+
+/*!
+ *  @overload
+ */
+GenericError Json::checkedArrayConversion(QList<QJsonObject>& valueBuffer, QJsonArray jArray)
+{
+    // Reset buffer
+    valueBuffer.clear();
+
+    for(const QJsonValue& value : jArray)
+    {
+        if(value.isObject())
+            valueBuffer.append(value.toObject());
+        else
+        {
+            valueBuffer.clear();
+            return GenericError(GenericError::Error, ERR_CONVERTING_ARRAY.arg(TYPE_STR_OBJECT), ERR_VALUE_TYPE_MISMATCH.arg(TYPE_STR_OBJECT));
+        }
+    }
+
+    return GenericError();
+}
+
+/*!
  *  Recursively searches @a rootValue for @a key and returns the associated value for
  *  all matches as a list, or an empty list if the key was not found.
  *
