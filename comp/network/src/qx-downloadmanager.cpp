@@ -157,11 +157,28 @@ DownloadManagerReport DownloadManagerReport::Builder::build()
         }
 
         // Create error details
-        QString errorDetails = "- " + errorList.join("\n- ");
-        if(skipped)
-            errorDetails += "\n\n" + ERR_D_SKIP.arg(skipped);
-        if(aborted)
-            errorDetails += "\n\n" + ERR_D_ABORT.arg(aborted);
+        QString errorDetails;
+
+        if(!errorList.isEmpty())
+        {
+            errorDetails += ERR_D_SPECIFIC + "\n";
+            errorDetails += "- " + errorList.join("\n- ");
+        }
+        if(skipped || aborted)
+        {
+            if(!errorDetails.isEmpty())
+                errorDetails += "\n\n";
+
+            errorDetails += ERR_D_GENERAL + "\n";
+
+            QStringList generalList;
+            if(skipped)
+                generalList << ERR_D_SKIP.arg(skipped);
+            if(aborted)
+                generalList << ERR_D_ABORT.arg(aborted);
+
+            errorDetails += "- " + generalList.join("\n- ");
+        }
 
         mWorkingReport->mErrorInfo = GenericError(GenericError::Error, ERR_P_QUEUE_INCOMPL, ERR_S_OUTCOME_FAIL, errorDetails);
     }
