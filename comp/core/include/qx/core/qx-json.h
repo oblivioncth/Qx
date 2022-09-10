@@ -27,6 +27,8 @@ private:
     static inline const QString ERR_RETRIEVING_VALUE = "JSON Error: Could not retrieve the %1 value from key '%2'.";
     static inline const QString ERR_KEY_DOESNT_EXIST = "The key '%1' does not exist.";
     static inline const QString ERR_KEY_TYPE_MISMATCH = "They key '%1' does not hold a %2 value.";
+    static inline const QString ERR_CONVERTING_ARRAY = "JSON Error: Could not convert JSON array to list of %1.";
+    static inline const QString ERR_VALUE_TYPE_MISMATCH = "The array contained a value of a different type than %1.";
 
 //-Class Functions-----------------------------------------------------------------------------------------------
 public:
@@ -35,6 +37,12 @@ public:
     static GenericError checkedKeyRetrieval(QString& valueBuffer, QJsonObject jObject, const QString& key);
     static GenericError checkedKeyRetrieval(QJsonArray& valueBuffer, QJsonObject jObject, const QString& key);
     static GenericError checkedKeyRetrieval(QJsonObject& valueBuffer, QJsonObject jObject, const QString& key);
+
+    static GenericError checkedArrayConversion(QList<bool>& valueBuffer, QJsonArray jArray);
+    static GenericError checkedArrayConversion(QList<double>& valueBuffer, QJsonArray jArray);
+    static GenericError checkedArrayConversion(QList<QString>& valueBuffer, QJsonArray jArray);
+    static GenericError checkedArrayConversion(QList<QJsonArray>& valueBuffer, QJsonArray jArray);
+    static GenericError checkedArrayConversion(QList<QJsonObject>& valueBuffer, QJsonArray jArray);
 
     static QList<QJsonValue> findAllValues(const QJsonValue& rootValue, const QString& key);
 
