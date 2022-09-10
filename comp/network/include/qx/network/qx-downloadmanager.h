@@ -7,7 +7,6 @@
 #include <QAuthenticator>
 
 // Intra-component Includes
-#include "qx/network/qx-networkreplyerror.h"
 #include "qx/network/qx-common-network.h"
 
 // Extra-component Includes
