@@ -10,11 +10,12 @@
 #include <qx/core/qx-regularexpression.h>
 #include <qx/core/qx-algorithm.h>
 
+// Windows Includes
+#include "windows.h"
+#include "TlHelp32.h"
+
 namespace Qx
 {
-
-
-
 //-Namespace Functions-------------------------------------------------------------------------------------------------------------
 quint32 processId(QString processName)
 {
@@ -57,7 +58,7 @@ QString processName(quint32 processId)
     {
         while (Process32Next(snapshot, &entry) == TRUE)
         {
-            if (entry.th32ProcessID == processID)
+            if (entry.th32ProcessID == processId)
             {
                 processName = QString::fromWCharArray(entry.szExeFile);
                 break;
