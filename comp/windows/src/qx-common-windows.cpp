@@ -466,50 +466,6 @@ GenericError forceKillProcess(DWORD processId)
 }
 
 /*!
- *  This function is used to limit a particular application such that only one running instance is
- *  allowed at one time via a mutex. Call this function early in your program, at the point at which
- *  you want additional instances to terminate, and check the result:
- *
- *  If the calling instance is the only one running, the function will return @c true; otherwise
- *  it returns false.
- *
- *  @note This function uses the SHA256 based hash of the application's executable as the name of the
- *  mutex, so it will only limit instances of the exact same build. If you need to prevent additional
- *  instances across multiple builds of your application, use the overload of this function that
- *  accepts a name argument.
- */
-bool enforceSingleInstance()
-{
-    // Get self hash
-    QFile selfEXE(QCoreApplication::applicationFilePath());
-    QString selfHash;
-
-    if(calculateFileChecksum(selfHash, selfEXE, QCryptographicHash::Sha256).isFailure())
-        return false;
-
-    // Attempt to create unique mutex
-    return createMutex(selfHash);
-}
-
-/*!
- *  @overload
- *
- *  Limits the application to a single instance using the SHA256 based hash of @a uniqueAppId as the
- *  mutex name.
- *
- *  @note The mutex is created at the OS level so the contents of @a uniqueAppId should be reasonably
- *  unique!
- */
-bool enforceSingleInstance(QString uniqueAppId)
-{
-    // Attempt to create unique mutex
-    QByteArray idData = uniqueAppId.toUtf8();
-    QString hashId = Integrity::generateChecksum(idData, QCryptographicHash::Sha256);
-
-    return createMutex(hashId);
-}
-
-/*!
  *  Returns the HRESULT value @a res as a generic error.
  *
  *  Only the primary info portion of the error is filled.

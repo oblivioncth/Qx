@@ -6,9 +6,8 @@
 #include <QDir>
 #include <QDirIterator>
 
-// Inner-component Includes
-#include <qx/core/qx-regularexpression.h>
-#include <qx/core/qx-algorithm.h>
+// Extra-component Includes
+#include "qx/core/qx-integrity.h"
 
 // Windows Includes
 #include "windows.h"
@@ -16,6 +15,27 @@
 
 namespace Qx
 {
+
+namespace  // Anonymous namespace for effectively private (to this cpp) functions
+{
+    bool createMutex(QString mutexName)
+    {
+        // Persistent handle instance
+        static HANDLE uniqueAppMutex = NULL;
+
+        // Attempt to create unique mutex
+        uniqueAppMutex = CreateMutex(NULL, FALSE, (const wchar_t*)mutexName.utf16());
+        if(GetLastError() == ERROR_ALREADY_EXISTS)
+        {
+            CloseHandle(uniqueAppMutex);
+            return false; // Name isn't unique
+        }
+
+        // Name is unique
+        return true;
+    }
+}
+
 //-Namespace Functions-------------------------------------------------------------------------------------------------------------
 quint32 processId(QString processName)
 {
@@ -70,6 +90,15 @@ QString processName(quint32 processId)
 
     // Return if found or not (Null if not)
     return processName;
+}
+
+bool enforceSingleInstance(QString uniqueAppId)
+{
+    // Attempt to create unique mutex
+    QByteArray idData = uniqueAppId.toUtf8();
+    QString hashId = Integrity::generateChecksum(idData, QCryptographicHash::Sha256);
+
+    return createMutex(hashId);
 }
 
 }

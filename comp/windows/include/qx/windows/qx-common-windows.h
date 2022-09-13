@@ -46,7 +46,6 @@ QList<DWORD> processThreadIds(DWORD processId);
  * See https://docs.microsoft.com/en-us/windows/win32/psapi/module-information
  */
 
-// TODO: error check these functions like processIsElevated (maybe, it would make them cumbersome and theyre unlikely to fail)
 bool processIsRunning(HANDLE processHandle);
 
 GenericError processIsElevated(bool& elevated);
@@ -57,9 +56,6 @@ GenericError cleanKillProcess(HANDLE processHandle);
 GenericError cleanKillProcess(DWORD processId);
 GenericError forceKillProcess(HANDLE processHandle);
 GenericError forceKillProcess(DWORD processId);
-
-bool enforceSingleInstance();
-bool enforceSingleInstance(QString uniqueAppId);
 
 // Error codes
 GenericError translateHresult(HRESULT res);
