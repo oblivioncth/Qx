@@ -234,7 +234,6 @@ AsyncDownloadManager::AsyncDownloadManager(QObject* parent) :
     mStatus(Status::Initial)
 {
     // Configure access manager
-    mNam.setAutoDeleteReplies(true);
     connect(&mNam, &QNetworkAccessManager::sslErrors, this, &AsyncDownloadManager::sslErrorHandler);
     connect(&mNam, &QNetworkAccessManager::authenticationRequired, this, &AsyncDownloadManager::authHandler);
     connect(&mNam, &QNetworkAccessManager::preSharedKeyAuthenticationRequired, this, &AsyncDownloadManager::preSharedAuthHandler);
@@ -771,6 +770,9 @@ void AsyncDownloadManager::sizeQueryFinishedHandler(QNetworkReply* reply)
             stopOnError();
     }
 
+    // Mark reply for deletion
+    reply->deleteLater();
+
     // Proceed
     pushEnumerationsUntilFinished();
 }
@@ -828,6 +830,9 @@ void AsyncDownloadManager::downloadFinishedHandler(QNetworkReply* reply)
 
     // Remove from active writers
     mActiveWriters.remove(reply);
+
+    // Mark reply for deletion
+    reply->deleteLater();
 
     // Proceed
     pushDownloadsUntilFinished();
