@@ -3,6 +3,7 @@
 
 // Qt Includes
 #include <QNetworkProxy>
+#include <QNetworkReply>
 
 // Extra-component Includes
 #include "qx/core/qx-string.h"
