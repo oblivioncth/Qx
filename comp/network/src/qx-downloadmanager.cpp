@@ -4,6 +4,7 @@
 // Qt Includes
 #include <QNetworkProxy>
 #include <QNetworkReply>
+#include <QTimer>
 
 // Extra-component Includes
 #include "qx/core/qx-string.h"
@@ -773,8 +774,8 @@ void AsyncDownloadManager::sizeQueryFinishedHandler(QNetworkReply* reply)
     // Mark reply for deletion
     reply->deleteLater();
 
-    // Proceed
-    pushEnumerationsUntilFinished();
+    // Proceed on next loop iteration
+    QTimer::singleShot(0, this, &AsyncDownloadManager::pushEnumerationsUntilFinished);
 }
 
 void AsyncDownloadManager::downloadFinishedHandler(QNetworkReply* reply)
@@ -834,8 +835,8 @@ void AsyncDownloadManager::downloadFinishedHandler(QNetworkReply* reply)
     // Mark reply for deletion
     reply->deleteLater();
 
-    // Proceed
-    pushDownloadsUntilFinished();
+    // Proceed on next loop iteration
+    QTimer::singleShot(0, this, &AsyncDownloadManager::pushDownloadsUntilFinished);
 }
 
 //Public:
