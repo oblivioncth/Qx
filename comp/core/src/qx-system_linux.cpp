@@ -1,6 +1,13 @@
 // Unit Includes
 #include "qx/core/qx-system.h"
 
+// Standard Library Includes
+#include <string.h>
+
+// System Includes
+#include <sys/un.h>
+#include <sys/socket.h>
+
 // Qt Includes
 #include <QFile>
 #include <QDir>
@@ -122,6 +129,56 @@ QString processName(quint32 processId)
      * based specifically on process name.
      */
     return procNameFromStat(processId);
+}
+
+bool enforceSingleInstance(QString uniqueAppId)
+{
+    /* Open a socket in the abstract socket namespace to prevent further instances
+     *
+     * The socket cannot clash with regular sockets/ports, it will be closed
+     * automatically by the kernel when the process terminates for any reason,
+     * and does not touch the filesystem.
+     *
+     * In cases where an unexpected error occurs (i.e. not EADDRINUSE), ideally something
+     * else should be done, like returning an error status from this function instead,
+     * or throwing an exception if a general purpose exception handler is implemented,
+     * but for now any errors will lead to a return of false so that at the very least
+     * the calling application does not continue to run in this unexpected state.
+     */
+
+    int sockFD;
+    sockaddr_un addr = {0};
+
+    // Setup address
+    addr.sun_family = AF_UNIX;
+
+    /* To use an abstract socket address, the path must start with a null byte. Here
+     * this is already the case since the whole struct is initialized to 0. So, just
+     * copy the unique name into the buffer starting at index 1.
+     */
+    std::string ansiiId = uniqueAppId.toStdString();
+
+    // - 2: -1 since starting at index 1, another -1 to ensure the destination is always null-terminated
+    size_t maxChars = std::min(uniqueAppId.size(), static_cast<qsizetype>(sizeof(addr.sun_path)) - 2);
+    strncpy(addr.sun_path + 1, ansiiId.c_str(), maxChars);
+
+    // Create socket (don't let child processes inherit it)
+    sockFD = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
+    if(sockFD == -1)
+        return false; // Unexpected error
+
+    // Bind to abstract address
+    if(bind(sockFD, (struct sockaddr *)&addr, sizeof(addr)) == -1)
+    {
+        // Check for specific error
+        if(errno == EADDRINUSE)
+            return false; // Another instance already exists
+        else
+            return false; // Unexpected error, still returning false for now
+    }
+
+    // This is the first instance
+    return true;
 }
 
 }
