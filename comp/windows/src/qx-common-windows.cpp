@@ -169,72 +169,6 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
 }
 
 /*!
- *  Returns the PID (process ID) of a running process with the image (executable) name @a processName,
- *  or zero if the process could not be found.
- *
- *  @sa processNameById().
- */
-DWORD processId(QString processName)
-{
-    // Find process ID by name
-    DWORD processID = 0;
-    PROCESSENTRY32 entry;
-    entry.dwSize = sizeof(PROCESSENTRY32);
-
-    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
-
-    if (Process32First(snapshot, &entry) == TRUE)
-    {
-        while (Process32Next(snapshot, &entry) == TRUE)
-        {
-            if (QString::fromWCharArray(entry.szExeFile) == processName)
-            {
-                processID = entry.th32ProcessID;
-                break;
-            }
-        }
-    }
-
-    CloseHandle(snapshot);
-
-    // Return if found or not (0 if not)
-    return processID;
-}
-
-/*!
- *  Returns the image (executable) name of a running process with the PID @a processID,
- *  or a null string if the process could not be found.
- *
- *  @sa processIdByName().
- */
-QString processName(DWORD processID)
-{
-    // Find process name by ID
-    QString processName = QString();
-    PROCESSENTRY32 entry;
-    entry.dwSize = sizeof(PROCESSENTRY32);
-
-    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
-
-    if (Process32First(snapshot, &entry) == TRUE)
-    {
-        while (Process32Next(snapshot, &entry) == TRUE)
-        {
-            if (entry.th32ProcessID == processID)
-            {
-                processName = QString::fromWCharArray(entry.szExeFile);
-                break;
-            }
-        }
-    }
-
-    CloseHandle(snapshot);
-
-    // Return if found or not (Null if not)
-    return processName;
-}
-
-/*!
  *  Returns a list of thread IDs, sorted by creation time (oldest to newest), for all threads
  *  associated with the process specified by PID @a processId.
  *
@@ -333,22 +267,6 @@ bool processIsRunning(HANDLE processHandle)
              return false;
     }
 }
-
-/*!
- *  @overload
- *
- *  Returns @c true if the process with the image (executable) @a processName is currently running;
- *  otherwise returns @c false.
- */
-bool processIsRunning(QString processName) { return processId(processName); }
-
-/*!
- *  @overload
- *
- *  Returns @c true if the process with the PID @a processID is currently running;
- *  otherwise returns @c false.
- */
-bool processIsRunning(DWORD processID) { return processName(processID).isNull(); }
 
 /*!
  *  Sets @a elevated to true if the current process is running with elevated privileges; otherwise,
@@ -545,50 +463,6 @@ GenericError forceKillProcess(DWORD processId)
 
     // Return result
     return res;
-}
-
-/*!
- *  This function is used to limit a particular application such that only one running instance is
- *  allowed at one time via a mutex. Call this function early in your program, at the point at which
- *  you want additional instances to terminate, and check the result:
- *
- *  If the calling instance is the only one running, the function will return @c true; otherwise
- *  it returns false.
- *
- *  @note This function uses the SHA256 based hash of the application's executable as the name of the
- *  mutex, so it will only limit instances of the exact same build. If you need to prevent additional
- *  instances across multiple builds of your application, use the overload of this function that
- *  accepts a name argument.
- */
-bool enforceSingleInstance()
-{
-    // Get self hash
-    QFile selfEXE(QCoreApplication::applicationFilePath());
-    QString selfHash;
-
-    if(calculateFileChecksum(selfHash, selfEXE, QCryptographicHash::Sha256).isFailure())
-        return false;
-
-    // Attempt to create unique mutex
-    return createMutex(selfHash);
-}
-
-/*!
- *  @overload
- *
- *  Limits the application to a single instance using the SHA256 based hash of @a uniqueAppId as the
- *  mutex name.
- *
- *  @note The mutex is created at the OS level so the contents of @a uniqueAppId should be reasonably
- *  unique!
- */
-bool enforceSingleInstance(QString uniqueAppId)
-{
-    // Attempt to create unique mutex
-    QByteArray idData = uniqueAppId.toUtf8();
-    QString hashId = Integrity::generateChecksum(idData, QCryptographicHash::Sha256);
-
-    return createMutex(hashId);
 }
 
 /*!

@@ -27,6 +27,7 @@ set(COMPONENT_INCLUDE_HEADERS
     qx-regularexpression.h
     qx-setonce.h
     qx-string.h
+    qx-system.h
     qx-traverser.h
 )
 set(COMPONENT_PRIVATE_HEADERS
@@ -48,6 +49,7 @@ set(COMPONENT_IMPL
     qx-progressgroup.cpp
     qx-versionnumber.cpp
     qx-string.cpp
+    qx-system.cpp
 )
 
 # Doc Only Files
@@ -69,6 +71,21 @@ set(COMPONENT_PUBLIC_LINKS
     Qt6::Core
     Qx::Utility
 )
+
+################# Windows Build #################
+if(CMAKE_SYSTEM_NAME STREQUAL Windows)
+    list(APPEND COMPONENT_IMPL
+        qx-system_win.cpp
+    )
+endif()
+
+
+################# Linux Build #################
+if(CMAKE_SYSTEM_NAME STREQUAL Linux)
+    list(APPEND COMPONENT_IMPL
+        qx-system_linux.cpp
+    )
+endif()
 
 #=============== Component Handler =======================
 include(Qx/ComponentHelper)
