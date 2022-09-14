@@ -112,7 +112,7 @@ public slots:
     void setProgressMinimum(int progressMinimum);
     void setProgressMaximum(int progressMaximum);
     void setProgressRange(int progressMinimum, int progressMaximum);
-    void setProgressState(Qx::TaskbarButton::ProgressState progressState);
+    void setProgressState(TaskbarButton::ProgressState progressState);
     void resetProgress();
 
 //-Signals------------------------------------------------------------------------------------------------------------
@@ -120,7 +120,7 @@ signals:
     void progressValueChanged(int progressValue);
     void progressMinimumChanged(int progressMinimum);
     void progressMaximumChanged(int progressMaximum);
-    void progressStateChanged(Qx::TaskbarButton::ProgressState progressState);
+    void progressStateChanged(TaskbarButton::ProgressState progressState);
 };
 
 #endif // QX_TASHBARBUTTON_H

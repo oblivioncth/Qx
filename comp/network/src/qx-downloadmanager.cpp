@@ -1190,7 +1190,7 @@ DownloadManagerReport SyncDownloadManager::processQueue()
 
 //-Slots----------------------------------------------------------------------------------------------------------
 //Private:
-void SyncDownloadManager::finishHandler(const Qx::DownloadManagerReport& dmr)
+void SyncDownloadManager::finishHandler(const DownloadManagerReport& dmr)
 {
     mReport = dmr;
     mSpinner.quit();

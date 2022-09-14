@@ -676,7 +676,7 @@ void Base85::encodeData(const QByteArray& data, Base85& encodedObject)
     for(int chunkStartIdx = 0; chunkStartIdx < data.size(); chunkStartIdx += 4)
     {
         // Determine chunk size (accounts for padding)
-        int chunkSize = std::min(4, Qx::lengthOfRange(chunkStartIdx, maxIndex));
+        int chunkSize = std::min(4, lengthOfRange(chunkStartIdx, maxIndex));
 
         // Set buffer to chunk
         inputFrameBuffer = data.sliced(chunkStartIdx, chunkSize);
@@ -703,7 +703,7 @@ QByteArray Base85::encodeFrame(const QByteArray& frame, const Base85Encoding* en
     assert(frame.size() == 4);
 
     // Convert to 32-bit value frame (Base85 always uses BE)
-    quint32 frameValue = Qx::ByteArray::toPrimitive<quint32>(frame, QSysInfo::BigEndian);
+    quint32 frameValue = ByteArray::toPrimitive<quint32>(frame, QSysInfo::BigEndian);
 
     // Encode via 5 divisions by 85, taking remainder
     QByteArray encodedFrame;
@@ -794,7 +794,7 @@ void Base85::decodeData(const QByteArray& data, QByteArray& decodedData, const B
         }
 
         // Determine chunk size (accounts for padding)
-        int chunkSize = std::min(5, Qx::lengthOfRange(chunkStartIdx, maxIndex));
+        int chunkSize = std::min(5, lengthOfRange(chunkStartIdx, maxIndex));
 
         // Set buffer to chunk
         inputFrameBuffer = data.sliced(chunkStartIdx, chunkSize);
@@ -831,7 +831,7 @@ QByteArray Base85::decodeFrame(const QByteArray& frame, const Base85Encoding* en
         frameValue += encoding->characterPosition(frame[i]) * POWERS_OF_85[4 - i];
 
     // Convert to bytes
-    return Qx::ByteArray::fromPrimitive<quint32>(frameValue, QSysInfo::BigEndian);
+    return ByteArray::fromPrimitive<quint32>(frameValue, QSysInfo::BigEndian);
 }
 
 char Base85::charToLatin1(char ch) { return ch; }
@@ -848,7 +848,7 @@ char Base85::charToLatin1(QChar ch) { return ch.toLatin1(); }
  * definitions are obviously available here, the above holds true.
  */
 template<typename D>
-    requires Qx::any_of<D, QString, QByteArrayView>
+    requires any_of<D, QString, QByteArrayView>
 Base85 Base85::fromExternal(D base85, const Base85Encoding* enc, Base85ParseError* error)
 {
     // Ensure encoding is valid
@@ -877,7 +877,7 @@ Base85 Base85::fromExternal(D base85, const Base85Encoding* enc, Base85ParseErro
 }
 
 template<typename D, typename C>
-    requires Qx::any_of<D, QString, QByteArrayView>
+    requires any_of<D, QString, QByteArrayView>
 Base85ParseError Base85::parseExternal(D base85, Base85& externallyEncoded)
 {
     const Base85Encoding* encooding = externallyEncoded.encoding();
@@ -913,7 +913,7 @@ Base85ParseError Base85::parseExternal(D base85, Base85& externallyEncoded)
         const C& ch = base85[i];
 
         // White space is to be ignored, if char is whitespace, skip it
-        if(Qx::Char::isSpace(ch))
+        if(Char::isSpace(ch))
             continue;
 
         // Only matters for input type that contains QChar

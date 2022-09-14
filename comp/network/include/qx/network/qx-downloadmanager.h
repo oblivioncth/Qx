@@ -291,7 +291,7 @@ public:
 
 //-Slots------------------------------------------------------------------------------------------------------------
 private slots:
-    void finishHandler(const Qx::DownloadManagerReport& dmr);
+    void finishHandler(const DownloadManagerReport& dmr);
 
 public slots:
     void abort();

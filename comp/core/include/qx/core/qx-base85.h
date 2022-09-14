@@ -214,11 +214,11 @@ private:
 
     // External parse
     template<typename D>
-        requires Qx::any_of<D, QString, QByteArrayView>
+        requires any_of<D, QString, QByteArrayView>
     static Base85 fromExternal(D base85, const Base85Encoding* enc, Base85ParseError* error);
 
     template<typename D, typename C = typename std::iterator_traits<typename D::const_iterator>::value_type>
-        requires Qx::any_of<D, QString, QByteArrayView>
+        requires any_of<D, QString, QByteArrayView>
     static Base85ParseError parseExternal(D base85, Base85& externallyEncoded);
 
 public:
