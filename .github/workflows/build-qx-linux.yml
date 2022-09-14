@@ -31,8 +31,8 @@ jobs:
         qt_linkage: [shared, static]
     runs-on: ubuntu-latest
     env:
-      c_comp: clang
-      cxx_comp: clang++
+      c_comp: clang-12
+      cxx_comp: clang++-12
       cmake_gen: Ninja Multi-Config
     outputs:
       qt_shared_artifact_name: ${{ steps.get_artifact_name.outputs.qt_shared_artifact_name }}
@@ -92,11 +92,6 @@ jobs:
     - name: Extract Qt Install
       if: steps.cache-qt.outputs.cache-hit != 'true'
       run: 7z x ${{ env.qt_install_dest }} -o${{ env.qt_install_dir }}
-    - name: Set clang-12 as preferred
-      run: |
-        sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-12 100
-        sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-12 100
-        sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-12 100
     - name: Install OpenGL lib
       run: sudo apt-get install libglu1-mesa-dev
     - name: Install XCB-XKB
