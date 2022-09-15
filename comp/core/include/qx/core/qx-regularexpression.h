@@ -34,6 +34,7 @@ public:
                 "(?P<revision>0|[1-9]\\d*)"
                 "(?:-(?P<prerelease>(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?"
                 "(?:\\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?");
+    static inline const QRegularExpression LINE_BREAKS = QRegularExpression("[\\r\\n\\v]");
 };
 
 }

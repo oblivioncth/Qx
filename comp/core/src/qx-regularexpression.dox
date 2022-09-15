@@ -70,4 +70,10 @@ namespace Qx
  *  Same as @ref SEMANTIC_VERSION except that 4 digits are expected instead of 3, with the fourth
  *  digit corresponding to the additional capture group 'revision'.
  */
+
+/*!
+ *  @var QRegularExpression RegularExpression::LINE_BREAKS
+ *
+ *  Matches any line break character.
+ */
 }
