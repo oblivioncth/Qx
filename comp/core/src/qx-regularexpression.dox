@@ -76,4 +76,20 @@ namespace Qx
  *
  *  Matches any line break character.
  */
+
+/*!
+ *  @var QRegularExpression RegularExpression::WHITESPACE
+ *
+ *  Matches any whitespace character. Specifically:
+ *  @li @c \\f
+ *  @li @c \\n
+ *  @li @c \\r
+ *  @li @c \\t
+ *  @li @c \\v
+ *  @li @c \\x20
+ *  @li @c \\xA0
+ *  @li @c \\u00A0
+ *  @li @c \\u2028
+ *  @li @c \\u2029
+ */
 }
