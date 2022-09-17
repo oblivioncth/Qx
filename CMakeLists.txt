@@ -122,7 +122,7 @@ set(QT_FIND_COMPONENTS
 
 ################# Windows Build #################
 if(CMAKE_SYSTEM_NAME STREQUAL Windows)
-
+    list(REMOVE_ITEM BUILD_COMPONENTS linux)
 endif()
 
 ################# Linux Build #################

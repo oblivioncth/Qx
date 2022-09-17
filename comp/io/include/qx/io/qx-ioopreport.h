@@ -14,7 +14,7 @@ namespace Qx
 {
 	
 //-Types------------------------------------------------------------------------------------------------------
-enum IoOpType { IO_OP_READ, IO_OP_WRITE, IO_OP_ENUMERATE, IO_OP_INSPECT };
+enum IoOpType { IO_OP_READ, IO_OP_WRITE, IO_OP_ENUMERATE, IO_OP_INSPECT, IO_OP_MANIPULATE };
 enum IoOpResultType { IO_SUCCESS, IO_ERR_UNKNOWN, IO_ERR_ACCESS_DENIED, IO_ERR_WRONG_TYPE, IO_ERR_OUT_OF_RES,
                       IO_ERR_READ, IO_ERR_WRITE, IO_ERR_FATAL, IO_ERR_OPEN, IO_ERR_ABORT,
                       IO_ERR_TIMEOUT, IO_ERR_REMOVE, IO_ERR_RENAME, IO_ERR_REPOSITION,
@@ -41,13 +41,15 @@ private:
         {IO_OP_READ, "read"},
         {IO_OP_WRITE, "wrote"},
         {IO_OP_ENUMERATE, "enumerated"},
-        {IO_OP_INSPECT, "inspected"}
+        {IO_OP_INSPECT, "inspected"},
+        {IO_OP_MANIPULATE, "manipulated"}
     };
     static const inline QHash<IoOpType, QString> ERROR_VERBS = {
         {IO_OP_READ, "reading"},
         {IO_OP_WRITE, "writing"},
         {IO_OP_ENUMERATE, "enumerating"},
-        {IO_OP_INSPECT, "inspecting"}
+        {IO_OP_INSPECT, "inspecting"},
+        {IO_OP_MANIPULATE, "manipulating"}
     };
     static const inline QHash<IoOpResultType, QString> ERROR_INFO = {
         {IO_ERR_UNKNOWN, "An unknown error has occurred."},
