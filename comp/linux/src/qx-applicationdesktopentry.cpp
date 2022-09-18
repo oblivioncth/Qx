@@ -86,7 +86,13 @@ void DesktopAction::setExec(const QString& exec) { mExec = exec; }
 /*!
  *  Constructs an empty application desktop entry.
  */
-ApplicationDesktopEntry::ApplicationDesktopEntry() {}
+ApplicationDesktopEntry::ApplicationDesktopEntry() :
+    mDBusActivatable(false),
+    mTerminal(false),
+    mStartupNotify(false),
+    mPrefersNonDefaultGPU(false),
+    mSingleMainWindow(false)
+{}
 
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:
