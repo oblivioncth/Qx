@@ -29,7 +29,7 @@ jobs:
     strategy:
       matrix:
         qt_linkage: [shared, static]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       c_comp: clang-12
       cxx_comp: clang++-12
