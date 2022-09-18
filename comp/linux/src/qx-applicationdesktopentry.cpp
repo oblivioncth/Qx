@@ -160,12 +160,12 @@ bool ApplicationDesktopEntry::isDBusActivatable() { return mDBusActivatable; }
 QString ApplicationDesktopEntry::tryExec() { return mTryExec; }
 
 /*!
- *  Returns the name of associated application and its arguments.
+ *  Returns the full path of the associated application and its arguments.
  */
 QString ApplicationDesktopEntry::exec() { return mExec; }
 
 /*!
- *  Returns the path to the associated application.
+ *  Returns the working directory of the associated application .
  */
 QString ApplicationDesktopEntry::path() { return mPath; }
 
@@ -241,12 +241,12 @@ void ApplicationDesktopEntry::setDBusActivatable(bool activatable) { mDBusActiva
 void ApplicationDesktopEntry::setTryExec(const QString& tryExec) { mTryExec = tryExec; }
 
 /*!
- *  Sets the name of the associated application and its arguments to @a exec.
+ *  Sets the full path of the associated application and its arguments to @a exec.
  */
 void ApplicationDesktopEntry::setExec(const QString& exec) { mExec = exec; }
 
 /*!
- *  Sets the path of the associated application to @a path.
+ *  Sets the working directory of the associated application to @a path.
  */
 void ApplicationDesktopEntry::setPath(const QString& path) { mPath = path; }
 
