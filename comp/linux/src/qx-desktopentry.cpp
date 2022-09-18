@@ -76,7 +76,8 @@ QString DesktopEntry::keyValueString(const QString& key, const QStringList& valu
 
 //Public:
 /*!
- *  Writes the DesktopEntry to the file specified by @a path, overwriting any existing entry if any.
+ *  Writes the DesktopEntry to the file specified by @a path, overwriting any existing entry if any,
+ *  and sets the file's owner executable bit.
  *
  *  The correct extension is automatically appended to the filename portion of the path if it is not
  *  already present.
@@ -116,7 +117,7 @@ IoOpReport DesktopEntry::writeToDisk(QString path, const DesktopEntry* entry)
 
     // Mark as executable
     QFile entryFile(fullFilePath);
-    if(entryFile.setPermissions(QFile::ExeOwner | QFile::ExeUser))
+    if(entryFile.setPermissions(entryFile.permissions() | QFile::ExeOwner))
         return IoOpReport(IO_OP_MANIPULATE, IO_ERR_ACCESS_DENIED, entryFile);
     else
         return IoOpReport(IO_OP_WRITE, IO_SUCCESS, entryFile); // Use write here since it is the overall operation of this function
