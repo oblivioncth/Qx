@@ -46,13 +46,13 @@ jobs:
           {
             "shared": {
               "qt_install_name": "qt-Production-6.3.1-linux-clang-x64-shared-release.7z",
-              "qt_install_url": "https://mega.nz/file/NiIEAITC",
+              "qt_install_url": "https://mega.nz/file/tmh1CYwb",
               "qt_install_url_key": "${{ secrets.qt_shared_dec_key }}",
               "artifact_output_var": "qt_shared_artifact_name"
             },
             "static": {
               "qt_install_name": "qt-Production-6.3.1-linux-clang-x64-static-release.7z",
-              "qt_install_url": "https://mega.nz/file/VjJ2CR4R",
+              "qt_install_url": "https://mega.nz/file/oiBGhL6L",
               "qt_install_url_key": "${{ secrets.qt_static_dec_key }}",
               "artifact_output_var": "qt_static_artifact_name"
             }
