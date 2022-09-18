@@ -117,7 +117,7 @@ IoOpReport DesktopEntry::writeToDisk(QString path, const DesktopEntry* entry)
 
     // Mark as executable
     QFile entryFile(fullFilePath);
-    if(entryFile.setPermissions(entryFile.permissions() | QFile::ExeOwner))
+    if(!entryFile.setPermissions(entryFile.permissions() | QFile::ExeOwner))
         return IoOpReport(IO_OP_MANIPULATE, IO_ERR_ACCESS_DENIED, entryFile);
     else
         return IoOpReport(IO_OP_WRITE, IO_SUCCESS, entryFile); // Use write here since it is the overall operation of this function
