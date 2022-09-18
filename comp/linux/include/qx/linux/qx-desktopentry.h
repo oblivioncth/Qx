@@ -44,6 +44,7 @@ public:
 //-Class Functions----------------------------------------------------------------------------------------------
 protected:
     static QString keyValueString(const QString& key, bool value);
+    static QString keyValueString(const QString& key, const char* value);
     static QString keyValueString(const QString& key, const QString& value);
     static QString keyValueString(const QString& key, const QStringList& value);
 

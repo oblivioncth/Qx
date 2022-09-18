@@ -49,12 +49,17 @@ DesktopEntry::DesktopEntry() :
 /*!
  *  Creates a string of @a key and @a value in the same arrangement they would appear in a file.
  *
- *  Useful for implementing a custom desktop entry type.
+ *  This is useful for implementing a custom desktop entry type.
  */
 QString DesktopEntry::keyValueString(const QString& key, bool value)
 {
-    return keyValueString(key, value ? "true" : "false");
+    return keyValueString(key, (value ? "true" : "false"));
 }
+
+/*!
+ *  @overload
+ */
+QString DesktopEntry::keyValueString(const QString& key, const char* value) { return key + '=' + value; }
 
 /*!
  *  @overload
