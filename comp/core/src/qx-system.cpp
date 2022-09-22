@@ -24,6 +24,19 @@ namespace Qx
  */
 
 /*!
+ *  @fn QStringList<quint32> processChildren(quint32 processId, bool recursive)
+ *
+ *  Returns a list of process IDs for all the children of the process specified by @a processId, or
+ *  an empty list of the process has no children or an an error occurred.
+ *
+ *  If @a recursive is true, the returned list will contain the process ID of every process
+ *  descended from the specified process, instead of just its immediate children; in other
+ *  words, the list will represent the entire process tree of @a processId, excluding itself.
+ *
+ *  The list is not guaranteed to be in any particular order.
+ */
+
+/*!
  *  Returns @c true if the process with the name @a processName is currently running;
  *  otherwise returns @c false.
  */
