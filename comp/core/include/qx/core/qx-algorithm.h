@@ -20,7 +20,7 @@ unsigned long long abs(unsigned long long n);
 
 template<typename T>
     requires std::integral<T>
-T lengthOfRange(T start, T end) { return (end - start) + 1; }
+T length(T start, T end) { return (end - start) + 1; }
 
 template<typename T>
     requires arithmetic<T>

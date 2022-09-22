@@ -676,7 +676,7 @@ void Base85::encodeData(const QByteArray& data, Base85& encodedObject)
     for(int chunkStartIdx = 0; chunkStartIdx < data.size(); chunkStartIdx += 4)
     {
         // Determine chunk size (accounts for padding)
-        int chunkSize = std::min(4, lengthOfRange(chunkStartIdx, maxIndex));
+        int chunkSize = std::min(4, length(chunkStartIdx, maxIndex));
 
         // Set buffer to chunk
         inputFrameBuffer = data.sliced(chunkStartIdx, chunkSize);
@@ -794,7 +794,7 @@ void Base85::decodeData(const QByteArray& data, QByteArray& decodedData, const B
         }
 
         // Determine chunk size (accounts for padding)
-        int chunkSize = std::min(5, lengthOfRange(chunkStartIdx, maxIndex));
+        int chunkSize = std::min(5, length(chunkStartIdx, maxIndex));
 
         // Set buffer to chunk
         inputFrameBuffer = data.sliced(chunkStartIdx, chunkSize);

@@ -68,7 +68,7 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
             {
                 qsizetype nameStart = nameStartMarker + 1;
                 qsizetype nameEnd = nameEndMarker - 1;
-                QString name = stat.sliced(nameStart, Qx::lengthOfRange(nameStart, nameEnd));
+                QString name = stat.sliced(nameStart, length(nameStart, nameEnd));
 
                 // Name should be limited to 15 char (excluding '\0')
                 if(name.size() <= 15)
