@@ -1,6 +1,13 @@
 // Unit Includes
 #include "qx/core/qx-system.h"
 
+/*!
+ *  @file qx-system.h
+ *  @ingroup qx-core
+ *
+ *  @brief The qx-system header file provides various portable system utilities.
+ */
+
 namespace Qx
 {
 
