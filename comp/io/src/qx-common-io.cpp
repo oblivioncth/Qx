@@ -760,7 +760,7 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
                 returnBuffer = lastLine.right(1);
             else // Some range of last line is desired
             {
-                int endPoint = endPos.character().isLast() ? -1 : lengthOfRange(*startPos.character(), *endPos.character());
+                int endPoint = endPos.character().isLast() ? -1 : length(*startPos.character(), *endPos.character());
                 returnBuffer = lastLine.mid(*startPos.character(), endPoint);
             }
         }
@@ -779,7 +779,7 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
                         returnBuffer = fileTextStream.readLine().right(1);
                     else // Some range of single line segment is desired
                     {
-                        int endPoint = endPos.character().isLast() ? -1 : lengthOfRange(*startPos.character(), *endPos.character());
+                        int endPoint = endPos.character().isLast() ? -1 : length(*startPos.character(), *endPos.character());
                         returnBuffer = fileTextStream.readLine().mid(*startPos.character(), endPoint);
                     }
                 }
@@ -1069,7 +1069,7 @@ namespace
                     // Determine last overwritten line start, end, and length
                     qint64 lastLineStart = lastLf + 1;
                     qint64 lastLineEnd = (nextLf == -1 ? afterNew.count(): nextLf) - 1;
-                    qint64 lastLineLength = lengthOfRange(lastLineStart, lastLineEnd);
+                    qint64 lastLineLength = length(lastLineStart, lastLineEnd);
 
                     // Keep portion of last line that is past replacement last line
                     afterNew = afterNew.mid(lastLineEnd + 1 - std::max(lastLineLength - lastNewLineLength, qint64(0)));
@@ -1474,7 +1474,7 @@ IoOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, Index64 star
     }
 
     // Determine data length and allocate buffer
-    qint64 bufferSize = lengthOfRange(*startPos, *endPos);
+    qint64 bufferSize = length(*startPos, *endPos);
     returnBuffer.resize(bufferSize);
 
     // Skip to start pos

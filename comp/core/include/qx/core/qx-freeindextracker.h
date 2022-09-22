@@ -111,7 +111,7 @@ public:
     T firstFree() const
     {
         // Quick check for all reserved
-        if(mReservedIndicies.count() == lengthOfRange(mMinIndex, mMaxIndex))
+        if(mReservedIndicies.count() == length(mMinIndex, mMaxIndex))
             return -1;
 
         // Full check for first available
@@ -126,7 +126,7 @@ public:
     T lastFree() const
     {
         // Quick check for all reserved
-        if(mReservedIndicies.count() == lengthOfRange(mMinIndex, mMaxIndex))
+        if(mReservedIndicies.count() == length(mMinIndex, mMaxIndex))
             return -1;
 
         // Full check for first available (backwards)
