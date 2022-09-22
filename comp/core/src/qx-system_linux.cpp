@@ -20,8 +20,38 @@
 namespace Qx
 {
 
-namespace  // Anonymous namespace for effectively private (to this cpp) functions
+namespace  // Anonymous namespace for local only definitions
 {
+    // Starts at first entry, check atEnd before moving to next
+    class ProcTraverser
+    {
+    private:
+        QDirIterator mItr;
+
+    public:
+        ProcTraverser() :
+            mItr("/proc", QDir::Dirs | QDir::NoDotAndDotDot)
+        {
+            // Go to first entry
+            if(mItr.hasNext())
+                advance();
+        }
+
+        bool atEnd() { return !mItr.hasNext(); }
+        void advance()
+        {
+            while(mItr.hasNext())
+            {
+                mItr.next();
+
+                // Ignore non-PID folders
+                if(mItr.fileName().contains(Qx::RegularExpression::NUMBERS_ONLY))
+                    break;
+            }
+        }
+        quint32 pid() { return mItr.fileName().toInt(); }
+    };
+
     QString readProcString(quint32 pid, QString subFilePath)
     {
         QFile procFile("/proc/" + QString::number(pid) + subFilePath);
@@ -128,20 +158,12 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
 //-Namespace Functions-------------------------------------------------------------------------------------------------------------
 quint32 processId(QString processName)
 {
-    // Iterate over /proc sub-directories
-    QDirIterator dit("/proc", QDir::Dirs | QDir::NoDotAndDotDot);
-    while(dit.hasNext())
+    // Iterate over /proc
+    for(ProcTraverser pt; !pt.atEnd(); pt.advance())
     {
-        QString currentDirName = dit.nextFileInfo().fileName();
-
-        // Ignore non-process specific folders
-        if(!currentDirName.contains(Qx::RegularExpression::NUMBERS_ONLY))
-            continue;
-
-        // Note process ID
-        quint32 pid = currentDirName.toInt();
-
         // Check for all match methods
+        quint32 pid = pt.pid();
+
         if(processName == readProcString(pid, "/comm") ||
            processName == procNameFromCmdline(pid) ||
            processName == procNameFromStat(pid) ||
