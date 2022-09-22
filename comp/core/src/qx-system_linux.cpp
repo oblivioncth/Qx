@@ -135,7 +135,7 @@ namespace  // Anonymous namespace for local only definitions
         if(!stats.isEmpty())
         {
             // Get name entry, strip parentheses
-            QString nameEntry = stats[1];
+            QString nameEntry = stats.value(1);
             return nameEntry.sliced(1, nameEntry.count() - 2);
         }
 
@@ -183,6 +183,36 @@ QString processName(quint32 processId)
      * based specifically on process name.
      */
     return procNameFromStat(processId);
+}
+
+QList<quint32> processChildren(quint32 processId, bool recursive)
+{
+    // Output list
+    QList<quint32> cPids;
+
+    // Recursive enumerator
+    auto enumChildren = [&cPids](auto&& enumChildren, quint32 tPid, bool r)->void{
+        // Find all processes that have `pid` as their parent
+        for(ProcTraverser pt; !pt.atEnd(); pt.advance())
+        {
+            quint32 pid = pt.pid();
+            QStringList stats = statList(pid);
+            quint32 pPid = stats.value(3, "0").toInt();
+
+            if(pPid == tPid)
+            {
+                cPids.append(pid);
+                if(r)
+                    enumChildren(enumChildren, tPid, r);
+            }
+        }
+    };
+
+    // Ensure parent exists
+    if(QFileInfo::exists("/proc/" + QString::number(processId)))
+        enumChildren(enumChildren, processId, recursive);
+
+    return cPids;
 }
 
 bool enforceSingleInstance(QString uniqueAppId)

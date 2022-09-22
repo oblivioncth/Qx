@@ -10,6 +10,7 @@ namespace Qx
 //-Namespace Functions-------------------------------------------------------------------------------------------------------------
 quint32 processId(QString processName);
 QString processName(quint32 processId);
+QList<quint32> processChildren(quint32 processId, bool recursive = false);
 
 bool processIsRunning(QString processName);
 bool processIsRunning(quint32 processID);
