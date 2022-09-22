@@ -38,6 +38,50 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
         return QString();
     }
 
+    QStringList statList(quint32 pid)
+    {
+        QStringList stats;
+
+        QString stat = readProcString(pid, "/stat");
+        if(!stat.isEmpty())
+        {
+            // Single out name (can contain all kinds of problematic characters)
+            qsizetype nameStartMarker = stat.indexOf('(');
+            qsizetype nameEndMarker = stat.lastIndexOf(')');
+
+            if(nameStartMarker != -1 && nameEndMarker != -1)
+            {
+                QString nameEntry = stat.sliced(nameStartMarker, length(nameStartMarker, nameEndMarker));
+
+                // Name should be limited to 15 char (16 w/ '\0', but that isn't present here), so
+                // with the parenthesizes that's 17
+                if(nameEntry.size() <= 17)
+                {
+                    // Now that the name entry has be isolated, everything else is easy,
+                    // they're just space delimited
+
+                    // Get the 1st entry before the name
+                    QString pid = stat.sliced(0, length(qsizetype(0), nameStartMarker - 2));
+                    stats.append(pid);
+
+                    // Add name
+                    stats.append(nameEntry);
+
+                    // Get everything after the name
+                    qsizetype lastIdx = stat.size() - 1;
+                    if(stat.back() == '\n' || stat.back() == '\0')
+                        lastIdx--; // Ignore terminating char
+                    qsizetype aftNameIdx = nameEndMarker + 2;
+
+                    QString afterName = stat.sliced(aftNameIdx, length(aftNameIdx, lastIdx));
+                    stats.append(afterName.split(' '));
+                }
+            }
+        }
+
+        return stats;
+    }
+
     QString procNameFromCmdline(quint32 pid)
     {
         QString cmdline = readProcString(pid, "/cmdline");
@@ -57,23 +101,12 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
 
     QString procNameFromStat(quint32 pid)
     {
-        QString stat = readProcString(pid, "/stat");
-        if(!stat.isEmpty())
+        QStringList stats = statList(pid);
+        if(!stats.isEmpty())
         {
-            // Single out name
-            qsizetype nameStartMarker = stat.indexOf('(');
-            qsizetype nameEndMarker = stat.lastIndexOf(')');
-
-            if(nameStartMarker != -1 && nameEndMarker != -1)
-            {
-                qsizetype nameStart = nameStartMarker + 1;
-                qsizetype nameEnd = nameEndMarker - 1;
-                QString name = stat.sliced(nameStart, length(nameStart, nameEnd));
-
-                // Name should be limited to 15 char (excluding '\0')
-                if(name.size() <= 15)
-                    return name;
-            }
+            // Get name entry, strip parentheses
+            QString nameEntry = stats[1];
+            return nameEntry.sliced(1, nameEntry.count() - 2);
         }
 
         return QString();
@@ -119,7 +152,6 @@ quint32 processId(QString processName)
     // No match
     return 0;
 }
-
 
 QString processName(quint32 processId)
 {
