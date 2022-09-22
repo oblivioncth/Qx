@@ -92,6 +92,68 @@ QString processName(quint32 processId)
     return processName;
 }
 
+QList<quint32> processChildren(quint32 processId, bool recursive)
+{
+    /* Process32First and Process32Next modify an index internal to the snapshot taken
+     * with CreateToolhelp32Snapshot() and so there can't be multiple iterators of the
+     * snapshot at the same time; therefore, the tree traversal approach here needs to
+     * progress from left-to-right across an entire depth to make sure that the entire
+     * snapshot has been iterated for each PID before checking the next one, instead
+     * of calling the function recursively on the spot as soon as a matching child
+     * ID is found.
+     */
+
+    // Output list
+    // Target PID is temporarily added to list to facilitate the recursive implementation
+    QList<quint32> cPids = {processId};
+
+    // Initialize snapshot
+    if(HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL))
+    {
+        // Initialize entry data holder
+        PROCESSENTRY32 procEntry;
+        procEntry.dwSize = sizeof(PROCESSENTRY32);
+
+        // Track processed children
+        qsizetype pIdx = 0;
+
+        /* Enumerate
+         * Get the first depth of children and then only loop if recursion is enabled
+         * and there are still children to process. This will be the case when the last
+         * cPids element has been checked and no new processes got added to the list.
+         */
+        do
+        {
+            // Target PID
+            quint32 currentPid = cPids[pIdx];
+
+            // Go to first entry in the snapshot
+            if(Process32First(snapshot, &procEntry))
+            {
+                // Find all processes that have target PID as their parent
+                do
+                {
+                    if(procEntry.th32ParentProcessID == currentPid)
+                        cPids.append(procEntry.th32ProcessID);
+                }
+                while(Process32Next(snapshot, &procEntry));
+            }
+
+            // Proceed to next PID
+            currentPid++;
+        }
+        while(recursive && pIdx < cPids.size());
+
+        // Cleanup snapshot
+        CloseHandle(snapshot);
+    }
+
+    // Remove target PID from list
+    cPids.removeFirst();
+
+    return cPids;
+}
+
 bool enforceSingleInstance(QString uniqueAppId)
 {
     // Attempt to create unique mutex
