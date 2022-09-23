@@ -151,16 +151,17 @@ quint32 processId(QString processName)
 
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
 
-    if (Process32First(snapshot, &entry) == TRUE)
+    if(Process32First(snapshot, &entry))
     {
-        while (Process32Next(snapshot, &entry) == TRUE)
+        do
         {
-            if (QString::fromWCharArray(entry.szExeFile) == processName)
+            if(QString::fromWCharArray(entry.szExeFile) == processName)
             {
                 processID = entry.th32ProcessID;
                 break;
             }
         }
+        while(Process32Next(snapshot, &entry));
     }
 
     CloseHandle(snapshot);
@@ -179,16 +180,18 @@ QString processName(quint32 processId)
 
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
 
-    if (Process32First(snapshot, &entry) == TRUE)
+
+    if(Process32First(snapshot, &entry))
     {
-        while (Process32Next(snapshot, &entry) == TRUE)
+        do
         {
-            if (entry.th32ProcessID == processId)
+            if(entry.th32ProcessID == processId)
             {
                 processName = QString::fromWCharArray(entry.szExeFile);
                 break;
             }
         }
+        while(Process32Next(snapshot, &entry));
     }
 
     CloseHandle(snapshot);
