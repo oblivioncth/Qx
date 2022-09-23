@@ -7,6 +7,7 @@
 // System Includes
 #include <sys/un.h>
 #include <sys/socket.h>
+#include <signal.h>
 
 // Qt Includes
 #include <QFile>
@@ -27,27 +28,31 @@ namespace  // Anonymous namespace for local only definitions
     {
     private:
         QDirIterator mItr;
+        bool mAtEnd;
 
     public:
         ProcTraverser() :
-            mItr("/proc", QDir::Dirs | QDir::NoDotAndDotDot)
+            mItr("/proc", QDir::Dirs | QDir::NoDotAndDotDot),
+            mAtEnd(false)
         {
             // Go to first entry
             if(mItr.hasNext())
                 advance();
         }
 
-        bool atEnd() { return !mItr.hasNext(); }
+        bool atEnd() { return mAtEnd; }
         void advance()
         {
-            while(mItr.hasNext())
+            while(!mAtEnd && mItr.hasNext())
             {
                 mItr.next();
 
-                // Ignore non-PID folders
+                // Ignore non-PID folders (only stop at PID folders)
                 if(mItr.fileName().contains(Qx::RegularExpression::NUMBERS_ONLY))
-                    break;
+                    return;
             }
+
+            mAtEnd = true;
         }
         quint32 pid() { return mItr.fileName().toInt(); }
     };
@@ -135,7 +140,7 @@ namespace  // Anonymous namespace for local only definitions
         if(!stats.isEmpty())
         {
             // Get name entry, strip parentheses
-            QString nameEntry = stats[1];
+            QString nameEntry = stats.value(1);
             return nameEntry.sliced(1, nameEntry.count() - 2);
         }
 
@@ -152,6 +157,38 @@ namespace  // Anonymous namespace for local only definitions
         }
 
         return QString();
+    }
+
+
+    // TODO: Consider adding this and errnoGen as public functions in qx-linux
+    GenericError translateErrno(int err)
+    {
+        /* TODO: Once moving to Ubuntu 22.04 LTS as a reference (and therefore using a higher version of
+         * glibc, use strerrorname_np() to get the text name of the error number
+         */
+        QString name = "0x" + QString::number(err, 16);
+
+        //NOTE: If ever used in other UNIX systems, the POSIX version of this needs to differ as noted here:
+        // http://www.club.cc.cmu.edu/~cmccabe/blog_strerror.html
+        char buffer[128]; // No need to initialize, GNU strerror_r() guarantees result is null terminated
+        QString desc = QString::fromLatin1(strerror_r(err, buffer, sizeof(buffer)), -1);
+
+        return GenericError(GenericError::Error, "System Error: " + desc + " (" + name + ").");
+    }
+
+    GenericError errnoGen() { return translateErrno(errno); }
+
+    GenericError sendKillSignal(quint32 pid, int sig)
+    {
+        if(pid == 0 || pid > std::numeric_limits<pid_t>::max())
+            return translateErrno(EINVAL);
+        else
+        {
+            if(::kill(static_cast<pid_t>(pid), sig) == 0)
+                return Qx::GenericError();
+            else
+                return errnoGen();
+        }
     }
 }
 
@@ -184,6 +221,40 @@ QString processName(quint32 processId)
      */
     return procNameFromStat(processId);
 }
+
+QList<quint32> processChildren(quint32 processId, bool recursive)
+{
+    // Output list
+    QList<quint32> cPids;
+
+    // Recursive enumerator
+    auto enumChildren = [&cPids](auto&& enumChildren, quint32 tPid, bool r)->void{
+        // Find all processes that have `pid` as their parent
+        for(ProcTraverser pt; !pt.atEnd(); pt.advance())
+        {
+            quint32 pid = pt.pid();
+            QStringList stats = statList(pid);
+            quint32 pPid = stats.value(3, "0").toInt();
+
+            if(pPid == tPid)
+            {
+                cPids.append(pid);
+                if(r)
+                    enumChildren(enumChildren, tPid, r);
+            }
+        }
+    };
+
+    // Ensure parent exists
+    if(QFileInfo::exists("/proc/" + QString::number(processId)))
+        enumChildren(enumChildren, processId, recursive);
+
+    return cPids;
+}
+
+GenericError cleanKillProcess(quint32 processId)  { return sendKillSignal(processId, SIGTERM); }
+
+GenericError forceKillProcess(quint32 processId) { return sendKillSignal(processId, SIGKILL); }
 
 bool enforceSingleInstance(QString uniqueAppId)
 {

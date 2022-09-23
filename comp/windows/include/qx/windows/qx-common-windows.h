@@ -5,7 +5,6 @@
 #include <QString>
 
 // Intra-component Includes
-#include "qx/windows/qx-filedetails.h"
 #include "qx/windows/qx-windefs.h"
 
 // Extra-component Includes
@@ -37,7 +36,7 @@ struct ShortcutProperties
 // Processes
 QList<DWORD> processThreadIds(DWORD processId);
 
-/* TODO : DWORD processMainThreadId(DWORD processId);
+/* TODO: DWORD processMainThreadId(DWORD processId);
  *
  * The best way known so far to figure this out is to use processThreadIds as a baseline and while checking
  * the threads, use NtQueryInformationThread to get their start addresses and find the one that matches
@@ -53,9 +52,7 @@ GenericError processIsElevated(bool& elevated, HANDLE processHandle);
 GenericError processIsElevated(bool& elevated, DWORD processId);
 
 GenericError cleanKillProcess(HANDLE processHandle);
-GenericError cleanKillProcess(DWORD processId);
 GenericError forceKillProcess(HANDLE processHandle);
-GenericError forceKillProcess(DWORD processId);
 
 // Error codes
 GenericError translateHresult(HRESULT res);
