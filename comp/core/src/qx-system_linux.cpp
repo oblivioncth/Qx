@@ -27,27 +27,31 @@ namespace  // Anonymous namespace for local only definitions
     {
     private:
         QDirIterator mItr;
+        bool mAtEnd;
 
     public:
         ProcTraverser() :
-            mItr("/proc", QDir::Dirs | QDir::NoDotAndDotDot)
+            mItr("/proc", QDir::Dirs | QDir::NoDotAndDotDot),
+            mAtEnd(false)
         {
             // Go to first entry
             if(mItr.hasNext())
                 advance();
         }
 
-        bool atEnd() { return !mItr.hasNext(); }
+        bool atEnd() { return mAtEnd; }
         void advance()
         {
-            while(mItr.hasNext())
+            while(!mAtEnd && mItr.hasNext())
             {
                 mItr.next();
 
-                // Ignore non-PID folders
+                // Ignore non-PID folders (only stop at PID folders)
                 if(mItr.fileName().contains(Qx::RegularExpression::NUMBERS_ONLY))
-                    break;
+                    return;
             }
+
+            mAtEnd = true;
         }
         quint32 pid() { return mItr.fileName().toInt(); }
     };
