@@ -4,19 +4,18 @@
 // Qt Includes
 #include <QFile>
 #include <QCoreApplication>
+#include <QFileInfo>
 
 // Windows Includes
 #include "qx_windows.h"
 #include "TlHelp32.h"
 #include "comdef.h"
-#include "ShObjIdl.h"
 #include "ShlGuid.h"
 #include "atlbase.h"
 
 // Extra-component Includes
-#include "qx/io/qx-common-io.h"
 #include "qx/core/qx-bitarray.h"
-#include "qx/core/qx-integrity.h"
+#include "qx/core/qx-system.h"
 
 /*!
  *  @file qx-common-windows.h
@@ -24,6 +23,29 @@
  *
  *  @brief The qx-common-windows header file provides various types, variables, and functions related to windows
  *  specific programming.
+ */
+
+/* TODO: Some of the code here is duplicated from the anonymous namespace in qx-system_win.cpp because I can't
+ * think of any good way to share it privately without exposing it to consumers, because the headers that would
+ * be created to make that code include-able would have to be set as PUBLIC in target_include_directories() in
+ * order for components outside Core to access them, but this would then make it public to anyone.
+ *
+ * I imagine the way that Qt handles sharing private source between its components is to simply not copy over
+ * the private headers during install, since almost always Qt is build and installed separately given its size,
+ * and then imported via find_package(). This won't work for Qx though as its primary usage method is via
+ * FetchContent/add_subdirectory() where there is no control over what headers are exposed to consumers
+ * independent from Qx's own targets.
+ *
+ * A shitty option is to put the code in that anonymous namespace into its own .cpp that is entirely an
+ * anonymous namespace and then straight up add it to the sources in target_sources() of any target that needs
+ * it, sharing it directly. This is clunky, and will only work for targets that already link to the required
+ * dependencies (i.e. no transient dependencies); however, since this would be for core, which all other
+ * components link to, maybe it wouldn't be that horrible.
+ */
+
+/* TODO: A potential long run solution to the above is morph createShortcut() and ShortcutProperties into a class
+ * and move them to their own files. Then, move the few remaining tools here to qx-system using #ifdefs and note
+ * they are only available on Windows.
  */
 
 namespace Qx
@@ -133,23 +155,6 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
             result = GetLastError();
             SetLastError(oldError);
             return result;
-    }
-
-    bool createMutex(QString mutexName)
-    {
-        // Persistent handle instance
-        static HANDLE uniqueAppMutex = NULL;
-
-        // Attempt to create unique mutex
-        uniqueAppMutex = CreateMutex(NULL, FALSE, (const wchar_t*)mutexName.utf16());
-        if(GetLastError() == ERROR_ALREADY_EXISTS)
-        {
-            CloseHandle(uniqueAppMutex);
-            return false; // Name isn't unique
-        }
-
-        // Name is unique
-        return true;
     }
 
     int nativeShowMode(ShortcutProperties::ShowMode showMode)
@@ -353,51 +358,13 @@ GenericError processIsElevated(bool& elevated, DWORD processId)
     return res;
 }
 
-namespace {
-static BOOL QT_WIN_CALLBACK cleanKill(HWND hWindow, LPARAM processId)
-{
-    /* This compares target process ID to the process ID of the owner of each window
-     * since EnumWindows loops through all open windows, sending the close signal
-     * to windows that belong to the target ID. When this function returns FALSE,
-     * the invocation of EnumWindows that triggered this function will also return
-     * FALSE, and GetLastError can be used to there to obtain error information.
-     *
-     * For this reason this function returns false upon any failure so that the caller
-     * can immediately obtain said error info before it is potentially overwritten.
-     */
-    DWORD windowOwnerProcessId = 0;
-    DWORD targetProcessId = DWORD(processId);
-    GetWindowThreadProcessId(hWindow, &windowOwnerProcessId);
-    if (windowOwnerProcessId == targetProcessId)
-        if(!PostMessage(hWindow, WM_CLOSE, 0, 0))
-            return FALSE;
-
-    return TRUE;
-}
-}
-
 /*!
  *  Closes the process referenced by @a processHandle.
- *
- *  The closure is performed by signaling all top-level windows of the process to close via `WM_CLOSE`,
- *  which allows for the process to first perform cleanup or potentially prompt the user to save their
- *  work.
- *
- *  If the operation fails the returned error object will contain the cause.
- *
- *  @parblock
- *  @note This function is not guaranteed to end the specified process.
- *
- *  @note If the process has no windows (i.e. a console application), is designed to remain running with no
- *  windows open, or otherwise doesn't process the WM_CLOSE message it will remain running. Additionally,
- *  in the event the process presents a dialog upon receiving this signal it will continue running until
- *  the user dismisses the dialog.
- *  @endparblock
  *
  *  @note
  *  The handle must be valid.
  *
- *  @sa forceKillProcess(), and QProcess::terminate();
+ *  @sa cleanKillProcess(quint32), forceKillProcess().
  */
 GenericError cleanKillProcess(HANDLE processHandle)
 {
@@ -409,31 +376,9 @@ GenericError cleanKillProcess(HANDLE processHandle)
 }
 
 /*!
- *  @overload
- *
- *  Closes the process specified by @a processId.
- */
-GenericError cleanKillProcess(DWORD processId)
-{
-    // Try to notify process to close
-    if(!EnumWindows(cleanKill, (LPARAM)processId)) // Tells all top-level windows of the process to close
-        return getLastError();
-
-    return GenericError();
-}
-
-/*!
  *  Forcefully closes the process referenced by @a processHandle.
  *
- *  The closure is performed by invoking `TerminateProcess()` on the process which results
- *  in an immediate, unclean shutdown with an exit code of @c 0xFFFF if it succeeds.
- *
- *  If the operation fails the returned error object will contain the cause.
- *
- *  @note
- *  The handle must be valid and have been opened with the `PROCESS_TERMINATE` access right.
- *
- *  @sa cleanKillProcess(), and QProcess::kill();
+ *  @sa forceKillProcess(quint32), cleanKillProcess();
  */
 GenericError forceKillProcess(HANDLE processHandle)
 {
@@ -441,28 +386,6 @@ GenericError forceKillProcess(HANDLE processHandle)
         return getLastError();
 
     return GenericError();
-}
-
-/*!
- *  @overload
- *
- *  Forcefully closes the process specified by @a processId.
- */
-GenericError forceKillProcess(DWORD processId)
-{
-    // Open handle
-    HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, processId);
-    if(!hProcess)
-        return getLastError();
-
-    // Try kill
-    GenericError res = forceKillProcess(hProcess);
-
-    // Cleanup Handle
-    CloseHandle(hProcess);
-
-    // Return result
-    return res;
 }
 
 /*!

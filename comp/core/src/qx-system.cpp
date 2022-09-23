@@ -58,6 +58,53 @@ bool processIsRunning(QString processName) { return processId(processName); }
 bool processIsRunning(quint32 processID) { return processName(processID).isNull(); }
 
 /*!
+ *  @fn GenericError cleanKillProcess(quint32 processId)
+ *
+ *  Attempts to close the process referenced by @a processId in a manner that allows it to
+ *  shutdown gracefully.
+ *
+ *  In general this is not guaranteed to close the process as the target application ultimately
+ *  decides how to handle the termination request, and may perform alternate actions such as
+ *  prompting the user to save files.
+ *
+ *  @par Windows:
+ *  @parblock
+ *  The closure is performed by signaling all top-level windows of the process to close via `WM_CLOSE`.
+ *
+ *  If the process has no windows (i.e. a console application), is designed to remain running with no
+ *  windows open, or otherwise doesn't process the WM_CLOSE message it will remain running.
+ *  @endparblock
+ *
+ *  @par Linux:
+ *  The closure is performed by sending the SIGTERM signal to the process.
+ *
+ *  If the operation fails the returned error object will contain the cause.
+ *
+ *  @sa forceKillProcess(), and QProcess::terminate();
+ */
+
+/*!
+ *  @fn GenericError forceKillProcess(quint32 processId)
+ *
+ *  Forcefully closes the process referenced by @a processId such that it exists immediately.
+ *
+ *  In general this is not guaranteed to close the process as the target application ultimately
+ *  decides how to handle the termination request, and may perform alternate actions such as
+ *  prompting the user to save files.
+ *
+ *  @par Windows:
+ *  The closure is performed by invoking `TerminateProcess()` on the process, setting its
+ *  exit code to @c 0xFFFF.
+ *
+ *  @par Linux:
+ *  The closure is performed by sending the SIGKILL signal to the process.
+ *
+ *  If the operation fails the returned error object will contain the cause.
+ *
+ *  @sa cleanKillProcess(), and QProcess::kill();
+ */
+
+/*!
  *  @fn bool enforceSingleInstance(QString uniqueAppId)
  *
  *  This function is used to limit a particular application such that only one running instance is
