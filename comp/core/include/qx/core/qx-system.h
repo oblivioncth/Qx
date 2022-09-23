@@ -16,8 +16,11 @@ QString processName(quint32 processId);
 QList<quint32> processChildren(quint32 processId, bool recursive = false);
 
 bool processIsRunning(QString processName);
-bool processIsRunning(quint32 processID);
+bool processIsRunning(quint32 processId);
 
+/* TODO: Consider setting the primary details of the errors returned here to an appropriate message like
+ * "Failed to close process *processId*." and set the secondary details to the system error info.
+ */
 GenericError cleanKillProcess(quint32 processId);
 GenericError forceKillProcess(quint32 processId);
 

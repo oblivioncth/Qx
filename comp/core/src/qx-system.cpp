@@ -55,7 +55,7 @@ bool processIsRunning(QString processName) { return processId(processName); }
  *  Returns @c true if the process with the PID @a processID is currently running;
  *  otherwise returns @c false.
  */
-bool processIsRunning(quint32 processID) { return processName(processID).isNull(); }
+bool processIsRunning(quint32 processId) { return processName(processId).isNull(); }
 
 /*!
  *  @fn GenericError cleanKillProcess(quint32 processId)
@@ -80,6 +80,10 @@ bool processIsRunning(quint32 processID) { return processName(processID).isNull(
  *
  *  If the operation fails the returned error object will contain the cause.
  *
+ *  @note
+ *  This function does not support a value of @c 0 for @a processId in order to kill the
+ *  current process. Instead pass the result of QCoreApplication::applicationPid().
+ *
  *  @sa forceKillProcess(), and QProcess::terminate();
  */
 
@@ -100,6 +104,10 @@ bool processIsRunning(quint32 processID) { return processName(processID).isNull(
  *  The closure is performed by sending the SIGKILL signal to the process.
  *
  *  If the operation fails the returned error object will contain the cause.
+ *
+ *  @note
+ *  This function does not support a value of @c 0 for @a processId in order to kill the
+ *  current process. Instead pass the result of QCoreApplication::applicationPid().
  *
  *  @sa cleanKillProcess(), and QProcess::kill();
  */
