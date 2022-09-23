@@ -240,7 +240,7 @@ QList<quint32> processChildren(quint32 processId, bool recursive)
             {
                 cPids.append(pid);
                 if(r)
-                    enumChildren(enumChildren, tPid, r);
+                    enumChildren(enumChildren, pid, r);
             }
         }
     };
