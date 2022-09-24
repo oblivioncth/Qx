@@ -121,6 +121,14 @@ IoOpReport DesktopEntry::writeToDisk(QString path, const DesktopEntry* entry)
         return IoOpReport(IO_OP_MANIPULATE, IO_ERR_ACCESS_DENIED, entryFile);
     else
         return IoOpReport(IO_OP_WRITE, IO_SUCCESS, entryFile); // Use write here since it is the overall operation of this function
+
+    /* TODO: At some point GTK2::gio (see FindGTK2.cmake) could be used to set the file as trusted for environments
+     * where that matters by making the package optional and using it here if present. It uses some names that clash
+     * with Qt so it's includes here would have to occur first. Even though it would be optional, it's worth considering
+     * if manipulating Desktop Environment specific metadata is really within the scope of this library. An potential
+     * equivalent for KDE would also need to be implmeneted and documentation for this function would have to note its
+     * differing behavior depending on if the package was found or not.
+     */
 }
 
 //-Instance Functions--------------------------------------------------------------------------------------------
