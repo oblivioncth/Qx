@@ -248,7 +248,7 @@ QList<quint32> processChildren(quint32 processId, bool recursive)
             }
 
             // Proceed to next PID
-            currentPid++;
+            pIdx++;
         }
         while(recursive && pIdx < cPids.size());
 
