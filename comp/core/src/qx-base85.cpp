@@ -35,7 +35,7 @@ namespace Qx
  *  reasons. Whitespace characters, specifically @c 0x09 ('\\t'), @c 0x0A ('\\n'), @c 0x0B ('\\v'), @c 0x0C ('\\f'),
  *  @c 0x0D ('\\r') and @c 0x20 (' '), are always ignored while decoding a Base85 string, and as such cannot be
  *  part of a character set. Additionally, ASCII control characters (@c 0x00 - @c 0x1F and @c 0x7F) may evidently
- *  be interpreted by commands by many parsers, making their use in a character set impractical without extreme
+ *  be interpreted as commands by many parsers, making their use in a character set impractical without extreme
  *  care.
  *  @endparblock
  *
@@ -49,7 +49,7 @@ namespace Qx
  *  <tr><td>Space Group  <td> All 'space' (@c 0x20202020) binary frames will be encoded as a single special character
  *                                     <td> setSpaceGroupCharacter()\n
  *                                          resetSpaceGroupCharacter()
- *  <tr><td>Padding      <td> Allows for and enables the automatic handling of padding during encoding/decoding where necessary
+ *  <tr><td>Padding      <td> Allows for, and enables the automatic handling of padding during encoding/decoding where necessary
  *                                     <td> setHandlePadding()
  *  </table>
  *  @endparblock
@@ -66,7 +66,7 @@ namespace Qx
  *
  *  <table>
  *  <caption>Standard Encoding Properties</caption>
- *  <tr><th>Encoding    <th> Character Set  <th> Zero Group Character <th> Space Group Character <th> Supports Padding                                                                                             <th> Controlled By
+ *  <tr><th>Encoding    <th> Character Set  <th> Zero Group Character <th> Space Group Character <th> Supports Padding
  *  <tr><td>btoa        <td> Original       <td> @c 0x7A ('z')        <td> No                    <td> No
  *  <tr><td>btoa 4.2    <td> Original       <td> @c 0x7A ('z')        <td> @c 0x79 ('y')         <td> No
  *  <tr><td>Adobe       <td> Original       <td> @c 0x7A ('z')        <td> No                    <td> Yes
@@ -81,7 +81,7 @@ namespace Qx
  *  @par Custom Encodings:
  *  @parblock
  *  Custom encodings can be created from scratch by constructing a blank encoding via Base85() and then setting its
- *  parameters, or by modifying standard encodings via Base85(StandardEncoding).
+ *  parameters, or by modifying standard encodings via @ref Base85Encoding(StandardEncoding).
  *  @endparblock
  */
 
@@ -90,7 +90,7 @@ namespace Qx
 /*!
  *  @enum Base85Encoding::StandardEncoding
  *
- *  This enum represents the error level of a generic error.
+ *  This enum specifies the different standard Base85 encodings that are available.
  */
 
 /*!
@@ -610,7 +610,7 @@ qsizetype Base85ParseError::offset() const { return mOffset; }
  *  characters that aren't necessarily sequential.
  *
  *  @note
- *  Base85 strings with prefix/suffix markets (e.g. "xbtoa Begin", "xbtoa End", "~>") are not supported. They
+ *  Base85 strings with prefix/suffix markers (e.g. "xbtoa Begin", "xbtoa End", "~>") are not supported. They
  *  must be handled independently of the actual payload when creating a Base85 instance from a pre-encoded
  *  string, and they will not be added to encoded strings created with encode().
  *
@@ -676,7 +676,7 @@ void Base85::encodeData(const QByteArray& data, Base85& encodedObject)
     for(int chunkStartIdx = 0; chunkStartIdx < data.size(); chunkStartIdx += 4)
     {
         // Determine chunk size (accounts for padding)
-        int chunkSize = std::min(4, Qx::lengthOfRange(chunkStartIdx, maxIndex));
+        int chunkSize = std::min(4, length(chunkStartIdx, maxIndex));
 
         // Set buffer to chunk
         inputFrameBuffer = data.sliced(chunkStartIdx, chunkSize);
@@ -703,7 +703,7 @@ QByteArray Base85::encodeFrame(const QByteArray& frame, const Base85Encoding* en
     assert(frame.size() == 4);
 
     // Convert to 32-bit value frame (Base85 always uses BE)
-    quint32 frameValue = Qx::ByteArray::toPrimitive<quint32>(frame, QSysInfo::BigEndian);
+    quint32 frameValue = ByteArray::toPrimitive<quint32>(frame, QSysInfo::BigEndian);
 
     // Encode via 5 divisions by 85, taking remainder
     QByteArray encodedFrame;
@@ -794,7 +794,7 @@ void Base85::decodeData(const QByteArray& data, QByteArray& decodedData, const B
         }
 
         // Determine chunk size (accounts for padding)
-        int chunkSize = std::min(5, Qx::lengthOfRange(chunkStartIdx, maxIndex));
+        int chunkSize = std::min(5, length(chunkStartIdx, maxIndex));
 
         // Set buffer to chunk
         inputFrameBuffer = data.sliced(chunkStartIdx, chunkSize);
@@ -831,7 +831,7 @@ QByteArray Base85::decodeFrame(const QByteArray& frame, const Base85Encoding* en
         frameValue += encoding->characterPosition(frame[i]) * POWERS_OF_85[4 - i];
 
     // Convert to bytes
-    return Qx::ByteArray::fromPrimitive<quint32>(frameValue, QSysInfo::BigEndian);
+    return ByteArray::fromPrimitive<quint32>(frameValue, QSysInfo::BigEndian);
 }
 
 char Base85::charToLatin1(char ch) { return ch; }
@@ -848,7 +848,7 @@ char Base85::charToLatin1(QChar ch) { return ch.toLatin1(); }
  * definitions are obviously available here, the above holds true.
  */
 template<typename D>
-    requires Qx::any_of<D, QString, QByteArrayView>
+    requires any_of<D, QString, QByteArrayView>
 Base85 Base85::fromExternal(D base85, const Base85Encoding* enc, Base85ParseError* error)
 {
     // Ensure encoding is valid
@@ -877,7 +877,7 @@ Base85 Base85::fromExternal(D base85, const Base85Encoding* enc, Base85ParseErro
 }
 
 template<typename D, typename C>
-    requires Qx::any_of<D, QString, QByteArrayView>
+    requires any_of<D, QString, QByteArrayView>
 Base85ParseError Base85::parseExternal(D base85, Base85& externallyEncoded)
 {
     const Base85Encoding* encooding = externallyEncoded.encoding();
@@ -913,7 +913,7 @@ Base85ParseError Base85::parseExternal(D base85, Base85& externallyEncoded)
         const C& ch = base85[i];
 
         // White space is to be ignored, if char is whitespace, skip it
-        if(Qx::Char::isSpace(ch))
+        if(Char::isSpace(ch))
             continue;
 
         // Only matters for input type that contains QChar
@@ -969,11 +969,16 @@ Base85 Base85::fromString(const QString& base85, const Base85Encoding* enc, Base
 }
 
 /*!
- *  @overload
- *
  *  Parses the binary data @a base85 as a Base85 string that was encoded with @a enc and creates
  *  a Base85 object from it. Any whitespace within the original string will not be present in the
  *  resultant object.
+ *
+ *  Returns a valid (non-null) Base85 string if the parsing succeeds. If it fails, the
+ *  returned string will be null, and the optional @a error variable will contain further
+ *  details about the error.
+ *
+ *  @warning The caller must be able to guarantee that @a enc will not be deleted as long as
+ *  the Base85 exists and may have its methods used.
  *
  *  @sa fromString(), Base85ParseError, isNull(), and @a encodedData().
  */

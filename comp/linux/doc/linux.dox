@@ -1,0 +1,13 @@
+/*!
+ *  @defgroup qx-linux Qx Linux
+ *
+ *  @brief The Linux component provides functionality centered around Linux specific programming.
+ *
+ *  @component{Linux,linux.h}
+ *
+ *	@note This component is only available when Qx is built to target Linux
+ *
+ *  Qx Linux contains classes and functions that generally either wrap existing Linux system functionality
+ *  into a more user friendly interface, other otherwise make various programming tasks on Linux more
+ *  convenient.
+ */

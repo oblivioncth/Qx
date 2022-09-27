@@ -18,6 +18,8 @@ class GroupedProgressManager : public QObject
 
 //-Class Members---------------------------------------------------------------------------------------------
 private:
+    // TODO: Consider increasing this to 100,000 for finer granularity of overall progress and more
+    // frequent emissions of valueChanged() (for things like QProgressBar::setValue())
     static const quint64 UNIFIED_MAXIMUM = 100;
 
 //-Instance Properties-------------------------------------------------------------------------------------------------------
@@ -51,13 +53,16 @@ public:
 
 //-Slots------------------------------------------------------------------------------------------------------------
 private slots:
-    void childValueChanged();
-    void childMaximumChanged();
+    void childValueChanged(quint64 value);
+    void childMaximumChanged(quint64 maximum);
     void childWeightChanged();
 
 //-Signals------------------------------------------------------------------------------------------------------------
 signals:
     void valueChanged(quint64 value);
+    void progressUpdated(quint64 currentValue);
+    void groupValueChanged(Qx::ProgressGroup* group, quint64 value);
+    void groupMaximumChanged(Qx::ProgressGroup* group, quint64 maximum);
 };
 
 }

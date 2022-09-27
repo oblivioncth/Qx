@@ -29,10 +29,10 @@ jobs:
     strategy:
       matrix:
         qt_linkage: [shared, static]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
-      c_comp: clang
-      cxx_comp: clang++
+      c_comp: clang-12
+      cxx_comp: clang++-12
       cmake_gen: Ninja Multi-Config
     outputs:
       qt_shared_artifact_name: ${{ steps.get_artifact_name.outputs.qt_shared_artifact_name }}
@@ -46,13 +46,13 @@ jobs:
           {
             "shared": {
               "qt_install_name": "qt-Production-6.3.1-linux-clang-x64-shared-release.7z",
-              "qt_install_url": "https://mega.nz/file/NiIEAITC",
+              "qt_install_url": "https://mega.nz/file/tmh1CYwb",
               "qt_install_url_key": "${{ secrets.qt_shared_dec_key }}",
               "artifact_output_var": "qt_shared_artifact_name"
             },
             "static": {
               "qt_install_name": "qt-Production-6.3.1-linux-clang-x64-static-release.7z",
-              "qt_install_url": "https://mega.nz/file/VjJ2CR4R",
+              "qt_install_url": "https://mega.nz/file/oiBGhL6L",
               "qt_install_url_key": "${{ secrets.qt_static_dec_key }}",
               "artifact_output_var": "qt_static_artifact_name"
             }
@@ -92,11 +92,6 @@ jobs:
     - name: Extract Qt Install
       if: steps.cache-qt.outputs.cache-hit != 'true'
       run: 7z x ${{ env.qt_install_dest }} -o${{ env.qt_install_dir }}
-    - name: Set clang-12 as preferred
-      run: |
-        sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-12 100
-        sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-12 100
-        sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-12 100
     - name: Install OpenGL lib
       run: sudo apt-get install libglu1-mesa-dev
     - name: Install XCB-XKB

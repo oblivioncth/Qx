@@ -3,6 +3,8 @@
 
 // Qt Includes
 #include <QNetworkProxy>
+#include <QNetworkReply>
+#include <QTimer>
 
 // Extra-component Includes
 #include "qx/core/qx-string.h"
@@ -157,11 +159,28 @@ DownloadManagerReport DownloadManagerReport::Builder::build()
         }
 
         // Create error details
-        QString errorDetails = "- " + errorList.join("\n- ");
-        if(skipped)
-            errorDetails += "\n\n" + ERR_D_SKIP.arg(skipped);
-        if(aborted)
-            errorDetails += "\n\n" + ERR_D_ABORT.arg(aborted);
+        QString errorDetails;
+
+        if(!errorList.isEmpty())
+        {
+            errorDetails += ERR_D_SPECIFIC + "\n";
+            errorDetails += "- " + errorList.join("\n- ");
+        }
+        if(skipped || aborted)
+        {
+            if(!errorDetails.isEmpty())
+                errorDetails += "\n\n";
+
+            errorDetails += ERR_D_GENERAL + "\n";
+
+            QStringList generalList;
+            if(skipped)
+                generalList << ERR_D_SKIP.arg(skipped);
+            if(aborted)
+                generalList << ERR_D_ABORT.arg(aborted);
+
+            errorDetails += "- " + generalList.join("\n- ");
+        }
 
         mWorkingReport->mErrorInfo = GenericError(GenericError::Error, ERR_P_QUEUE_INCOMPL, ERR_S_OUTCOME_FAIL, errorDetails);
     }
@@ -216,7 +235,6 @@ AsyncDownloadManager::AsyncDownloadManager(QObject* parent) :
     mStatus(Status::Initial)
 {
     // Configure access manager
-    mNam.setAutoDeleteReplies(true);
     connect(&mNam, &QNetworkAccessManager::sslErrors, this, &AsyncDownloadManager::sslErrorHandler);
     connect(&mNam, &QNetworkAccessManager::authenticationRequired, this, &AsyncDownloadManager::authHandler);
     connect(&mNam, &QNetworkAccessManager::preSharedKeyAuthenticationRequired, this, &AsyncDownloadManager::preSharedAuthHandler);
@@ -753,8 +771,11 @@ void AsyncDownloadManager::sizeQueryFinishedHandler(QNetworkReply* reply)
             stopOnError();
     }
 
-    // Proceed
-    pushEnumerationsUntilFinished();
+    // Mark reply for deletion
+    reply->deleteLater();
+
+    // Proceed on next loop iteration
+    QTimer::singleShot(0, this, &AsyncDownloadManager::pushEnumerationsUntilFinished);
 }
 
 void AsyncDownloadManager::downloadFinishedHandler(QNetworkReply* reply)
@@ -811,8 +832,11 @@ void AsyncDownloadManager::downloadFinishedHandler(QNetworkReply* reply)
     // Remove from active writers
     mActiveWriters.remove(reply);
 
-    // Proceed
-    pushDownloadsUntilFinished();
+    // Mark reply for deletion
+    reply->deleteLater();
+
+    // Proceed on next loop iteration
+    QTimer::singleShot(0, this, &AsyncDownloadManager::pushDownloadsUntilFinished);
 }
 
 //Public:
@@ -1166,7 +1190,7 @@ DownloadManagerReport SyncDownloadManager::processQueue()
 
 //-Slots----------------------------------------------------------------------------------------------------------
 //Private:
-void SyncDownloadManager::finishHandler(const Qx::DownloadManagerReport& dmr)
+void SyncDownloadManager::finishHandler(const DownloadManagerReport& dmr)
 {
     mReport = dmr;
     mSpinner.quit();

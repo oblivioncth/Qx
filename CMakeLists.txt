@@ -17,7 +17,7 @@ option(QX_DOCS_TARGET "Build Qx documentation" OFF)
 # NOTE: For versions stick to w.x.y.z, where z is generally
 # avoided and only used for hotfixes. DON'T USE TRAILING
 # ZEROS IN VERSIONS
-set(QX_BASE_VERSION 0.3.2) # Required for CI/CD
+set(QX_BASE_VERSION 0.4) # Required for CI/CD
 project(Qx
     VERSION ${QX_BASE_VERSION}
     LANGUAGES CXX
@@ -122,7 +122,7 @@ set(QT_FIND_COMPONENTS
 
 ################# Windows Build #################
 if(CMAKE_SYSTEM_NAME STREQUAL Windows)
-
+    list(REMOVE_ITEM BUILD_COMPONENTS linux)
 endif()
 
 ################# Linux Build #################

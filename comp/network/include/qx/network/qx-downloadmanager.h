@@ -7,7 +7,6 @@
 #include <QAuthenticator>
 
 // Intra-component Includes
-#include "qx/network/qx-networkreplyerror.h"
 #include "qx/network/qx-common-network.h"
 
 // Extra-component Includes
@@ -84,6 +83,8 @@ private:
         static inline const QString ERR_S_OUTCOME_FAIL = "One or more downloads failed due to the following reasons.";
         static inline const QString ERR_D_SKIP = "%1 remaining download(s) were skipped due to previous errors aborted.";
         static inline const QString ERR_D_ABORT = "%1 remaining download(s) were aborted.";
+        static inline const QString ERR_D_SPECIFIC = "Specific:";
+        static inline const QString ERR_D_GENERAL = "General:";
         static inline const QString ERR_D_LIST_ITEM = "[%1] %2";
 
     //-Instance Variables---------------------------------------------------------------------------------------------
@@ -290,7 +291,7 @@ public:
 
 //-Slots------------------------------------------------------------------------------------------------------------
 private slots:
-    void finishHandler(const Qx::DownloadManagerReport& dmr);
+    void finishHandler(const DownloadManagerReport& dmr);
 
 public slots:
     void abort();

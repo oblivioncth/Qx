@@ -51,9 +51,9 @@ long long abs (long long n) { return std::abs(n); }
 unsigned long long abs(unsigned long long n) { return n; }
 
 /*!
- *  @fn template<typename T> requires std::integral<T> T lengthOfRange(T start, T end)
+ *  @fn template<typename T> requires std::integral<T> T length(T start, T end)
  *
- *  Computes the length of, or alternatively the number of element in, a range.
+ *  Computes the length of, or alternatively the number of elements in, the range [@a start,  @a end].
  *
  *  This is equivalent to: <tt>(end - start) + 1</tt>.
  */
