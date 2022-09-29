@@ -1,12 +1,12 @@
-name: Linux - Build Qx (Qt 6.3.1)
+name: Linux - Build Qx
 on:
   workflow_call:
     secrets:
-      qt_shared_dec_key:
-        description: 'MEGA decryption key for Qt shared install archive URL'
+      qt_shared_url:
+        description: 'MEGA Qt shared install archive URL'
         required: true
-      qt_static_dec_key:
-        description: 'MEGA decryption key for Qt static install archive URL'
+      qt_static_url:
+        description: 'MEGA Qt static install archive URL'
         required: true
     outputs:
       qt_shared_artifact_name:
@@ -46,14 +46,12 @@ jobs:
           {
             "shared": {
               "qt_install_name": "qt-Production-6.3.1-linux-clang-x64-shared-release.7z",
-              "qt_install_url": "https://mega.nz/file/tmh1CYwb",
-              "qt_install_url_key": "${{ secrets.qt_shared_dec_key }}",
+              "qt_install_url": "${{ secrets.qt_shared_url }}",
               "artifact_output_var": "qt_shared_artifact_name"
             },
             "static": {
               "qt_install_name": "qt-Production-6.3.1-linux-clang-x64-static-release.7z",
-              "qt_install_url": "https://mega.nz/file/oiBGhL6L",
-              "qt_install_url_key": "${{ secrets.qt_static_dec_key }}",
+              "qt_install_url": "${{ secrets.qt_static_url }}",
               "artifact_output_var": "qt_static_artifact_name"
             }
           }
@@ -88,7 +86,7 @@ jobs:
       run: mkdir -p "${{ env.qt_download_dir }}"
     - name: Download Qt Install
       if: steps.cache-qt.outputs.cache-hit != 'true'
-      run: megatools dl "$qt_install_url#$qt_install_url_key" --path "${{ env.qt_download_dir }}"
+      run: megatools dl "$qt_install_url" --path "${{ env.qt_download_dir }}"
     - name: Extract Qt Install
       if: steps.cache-qt.outputs.cache-hit != 'true'
       run: 7z x ${{ env.qt_install_dest }} -o${{ env.qt_install_dir }}
