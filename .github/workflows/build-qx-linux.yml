@@ -111,6 +111,8 @@ jobs:
       run: sudo apt-get install graphviz
     - name: Install Ninja
       run: sudo apt-get install ninja-build
+    - name: Install Harfbuzz
+      run: sudo apt-get install libharfbuzz-dev
     - name: Checkout Qx
       uses: actions/checkout@v3
       with:
