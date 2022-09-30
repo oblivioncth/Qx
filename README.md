@@ -63,6 +63,6 @@ For all builds, Qt was configured as follows (excluding defaults):
 
  - Release
  - Shared/Static Linkage
- - Modules: qtbase, qtimageformats, qtnetworkauth, qtsvg
+ - Modules: qtbase, qtimageformats, qtnetworkauth, qtsvg, qt5compat
  - Features: relocatable
  - -ssl (Linux) / -schannel (Windows)
