@@ -92,10 +92,6 @@ bool processIsRunning(quint32 processId) { return processName(processId).isNull(
  *
  *  Forcefully closes the process referenced by @a processId such that it exists immediately.
  *
- *  In general this is not guaranteed to close the process as the target application ultimately
- *  decides how to handle the termination request, and may perform alternate actions such as
- *  prompting the user to save files.
- *
  *  @par Windows:
  *  The closure is performed by invoking `TerminateProcess()` on the process, setting its
  *  exit code to @c 0xFFFF.
