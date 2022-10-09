@@ -139,6 +139,9 @@ void ApplicationLogger::setApplicationVersion(const QString& version) { mAppVers
 /*!
  *  Sets the arguments string of the application that will be recorded in the log to @a args.
  *
+ *  If no arguments are set or the provided argument string is empty, the log will record
+ *  the application's arguments as `*None*`.
+ *
  *  @note This must be called before the log is opened or else it will have no effect.
  *
  *  @sa applicationArguments().
@@ -164,7 +167,8 @@ void ApplicationLogger::setApplicationArguments(const QStringList& args) { mAppA
 void ApplicationLogger::setMaximumEntries(int max) { mMaxEntries = max; }
 
 /*!
- *  Opens the log for recording and returns a report noting if the operation succeeded or failed.
+ *  Opens the log for recording, writes the log entry heading and basic application information,
+ *  and returns a report noting if the operation succeeded or failed.
  *
  *  @sa finish().
  */
@@ -232,7 +236,7 @@ IoOpReport ApplicationLogger::openLog()
     entryStart += HEADER_TEMPLATE.arg(mAppName, mAppVersion, QDateTime::currentDateTime().toString()) + "\n";
 
     // Start parameters
-    entryStart += COMMANDLINE_LABEL + ' ' + mAppArguments + '\n';
+    entryStart += COMMANDLINE_LABEL + ' ' + (mAppArguments.isEmpty() ? NO_PARAMS : mAppArguments) + '\n';
 
     // Events start
     entryStart += EVENTS_LABEL + '\n';

@@ -23,6 +23,7 @@ private:
     // NOTE: Changes to the members of this class might require changes to this pattern
     static inline const QRegularExpression HEADER_PATTERN = QRegularExpression(R"(^\[ .* Execution Log \] \(.*\) : .+)",
                                                                                QRegularExpression::MultilineOption);
+    static inline const QString NO_PARAMS = "*None*";
     static inline const QString EVENT_TEMPLATE = " - <%1> [%2] %3";
     static inline const QString COMMANDLINE_LABEL = "Arguments:";
     static inline const QString EVENTS_LABEL = "Events:";
