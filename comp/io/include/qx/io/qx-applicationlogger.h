@@ -10,6 +10,8 @@
 #include <qx/core/qx-genericerror.h>
 #include <qx/io/qx-textstreamwriter.h>
 
+class QCoreApplication;
+
 namespace Qx
 {
 
