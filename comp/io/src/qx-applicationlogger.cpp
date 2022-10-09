@@ -64,12 +64,18 @@ QString ApplicationLogger::applicationName() const { return mAppName; }
 QString ApplicationLogger::applicationVersion() const { return mAppVersion; }
 QString ApplicationLogger::applicationArguments() const { return mAppArguments; }
 
-void ApplicationLogger::setFilePath(const QString path) { mFilePath = path; }
+int ApplicationLogger::maximumEntries() const { return mMaxEntries; }
+void ApplicationLogger::setFilePath(const QString& path) { mFilePath = path; }
 void ApplicationLogger::setApplicationName(const QString name) { mAppName = name; }
 void ApplicationLogger::setApplicationVersion(const QString version) { mAppVersion = version; }
 void ApplicationLogger::setApplicationArguments(const QString args) { mAppArguments = args; }
 void ApplicationLogger::setApplicationArguments(const QStringList args) { mAppArguments = args.join(' '); }
 
+void ApplicationLogger::setApplicationName(const QString& name) { mAppName = name; }
+void ApplicationLogger::setApplicationVersion(const QString& version) { mAppVersion = version; }
+void ApplicationLogger::setApplicationArguments(const QString& args) { mAppArguments = args; }
+void ApplicationLogger::setApplicationArguments(const QStringList& args) { mAppArguments = args.join(' '); }
+void ApplicationLogger::setMaximumEntries(int max) { mMaxEntries = max; }
 IoOpReport ApplicationLogger::openLog()
 {
     //-Prepare Log File--------------------------------------------------
@@ -152,7 +158,7 @@ IoOpReport ApplicationLogger::recordVerbatim(QString text)
         return mErrorStatus;
     }
 
-    return IoOpReport();
+    return mErrorStatus;
 }
 
 IoOpReport ApplicationLogger::recordErrorEvent(QString src, GenericError error)
@@ -169,7 +175,7 @@ IoOpReport ApplicationLogger::recordErrorEvent(QString src, GenericError error)
         return mErrorStatus;
     }
 
-    return IoOpReport();
+    return mErrorStatus;
 }
 
 IoOpReport ApplicationLogger::recordGeneralEvent(QString src, QString event)
@@ -180,7 +186,7 @@ IoOpReport ApplicationLogger::recordGeneralEvent(QString src, QString event)
         return mErrorStatus;
     }
 
-    return IoOpReport();
+    return mErrorStatus;
 }
 
 IoOpReport ApplicationLogger::finish(int returnCode)
@@ -190,15 +196,16 @@ IoOpReport ApplicationLogger::finish(int returnCode)
         // Print exit code
         mErrorStatus = mTextStreamWriter.writeLine(FINISH_TEMPLATE.arg(returnCode == 0 ? FINISH_SUCCESS : FINISH_ERR).arg(returnCode));
 
-        // Close log
-        mTextStreamWriter.closeFile();
-        return mErrorStatus;
+    // Close log
+    mTextStreamWriter.closeFile();
+    return mErrorStatus;
     }
 
     return IoOpReport();
 }
 
-IoOpReport ApplicationLogger::error() { return mErrorStatus; }
+IoOpReport ApplicationLogger::status() { return mErrorStatus; }
+void ApplicationLogger::resetStatus() { mErrorStatus = IoOpReport(); }
 bool ApplicationLogger::hasError() { return mErrorStatus.isFailure(); }
 
 }

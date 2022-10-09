@@ -61,12 +61,14 @@ public:
     QString applicationName() const;
     QString applicationVersion() const;
     QString applicationArguments() const;
+    int maximumEntries() const;
 
-    void setFilePath(const QString path);
-    void setApplicationName(const QString name);
-    void setApplicationVersion(const QString version);
-    void setApplicationArguments(const QString args);
-    void setApplicationArguments(const QStringList args);
+    void setFilePath(const QString& path);
+    void setApplicationName(const QString& name);
+    void setApplicationVersion(const QString& version);
+    void setApplicationArguments(const QString& args);
+    void setApplicationArguments(const QStringList& args);
+    void setMaximumEntries(int max);
 
     // Operate
     IoOpReport openLog();
@@ -76,7 +78,8 @@ public:
     IoOpReport finish(int returnCode);
 
     // Status
-    IoOpReport error();
+    IoOpReport status();
+    void resetStatus();
     bool hasError();
 };
 
