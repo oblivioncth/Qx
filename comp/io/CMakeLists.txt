@@ -6,6 +6,7 @@ set(COMPONENT_LIB_TYPE STATIC)
 
 # Headers
 set(COMPONENT_INCLUDE_HEADERS
+    qx-applicationlogger.h
     qx-common-io.h
     qx-filestreamreader.h
     qx-filestreamwriter.h
@@ -23,6 +24,7 @@ set(COMPONENT_PRIVATE_HEADERS
 
 # Source Files
 set(COMPONENT_IMPL
+    qx-applicationlogger.cpp
     qx-common-io.cpp
     qx-common-io_p.cpp
     qx-filestreamreader.cpp
