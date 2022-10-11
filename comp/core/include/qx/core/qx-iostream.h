@@ -12,7 +12,9 @@ QTextStream cerr(stderr); // QTextStream version of std::cerr
 QTextStream cin(stdin); // QTextStream version of std::cin
 
 //-Namespace Functions------------------------------------------------------------------------------------------
+#if defined _WIN32 || (defined __linux__ && __has_include(<termios.h>))
 void setUserInputEchoEnabled(bool enabled);
+#endif
 }
 
 #endif // QX_IOSTREAM_H
