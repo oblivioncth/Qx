@@ -12,7 +12,7 @@ QTextStream cerr(stderr); // QTextStream version of std::cerr
 QTextStream cin(stdin); // QTextStream version of std::cin
 
 //-Namespace Functions------------------------------------------------------------------------------------------
-
+void setUserInputEchoEnabled(bool enabled);
 }
 
 #endif // QX_IOSTREAM_H

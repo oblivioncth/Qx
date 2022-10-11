@@ -75,6 +75,7 @@ set(COMPONENT_PUBLIC_LINKS
 ################# Windows Build #################
 if(CMAKE_SYSTEM_NAME STREQUAL Windows)
     list(APPEND COMPONENT_IMPL
+        qx-iostream_win.cpp
         qx-system_win.cpp
     )
 endif()
@@ -83,6 +84,7 @@ endif()
 ################# Linux Build #################
 if(CMAKE_SYSTEM_NAME STREQUAL Linux)
     list(APPEND COMPONENT_IMPL
+        qx-iostream_linux.cpp
         qx-system_linux.cpp
     )
 endif()
