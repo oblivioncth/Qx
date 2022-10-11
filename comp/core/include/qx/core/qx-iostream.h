@@ -7,9 +7,12 @@
 namespace Qx
 {
 //-Namespace Members--------------------------------------------------------------------------------------------
-static inline QTextStream cout(stdout); // QTextStream version of std::cout
-static inline QTextStream cerr(stderr); // QTextStream version of std::cerr
-static inline QTextStream cin(stdin); // QTextStream version of std::cin
+QTextStream cout(stdout); // QTextStream version of std::cout
+QTextStream cerr(stderr); // QTextStream version of std::cerr
+QTextStream cin(stdin); // QTextStream version of std::cin
+
+//-Namespace Functions------------------------------------------------------------------------------------------
+
 }
 
 #endif // QX_IOSTREAM_H
