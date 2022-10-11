@@ -23,5 +23,18 @@ namespace Qx
  *  QTextStream equivalent of std::cin.
  */
 
+//-Namespace Functions------------------------------------------------------------------------------------------
+/*! @fn void setUserInputEchoEnabled(bool enabled)
+ *
+ *  This function only pertains to console applications.
+ *
+ *  Enables or disables the echoing of user input (stdin) to the console depending on the value
+ *  of @a enabled.
+ *
+ *  By default echoing is enabled.
+ *
+ *  @note On Linux this function is only available on systems that utilize the 'termios' terminal interface.
+ */
+
 /*! @}*/
 }
