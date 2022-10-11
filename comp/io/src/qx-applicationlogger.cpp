@@ -103,6 +103,8 @@ QString ApplicationLogger::applicationArguments() const { return mAppArguments; 
 /*!
  *  Returns the maximum number of entries allowed in the log before the oldest entry is purged.
  *
+ *  The default is @c 100.
+ *
  *  @sa setMaximumEntries().
  */
 int ApplicationLogger::maximumEntries() const { return mMaxEntries; }
