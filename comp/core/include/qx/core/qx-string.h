@@ -5,6 +5,9 @@
 #include <QString>
 #include <QCryptographicHash>
 
+// Project Includes
+#include "qx/utility/qx-concepts.h"
+
 namespace Qx
 {
 
@@ -18,6 +21,7 @@ public:
     static QString stripToHexOnly(QString string);
 
     template<typename T, typename F>
+        requires defines_call_for_s<F, QString, const T&>
     static QString join(QList<T> list, F&& toStringFunc, QString separator = "", QString prefix = "")
     {
         QString conjuction;
@@ -36,6 +40,7 @@ public:
     static QString join(QList<QString> list, QString separator = "", QString prefix = ""); // Overload for T = QString
 
     template<typename T, typename F>
+        requires defines_call_for_s<F, QString, const T&>
     static QString join(QSet<T> set, F&& toStringFunc, QString separator = "", QString prefix = "")
     {
         QString conjuction;
