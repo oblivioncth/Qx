@@ -140,18 +140,21 @@ DsvTable DsvTable::fromDsv(const QByteArray& dsv, QChar delim, QChar esc, DsvPar
         return DsvTable();
     }
 
-    // Handle unterminated final field
-    if(escapedField && !postEscape)
+    // Handle end of file
+    if(escapedField && !postEscape) // Unterminated escaped field
     {
         setError(DsvParseError(DsvParseError::UnterminatedField, parser.pos()));
         return DsvTable();
     }
-
-    // If last row is empty (due to trailing '\n'), remove it
-    if(table.mTable.back().isEmpty())
-        table.mTable.removeLast();
-    else // Handle field value
-        table.mTable.back().append(currentField);
+    else if(!escapedField)
+    {
+        // If last row is empty (due to trailing '\n'), remove it
+        if(table.mTable.back().isEmpty()) // Data ended with a trailing '\n'
+            table.mTable.removeLast();
+        else // Handle field value // Data ended in middle of unescaped field
+            table.mTable.back().append(currentField);
+    }
+    // else <- An escaped field that ended with a quote, followed by EOF needs to extra handling
 
     return table;
 }
