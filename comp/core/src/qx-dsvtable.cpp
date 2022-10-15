@@ -31,14 +31,46 @@ QString DsvParseError::errorString() const { return ERROR_STR_MAP[mError]; }
 
 qsizetype DsvParseError::offset() const { return mOffset; }
 
-
 //===============================================================================================================
 // DsvTable
 //===============================================================================================================
 
 //-Constructor--------------------------------------------------------------------------------------------------
 //Public:
+
 DsvTable::DsvTable() {}
+
+DsvTable::DsvTable(qsizetype r, qsizetype c)
+{
+    mTable.resize(r);
+    for(QList<QVariant>& row : mTable)
+        row.resize(c);
+}
+DsvTable::DsvTable(qsizetype r, qsizetype c, const QVariant& value)
+{
+    QList<QVariant> row(c, value);
+    mTable = QList<QList<QVariant>>(r, row);
+}
+
+DsvTable::DsvTable(std::initializer_list<std::initializer_list<QVariant>> table)
+{
+    if(table.size() == 0)
+        return;
+
+    qsizetype headerWidth = table.begin()->size();
+
+    for(auto itr = table.begin(); itr != table.end(); itr++)
+    {
+        if(itr->size() != headerWidth)
+        {
+            mTable.clear();
+            break;
+        }
+
+        mTable.append(*itr);
+    }
+
+}
 
 //-Class Functions----------------------------------------------------------------------------------------------
 //Public:
@@ -164,21 +196,21 @@ DsvTable DsvTable::fromDsv(const QByteArray& dsv, QChar delim, QChar esc, DsvPar
 
 QVariant& DsvTable::at(qsizetype r, qsizetype c)
 {
-    Q_ASSERT_X(r < rowCount() && c < columnCount(), Q_FUNC_INFO, "index out of range");
+    Q_ASSERT_X(size_t(r) < size_t(rowCount()) && size_t(c) < size_t(columnCount()), Q_FUNC_INFO, "index out of range");
 
     return mTable[r][c];
 }
 
 const QVariant& DsvTable::at(qsizetype r, qsizetype c) const
 {
-    Q_ASSERT_X(r < rowCount() && c < columnCount(), Q_FUNC_INFO, "index out of range");
+    Q_ASSERT_X(size_t(r) < size_t(rowCount()) && size_t(c) < size_t(columnCount()), Q_FUNC_INFO, "index out of range");
 
     return mTable.at(r).at(c);
 }
 
-QList<QVariant> DsvTable::column(qsizetype i) const
+QList<QVariant> DsvTable::columnAt(qsizetype i) const
 {
-    Q_ASSERT_X(i < columnCount(), Q_FUNC_INFO, "index out of range");
+    Q_ASSERT_X(size_t(i) < size_t(columnCount()), Q_FUNC_INFO, "index out of range");
 
     // Build column list
     QList<QVariant> col;
@@ -191,7 +223,19 @@ QList<QVariant> DsvTable::column(qsizetype i) const
 
 qsizetype DsvTable::columnCount() const { return mTable.isEmpty() ? 0 : mTable.first().size(); }
 
-QList<QVariant> DsvTable::row(qsizetype i) const
+QList<QVariant> DsvTable::firstColumn() const
+{
+    Q_ASSERT(columnCount() > 0);
+    return columnAt(0);
+}
+
+QList<QVariant> DsvTable::firstRow() const
+{
+    Q_ASSERT(rowCount() > 0);
+    return rowAt(0);
+}
+
+QList<QVariant> DsvTable::rowAt(qsizetype i) const
 {
     Q_ASSERT_X(i < rowCount(), Q_FUNC_INFO, "index out of range");
 
@@ -199,6 +243,20 @@ QList<QVariant> DsvTable::row(qsizetype i) const
 }
 
 bool DsvTable::isEmpty() const { return mTable.isEmpty(); }
+
+QList<QVariant> DsvTable::lastColumn() const
+{
+    qsizetype height = columnCount();
+    Q_ASSERT(height > 0);
+    return rowAt(height - 1);
+}
+
+QList<QVariant> DsvTable::lastRow() const
+{
+    qsizetype width = rowCount();
+    Q_ASSERT(width > 0);
+    return rowAt(width - 1);
+}
 
 qsizetype DsvTable::rowCount() const { return mTable.size(); }
 
@@ -263,9 +321,9 @@ QByteArray DsvTable::toDsv(QChar delim, QChar esc)
     return dsv;
 }
 
-QVariant DsvTable::value(qsizetype r, qsizetype c) { return value(r, c, QVariant()); }
+QVariant DsvTable::value(qsizetype r, qsizetype c) const { return value(r, c, QVariant()); }
 
-QVariant DsvTable::value(qsizetype r, qsizetype c, const QVariant& defaultValue)
+QVariant DsvTable::value(qsizetype r, qsizetype c, const QVariant& defaultValue) const
 {
     return r < rowCount() && c < columnCount() ? at(r,c) : defaultValue;
 }
@@ -300,12 +358,127 @@ void DsvTable::appendRow(const QList<QVariant>& r)
         mTable.back().resize(width);
 }
 
+void DsvTable::removeColumnAt(qsizetype i) { removeColumns(i); }
+
+void DsvTable::removeColumns(qsizetype i, qsizetype n)
+{
+    Q_ASSERT_X(size_t(i) + size_t(n) <= size_t(columnCount()), Q_FUNC_INFO, "index out of range");
+    Q_ASSERT_X(n >= 0, Q_FUNC_INFO, "invalid count");
+
+    if (n == 0)
+        return;
+
+    for(QList<QVariant>& row : mTable)
+        row.remove(i, n);
+}
+
+void DsvTable::removeRowAt(qsizetype i) { removeRows(i); }
+
+void DsvTable::removeRows(qsizetype i, qsizetype n)
+{
+    Q_ASSERT_X(size_t(i) + size_t(n) <= size_t(rowCount()), Q_FUNC_INFO, "index out of range");
+    Q_ASSERT_X(n >= 0, Q_FUNC_INFO, "invalid count");
+
+    if (n == 0)
+        return;
+
+    mTable.remove(i, n);
+}
+
+void DsvTable::removeFirstColumn()
+{
+    Q_ASSERT(columnCount() > 0);
+    removeColumnAt(0);
+}
+
+void DsvTable::removeFirstRow()
+{
+    Q_ASSERT(rowCount() > 0);
+    removeRowAt(0);
+}
+
+void DsvTable::removeLastColumn()
+{
+    qsizetype height = columnCount();
+    Q_ASSERT(height > 0);
+    removeColumnAt(height - 1);
+}
+
+void DsvTable::removeLastRow()
+{
+    qsizetype width = rowCount();
+    Q_ASSERT(width > 0);
+    removeColumnAt(width - 1);
+}
+
 void DsvTable::resizeColumns(qsizetype size)
 {
+    if(size == columnCount())
+        return;
+
     for(QList<QVariant>& row : mTable)
         row.resize(size);
 }
 
-void DsvTable::resizeRows(qsizetype size) { mTable.resize(size); }
+void DsvTable::resizeRows(qsizetype size)
+{
+    if(size == rowCount())
+        return;
+
+    qsizetype currentSize = rowCount();
+    qsizetype growth = size - currentSize;
+    qsizetype columns = columnCount();
+
+    mTable.resize(size);
+
+    if(growth > 0 && columns > 0)
+    {
+
+        for(qsizetype r = currentSize; r < rowCount(); r++)
+            mTable[r].resize(columns);
+    }
+}
+
+QList<QVariant> DsvTable::takeColumnAt(qsizetype i)
+{
+    Q_ASSERT_X(size_t(i) < size_t(columnCount()), Q_FUNC_INFO, "index out of range");
+
+    QList<QVariant> col = columnAt(i);
+    removeColumnAt(i);
+    return col;
+}
+
+QList<QVariant> DsvTable::takeFirstColumn()
+{
+    Q_ASSERT(columnCount() > 0);
+    return takeColumnAt(0);
+}
+
+QList<QVariant> DsvTable::takeFirstRow()
+{
+    Q_ASSERT(rowCount() > 0);
+    return takeRowAt(0);
+}
+
+QList<QVariant> DsvTable::takeLastColumn()
+{
+    qsizetype height = columnCount();
+    Q_ASSERT(height > 0);
+    return takeColumnAt(height - 1);
+}
+
+QList<QVariant> DsvTable::takeLastRow()
+{
+    qsizetype width = rowCount();
+    Q_ASSERT(width > 0);
+    return takeRowAt(width - 1);
+}
+
+QList<QVariant> DsvTable::takeRowAt(qsizetype i)
+{
+    Q_ASSERT_X(size_t(i) < size_t(rowCount()), Q_FUNC_INFO, "index out of range");
+
+    return mTable.takeAt(i);
+}
 
 }

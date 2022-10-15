@@ -55,6 +55,9 @@ private:
 //-Constructor----------------------------------------------------------------------------------------------
 public:
     DsvTable();
+    DsvTable(qsizetype r, qsizetype c);
+    DsvTable(qsizetype r, qsizetype c, const QVariant& value);
+    DsvTable(std::initializer_list<std::initializer_list<QVariant>> table);
 
 //-Class Functions----------------------------------------------------------------------------------------------
 public:
@@ -64,21 +67,39 @@ public:
 public:
     QVariant& at(qsizetype r, qsizetype c);
     const QVariant& at(qsizetype r, qsizetype c) const;
-    QList<QVariant> column(qsizetype i) const;
+    QList<QVariant> columnAt(qsizetype i) const;
     qsizetype columnCount() const;
+    QList<QVariant> firstColumn() const;
+    QList<QVariant> firstRow() const;
     bool isEmpty() const;
-    QList<QVariant> row(qsizetype i) const;
+    QList<QVariant> lastColumn() const;
+    QList<QVariant> lastRow() const;
+    QList<QVariant> rowAt(qsizetype i) const;
     qsizetype rowCount() const;
     DsvTable section(qsizetype r, qsizetype c, qsizetype width, qsizetype height) const;
-    QVariant value(qsizetype r, qsizetype c);
-    QVariant value(qsizetype r, qsizetype c, const QVariant& defaultValue);
+    QVariant value(qsizetype r, qsizetype c) const;
+    QVariant value(qsizetype r, qsizetype c, const QVariant& defaultValue) const;
 
     void addColumns(qsizetype c);
     void addRows(qsizetype r);
     void appendColumn(const QList<QVariant>& c);
     void appendRow(const QList<QVariant>& r);
+    void removeColumnAt(qsizetype i);
+    void removeColumns(qsizetype i, qsizetype n = 1);
+    void removeRowAt(qsizetype i);
+    void removeRows(qsizetype i, qsizetype n = 1);
+    void removeFirstColumn();
+    void removeFirstRow();
+    void removeLastColumn();
+    void removeLastRow();
     void resizeColumns(qsizetype size);
     void resizeRows(qsizetype size);
+    QList<QVariant> takeColumnAt(qsizetype i);
+    QList<QVariant> takeFirstColumn();
+    QList<QVariant> takeFirstRow();
+    QList<QVariant> takeLastColumn();
+    QList<QVariant> takeLastRow();
+    QList<QVariant> takeRowAt(qsizetype i);
 
     QByteArray toDsv(QChar delim = ',', QChar esc = '"');
 };
