@@ -14,6 +14,7 @@ set(COMPONENT_INCLUDE_HEADERS
     qx-char.h
     qx-cumulation.h
     qx-datetime.h
+    qx-dsvtable.h
     qx-freeindextracker.h
     qx-genericerror.h
     qx-groupedprogressmanager.h
@@ -41,6 +42,7 @@ set(COMPONENT_IMPL
     qx-bitarray.cpp
     qx-char.cpp
     qx-datetime.cpp
+    qx-dsvtable.cpp
     qx-genericerror.cpp
     qx-groupedprogressmanager.cpp
     qx-integrity.cpp
