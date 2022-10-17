@@ -103,6 +103,8 @@ public:
     QList<QVariant> takeRowAt(qsizetype i);
 
     QByteArray toDsv(QChar delim = ',', QChar esc = '"');
+
+    bool operator==(const DsvTable& other);
 };
 
 }
