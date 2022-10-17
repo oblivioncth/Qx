@@ -267,10 +267,10 @@ QList<QVariant> DsvTable::lastRow() const
 
 qsizetype DsvTable::rowCount() const { return mTable.size(); }
 
-DsvTable DsvTable::section(qsizetype r, qsizetype c, qsizetype width, qsizetype height) const
+DsvTable DsvTable::section(qsizetype r, qsizetype c, qsizetype height, qsizetype width) const
 {
     // Empty shortcut: If table is already empty, or start pos would make it empty
-    if(mTable.isEmpty() || r > mTable.size() - 1 || c > mTable.first().size() - 1)
+    if(mTable.isEmpty() || size_t(r) > size_t(mTable.size() - 1) || size_t(c) > size_t(mTable.first().size() - 1))
         return DsvTable();
 
     // Cap width/height to max
@@ -287,7 +287,7 @@ DsvTable DsvTable::section(qsizetype r, qsizetype c, qsizetype width, qsizetype 
     return sec;
 }
 
-QSize DsvTable::size() const { return QSize(rowCount(), columnCount()); }
+QSize DsvTable::size() const { return QSize(columnCount(), rowCount()); }
 QByteArray DsvTable::toDsv(QChar delim, QChar esc)
 {
     // Empty shortcut
@@ -296,7 +296,7 @@ QByteArray DsvTable::toDsv(QChar delim, QChar esc)
 
     // Setup
     QByteArray dsv;
-    QTextStream printer(dsv);
+    QTextStream serializer(dsv);
 
     // Print all values
     for(const QList<QVariant>& row : mTable)
@@ -315,31 +315,71 @@ QByteArray DsvTable::toDsv(QChar delim, QChar esc)
             }
 
             // Print
-            printer << fieldStr;
+            serializer << fieldStr;
 
             // Delimit
             if(itr != row.constEnd() - 1)
-                printer << delim;
+                serializer << delim;
         }
 
         // Terminate line
-        printer << '\n';
+        serializer << '\n';
     }
 
     return dsv;
 }
 
+/*!
+  *  Returns the field at row @a r and column @a c.
+  *
+  *  If the position is out of bounds, the function returns an invalid QVariant.
+  *  If you are certain that @a r and @a c are within bounds, you can use at()
+  *  instead, which is slightly faster.
+ */
 QVariant DsvTable::value(qsizetype r, qsizetype c) const { return value(r, c, QVariant()); }
 
+/*!
+ *  @overload
+ *
+ *  If the position is out of bounds, the function returns @a defaultValue.
+ */
 QVariant DsvTable::value(qsizetype r, qsizetype c, const QVariant& defaultValue) const
 {
     return r < rowCount() && c < columnCount() ? at(r,c) : defaultValue;
 }
 
+/*!
+ *  Appends @a c columns, with their fields set to invalid QVariants, to the 'right' end of the table.
+ *
+ *  Equivalent to:
+ *  @code{.cpp}
+ *  resizeColumns(columnCount() + c);
+ *  @endcode
+ *
+ *  @sa resizeColumns() and appendColumn().
+ */
 void DsvTable::addColumns(qsizetype c) { resizeColumns(columnCount() + c); }
 
+/*!
+ *  Appends @a c columns, with their fields set to invalid QVariants, to the 'bottom' end of the table.
+ *
+ *  Equivalent to:
+ *  @code{.cpp}
+ *  resizeRows(rowCount() + r);
+ *  @endcode
+ *
+ *  @sa resizeRows() and appendRow().
+ */
 void DsvTable::addRows(qsizetype r) { resizeRows(rowCount() + r); }
 
+/*!
+ *  Appends @a c as a column to the 'right' end of the table.
+ *
+ *  If @a c is smaller than the current height (rowCount()) of the table, it will be expanded with
+ *  invalid QVariants after insertion to match the current height. If @a c is larger than the current
+ *  height, the rest of the table's columns will be expanded with invalid QVariants to match the height
+ *  of @a c.
+ */
 void DsvTable::appendColumn(const QList<QVariant>& c)
 {
     // If column is larger than current table height, expand it

@@ -78,7 +78,7 @@ public:
     QList<QVariant> lastRow() const;
     QList<QVariant> rowAt(qsizetype i) const;
     qsizetype rowCount() const;
-    DsvTable section(qsizetype r, qsizetype c, qsizetype width, qsizetype height) const;
+    DsvTable section(qsizetype r, qsizetype c, qsizetype height, qsizetype width) const;
     QSize size() const;
     QVariant value(qsizetype r, qsizetype c) const;
     QVariant value(qsizetype r, qsizetype c, const QVariant& defaultValue) const;
