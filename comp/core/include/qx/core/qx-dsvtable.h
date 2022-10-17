@@ -105,7 +105,7 @@ public:
 
     QByteArray toDsv(QChar delim = ',', QChar esc = '"');
 
-    bool operator==(const DsvTable& other);
+    bool operator==(const DsvTable& other) const;
 };
 
 }

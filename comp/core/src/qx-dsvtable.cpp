@@ -482,6 +482,6 @@ QList<QVariant> DsvTable::takeRowAt(qsizetype i)
     return mTable.takeAt(i);
 }
 
-bool DsvTable::operator==(const DsvTable& other) { return mTable == other.mTable; }
+bool DsvTable::operator==(const DsvTable& other) const { return mTable == other.mTable; }
 
 }
