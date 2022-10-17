@@ -68,6 +68,7 @@ public:
 public:
     QVariant& at(qsizetype r, qsizetype c);
     const QVariant& at(qsizetype r, qsizetype c) const;
+    QSize capcity() const;
     QList<QVariant> columnAt(qsizetype i) const;
     qsizetype columnCount() const;
     QList<QVariant> firstColumn() const;
@@ -94,8 +95,11 @@ public:
     void removeFirstRow();
     void removeLastColumn();
     void removeLastRow();
+    void reserve(QSize size);
+    void resize(QSize size);
     void resizeColumns(qsizetype size);
     void resizeRows(qsizetype size);
+    void squeeze();
     QList<QVariant> takeColumnAt(qsizetype i);
     QList<QVariant> takeFirstColumn();
     QList<QVariant> takeFirstRow();

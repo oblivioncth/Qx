@@ -208,6 +208,13 @@ const QVariant& DsvTable::at(qsizetype r, qsizetype c) const
     return mTable.at(r).at(c);
 }
 
+QSize DsvTable::capcity() const
+{
+    qsizetype rowCap = mTable.capacity();
+    qsizetype colCap = !mTable.isEmpty() ? mTable.first().capacity() : 0;
+
+    return QSize(rowCap, colCap);
+}
 QList<QVariant> DsvTable::columnAt(qsizetype i) const
 {
     Q_ASSERT_X(size_t(i) < size_t(columnCount()), Q_FUNC_INFO, "index out of range");
@@ -412,6 +419,32 @@ void DsvTable::removeLastRow()
     removeColumnAt(width - 1);
 }
 
+void DsvTable::reserve(QSize size)
+{
+    /* TODO: A focused "table" template class could be created, that somehow tracks which rows are
+     * actually part of the table, so that empty rows could be added without messing up the actual row
+     * count/size of the table. This would avoid the limitation mentioned above, as empty rows
+     * could be added, which then have reserve called on them in order to reserve the full
+     * size specified by the user, though it would add a small amount of overhead elsewhere.
+     *
+     * This class could then derive from, or composite that class.
+     */
+
+    if(size == DsvTable::size())
+        return;
+
+    mTable.reserve(size.height());
+    for(QList<QVariant>& row : mTable)
+        row.reserve(size.width());
+}
+void DsvTable::resize(QSize size)
+{
+    if(size == DsvTable::size())
+        return;
+
+    resizeRows(size.height());
+    resizeColumns(size.width());
+}
 void DsvTable::resizeColumns(qsizetype size)
 {
     if(size == columnCount())
@@ -440,6 +473,12 @@ void DsvTable::resizeRows(qsizetype size)
     }
 }
 
+void DsvTable::squeeze()
+{
+    mTable.squeeze();
+    for(QList<QVariant>& row : mTable)
+        row.squeeze();
+}
 QList<QVariant> DsvTable::takeColumnAt(qsizetype i)
 {
     Q_ASSERT_X(size_t(i) < size_t(columnCount()), Q_FUNC_INFO, "index out of range");
