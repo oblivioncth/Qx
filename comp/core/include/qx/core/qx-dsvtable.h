@@ -3,6 +3,7 @@
 
 // Qt Includes
 #include <QVariant>
+#include <QSize>
 
 namespace Qx
 {
