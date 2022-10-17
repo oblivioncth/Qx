@@ -280,6 +280,7 @@ DsvTable DsvTable::section(qsizetype r, qsizetype c, qsizetype width, qsizetype 
     return sec;
 }
 
+QSize DsvTable::size() const { return QSize(rowCount(), columnCount()); }
 QByteArray DsvTable::toDsv(QChar delim, QChar esc)
 {
     // Empty shortcut
