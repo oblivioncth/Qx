@@ -52,10 +52,6 @@ public:
 
 class DsvTable : public Table<QVariant>
 {
-//-Instance Variables----------------------------------------------------------------------------------------------
-private:
-    QList<QList<QVariant>> mTable;
-
 //-Constructor----------------------------------------------------------------------------------------------
 public:
     DsvTable();

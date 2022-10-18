@@ -16,7 +16,7 @@ public:
     typedef typename QList<QList<T>>::const_iterator row_iterator;
 
 //-Instance Variables----------------------------------------------------------------------------------------------
-private:
+protected:
     QList<QList<T>> mTable;
 
 //-Constructor----------------------------------------------------------------------------------------------
