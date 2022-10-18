@@ -167,7 +167,7 @@ DsvTable DsvTable::fromDsv(const QByteArray& dsv, QChar delim, QChar esc, DsvPar
     // Setup
     DsvTable table;
     table.mTable.append(QList<QVariant>()); // Add first empty row
-    QTextStream parser(dsv);
+    QTextStream parser(dsv, QIODeviceBase::OpenMode(QIODeviceBase::ReadOnly | QIODeviceBase::Text));
 
     // Working var
     qsizetype columnCount = -1;
