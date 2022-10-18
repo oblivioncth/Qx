@@ -18,9 +18,17 @@ namespace Qx
 /*!
  *  @typedef Table<T>::row_iterator
  *
- *  The Table::row_iterator typedef providess an STL_style const iterator for Table.
+ *  The Table::row_iterator typedef provides an STL_style const iterator for Table.
  *
  *  This iterator steps through each row of the table.
+ */
+
+//-Instance Variables---------------------------------------------------------------------------------------
+//Protected:
+/*!
+ *  @var Table<T>::mTable
+ *
+ *  This is the internal structure of the table, available for direct modification in derived classes.
  */
 
 //-Constructor----------------------------------------------------------------------------------------------
