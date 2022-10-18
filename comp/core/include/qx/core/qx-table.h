@@ -409,6 +409,7 @@ public:
     QList<T> takeRowAt(qsizetype i);
 
     bool operator==(const Table& other) const { return mTable == other.mTable; }
+    bool operator!=(const Table& other) const { return !(mTable == other.mTable); }
 };
 
 }

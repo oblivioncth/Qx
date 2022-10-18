@@ -565,4 +565,10 @@ namespace Qx
  *
  *  Returns @c true if the table contains the same fields as @a other; otherwise, returns @c false.
  */
+
+/*!
+ *  @fn template<typename T> bool Table<T>::operator!=(const Table& other) const
+ *
+ *  Returns @c true if the table does not contain the same fields as @a other; otherwise, returns @c false.
+ */
 }
