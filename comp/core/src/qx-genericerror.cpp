@@ -149,6 +149,31 @@ QString GenericError::secondaryInfo() const { return mSecondaryInfo; }
  */
 QString GenericError::detailedInfo() const { return mDetailedInfo; }
 
+/*!
+ *  Returns a single string that contains the error's error level, primary info, and secondary info.
+ *
+ *  @sa errorLevelString().
+ */
+QString GenericError::toString() const
+{
+    QString str = '[' + errorLevelString() + ']';
+
+    if(!mPrimaryInfo.isEmpty())
+    {
+        str += ' ' + mPrimaryInfo;
+        if(!mPrimaryInfo.back().isPunct())
+            str += '.';
+    }
+
+    if(!mSecondaryInfo.isEmpty())
+    {
+        str += ' ' + mSecondaryInfo;
+        if(!mSecondaryInfo.back().isPunct())
+            str += '.';
+    }
+
+    return str;
+}
 
 /*!
  *  Sets the generic error's error level.
