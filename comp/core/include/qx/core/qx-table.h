@@ -408,7 +408,12 @@ public:
         return takeRowAt(width - 1);
     }
 
-    QList<T> takeRowAt(qsizetype i);
+    QList<T> takeRowAt(qsizetype i)
+    {
+        Q_ASSERT_X(size_t(i) < size_t(rowCount()), Q_FUNC_INFO, "index out of range");
+
+        return mTable.takeAt(i);
+    }
 
     qsizetype width() const { return columnCount(); }
 
