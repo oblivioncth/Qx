@@ -505,7 +505,7 @@ bool Base85Encoding::operator!=(const Base85Encoding& other) const { return !(*t
  *  @class Base85ParseError qx/core/qx-base85.h
  *  @ingroup qx-core
  *
- *  @brief The Base85 class is used to report errors while parsing a Base85 encoded string.
+ *  @brief The Base85ParseError class is used to report errors while parsing a Base85 encoded string.
  *
  *  @sa Base85, and Base85Encoding.
  */
