@@ -119,6 +119,12 @@ namespace Qx
  */
 
 /*!
+ *  @fn template<typename T> qsizetype Table<T>::height() const
+ *
+ *  Same as rowCount().
+ */
+
+/*!
  *  @fn template<typename T> bool Table<T>::isEmpty() const
  *
  *  Returns @c true if the table has no elements; otherwise, returns @c false.
@@ -558,6 +564,12 @@ namespace Qx
  *  @endcode
  *
  *  @sa takeFirstRow(), takeLastRow(), and takeColumnAt().
+ */
+
+/*!
+ *  @fn template<typename T> qsizetype Table<T>::width() const
+ *
+ *  Same as columnCount().
  */
 
 /*!

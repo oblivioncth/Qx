@@ -106,6 +106,8 @@ public:
         return rowAt(0);
     }
 
+    qsizetype height() const { return rowCount(); }
+
     bool isEmpty() const { return mTable.isEmpty(); }
 
     QList<T> lastColumn() const
@@ -407,6 +409,8 @@ public:
     }
 
     QList<T> takeRowAt(qsizetype i);
+
+    qsizetype width() const { return columnCount(); }
 
     bool operator==(const Table& other) const { return mTable == other.mTable; }
     bool operator!=(const Table& other) const { return !(mTable == other.mTable); }
