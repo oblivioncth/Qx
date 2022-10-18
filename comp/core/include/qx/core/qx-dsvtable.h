@@ -5,6 +5,9 @@
 #include <QVariant>
 #include <QSize>
 
+// Intra-component Includes
+#include "qx/core/qx-table.h"
+
 namespace Qx
 {
 
@@ -47,7 +50,7 @@ public:
     qsizetype offset() const;
 };
 
-class DsvTable
+class DsvTable : public Table<QVariant>
 {
 //-Instance Variables----------------------------------------------------------------------------------------------
 private:
@@ -56,8 +59,8 @@ private:
 //-Constructor----------------------------------------------------------------------------------------------
 public:
     DsvTable();
-    DsvTable(qsizetype r, qsizetype c);
-    DsvTable(qsizetype r, qsizetype c, const QVariant& value);
+    DsvTable(QSize size);
+    DsvTable(QSize size, const QVariant& value);
     DsvTable(std::initializer_list<std::initializer_list<QVariant>> table);
 
 //-Class Functions----------------------------------------------------------------------------------------------
@@ -66,55 +69,7 @@ public:
 
 //-Instance Functions----------------------------------------------------------------------------------------------
 public:
-    QVariant& at(qsizetype r, qsizetype c);
-    const QVariant& at(qsizetype r, qsizetype c) const;
-    QSize capcity() const;
-    QList<QVariant> columnAt(qsizetype i) const;
-    qsizetype columnCount() const;
-    QList<QVariant> firstColumn() const;
-    QList<QVariant> firstRow() const;
-    bool isEmpty() const;
-    QList<QVariant> lastColumn() const;
-    QList<QVariant> lastRow() const;
-    QList<QVariant> rowAt(qsizetype i) const;
-    qsizetype rowCount() const;
-    DsvTable section(qsizetype r, qsizetype c, qsizetype height, qsizetype width) const;
-    QSize size() const;
-    QVariant value(qsizetype r, qsizetype c) const;
-    QVariant value(qsizetype r, qsizetype c, const QVariant& defaultValue) const;
-
-    void addColumns(qsizetype c);
-    void addRows(qsizetype r);
-    void appendColumn(const QList<QVariant>& c);
-    void appendRow(const QList<QVariant>& r);
-    void fill(const QVariant& value, QSize size);
-    void insertColumn(qsizetype i, const QList<QVariant>& c);
-    void insertRow(qsizetype i, const QList<QVariant>& r);
-    void removeColumnAt(qsizetype i);
-    void removeColumns(qsizetype i, qsizetype n = 1);
-    void removeRowAt(qsizetype i);
-    void removeRows(qsizetype i, qsizetype n = 1);
-    void removeFirstColumn();
-    void removeFirstRow();
-    void removeLastColumn();
-    void removeLastRow();
-    void replaceColumn(qsizetype i, const QList<QVariant>& c);
-    void replaceRow(qsizetype i, const QList<QVariant>& c);
-    void reserve(QSize size);
-    void resize(QSize size);
-    void resizeColumns(qsizetype size);
-    void resizeRows(qsizetype size);
-    void squeeze();
-    QList<QVariant> takeColumnAt(qsizetype i);
-    QList<QVariant> takeFirstColumn();
-    QList<QVariant> takeFirstRow();
-    QList<QVariant> takeLastColumn();
-    QList<QVariant> takeLastRow();
-    QList<QVariant> takeRowAt(qsizetype i);
-
     QByteArray toDsv(QChar delim = ',', QChar esc = '"');
-
-    bool operator==(const DsvTable& other) const;
 };
 
 }

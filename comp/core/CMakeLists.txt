@@ -24,6 +24,7 @@ set(COMPONENT_INCLUDE_HEADERS
     qx-json.h
     qx-list.h
     qx-progressgroup.h
+    qx-table.h
     qx-versionnumber.h
     qx-regularexpression.h
     qx-setonce.h
@@ -66,6 +67,7 @@ set(COMPONENT_DOC_ONLY
     qx-cumulation.dox
     qx-array.dox
     qx-setonce.dox
+    qx-table.dox
 )
 
 # Links
