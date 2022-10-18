@@ -13,6 +13,16 @@ namespace Qx
  *  Table<T> is a generic container class that features fast index-based access and a similar API to QList<T>.
  */
 
+//-Iterators---------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @typedef Table<T>::row_iterator
+ *
+ *  The Table::row_iterator typedef providess an STL_style const iterator for Table.
+ *
+ *  This iterator steps through each row of the table.
+ */
+
 //-Constructor----------------------------------------------------------------------------------------------
 //Public:
 /*!
@@ -145,11 +155,31 @@ namespace Qx
  */
 
 /*!
+ *  @fn template<typename T> row_iterator Table<T>::rowBegin() const
+ *
+ *  Returns a const STL-style iterator pointing to the first row in the table.
+ *
+ *  @warning The returned iterator is invalidated when the Table is modified.
+ *
+ *  @sa rowEnd().
+ */
+
+/*!
  *  @fn template<typename T> qsizetype Table<T>::rowCount() const
  *
  *  Returns the number of rows in the table.
  *
  *  @sa isEmpty(), columnCount(), and resizeRows().
+ */
+
+/*!
+ *  @fn template<typename T> row_iterator Table<T>::rowEnd() const
+ *
+ *  Returns a const STL-style iterator pointing just after the last row in the table.
+ *
+ *  @warning The returned iterator is invalidated when the Table is modified.
+ *
+ *  @sa rowBegin().
  */
 
 /*!

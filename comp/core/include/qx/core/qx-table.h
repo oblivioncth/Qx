@@ -11,6 +11,10 @@ namespace Qx
 template<typename T>
 class Table
 {
+//-Iterators---------------------------------------------------------------------------------------------
+public:
+    typedef typename QList<QList<T>>::const_iterator row_iterator;
+
 //-Instance Variables----------------------------------------------------------------------------------------------
 private:
     QList<QList<T>> mTable;
@@ -96,7 +100,7 @@ public:
         return columnAt(0);
     }
 
-    QList<T> firstRow() const
+    const QList<T>& firstRow() const
     {
         Q_ASSERT(rowCount() > 0);
         return rowAt(0);
@@ -111,21 +115,25 @@ public:
         return rowAt(height - 1);
     }
 
-    QList<T> lastRow() const
+    const QList<T>& lastRow() const
     {
         qsizetype width = rowCount();
         Q_ASSERT(width > 0);
         return rowAt(width - 1);
     }
 
-    QList<T> rowAt(qsizetype i) const
+    const QList<T>& rowAt(qsizetype i) const
     {
         Q_ASSERT_X(i < rowCount(), Q_FUNC_INFO, "index out of range");
 
         return mTable[i];
     }
 
+    row_iterator rowBegin() const { return mTable.constBegin(); }
+
     qsizetype rowCount() const { return mTable.size(); }
+
+    row_iterator rowEnd() const { return mTable.constEnd(); }
 
     Table section(qsizetype r, qsizetype c, qsizetype height, qsizetype width) const
     {
