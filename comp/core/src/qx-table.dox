@@ -79,7 +79,7 @@ namespace Qx
  *
  *  @overload
  *
- *  Returns the field as a constant reference.
+ *  Returns the element as a constant reference.
  */
 
 /*!
@@ -199,7 +199,7 @@ namespace Qx
 /*!
  *  @fn template<typename T> Table<T> Table<T>::section(qsizetype r, qsizetype c, qsizetype height, qsizetype width) const
  *
- *  Returns a new Table that contains a portion of the table's fields.
+ *  Returns a new Table that contains a portion of the table's elements.
  *
  *  @a r and @c specify the origin of the subsection, while @a height specifies the number of
  *  rows to include, and @a width specifies the number of columns to include.
@@ -224,7 +224,7 @@ namespace Qx
 /*!
  *  @fn template<typename T> T Table<T>::value(qsizetype r, qsizetype c) const
  *
- *  Returns the field at row @a r and column @a c.
+ *  Returns the element at row @a r and column @a c.
  *
  *  If the position is out of bounds, the function returns an invalid QVariant.
  *  If you are certain that @a r and @a c are within bounds, you can use at()
@@ -325,7 +325,7 @@ namespace Qx
  *
  *  Removes the column @a i from the table.
  *
- *  Field removal will preserve the table's capacity and not reduce the amount of allocated memory.
+ *  Element removal will preserve the table's capacity and not reduce the amount of allocated memory.
  *  To shed extra capacity and free as much memory as possible, call squeeze().
  *
  *  @sa removeColumns(), and removeRows().
@@ -336,7 +336,7 @@ namespace Qx
  *
  *  Removes @a n columns from the table, starting at column @a i.
  *
- *  Field removal will preserve the table's capacity and not reduce the amount of allocated memory.
+ *  Element removal will preserve the table's capacity and not reduce the amount of allocated memory.
  *  To shed extra capacity and free as much memory as possible, call squeeze().
  *
  *  @sa insertColumn(), replaceColumn(), and fill().
@@ -347,7 +347,7 @@ namespace Qx
  *
  *  Removes the row @a i from the table.
  *
- *  Field removal will preserve the table's capacity and not reduce the amount of allocated memory.
+ *  Element removal will preserve the table's capacity and not reduce the amount of allocated memory.
  *  To shed extra capacity and free as much memory as possible, call squeeze().
  *
  *  @sa removeRows(), and removeColumns().
@@ -358,7 +358,7 @@ namespace Qx
  *
  *  Removes @a n rows from the table, starting at row @a i.
  *
- *  Field removal will preserve the table's capacity and not reduce the amount of allocated memory.
+ *  Element removal will preserve the table's capacity and not reduce the amount of allocated memory.
  *  To shed extra capacity and free as much memory as possible, call squeeze().
  *
  *  @sa insertRow(), replaceRow(), and fill().
@@ -370,7 +370,7 @@ namespace Qx
  *  Removes the first column from the table. Calling this function is equivalent to calling `removeColumns(0)`.
  *  The table must have columns. To prevent failure, call columnCount() before calling this function.
  *
- *  Field removal will preserve the table's capacity and not reduce the amount of allocated memory.
+ *  Element removal will preserve the table's capacity and not reduce the amount of allocated memory.
  *  To shed extra capacity and free as much memory as possible, call squeeze().
  *
  *  @sa removeColumns(), takeFirstColumn(), and columnCount().
@@ -382,7 +382,7 @@ namespace Qx
  *  Removes the first row from the table. Calling this function is equivalent to calling `removeRows(0)`.
  *  The table must have rows. To prevent failure, call rowCount() before calling this function.
  *
- *  Field removal will preserve the table's capacity and not reduce the amount of allocated memory.
+ *  Element removal will preserve the table's capacity and not reduce the amount of allocated memory.
  *  To shed extra capacity and free as much memory as possible, call squeeze().
  *
  *  @sa removeRows(), takeFirstRow(), and rowCount().
@@ -395,7 +395,7 @@ namespace Qx
  *  `removeColumns(columnCount() - 1)`. The table must have columns. To prevent failure, call
  *  columnCount() before calling this function.
  *
- *  Field removal will preserve the table's capacity and not reduce the amount of allocated memory.
+ *  Element removal will preserve the table's capacity and not reduce the amount of allocated memory.
  *  To shed extra capacity and free as much memory as possible, call squeeze().
  *
  *  @sa removeColumns(), takeLastColumn(), and columnCount().
@@ -408,7 +408,7 @@ namespace Qx
  *  `removeRows(rowCount() - 1)`. The table must have rows. To prevent failure, call
  *  rowCount() before calling this function.
  *
- *  Field removal will preserve the table's capacity and not reduce the amount of allocated memory.
+ *  Element removal will preserve the table's capacity and not reduce the amount of allocated memory.
  *  To shed extra capacity and free as much memory as possible, call squeeze().
  *
  *  @sa removeRows(), takeLastRow(), and rowCount().
@@ -583,12 +583,12 @@ namespace Qx
 /*!
  *  @fn template<typename T> bool Table<T>::operator==(const Table& other) const
  *
- *  Returns @c true if the table contains the same fields as @a other; otherwise, returns @c false.
+ *  Returns @c true if the table contains the same elements as @a other; otherwise, returns @c false.
  */
 
 /*!
  *  @fn template<typename T> bool Table<T>::operator!=(const Table& other) const
  *
- *  Returns @c true if the table does not contain the same fields as @a other; otherwise, returns @c false.
+ *  Returns @c true if the table does not contain the same elements as @a other; otherwise, returns @c false.
  */
 }
