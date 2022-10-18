@@ -87,6 +87,9 @@ public:
     void addRows(qsizetype r);
     void appendColumn(const QList<QVariant>& c);
     void appendRow(const QList<QVariant>& r);
+    void fill(const QVariant& value, QSize size);
+    void insertColumn(qsizetype i, const QList<QVariant>& c);
+    void insertRow(qsizetype i, const QList<QVariant>& r);
     void removeColumnAt(qsizetype i);
     void removeColumns(qsizetype i, qsizetype n = 1);
     void removeRowAt(qsizetype i);
@@ -95,6 +98,8 @@ public:
     void removeFirstRow();
     void removeLastColumn();
     void removeLastRow();
+    void replaceColumn(qsizetype i, const QList<QVariant>& c);
+    void replaceRow(qsizetype i, const QList<QVariant>& c);
     void reserve(QSize size);
     void resize(QSize size);
     void resizeColumns(qsizetype size);

@@ -287,47 +287,12 @@ DsvTable DsvTable::section(qsizetype r, qsizetype c, qsizetype height, qsizetype
     return sec;
 }
 
+/*!
+ *  Returns the column count (width), and row count (height) of the table as a QSize object.
+ *
+ *  @sa columnCount(), and rowCount().
+ */
 QSize DsvTable::size() const { return QSize(columnCount(), rowCount()); }
-QByteArray DsvTable::toDsv(QChar delim, QChar esc)
-{
-    // Empty shortcut
-    if(mTable.isEmpty())
-        return QByteArray();
-
-    // Setup
-    QByteArray dsv;
-    QTextStream serializer(dsv);
-
-    // Print all values
-    for(const QList<QVariant>& row : mTable)
-    {
-        for(auto itr = row.constBegin(); itr != row.constEnd(); itr++)
-        {
-            // Raw string data
-            QString fieldStr = (*itr).toString();
-
-            // Escape if necessary
-            if(fieldStr.contains(delim) || fieldStr.contains(esc))
-            {
-                fieldStr.replace(esc, QString(2, esc));
-                fieldStr.prepend(esc);
-                fieldStr.append(esc);
-            }
-
-            // Print
-            serializer << fieldStr;
-
-            // Delimit
-            if(itr != row.constEnd() - 1)
-                serializer << delim;
-        }
-
-        // Terminate line
-        serializer << '\n';
-    }
-
-    return dsv;
-}
 
 /*!
   *  Returns the field at row @a r and column @a c.
@@ -406,6 +371,41 @@ void DsvTable::appendRow(const QList<QVariant>& r)
         mTable.back().resize(width);
 }
 
+void DsvTable::fill(const QVariant& value, QSize size)
+{
+    if(!size.isNull())
+        resize(size);
+
+    for(QList<QVariant>& row : mTable)
+        row.fill(value);
+}
+
+void DsvTable::insertColumn(qsizetype i, const QList<QVariant>& c)
+{
+    // Expand height if c is larger than current height
+    qsizetype rows = rowCount();
+    qsizetype rowGrowth = rows - c.size();
+    if(rowGrowth > 0)
+        resizeRows(c.size());
+
+    // Insert values from column, or default values if column is smaller than height
+    for(qsizetype r = 0; r < rows; r++)
+        mTable[r].insert(i, r > c.size() - 1 ? QVariant() : c[r]);
+}
+
+void DsvTable::insertRow(qsizetype i, const QList<QVariant>& r)
+{
+    // Expand width if r is larger than current width
+    qsizetype columns = columnCount();
+    qsizetype columnGrowth = columns - r.size();
+    if(columnGrowth > 0)
+        resizeColumns(r.size());
+
+    // Insert row, then expand it if it's smaller than the current width
+    mTable.insert(i, r);
+    if(columnGrowth < 0)
+        mTable[i].resize(columns);
+}
 void DsvTable::removeColumnAt(qsizetype i) { removeColumns(i); }
 
 void DsvTable::removeColumns(qsizetype i, qsizetype n)
@@ -459,6 +459,32 @@ void DsvTable::removeLastRow()
     removeColumnAt(width - 1);
 }
 
+void DsvTable::replaceColumn(qsizetype i, const QList<QVariant>& c)
+{
+    // Expand height if c is larger than current height
+    qsizetype rows = rowCount();
+    qsizetype rowGrowth = rows - c.size();
+    if(rowGrowth > 0)
+        resizeRows(c.size());
+
+    // Replace with values from column, or default values if column is smaller than height
+    for(qsizetype r = 0; r < rows; r++)
+        mTable[r].replace(i, r > c.size() - 1 ? QVariant() : c[r]);
+}
+
+void DsvTable::replaceRow(qsizetype i, const QList<QVariant>& r)
+{
+    // Expand width if r is larger than current width
+    qsizetype columns = columnCount();
+    qsizetype columnGrowth = columns - r.size();
+    if(columnGrowth > 0)
+        resizeColumns(r.size());
+
+    // Replace row, then expand it if it's smaller than the current width
+    mTable.replace(i, r);
+    if(columnGrowth < 0)
+        mTable[i].resize(columns);
+}
 void DsvTable::reserve(QSize size)
 {
     /* TODO: A focused "table" template class could be created, that somehow tracks which rows are
@@ -561,6 +587,54 @@ QList<QVariant> DsvTable::takeRowAt(qsizetype i)
     return mTable.takeAt(i);
 }
 
+/*!
+ *  Converts the DsvTable to a serialized delimiter-separated values byte array, using @a
+ *  delim as the delimiter and @a esc as the quote/escape character.
+ */
+QByteArray DsvTable::toDsv(QChar delim, QChar esc)
+{
+    // Empty shortcut
+    if(mTable.isEmpty())
+        return QByteArray();
+
+    // Setup
+    QByteArray dsv;
+    QTextStream serializer(dsv);
+
+    // Print all values
+    for(const QList<QVariant>& row : mTable)
+    {
+        for(auto itr = row.constBegin(); itr != row.constEnd(); itr++)
+        {
+            // Raw string data
+            QString fieldStr = (*itr).toString();
+
+            // Escape if necessary
+            if(fieldStr.contains(delim) || fieldStr.contains(esc))
+            {
+                fieldStr.replace(esc, QString(2, esc));
+                fieldStr.prepend(esc);
+                fieldStr.append(esc);
+            }
+
+            // Print
+            serializer << fieldStr;
+
+            // Delimit
+            if(itr != row.constEnd() - 1)
+                serializer << delim;
+        }
+
+        // Terminate line
+        serializer << '\n';
+    }
+
+    return dsv;
+}
+
+/*!
+ *  Returns @c true if the table contains the same fields as @a other; otherwise, returns @c false.
+ */
 bool DsvTable::operator==(const DsvTable& other) const { return mTable == other.mTable; }
 
 }
