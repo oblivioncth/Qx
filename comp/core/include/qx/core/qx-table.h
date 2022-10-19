@@ -26,14 +26,14 @@ public:
     Table(QSize size)
     {
         mTable.resize(size.height());
-        for(QList<QVariant>& row : mTable)
+        for(QList<T>& row : mTable)
             row.resize(size.width());
     }
 
     Table(QSize size, const T& value)
     {
-        QList<QVariant> row(size.width(), value);
-        mTable = QList<QList<QVariant>>(size.height(), row);
+        QList<T> row(size.width(), value);
+        mTable = QList<QList<T>>(size.height(), row);
     }
 
     Table(std::initializer_list<std::initializer_list<T>> table)
@@ -84,9 +84,9 @@ public:
         Q_ASSERT_X(size_t(i) < size_t(columnCount()), Q_FUNC_INFO, "index out of range");
 
         // Build column list
-        QList<QVariant> col;
+        QList<T> col;
 
-        for(const QList<QVariant>& row : mTable)
+        for(const QList<T>& row : mTable)
             col << row[i];
 
         return col;
@@ -151,7 +151,7 @@ public:
 
         Table sec;
         sec.mTable = mTable.sliced(r, width);
-        for(QList<QVariant>& row : sec.mTable)
+        for(QList<T>& row : sec.mTable)
             row = row.sliced(c, height);
 
         return sec;
@@ -201,7 +201,7 @@ public:
         if(!size.isNull())
             resize(size);
 
-        for(QList<QVariant>& row : mTable)
+        for(QList<T>& row : mTable)
             row.fill(value);
     }
 
@@ -242,7 +242,7 @@ public:
         if (n == 0)
             return;
 
-        for(QList<QVariant>& row : mTable)
+        for(QList<T>& row : mTable)
             row.remove(i, n);
     }
 
@@ -325,7 +325,7 @@ public:
             return;
 
         mTable.reserve(size.height());
-        for(QList<QVariant>& row : mTable)
+        for(QList<T>& row : mTable)
             row.reserve(size.width());
     }
 
@@ -343,7 +343,7 @@ public:
         if(size == columnCount())
             return;
 
-        for(QList<QVariant>& row : mTable)
+        for(QList<T>& row : mTable)
             row.resize(size);
     }
 
@@ -369,7 +369,7 @@ public:
     void squeeze()
     {
         mTable.squeeze();
-        for(QList<QVariant>& row : mTable)
+        for(QList<T>& row : mTable)
             row.squeeze();
     }
 
@@ -377,7 +377,7 @@ public:
     {
         Q_ASSERT_X(size_t(i) < size_t(columnCount()), Q_FUNC_INFO, "index out of range");
 
-        QList<QVariant> col = columnAt(i);
+        QList<T> col = columnAt(i);
         removeColumnAt(i);
         return col;
     }
