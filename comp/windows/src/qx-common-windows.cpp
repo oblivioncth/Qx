@@ -482,21 +482,37 @@ GenericError createShortcut(QString shortcutPath, ShortcutProperties sp)
     QFileInfo targetInfo(sp.target);
     QString fullTargetPath = targetInfo.absoluteFilePath();
 
-    // Get a pointer to the IShellLink interface
-    hRes = CoCreateInstance(CLSID_ShellLink,
-                            NULL,
-                            CLSCTX_INPROC_SERVER,
-                            IID_IShellLink,
-                            (void**)&ipShellLink);
 
-    if (SUCCEEDED(hRes))
+    // Get a pointer to the IShellLink interface
+    auto getIShellLinkPtr = [](CComPtr<IShellLink>& ptrShellLnk){
+        return CoCreateInstance(CLSID_ShellLink,
+                                NULL,
+                                CLSCTX_INPROC_SERVER,
+                                IID_IShellLink,
+                                (void**)&ptrShellLnk);
+    };
+
+    hRes = getIShellLinkPtr(ipShellLink);
+
+    // Handle the case for if the COM server wasn't already initialized in this thread
+    QScopeGuard COMGuard([]{ CoUninitialize(); });
+    if(hRes == CO_E_NOTINITIALIZED)
+    {
+        CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+        hRes = getIShellLinkPtr(ipShellLink);
+    }
+    else
+        COMGuard.dismiss();
+
+    // Commence shortcut creation if COM server was properly connected to
+    if(SUCCEEDED(hRes))
     {
         // Get a pointer to the IPersistFile interface
         CComQIPtr<IPersistFile> ipPersistFile(ipShellLink);
 
         // Set shortcut properties
         hRes = ipShellLink->SetPath((const wchar_t*)fullTargetPath.utf16());
-        if (FAILED(hRes))
+        if(FAILED(hRes))
             return translateHresult(hRes);
 
         if(!sp.targetArgs.isEmpty())
@@ -528,7 +544,7 @@ GenericError createShortcut(QString shortcutPath, ShortcutProperties sp)
         }
 
         hRes = ipShellLink->SetShowCmd(nativeShowMode(sp.showMode));
-        if (FAILED(hRes))
+        if(FAILED(hRes))
             return translateHresult(hRes);
 
         // Write the shortcut to disk
