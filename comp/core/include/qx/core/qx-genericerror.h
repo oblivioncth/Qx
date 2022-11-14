@@ -52,6 +52,7 @@ public:
     QString primaryInfo() const;
     QString secondaryInfo() const;
     QString detailedInfo() const;
+    QString toString() const;
 
     GenericError& setErrorLevel(ErrorLevel errorLevel);
     GenericError& setCaption(QString caption);

@@ -39,7 +39,7 @@ jobs:
           throw "Could not get base version!"
         }
         $new_tag = "v$($Matches[1].Trim())"
-        echo "::set-output name=new_tag::$new_tag"
+        echo "new_tag=$new_tag" >> $Env:GITHUB_OUTPUT
         git tag -a $new_tag -m "Release $new_tag"
         git push --tags
     - name: Move 'latest' tag

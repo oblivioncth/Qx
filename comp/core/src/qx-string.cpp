@@ -69,7 +69,7 @@ QString String::stripToHexOnly(QString string) { return string.replace(RegularEx
  */
 QString String::join(QList<QString> list, QString separator, QString prefix) // Overload for T = QString
 {
-    return join(list, [](const QString& str)->const QString&{ return str; }, separator, prefix);
+    return join(list, [](const QString& str)->QString{ return str; }, separator, prefix);
 }
 
 /*!
@@ -91,7 +91,7 @@ QString String::join(QList<QString> list, QString separator, QString prefix) // 
  */
 QString String::join(QSet<QString> set, QString separator, QString prefix) // Overload for T = QString
 {
-    return join(set, [](const QString& str)->const QString&{ return str; }, separator, prefix);
+    return join(set, [](const QString& str)->QString{ return str; }, separator, prefix);
 }	
 
 /*!

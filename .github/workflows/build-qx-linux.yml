@@ -39,7 +39,7 @@ jobs:
       qt_static_artifact_name: ${{ steps.get_artifact_name.outputs.qt_static_artifact_name }}
     steps:
     - name: Set matrix derived variables
-      uses: kanga333/variable-mapper@v0.2.2
+      uses: kanga333/variable-mapper@v0.3.0
       with:
         key: ${{ matrix.qt_linkage }}
         map: |
@@ -98,7 +98,7 @@ jobs:
       run: sudo apt-get install libx11-xcb-dev libxkbcommon-dev libxkbcommon-x11-dev libxcb-*-dev
     - name: Install Doxygen
       env:
-        doxy_build: doxygen-1.9.4
+        doxy_build: doxygen-1.9.5
         doxy_arch_ext: linux.bin.tar.gz
         doxy_repo: https://www.doxygen.nl/files
       run: |
@@ -143,7 +143,7 @@ jobs:
       run: |
         cpack_name=$(find * -type f -name "*.zip")
         artifact_name=$(basename "$cpack_name" .zip)
-        echo "::set-output name=${{ env.artifact_output_var }}::$artifact_name"
+        echo "${{ env.artifact_output_var }}=$artifact_name" >> $GITHUB_OUTPUT
     - name: Upload Qx build artifact
       uses: actions/upload-artifact@v3
       with:

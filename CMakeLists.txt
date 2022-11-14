@@ -10,14 +10,11 @@ endif()
 # by find_package/macro calls in dependencies (stupid)
 set(TRUE_CMAKE_MINIMUM_REQUIRED ${CMAKE_MINIMUM_REQUIRED_VERSION})
 
-# Configuration options
-option(QX_DOCS_TARGET "Build Qx documentation" OFF)
-
 # Project
 # NOTE: For versions stick to w.x.y.z, where z is generally
 # avoided and only used for hotfixes. DON'T USE TRAILING
 # ZEROS IN VERSIONS
-set(QX_BASE_VERSION 0.4) # Required for CI/CD
+set(QX_BASE_VERSION 0.4.1) # Required for CI/CD
 project(Qx
     VERSION ${QX_BASE_VERSION}
     LANGUAGES CXX
@@ -25,7 +22,6 @@ project(Qx
 )
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LC)
 string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UC)
-
 
 # C++
 set(CMAKE_CXX_STANDARD 20)
@@ -105,11 +101,10 @@ set(PACKAGE_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/out/dist")
 include(OB/VerboseVersioning)
 setup_verbose_versioning(PROJECT_VERSION_VERBOSE)
 
-################# Common Build #################
+#------------Enumerate Components----------------
 
-# Enumerate Components
 get_subdirectory_list(${COMPONENTS_PATH} LIB_COMPONENTS)
-set(BUILD_COMPONENTS ${LIB_COMPONENTS})
+set(AVAILABLE_COMPONENTS ${LIB_COMPONENTS})
 
 # Qt package components
 set(QT_FIND_COMPONENTS
@@ -120,16 +115,20 @@ set(QT_FIND_COMPONENTS
     Xml
 )
 
-################# Windows Build #################
 if(CMAKE_SYSTEM_NAME STREQUAL Windows)
-    list(REMOVE_ITEM BUILD_COMPONENTS linux)
+    list(REMOVE_ITEM AVAILABLE_COMPONENTS linux)
 endif()
 
-################# Linux Build #################
 if(CMAKE_SYSTEM_NAME STREQUAL Linux)
-    list(REMOVE_ITEM BUILD_COMPONENTS windows)
-    list(REMOVE_ITEM BUILD_COMPONENTS windows-gui)
+    list(REMOVE_ITEM AVAILABLE_COMPONENTS windows)
+    list(REMOVE_ITEM AVAILABLE_COMPONENTS windows-gui)
 endif()
+
+#------------Setup user options----------------
+
+# Configuration options
+option(QX_DOCS_TARGET "Build Qx documentation" OFF)
+set(QX_COMPONENTS "${AVAILABLE_COMPONENTS}" CACHE STRING "Qx components to configure")
 
 #================= Top Level Build =========================
 
@@ -155,9 +154,26 @@ write_basic_package_version_file(
 
 #================= Process Componets =======================
 
-# Build components
-foreach(component ${BUILD_COMPONENTS})
-    add_subdirectory(${COMPONENTS_PATH}/${component})
+# Configure requested components
+foreach(component ${QX_COMPONENTS})
+    string(TOLOWER ${component} component_lc)
+
+    # Confirm component is valid
+    list(FIND AVAILABLE_COMPONENTS ${component_lc} __COMP_IDX)
+    if(__COMP_IDX EQUAL -1)
+        message(FATAL_ERROR "${component_lc} is not a valid ${PROJECT_NAME} component!")
+    endif()
+
+    # Only procceed if component is valid wasn't already added as a dependency
+    if(NOT TARGET "${PROJECT_NAME_LC}_${component_lc}")
+        add_subdirectory(${COMPONENTS_PATH}/${component_lc})
+
+        # Configure the components sibling dependencies
+        while(QX_COMP_CONFIG_QUEUE)
+            list(POP_FRONT QX_COMP_CONFIG_QUEUE dependency_comp)
+            add_subdirectory(${COMPONENTS_PATH}/${dependency_comp})
+        endwhile()
+    endif()
 endforeach()
 
 #================ Build Documentation ======================

@@ -37,7 +37,7 @@ jobs:
       qt_static_artifact_name: ${{ steps.get_artifact_name.outputs.qt_static_artifact_name }}
     steps:
     - name: Set matrix derived variables
-      uses: kanga333/variable-mapper@v0.2.2
+      uses: kanga333/variable-mapper@v0.3.0
       with:
         key: ${{ matrix.qt_linkage }}
         map: |
@@ -83,7 +83,7 @@ jobs:
       run: 7z x ${{ env.qt_install_dest }} -o${{ env.qt_install_dir }}
     - name: Install Doxygen & Graphviz
       run: |
-        choco install doxygen.install --version 1.9.4
+        choco install doxygen.install --version 1.9.5
         choco install graphviz
     - name: Checkout Qx
       uses: actions/checkout@v3
@@ -117,7 +117,7 @@ jobs:
         echo "Build complete."
     - name: Get Qx artifact name
       id: get_artifact_name
-      run: echo "::set-output name=${{ env.artifact_output_var }}::$((Get-ChildItem -Path "${{ env.qx_package_path }}" -Filter *.zip)[0].BaseName)"
+      run: echo "${{ env.artifact_output_var }}=$((Get-ChildItem -Path "${{ env.qx_package_path }}" -Filter *.zip)[0].BaseName)" >> $Env:GITHUB_OUTPUT
     - name: Upload Qx build artifact
       uses: actions/upload-artifact@v3
       with:

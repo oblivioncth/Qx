@@ -7,9 +7,14 @@
 namespace Qx
 {
 //-Namespace Members--------------------------------------------------------------------------------------------
-static inline QTextStream cout(stdout); // QTextStream version of std::cout
-static inline QTextStream cerr(stderr); // QTextStream version of std::cerr
-static inline QTextStream cin(stdin); // QTextStream version of std::cin
+inline QTextStream cout = QTextStream(stdout); // QTextStream version of std::cout
+inline QTextStream cerr = QTextStream(stderr); // QTextStream version of std::cerr
+inline QTextStream cin = QTextStream(stdin); // QTextStream version of std::cin
+
+//-Namespace Functions------------------------------------------------------------------------------------------
+#if defined _WIN32 || (defined __linux__ && __has_include(<termios.h>))
+void setUserInputEchoEnabled(bool enabled);
+#endif
 }
 
 #endif // QX_IOSTREAM_H

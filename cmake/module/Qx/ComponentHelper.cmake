@@ -29,19 +29,33 @@ macro(register_qx_component)
         string(FIND "${link}" "Qx::" __QX_NAMESPACE_POS)
 
         if(__QT_NAMESPACE_POS EQUAL 0)
+            # Add Qt component to dependency list if not already present
             string(REPLACE "Qt6::" "" __QT_LINK ${link})
-            list(FIND "${COMPONENT_QT_DEPENDS}" ${__QT_LINK} __QT_LINK_IDX)
+            list(FIND COMPONENT_QT_DEPENDS ${__QT_LINK} __QT_LINK_IDX)
             if(__QT_LINK_IDX EQUAL -1)
                 list(APPEND COMPONENT_QT_DEPENDS ${__QT_LINK})
             endif()
         elseif(__QX_NAMESPACE_POS EQUAL 0)
+            # Add Qx component to dependency list if not already present
             string(REPLACE "Qx::" "" __QX_LINK ${link})
-            list(FIND "${COMPONENT_SIBLING_DEPENDS}" ${__QX_LINK} __QX_LINK_IDX)
+            list(FIND COMPONENT_SIBLING_DEPENDS ${__QX_LINK} __QX_LINK_IDX)
             if(__QX_LINK_IDX EQUAL -1)
                 list(APPEND COMPONENT_SIBLING_DEPENDS ${__QX_LINK})
             endif()
+
+            # Add Qx component to configure queue list if not already present, nor target already configured
+            string(TOLOWER "${__QX_LINK}" __QX_LINK_LC)
+            if(NOT TARGET "${PROJECT_NAME_LC}_${__QX_LINK_LC}")
+                list(FIND QX_COMP_CONFIG_QUEUE ${__QX_LINK_LC} __QX_QUEUE_IDX)
+                if(__QX_QUEUE_IDX EQUAL -1)
+                    list(APPEND QX_COMP_CONFIG_QUEUE ${__QX_LINK_LC})
+                endif()
+            endif()
         endif()
     endforeach()
+
+    # Forward component queue modifications to parent script
+    set(QX_COMP_CONFIG_QUEUE ${QX_COMP_CONFIG_QUEUE} PARENT_SCOPE)
 
     #================= Build ==========================
 

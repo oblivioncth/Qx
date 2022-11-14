@@ -1,0 +1,594 @@
+namespace Qx
+{
+//===============================================================================================================
+// Table
+//===============================================================================================================
+
+/*!
+ *  @class Table qx/core/qx-table.h
+ *  @ingroup qx-core
+ *
+ *  @brief The Table class is a template class that provides a dynamic two-dimensional array.
+ *
+ *  Table<T> is a generic container class that features fast index-based access and a similar API to QList<T>.
+ */
+
+//-Iterators---------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @typedef Table<T>::row_iterator
+ *
+ *  The Table::row_iterator typedef provides an STL_style const iterator for Table.
+ *
+ *  This iterator steps through each row of the table.
+ */
+
+//-Instance Variables---------------------------------------------------------------------------------------
+//Protected:
+/*!
+ *  @var Table<T>::mTable
+ *
+ *  This is the internal structure of the table, available for direct modification in derived classes.
+ */
+
+//-Constructor----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ * @fn template<typename T> Table<T>::Table()
+ *
+ *  Constructs an empty Table.
+ */
+
+/*!
+ *  @fn template<typename T> Table<T>::Table(QSize size)
+ *
+ *  Constructs a Table of size @a size, with every element initialized with a
+ *  default-constructed value.
+ */
+
+/*!
+ *  @fn template<typename T> Table<T>::Table(QSize size, const T& value)
+ *
+ *  Constructs a Table of size @a size, with every element initialized to @a value.
+ */
+
+/*!
+ *  @fn template<typename T> Table<T>::Table(std::initializer_list<std::initializer_list<T>> table)
+ *
+ *  Constructs a Table with a copy of each row in the initializer list @a list.
+ *
+ *  If all rows in the list are not the same size, this constructor will produce an
+ *  empty table.
+ */
+
+//-Instance Functions----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn template<typename T> T& Table<T>::at(qsizetype r, qsizetype c)
+ *
+ *  Returns the element at row @a r and column @a c as a modifiable reference.
+ *
+ *  @a r and @a c must point to a valid position within the table
+ *  (i.e. 0 <= @a r < rowCount() && 0 <= @a c < columnCount()).
+ *
+ *  @sa value().
+ */
+
+/*!
+ *  @fn template<typename T> const T& Table<T>::at(qsizetype r, qsizetype c) const
+ *
+ *  @overload
+ *
+ *  Returns the element as a constant reference.
+ */
+
+/*!
+ *  @fn template<typename T> QSize Table<T>::capacity() const
+ *
+ *  Returns the capacity of the table as a QSize object.
+ *
+ *  @sa reserve(), and squeeze().
+ */
+
+/*!
+ *  @fn template<typename T> QList<T> Table<T>::columnAt(qsizetype i) const
+ *
+ *  Returns the items in column @a i of the table as a list.
+ *
+ *  @a i must be a valid column index in the table (i.e. 0 <= @a i < columnCount())
+ *
+ *  @sa section().
+ */
+
+/*!
+ *  @fn template<typename T> qsizetype Table<T>::columnCount() const
+ *
+ *  Returns the number of columns in the table.
+ *
+ *  @sa isEmpty(), rowCount(), and resizeColumns().
+ */
+
+/*!
+ *  @fn template<typename T> QList<T> Table<T>::firstColumn() const
+ *
+ *  Returns the items in the first column of the table as a list.
+ *  This function assumes that the table isn't empty.
+ *
+ *  @sa isEmpty(), lastColumn(), and firstRow().
+ */
+
+/*!
+ *  @fn template<typename T> QList<T> Table<T>::firstRow() const
+ *
+ *  Returns the items in the first row of the table as a list.
+ *  This function assumes that the table isn't empty.
+ *
+ *  @sa isEmpty(), lastRow(), and firstColumn().
+ */
+
+/*!
+ *  @fn template<typename T> qsizetype Table<T>::height() const
+ *
+ *  Same as rowCount().
+ */
+
+/*!
+ *  @fn template<typename T> bool Table<T>::isEmpty() const
+ *
+ *  Returns @c true if the table has no elements; otherwise, returns @c false.
+ *
+ *  @sa size(), and resize().
+ */
+
+/*!
+ *  @fn template<typename T> QList<T> Table<T>::lastColumn() const
+ *
+ *  Returns the items in the last column of the table as a list.
+ *  This function assumes that the table isn't empty.
+ *
+ *  @sa isEmpty(), firstColumn(), and lastRow().
+ */
+
+/*!
+ *  @fn template<typename T> QList<T> Table<T>::lastRow() const
+ *
+ *  Returns the items in the last row of the table as a list.
+ *  This function assumes that the table isn't empty.
+ *
+ *  @sa isEmpty(), firstRow(), and lastColumn().
+ */
+
+/*!
+ *  @fn template<typename T> QList<T> Table<T>::rowAt(qsizetype i) const
+ *
+ *  Returns the items in row @a i of the table as a list.
+ *
+ *  @a i must be a valid column index in the table (i.e. 0 <= @a i < rowCount())
+ *
+ *  @sa section().
+ */
+
+/*!
+ *  @fn template<typename T> row_iterator Table<T>::rowBegin() const
+ *
+ *  Returns a const STL-style iterator pointing to the first row in the table.
+ *
+ *  @warning The returned iterator is invalidated when the Table is modified.
+ *
+ *  @sa rowEnd().
+ */
+
+/*!
+ *  @fn template<typename T> qsizetype Table<T>::rowCount() const
+ *
+ *  Returns the number of rows in the table.
+ *
+ *  @sa isEmpty(), columnCount(), and resizeRows().
+ */
+
+/*!
+ *  @fn template<typename T> row_iterator Table<T>::rowEnd() const
+ *
+ *  Returns a const STL-style iterator pointing just after the last row in the table.
+ *
+ *  @warning The returned iterator is invalidated when the Table is modified.
+ *
+ *  @sa rowBegin().
+ */
+
+/*!
+ *  @fn template<typename T> Table<T> Table<T>::section(qsizetype r, qsizetype c, qsizetype height, qsizetype width) const
+ *
+ *  Returns a new Table that contains a portion of the table's elements.
+ *
+ *  @a r and @c specify the origin of the subsection, while @a height specifies the number of
+ *  rows to include, and @a width specifies the number of columns to include.
+ *
+ *  Any portions of the specified section that fall outside the bounds of the table are simply
+ *  ignored, which can result in the new table being empty if the section does not intersect
+ *  with the table whatsoever.
+ *
+ *  @snippet qx-table.cpp 0
+ *
+ *  @sa columnAt(), and rowAt().
+ */
+
+/*!
+ *  @fn template<typename T> QSize Table<T>::size() const
+ *
+ *  Returns the column count (width), and row count (height) of the table as a QSize object.
+ *
+ *  @sa columnCount(), and rowCount().
+ */
+
+/*!
+ *  @fn template<typename T> T Table<T>::value(qsizetype r, qsizetype c) const
+ *
+ *  Returns the element at row @a r and column @a c.
+ *
+ *  If the position is out of bounds, the function returns an invalid QVariant.
+ *  If you are certain that @a r and @a c are within bounds, you can use at()
+ *  instead, which is slightly faster.
+ */
+
+/*!
+ *  @fn template<typename T> T Table<T>::value(qsizetype r, qsizetype c, const T& defaultValue) const
+ *
+ *  @overload
+ *
+ *  If the position is out of bounds, the function returns @a defaultValue.
+ */
+
+/*!
+ *  @fn template<typename T> void Table<T>::addColumns(qsizetype c)
+ *
+ *  Appends @a c columns, with their elements initialized to default-constructed values, to the
+ *  'right' end of the table.
+ *
+ *  Equivalent to:
+ *  @code{.cpp}
+ *  resizeColumns(columnCount() + c);
+ *  @endcode
+ *
+ *  @sa resizeColumns(), and appendColumn().
+ */
+
+/*!
+ *  @fn template<typename T> void Table<T>::addRows(qsizetype c)
+ *
+ *  Appends @a c columns, with their elements initialized to default-constructed values, to the
+ *  'bottom' end of the table.
+ *
+ *  Equivalent to:
+ *  @code{.cpp}
+ *  resizeRows(rowCount() + r);
+ *  @endcode
+ *
+ *  @sa resizeRows(), and appendRow().
+ */
+
+/*!
+ *  @fn template<typename T> void Table<T>::appendColumn(const QList<T>& c)
+ *
+ *  Appends @a c as a column to the 'right' end of the table.
+ *
+ *  If @a c is smaller than the current height (rowCount()) of the table, it will be expanded with
+ *  default-constructed values after insertion to match the current height. If @a c is larger than the
+ *  current height, the rest of the table's columns will be expanded with default-constructed values
+ *  to match the height of @a c.
+ */
+
+/*!
+ *  @fn template<typename T> void Table<T>::appendRow(const QList<T>& r)
+ *
+ *  Appends @a r as a row to the 'bottom' end of the table.
+ *
+ *  If @a r is smaller than the current width (columnCount()) of the table, it will be expanded with
+ *  default-constructed values after insertion to match the current width. If @a r is larger than the
+ *  current width, the rest of the table's rows will be expanded with default-constructed values
+ *  to match the width of @a c.
+ */
+
+/*!
+ *  @fn template<typename T> void Table<T>::fill(const T& value, QSize size)
+ *
+ *  Assigns @a value to all items in the table. If @a size is not null (the default), the table is
+ *  resized to @a size beforehand.
+ *
+ *  @sa resize().
+ */
+
+/*!
+ *  @fn template<typename T> void Table<T>::insertColumn(qsizetype i, const QList<T>& c)
+ *
+ *  Inserts @a c as a column to column index @a i in the table.
+ *
+ *  If @a c is smaller than the current height (rowCount()) of the table, it will be expanded with
+ *  default-constructed values after insertion to match the current height. If @a c is larger than the
+ *  current height, the rest of the table's columns will be expanded with default-constructed values to
+ *  match the height of @a c.
+ */
+
+/*!
+ *  @fn template<typename T> void Table<T>::insertRow(qsizetype i, const QList<T>& r)
+ *
+ *  Inserts @a r as a row to row index @a i in the table.
+ *
+ *  If @a r is smaller than the current width (columnCount()) of the table, it will be expanded with
+ *  default-constructed values after insertion to match the current width. If @a r is larger than the
+ *  current width, the rest of the table's rows will be expanded with default-constructed values to
+ *  match the width of @a c.
+ */
+
+/*!
+ *  @fn template<typename T> void Table<T>::removeColumnAt(qsizetype i)
+ *
+ *  Removes the column @a i from the table.
+ *
+ *  Element removal will preserve the table's capacity and not reduce the amount of allocated memory.
+ *  To shed extra capacity and free as much memory as possible, call squeeze().
+ *
+ *  @sa removeColumns(), and removeRows().
+ */
+
+/*!
+ *  @fn template<typename T> void Table<T>::removeColumns(qsizetype i, qsizetype n = 1)
+ *
+ *  Removes @a n columns from the table, starting at column @a i.
+ *
+ *  Element removal will preserve the table's capacity and not reduce the amount of allocated memory.
+ *  To shed extra capacity and free as much memory as possible, call squeeze().
+ *
+ *  @sa insertColumn(), replaceColumn(), and fill().
+ */
+
+/*!
+ *  @fn template<typename T> void Table<T>::removeRowAt(qsizetype i)
+ *
+ *  Removes the row @a i from the table.
+ *
+ *  Element removal will preserve the table's capacity and not reduce the amount of allocated memory.
+ *  To shed extra capacity and free as much memory as possible, call squeeze().
+ *
+ *  @sa removeRows(), and removeColumns().
+ */
+
+/*!
+ *  @fn template<typename T> void Table<T>::removeRows(qsizetype i, qsizetype n = 1)
+ *
+ *  Removes @a n rows from the table, starting at row @a i.
+ *
+ *  Element removal will preserve the table's capacity and not reduce the amount of allocated memory.
+ *  To shed extra capacity and free as much memory as possible, call squeeze().
+ *
+ *  @sa insertRow(), replaceRow(), and fill().
+ */
+
+/*!
+ *  @fn template<typename T> void Table<T>::removeFirstColumn()
+ *
+ *  Removes the first column from the table. Calling this function is equivalent to calling `removeColumns(0)`.
+ *  The table must have columns. To prevent failure, call columnCount() before calling this function.
+ *
+ *  Element removal will preserve the table's capacity and not reduce the amount of allocated memory.
+ *  To shed extra capacity and free as much memory as possible, call squeeze().
+ *
+ *  @sa removeColumns(), takeFirstColumn(), and columnCount().
+ */
+
+/*!
+ *  @fn template<typename T> void Table<T>::removeFirstRow()
+ *
+ *  Removes the first row from the table. Calling this function is equivalent to calling `removeRows(0)`.
+ *  The table must have rows. To prevent failure, call rowCount() before calling this function.
+ *
+ *  Element removal will preserve the table's capacity and not reduce the amount of allocated memory.
+ *  To shed extra capacity and free as much memory as possible, call squeeze().
+ *
+ *  @sa removeRows(), takeFirstRow(), and rowCount().
+ */
+
+/*!
+ *  @fn template<typename T> void Table<T>::removeLastColumn()
+ *
+ *  Removes the last column from the table. Calling this function is equivalent to calling
+ *  `removeColumns(columnCount() - 1)`. The table must have columns. To prevent failure, call
+ *  columnCount() before calling this function.
+ *
+ *  Element removal will preserve the table's capacity and not reduce the amount of allocated memory.
+ *  To shed extra capacity and free as much memory as possible, call squeeze().
+ *
+ *  @sa removeColumns(), takeLastColumn(), and columnCount().
+ */
+
+/*!
+ *  @fn template<typename T> void Table<T>::removeLastRow()
+ *
+ *  Removes the last row from the table. Calling this function is equivalent to calling
+ *  `removeRows(rowCount() - 1)`. The table must have rows. To prevent failure, call
+ *  rowCount() before calling this function.
+ *
+ *  Element removal will preserve the table's capacity and not reduce the amount of allocated memory.
+ *  To shed extra capacity and free as much memory as possible, call squeeze().
+ *
+ *  @sa removeRows(), takeLastRow(), and rowCount().
+ */
+
+/*!
+ *  @fn template<typename T> void Table<T>::replaceColumn(qsizetype i, const QList<T>& c)
+ *
+ *  Replaces column @a i with @a c in the table.
+ *
+ *  If @a c is smaller than the current height (rowCount()) of the table, it will be expanded with
+ *  default-constructed values after insertion to match the current height. If @a c is larger than the
+ *  current height, the rest of the table's columns will be expanded with default-constructed values to
+ *  match the height of @a c.
+ */
+
+/*!
+ *  @fn template<typename T> void Table<T>::replaceRow(qsizetype i, const QList<T>& r)
+ *
+ *  Replaces row @a i with @a r in the table.
+ *
+ *  If @a r is smaller than the current width (columnCount()) of the table, it will be expanded with
+ *  default-constructed values after insertion to match the current width. If @a r is larger than the
+ *  current width, the rest of the table's rows will be expanded with default-constructed values to
+ *  match the width of @a c.
+ */
+
+/*!
+ *  @fn template<typename T> void Table<T>::reserve(QSize size)
+ *
+ *  Attempts to allocate memory for @a size elements.
+ *
+ *  If you know in advance how large the table will be, you should call this function to prevent
+ *  reallocations and memory fragmentation. If you resize the table often, you are also likely
+ *  to get better performance.
+ *
+ *  If in doubt about how much space shall be needed, it is usually better to use an upper bound
+ *  as @a size, or a high estimate of the most likely size, if a strict upper bound would be much
+ *  bigger than this. If @a size is an underestimate, the table will grow as needed once the reserved
+ *  size is exceeded, which may lead to a larger allocation than your best overestimate would have
+ *  and will slow the operation that triggers it.
+ *
+ *  @parblock
+ *  @warning reserve() reserves memory but does not change the size of the table. Accessing data
+ *  beyond the current bounds of the table is undefined behavior. If you need to access memory
+ *  beyond the current bounds of the table, use resize().
+ *  @endparblock
+ *
+ *  @parblock
+ *  @warning due to technical limitations, the reserve space specified for the height of @a size
+ *  will only apply to existing rows, and not any that are only reserved. This may be resolved in a future version.
+ *  @endparblock
+ *
+ *  @sa squeeze(), capacity(), and resize().
+ */
+
+/*!
+ *  @fn template<typename T> void Table<T>::resize(QSize size)
+ *
+ *  Sets the size of the table to @a size. If @a size is greater than the current size, elements
+ *  are added to each end of the table; the new elements are initialized with default-constructed values.
+ *  If @a size is less than the current size, elements are removed from each end.
+ *
+ *  @sa size(), resizeColumns(), and resizeRows().
+ */
+
+/*!
+ *  @fn template<typename T> void Table<T>::resizeColumns(qsizetype size)
+ *
+ *  Sets the number of columns in the table to @a size. If @a size is greater than the current
+ *  column count, columns are added to the 'right' end of the table; the new elements are
+ *  initialized with default-constructed values. If @a size is less than the current column count,
+ *  columns are removed from the 'right' end.
+ *
+ *  @sa resize(), size(), and resizeRows().
+ */
+
+/*!
+ *  @fn template<typename T> void Table<T>::resizeRows(qsizetype size)
+ *
+ *  Sets the number of rows in the table to @a size. If @a size is greater than the current
+ *  row count, rows are added to the 'bottom' end of the table; the new elements are
+ *  initialized with default-constructed values. If @a size is less than the current row count,
+ *  rows are removed from the 'bottom' end.
+ *
+ *  @sa resize(), size(), and resizeColumns().
+ */
+
+/*!
+ *  @fn template<typename T> void Table<T>::squeeze()
+ *
+ *  Releases any memory not required to store the elements.
+ *
+ *  The sole purpose of this function is to provide a means of fine tuning Table's memory
+ *  usage. In general, you will rarely ever need to call this function.
+ *
+ *  @sa reserve(), and capacity().
+ */
+
+/*!
+ *  @fn template<typename T> void Table<T>::takeColumnAt(qsizetype i)
+ *
+ *  Removes column @a i and returns it.
+ *
+ *  Equivalent to:
+ *  @code{.cpp}
+ *  QList<T> col = columnAt(i);
+ *  removeColumnAt(i);
+ *  return col;
+ *  @endcode
+ *
+ *  @sa takeFirstColumn(), takeLastColumn(), and takeRowAt().
+ */
+
+/*!
+ *  @fn template<typename T> void Table<T>::takeFirstColumn()
+ *
+ *  Removes the first column from the table and returns it. This function assumes the table
+ *  has columns. To avoid failure, call columnCount() before calling this function.
+ *
+ *  @sa takeLastColumn(), takeFirstRow(), and takeColumnAt().
+ */
+
+/*!
+ *  @fn template<typename T> void Table<T>::takeFirstRow()
+ *
+ *  Removes the first row from the table and returns it. This function assumes the table
+ *  has rows. To avoid failure, call rowCount() before calling this function.
+ *
+ *  @sa takeLastRow(), takeFirstColumn(), and takeRowAt().
+ */
+
+/*!
+ *  @fn template<typename T> void Table<T>::takeLastColumn()
+ *
+ *  Removes the last column from the table and returns it. This function assumes the table
+ *  has columns. To avoid failure, call columnCount() before calling this function.
+ *
+ *  @sa takeFirstColumn(), takeLastRow(), and takeColumnAt().
+ */
+
+/*!
+ *  @fn template<typename T> void Table<T>::takeLastRow()
+ *
+ *  Removes the last row from the table and returns it. This function assumes the table
+ *  has rows. To avoid failure, call rowCount() before calling this function.
+ *
+ *  @sa takeFirstRow(), takeLastColumn(), and takeRowAt().
+ */
+
+/*!
+ *  @fn template<typename T> void Table<T>::takeRowAt(qsizetype i)
+ *
+ *  Removes row @a i and returns it.
+ *
+ *  Equivalent to:
+ *  @code{.cpp}
+ *  QList<T> row = rowAt(i);
+ *  removeRowAt(i);
+ *  return row;
+ *  @endcode
+ *
+ *  @sa takeFirstRow(), takeLastRow(), and takeColumnAt().
+ */
+
+/*!
+ *  @fn template<typename T> qsizetype Table<T>::width() const
+ *
+ *  Same as columnCount().
+ */
+
+/*!
+ *  @fn template<typename T> bool Table<T>::operator==(const Table& other) const
+ *
+ *  Returns @c true if the table contains the same elements as @a other; otherwise, returns @c false.
+ */
+
+/*!
+ *  @fn template<typename T> bool Table<T>::operator!=(const Table& other) const
+ *
+ *  Returns @c true if the table does not contain the same elements as @a other; otherwise, returns @c false.
+ */
+}
