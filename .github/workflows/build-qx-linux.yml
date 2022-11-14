@@ -98,7 +98,7 @@ jobs:
       run: sudo apt-get install libx11-xcb-dev libxkbcommon-dev libxkbcommon-x11-dev libxcb-*-dev
     - name: Install Doxygen
       env:
-        doxy_build: doxygen-1.9.4
+        doxy_build: doxygen-1.9.5
         doxy_arch_ext: linux.bin.tar.gz
         doxy_repo: https://www.doxygen.nl/files
       run: |
