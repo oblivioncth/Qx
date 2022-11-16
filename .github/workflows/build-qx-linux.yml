@@ -97,9 +97,16 @@ jobs:
     - name: Install XCB Related libs
       run: sudo apt-get install libx11-xcb-dev libxkbcommon-dev libxkbcommon-x11-dev libxcb-*-dev
     - name: Install Doxygen
-      uses: oblivioncth/actions/ubuntu/install-doxygen-from-source@dev
-      with:
-        ref: Release_1_9_5
+      env:
+        doxy_ver: 1.9.5
+        doxy_arch_ext: linux.bin.tar.gz
+        doxy_repo: https://sourceforge.net/projects/doxygen/files
+      run: |
+        curl "$doxy_repo/rel-$doxy_ver/doxygen-$doxy_ver.$doxy_arch_ext" --output "$general_download_dir/doxygen-$doxy_ver.$doxy_arch_ext" --create-dirs --location --silent --show-error
+        cd $general_download_dir
+        tar xf "doxygen-$doxy_ver.$doxy_arch_ext"
+        cd "doxygen-$doxy_ver"
+        sudo make install
     - name: Install Graphviz
       run: sudo apt-get install graphviz
     - name: Install Ninja
