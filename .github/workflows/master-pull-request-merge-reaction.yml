@@ -5,8 +5,6 @@ on:
     branches:
     - 'master'
 env:
-  ci_bot_username: ObyBotCI
-  ci_bot_email: 104651589+ObyBotCI@users.noreply.github.com
   qx_qtd_win_artifact_path: ${{ github.workspace }}/QxQtDWin
   qx_qts_win_artifact_path: ${{ github.workspace }}/QxQtSWin
   qx_qtd_linux_artifact_path: ${{ github.workspace }}/QxQtDLinux
@@ -25,9 +23,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: Setup git user for bot
-      run: |
-        git config --global user.name "${{ env.ci_bot_username }}"
-        git config --global user.email "${{ env.ci_bot_email }}"
+      uses: oblivioncth/actions/git/set-git-user-to-oby-bot@dev
     - name: Tag master with new version tag
       id: tag_master
       env:
