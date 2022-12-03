@@ -7,6 +7,11 @@
 // Extra-component Includes
 #include "qx/utility/qx-concepts.h"
 
+/* TODO: An iterator can't be added to this class unless it deferences to a special class like the QJsonValueRef
+ * approach since when the value is modified the running total would need to be changed as well. That or the running
+ * total needs to be done away with and the total() method needs to calculate the total each time its called (ehhhh)
+ */
+
 namespace Qx
 {
 
@@ -169,6 +174,7 @@ public:
     bool contains(K component) const { return mComponents.contains(component); }
     V value(K component) const { return mComponents.value(component); }
     V total() const { return mTotal; }
+    QList<K> components() const { return mComponents.keys(); }
 
     qsizetype count() const { return mComponents.count(); }
     bool isEmpty() const { return mComponents.isEmpty(); }
