@@ -131,6 +131,14 @@ namespace Qx
  */
 
 /*!
+ * @fn template <typename K, typename V> QList<K> Cumulation<K, V>::components() const
+ *
+ *  Returns a list containing all the components in the cumulation, in an arbitrary order.
+ *
+ *  This function creates a new list, in linear time.
+ */
+
+/*!
  * @fn template <typename K, typename V> qsizetype Cumulation<K, V>::count() const
  *
  *  Returns that number of components that compose the cumulation.
