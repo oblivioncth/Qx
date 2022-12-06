@@ -1,7 +1,7 @@
 #================= Project Setup ==========================
 
 # CMake
-cmake_minimum_required(VERSION 3.21.1)
+cmake_minimum_required(VERSION 3.25.0)
 if(NOT ${GENERATOR_IS_MULTI_CONFIG})
     message(FATAL_ERROR "This project currently only supports multi-config generators!")
 endif()
