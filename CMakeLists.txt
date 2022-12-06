@@ -14,9 +14,8 @@ set(TRUE_CMAKE_MINIMUM_REQUIRED ${CMAKE_MINIMUM_REQUIRED_VERSION})
 # NOTE: For versions stick to w.x.y.z, where z is generally
 # avoided and only used for hotfixes. DON'T USE TRAILING
 # ZEROS IN VERSIONS
-set(QX_BASE_VERSION 0.4.1) # Required for CI/CD
 project(Qx
-    VERSION ${QX_BASE_VERSION}
+    VERSION 0.4.1
     LANGUAGES CXX
     DESCRIPTION "Qt Extensions Library"
 )
