@@ -18,27 +18,26 @@ jobs:
     outputs:
       version_tag: ${{ steps.tag_master.outputs.new_tag }}
     steps:
-    - name: Checkout Qx Master
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - name: Setup git user for bot
+    - name: Get project version
+      id: get-proj-ver
+      uses: oblivioncth/actions/cmake/get-project-version@dev
+    - name: Set Git user to ObyBotCI
       uses: oblivioncth/actions/git/set-git-user-to-oby-bot@dev
+    - name: Checkout Project
+      id: proj-checkout
+      uses: oblivioncth/actions/git/smart-checkout@dev
     - name: Tag master with new version tag
       id: tag_master
+      working-directory: ${{ steps.proj-checkout.outputs.path }}
       env:
-        match_start: set\(QX_BASE_VERSION
-        match_end: \)
+        new_version: ${{ steps.get-proj-ver.outputs.version }}
       run: |
-        $project_lists = Get-Content -Raw CMakeLists.txt
-        if(!($project_lists -match '(?<=${{ env.match_start }})(.*)(?=${{ env.match_end }})')){
-          throw "Could not get base version!"
-        }
-        $new_tag = "v$($Matches[1].Trim())"
+        $new_tag = "v${Env:new_version}"
         echo "new_tag=$new_tag" >> $Env:GITHUB_OUTPUT
         git tag -a $new_tag -m "Release $new_tag"
         git push --tags
     - name: Move 'latest' tag
+      working-directory: ${{ steps.proj-checkout.outputs.path }}
       run: |
         echo "Checking for 'latest' tag..."
         if(git tag -l latest){
@@ -53,6 +52,7 @@ jobs:
         git push origin latest
     - name: Fast-forward merge master into to dev
       if: always()
+      working-directory: ${{ steps.proj-checkout.outputs.path }}
       run: |
         git checkout dev
         git merge master --ff-only
