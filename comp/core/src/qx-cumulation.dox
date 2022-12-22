@@ -159,4 +159,18 @@ namespace Qx
  *  If @a V is an integral type, the result is rounded to the nearest integer.
  */
 
+/*!
+ *  @fn template <typename K, typename V> V Cumulation<K, V>::operator==(const Cumulation& other) const
+ *
+ *  Returns @c true if this Cumulation and @a other Cumulation are the same;
+ *  otherwise, returns @c false.
+ */
+
+/*!
+ *  @fn template <typename K, typename V> V Cumulation<K, V>::operator!=(const Cumulation& other) const
+ *
+ *  Returns @c true if this Cumulation and @a other Cumulation are not the same;
+ *  otherwise, returns @c false.
+ */
+
 }

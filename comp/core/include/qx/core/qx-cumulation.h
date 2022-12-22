@@ -179,6 +179,13 @@ public:
     qsizetype count() const { return mComponents.count(); }
     bool isEmpty() const { return mComponents.isEmpty(); }
     V mean() const { return sMean<V>(); }
+
+    bool operator==(const Cumulation& other) const
+    {
+        return mComponents == other.mComponents && mScalers == other.mScalers && mTotal == other.mTotal;
+    }
+
+    bool operator!=(const Cumulation& other) const  { return !(*this == other); }
 };	
 
 }
