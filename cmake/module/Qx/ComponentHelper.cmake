@@ -7,6 +7,7 @@ macro(register_qx_component)
     # Determine component name via folder name
     get_filename_component(COMPONENT_NAME_LC "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
     string_to_proper_case(${COMPONENT_NAME_LC} COMPONENT_NAME)
+    string(TOUPPER ${COMPONENT_NAME} COMPONENT_NAME_UC)
     create_header_guard(${PROJECT_NAME} ${COMPONENT_NAME} COMPONENT_HEADER_GUARD)
 
     # Name here needs to be as unique as possible for when this project is inlcuded
