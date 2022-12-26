@@ -209,9 +209,11 @@ public:
     {
         // Expand height if c is larger than current height
         qsizetype rows = rowCount();
-        qsizetype rowGrowth = rows - c.size();
-        if(rowGrowth > 0)
+        if(c.size() > rows)
+        {
             resizeRows(c.size());
+            rows = c.size();
+        }
 
         // Insert values from column, or default values if column is smaller than height
         for(qsizetype r = 0; r < rows; r++)
@@ -222,13 +224,15 @@ public:
     {
         // Expand width if r is larger than current width
         qsizetype columns = columnCount();
-        qsizetype columnGrowth = columns - r.size();
-        if(columnGrowth > 0)
+        if(r.size() > columns)
+        {
             resizeColumns(r.size());
+            columns = r.size();
+        }
 
         // Insert row, then expand it if it's smaller than the current width
         mTable.insert(i, r);
-        if(columnGrowth < 0)
+        if(r.size() < columns)
             mTable[i].resize(columns);
     }
 
