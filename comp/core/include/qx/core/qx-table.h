@@ -207,11 +207,15 @@ public:
 
     void insertColumn(qsizetype i, const QList<T>& c)
     {
+        Q_ASSERT_X(i >= 0 && i <= columnCount(), "QTable<T>::insertColumn", "index out of range");
+
         // Expand height if c is larger than current height
         qsizetype rows = rowCount();
-        qsizetype rowGrowth = rows - c.size();
-        if(rowGrowth > 0)
+        if(c.size() > rows)
+        {
             resizeRows(c.size());
+            rows = c.size();
+        }
 
         // Insert values from column, or default values if column is smaller than height
         for(qsizetype r = 0; r < rows; r++)
@@ -220,15 +224,19 @@ public:
 
     void insertRow(qsizetype i, const QList<T>& r)
     {
+        Q_ASSERT_X(i >= 0 && i <= rowCount(), "QTable<T>::insertRow", "index out of range");
+
         // Expand width if r is larger than current width
         qsizetype columns = columnCount();
-        qsizetype columnGrowth = columns - r.size();
-        if(columnGrowth > 0)
+        if(r.size() > columns)
+        {
             resizeColumns(r.size());
+            columns = r.size();
+        }
 
         // Insert row, then expand it if it's smaller than the current width
         mTable.insert(i, r);
-        if(columnGrowth < 0)
+        if(r.size() < columns)
             mTable[i].resize(columns);
     }
 
