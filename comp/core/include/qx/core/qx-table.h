@@ -207,6 +207,8 @@ public:
 
     void insertColumn(qsizetype i, const QList<T>& c)
     {
+        Q_ASSERT_X(i >= 0 && i <= columnCount(), "QTable<T>::insertColumn", "index out of range");
+
         // Expand height if c is larger than current height
         qsizetype rows = rowCount();
         if(c.size() > rows)
@@ -222,6 +224,8 @@ public:
 
     void insertRow(qsizetype i, const QList<T>& r)
     {
+        Q_ASSERT_X(i >= 0 && i <= rowCount(), "QTable<T>::insertRow", "index out of range");
+
         // Expand width if r is larger than current width
         qsizetype columns = columnCount();
         if(r.size() > columns)
