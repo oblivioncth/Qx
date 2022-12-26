@@ -7,6 +7,7 @@ macro(register_qx_component)
     # Determine component name via folder name
     get_filename_component(COMPONENT_NAME_LC "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
     string_to_proper_case(${COMPONENT_NAME_LC} COMPONENT_NAME)
+    string(TOUPPER ${COMPONENT_NAME} COMPONENT_NAME_UC)
     create_header_guard(${PROJECT_NAME} ${COMPONENT_NAME} COMPONENT_HEADER_GUARD)
 
     # Name here needs to be as unique as possible for when this project is inlcuded
@@ -178,9 +179,9 @@ macro(register_qx_component)
     )
 
     # Install public headers
-    install(DIRECTORY include/${PROJECT_NAME_LC}
+    install(DIRECTORY include/
         COMPONENT ${COMPONENT_TARGET_NAME}
-        DESTINATION "include/${COMPONENT_NAME_LC}"
+        DESTINATION "include/${COMPONENT_NAME_LC}/"
         ${SUB_PROJ_EXCLUDE_FROM_ALL} # "EXCLUDE_FROM_ALL" if project is not top-level
     )
     install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME_LC}/${COMPONENT_NAME_LC}.h"

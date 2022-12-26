@@ -131,6 +131,14 @@ namespace Qx
  */
 
 /*!
+ * @fn template <typename K, typename V> QList<K> Cumulation<K, V>::components() const
+ *
+ *  Returns a list containing all the components in the cumulation, in an arbitrary order.
+ *
+ *  This function creates a new list, in linear time.
+ */
+
+/*!
  * @fn template <typename K, typename V> qsizetype Cumulation<K, V>::count() const
  *
  *  Returns that number of components that compose the cumulation.
@@ -149,6 +157,20 @@ namespace Qx
  *  number of components, or zero if the cumulation is empty.
  *
  *  If @a V is an integral type, the result is rounded to the nearest integer.
+ */
+
+/*!
+ *  @fn template <typename K, typename V> V Cumulation<K, V>::operator==(const Cumulation& other) const
+ *
+ *  Returns @c true if this Cumulation and @a other Cumulation are the same;
+ *  otherwise, returns @c false.
+ */
+
+/*!
+ *  @fn template <typename K, typename V> V Cumulation<K, V>::operator!=(const Cumulation& other) const
+ *
+ *  Returns @c true if this Cumulation and @a other Cumulation are not the same;
+ *  otherwise, returns @c false.
  */
 
 }

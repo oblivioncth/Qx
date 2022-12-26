@@ -1,7 +1,7 @@
 #================= Project Setup ==========================
 
 # CMake
-cmake_minimum_required(VERSION 3.21.1)
+cmake_minimum_required(VERSION 3.25.0)
 if(NOT ${GENERATOR_IS_MULTI_CONFIG})
     message(FATAL_ERROR "This project currently only supports multi-config generators!")
 endif()
@@ -14,9 +14,8 @@ set(TRUE_CMAKE_MINIMUM_REQUIRED ${CMAKE_MINIMUM_REQUIRED_VERSION})
 # NOTE: For versions stick to w.x.y.z, where z is generally
 # avoided and only used for hotfixes. DON'T USE TRAILING
 # ZEROS IN VERSIONS
-set(QX_BASE_VERSION 0.4.1) # Required for CI/CD
 project(Qx
-    VERSION ${QX_BASE_VERSION}
+    VERSION 0.4.2
     LANGUAGES CXX
     DESCRIPTION "Qt Extensions Library"
 )

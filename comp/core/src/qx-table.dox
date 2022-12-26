@@ -301,7 +301,8 @@ namespace Qx
 /*!
  *  @fn template<typename T> void Table<T>::insertColumn(qsizetype i, const QList<T>& c)
  *
- *  Inserts @a c as a column to column index @a i in the table.
+ *  Inserts @a c as a column to column index @a i in the table. If @a i is 0, the column is prepended to the
+ *  table. If @a i is columnSize(), the column is appended to the table.
  *
  *  If @a c is smaller than the current height (rowCount()) of the table, it will be expanded with
  *  default-constructed values after insertion to match the current height. If @a c is larger than the
@@ -312,7 +313,8 @@ namespace Qx
 /*!
  *  @fn template<typename T> void Table<T>::insertRow(qsizetype i, const QList<T>& r)
  *
- *  Inserts @a r as a row to row index @a i in the table.
+ *  Inserts @a r as a row to row index @a i in the table. If @a i is 0, the row is prepended to the
+ *  table. If @a i is rowSize(), the row is appended to the table.
  *
  *  If @a r is smaller than the current width (columnCount()) of the table, it will be expanded with
  *  default-constructed values after insertion to match the current width. If @a r is larger than the

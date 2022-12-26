@@ -83,7 +83,7 @@ jobs:
       run: 7z x ${{ env.qt_install_dest }} -o${{ env.qt_install_dir }}
     - name: Install Doxygen & Graphviz
       run: |
-        choco install doxygen.install --version 1.9.5
+        choco install doxygen.install --version 1.9.4
         choco install graphviz
     - name: Checkout Qx
       uses: actions/checkout@v3
@@ -93,13 +93,11 @@ jobs:
     - name: Build/Install Qx
       working-directory: ${{ env.qx_src_dir }}
       shell: cmd
-      env:
-        doxygen_root: C:\Program Files\doxygen # Required because of #42
       run: |
         echo "Setup C++ Build Environment..."
         CALL "${{ env.vs_dir }}\Common7\Tools\VsDevCmd.bat" -arch=amd64
         echo "Configure CMake using Qt wrapper..."
-        CALL "${{ env.qt_cmake }}" -G "${{ env.cmake_gen }}" -S "${{ env.qx_src_dir}}" -B "${{ env.qx_build_dir }}" -D QX_DOCS_TARGET=ON -D Doxygen_ROOT="${{ env.doxygen_root }}"
+        CALL "${{ env.qt_cmake }}" -G "${{ env.cmake_gen }}" -S "${{ env.qx_src_dir}}" -B "${{ env.qx_build_dir }}" -D QX_DOCS_TARGET=ON"
         echo "Changing to build directory..."
         cd "%qx_build_dir%"
         echo "Building Qx debug..."
