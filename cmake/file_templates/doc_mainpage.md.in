@@ -73,7 +73,7 @@ If newer to working with Qt, it is easiest to build from within Qt creator as it
 
 The CMake project is designed to be used with multi-configuration generators such as Visual Studio or Ninja Multi-Config (recommended), and may require some tweaking to work with single configuration generators.
 
-If you only need a subset of Qx's components, the **QX_COMPONENTS** cache variable can be set to a semicolon separated list of components. Only these components and their required dependencies will be configured, which can save on build time.
+If you only need a subset of Qx's components, the **QX_COMPONENTS** cache variable can be set to a semicolon or whitespace separated list of components. Only these components and their required dependencies will be configured, which can save on build time.
 
 #### CMake Targets:
 
