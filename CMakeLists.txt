@@ -116,6 +116,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL Linux)
     list(REMOVE_ITEM AVAILABLE_COMPONENTS "Windows-gui")
 endif()
 
+message(STATUS "Available Qx components: ${AVAILABLE_COMPONENTS}")
+
 #------------Setup user options----------------
 
 # Configuration options
@@ -133,15 +135,18 @@ foreach(sel_comp ${QX_COMPONENTS})
 endforeach()
 
 
+message(STATUS "Selected Qx components: ${QX_COMPONENTS_NORMALIZED}")
+
 #================= Top Level Build =========================
 
 # Determine full component list
 include(Qx/ComponentHelper)
 qx_enumerate_sibling_tree("${QX_COMPONENTS_NORMALIZED}" FULL_COMPONENT_LIST)
+message(STATUS "Configured Qx components: ${FULL_COMPONENT_LIST}")
 
 # Determine all Qt dependencies
 qx_get_all_qt_depends("${FULL_COMPONENT_LIST}" ALL_QT_COMPONENTS)
-message(STATUS "ALL_QT: ${ALL_QT_COMPONENTS}")
+message(STATUS "All Qx Qt component dependencies: ${ALL_QT_COMPONENTS}")
 
 # Find Qt package
 include(OB/BetterFindQt6)
