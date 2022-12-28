@@ -1,23 +1,21 @@
 #================= Setup Component ==========================
+set(COMPONENT_NAME "Utility")
 
-set(COMPONENT_LIB_TYPE INTERFACE)
+qx_get_component_qt_depends("${COMPONENT_NAME}" COMPONENT_QT_DEPENDS)
+qx_get_component_sibling_depends("${COMPONENT_NAME}" COMPONENT_SIBLING_DEPENDS)
 
-################# Common Build #################
-
-# Headers
-set(COMPONENT_INCLUDE_HEADERS
-    qx-concepts.h
-    qx-helpers.h
-    qx-macros.h
+qx_register_component(
+    NAME "${COMPONENT_NAME}"
+    LIB_TYPE "INTERFACE"
+    DEPENDS_QT ${COMPONENT_QT_DEPENDS}
+    DEPENDS_SIBLINGS ${COMPONENT_SIBLING_DEPENDS}
+    HEADERS
+        PUBLIC
+            qx-concepts.h
+            qx-helpers.h
+            qx-macros.h
+    DOC_ONLY
+        qx-concepts.dox
+        qx-helpers.dox
+        qx-macros.dox
 )
-
-# Doc Only Files
-set(COMPONENT_DOC_ONLY
-    qx-concepts.dox
-    qx-helpers.dox
-    qx-macros.dox
-)
-
-#=============== Component Handler =======================
-include(Qx/ComponentHelper)
-register_qx_component()

@@ -1,39 +1,29 @@
 #================= Setup Component ==========================
+set(COMPONENT_NAME "Windows")
 
-set(COMPONENT_LIB_TYPE STATIC)
+qx_get_component_qt_depends("${COMPONENT_NAME}" COMPONENT_QT_DEPENDS)
+qx_get_component_sibling_depends("${COMPONENT_NAME}" COMPONENT_SIBLING_DEPENDS)
 
-################# Common Build #################
-
-# Headers
-set(COMPONENT_INCLUDE_HEADERS
-    qx-common-windows.h
-    qx-filedetails.h
-    qx-windefs.h
+qx_register_component(
+    NAME "${COMPONENT_NAME}"
+    LIB_TYPE "STATIC"
+    DEPENDS_QT ${COMPONENT_QT_DEPENDS}
+    DEPENDS_SIBLINGS ${COMPONENT_SIBLING_DEPENDS}
+    HEADERS
+        PUBLIC
+            qx-common-windows.h
+            qx-filedetails.h
+            qx-windefs.h
+    IMPLEMENTATION
+        qx-common-windows.cpp
+        qx-filedetails.cpp
+    DOC_ONLY
+        qx-windefs.dox
+    LINKS
+        PRIVATE
+            Qx::Io
+        PUBLIC
+            Qt6::Core
+            Version.lib
+            Qx::Core
 )
-
-# Source Files
-set(COMPONENT_IMPL
-    qx-common-windows.cpp
-    qx-filedetails.cpp
-)
-
-# Doc Only Files
-set(COMPONENT_DOC_ONLY
-    qx-windefs.dox
-)
-
-# Links
-set(COMPONENT_PRIVATE_LINKS
-    Qx::Io
-)
-
-set(COMPONENT_PUBLIC_LINKS
-    Qt6::Core
-    Version.lib
-    Qx::Core
-)
-
-#=============== Component Handler =======================
-include(Qx/ComponentHelper)
-register_qx_component()
-

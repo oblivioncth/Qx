@@ -1,13 +1,141 @@
-# Qt/Qx (Inter-)Dependencies are determiend automatically via target link lists,
-# but this requires namespace prefixes to always be used in order to work!
+function(__qx_get_component_path component return)
+    string(TOLOWER "${component}" COMPONENT_LC)
+    set(COMPONENT_PATH "${PROJECT_SOURCE_DIR}/comp/${COMPONENT_LC}")
 
-macro(register_qx_component)
+    if(NOT EXISTS "${COMPONENT_PATH}")
+        message(FATAL_ERROR "${component} is not the name of a Qx component!")
+    endif()
+
+    set(${return} "${COMPONENT_PATH}" PARENT_SCOPE)
+endfunction()
+
+function(__qx_get_depends_from_file file_path return)
+    if(EXISTS "${file_path}")
+        file(STRINGS "${file_path}" DEPENDS REGEX [[[^ \t\v\r\n]+]])
+    endif()
+
+    set(${return} "${DEPENDS}" PARENT_SCOPE)
+endfunction()
+
+function(__qx_split_header_types headers r_private r_public)
+    # Default to public
+    set(CURRENT_TYPE "PUBLIC")
+
+    # Split
+    foreach(header ${headers})
+        if(("${header}" STREQUAL "PUBLIC") OR ("${header}" STREQUAL "PRIVATE"))
+            set(CURRENT_TYPE ${header})
+        elseif(${CURRENT_TYPE} STREQUAL "PUBLIC")
+            list(APPEND PUBLIC_HEADERS ${header})
+        elseif(${CURRENT_TYPE} STREQUAL "PRIVATE")
+            list(APPEND PRIVATE_HEADERS ${header})
+        endif()
+    endforeach()
+
+    set(${r_private} "${PRIVATE_HEADERS}" PARENT_SCOPE)
+    set(${r_public} "${PUBLIC_HEADERS}" PARENT_SCOPE)
+endfunction()
+
+function(qx_get_component_qt_depends component return)
+    __qx_get_component_path("${component}" COMPONENT_PATH)
+    __qx_get_depends_from_file("${COMPONENT_PATH}/cmake/depends_qt" DEPENDS_QT)
+    set(${return} "${DEPENDS_QT}" PARENT_SCOPE)
+endfunction()
+
+function(qx_get_component_sibling_depends component return)
+    __qx_get_component_path("${component}" COMPONENT_PATH)
+    __qx_get_depends_from_file("${COMPONENT_PATH}/cmake/depends_siblings" DEPENDS_SIBLINGS)
+    set(${return} "${DEPENDS_SIBLINGS}" PARENT_SCOPE)
+endfunction()
+
+function(qx_get_all_qt_depends components return)
+    foreach(component ${components})
+        qx_get_component_qt_depends("${component}" QT_DEPENDS)
+        list(APPEND ALL_QT_DEPENDS ${QT_DEPENDS})
+    endforeach()
+
+    list(REMOVE_DUPLICATES ALL_QT_DEPENDS)
+    set(${return} "${ALL_QT_DEPENDS}" PARENT_SCOPE)
+endfunction()
+
+function(qx_enumerate_sibling_tree components return)
+    foreach(component ${components})
+        # Ensure consistant case to avoid duplicates in list
+        string_to_proper_case("${component}" COMPONENT_PC)
+
+        # Check if component has already been processed
+        if(COMPONENT_PC IN_LIST FULL_COMPONENTS)
+            continue()
+        endif()
+
+        # Add component to final list
+        list(APPEND FULL_COMPONENTS "${COMPONENT_PC}")
+
+        # Get siblings
+        qx_get_component_sibling_depends("${COMPONENT_PC}" SIBLING_COMPONENTS)
+
+        # Recurse
+        qx_enumerate_sibling_tree("${SIBLING_COMPONENTS}" FULL_COMPONENTS)
+    endforeach()
+
+    # Return list at depth
+    set(${return} "${FULL_COMPONENTS}" PARENT_SCOPE)
+endfunction()
+
+function(qx_register_component)
+    #=============== Parse Arguments ==================
+
+    # Function inputs
+    set(oneValueArgs
+        NAME
+        LIB_TYPE
+    )
+    set(multiValueArgs
+        DEPENDS_SIBLINGS
+        DEPENDS_QT
+        HEADERS
+        IMPLEMENTATION
+        DOC_ONLY
+        LINKS
+    )
+
+    # Parse arguments
+    cmake_parse_arguments(COMPONENT "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    # Validate input
+    foreach(unk_val ${COMPONENT_UNPARSED_ARGUMENTS})
+        message(WARNING "Ignoring unrecognized parameter: ${unk_val}")
+    endforeach()
+
+    if(COMPONENT_KEYWORDS_MISSING_VALUES)
+        foreach(missing_val ${COMPONENT_KEYWORDS_MISSING_VALUES})
+            # Qt and sibling depend vars can be missing values
+            if((NOT "${missing_val}" STREQUAL "DEPENDS_SIBLINGS") AND (NOT "${missing_val}" STREQUAL "DEPENDS_QT"))
+                message(WARNING "A value for '${missing_val}' must be provided")
+                set(REQUIRED_VALUE_MISSING TRUE)
+            endif()
+        endforeach()
+        if(REQUIRED_VALUE_MISSING)
+            message(FATAL_ERROR "Not all required values were present!")
+        endif()
+    endif()
+
+    # Handle defaults/undefineds
+    if(NOT DEFINED COMPONENT_NAME)
+        message(FATAL_ERROR "A name for the component must be provided!")
+    endif()
+    if(NOT DEFINED COMPONENT_LIB_TYPE)
+        message(FATAL_ERROR "A lib type for the component must be provided!")
+    endif()
+
+    #============ Additional Variable Prep ============
+
+    string(TOLOWER ${COMPONENT_NAME} COMPONENT_NAME_LC)
+    string(TOUPPER ${COMPONENT_NAME} COMPONENT_NAME_UC)
+    __qx_split_header_types("${COMPONENT_HEADERS}" COMPONENT_HEADERS_PRIVATE COMPONENT_HEADERS_PUBLIC)
+
     #================= Setup ==========================
 
-    # Determine component name via folder name
-    get_filename_component(COMPONENT_NAME_LC "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
-    string_to_proper_case(${COMPONENT_NAME_LC} COMPONENT_NAME)
-    string(TOUPPER ${COMPONENT_NAME} COMPONENT_NAME_UC)
     create_header_guard(${PROJECT_NAME} ${COMPONENT_NAME} COMPONENT_HEADER_GUARD)
 
     # Name here needs to be as unique as possible for when this project is inlcuded
@@ -21,57 +149,28 @@ macro(register_qx_component)
     # export name both internally and when part of another build tree
     add_library(${PROJECT_NAME}::${COMPONENT_NAME} ALIAS ${COMPONENT_TARGET_NAME})
 
-    #================= Dependencies ===================
-    list(APPEND __COMPONENT_ALL_LINKS ${COMPONENT_PRIVATE_LINKS})
-    list(APPEND __COMPONENT_ALL_LINKS ${COMPONENT_PUBLIC_LINKS})
-
-    foreach(link ${__COMPONENT_ALL_LINKS})
-        string(FIND "${link}" "Qt6::" __QT_NAMESPACE_POS)
-        string(FIND "${link}" "Qx::" __QX_NAMESPACE_POS)
-
-        if(__QT_NAMESPACE_POS EQUAL 0)
-            # Add Qt component to dependency list if not already present
-            string(REPLACE "Qt6::" "" __QT_LINK ${link})
-            list(FIND COMPONENT_QT_DEPENDS ${__QT_LINK} __QT_LINK_IDX)
-            if(__QT_LINK_IDX EQUAL -1)
-                list(APPEND COMPONENT_QT_DEPENDS ${__QT_LINK})
-            endif()
-        elseif(__QX_NAMESPACE_POS EQUAL 0)
-            # Add Qx component to dependency list if not already present
-            string(REPLACE "Qx::" "" __QX_LINK ${link})
-            list(FIND COMPONENT_SIBLING_DEPENDS ${__QX_LINK} __QX_LINK_IDX)
-            if(__QX_LINK_IDX EQUAL -1)
-                list(APPEND COMPONENT_SIBLING_DEPENDS ${__QX_LINK})
-            endif()
-
-            # Add Qx component to configure queue list if not already present, nor target already configured
-            string(TOLOWER "${__QX_LINK}" __QX_LINK_LC)
-            if(NOT TARGET "${PROJECT_NAME_LC}_${__QX_LINK_LC}")
-                list(FIND QX_COMP_CONFIG_QUEUE ${__QX_LINK_LC} __QX_QUEUE_IDX)
-                if(__QX_QUEUE_IDX EQUAL -1)
-                    list(APPEND QX_COMP_CONFIG_QUEUE ${__QX_LINK_LC})
-                endif()
-            endif()
-        endif()
-    endforeach()
-
-    # Forward component queue modifications to parent script
-    set(QX_COMP_CONFIG_QUEUE ${QX_COMP_CONFIG_QUEUE} PARENT_SCOPE)
-
     #================= Build ==========================
 
     # Get timestamp
     string(TIMESTAMP BUILD_DATE_TIME "%Y-%m-%d @ %H:%M:%S ")
 
     # Source Files
-    if(COMPONENT_PRIVATE_HEADERS)
-        foreach(p_header ${COMPONENT_PRIVATE_HEADERS})
+    if(COMPONENT_HEADERS_PRIVATE)
+        foreach(p_header ${COMPONENT_HEADERS_PRIVATE})
             target_sources(${COMPONENT_TARGET_NAME} PRIVATE "src/${p_header}")
         endforeach()
     endif()
 
-    if(COMPONENT_IMPL)
+    if(COMPONENT_IMPLEMENTATION)
         foreach(impl ${COMPONENT_IMPL})
+            # Ignore not relavent system specific implementation
+            string(REGEX MATCH [[_win\.cpp$]] IS_WIN_IMPL "${impl}")
+            string(REGEX MATCH [[_linux\.cpp$]] IS_LINUX_IMPL "${impl}")
+            if((IS_WIN_IMPL AND NOT CMAKE_SYSTEM_NAME STREQUAL "Windows") OR
+               (IS_LINUX_IMPL AND NOT CMAKE_SYSTEM_NAME STREQUAL "Linux"))
+                continue()
+            endif()
+
             target_sources(${COMPONENT_TARGET_NAME} PRIVATE "src/${impl}")
         endforeach()
     endif()
@@ -91,9 +190,9 @@ macro(register_qx_component)
         )
     endif()
 
-    if(COMPONENT_INCLUDE_HEADERS)
+    if(COMPONENT_HEADERS_PUBLIC)
         # Build pathed include file list
-        foreach(api_header ${COMPONENT_INCLUDE_HEADERS})
+        foreach(api_header ${COMPONENT_HEADERS_PUBLIC})
             set(pathed_api_headers ${pathed_api_headers} "include/${PROJECT_NAME_LC}/${COMPONENT_NAME_LC}/${api_header}")
         endforeach()
 
@@ -127,18 +226,14 @@ macro(register_qx_component)
     endif()
 
     # Links
-    if(COMPONENT_PUBLIC_LINKS)
-            target_link_libraries(${COMPONENT_TARGET_NAME} PUBLIC ${COMPONENT_PUBLIC_LINKS})
-    endif()
-
-    if(COMPONENT_PRIVATE_LINKS)
-            target_link_libraries(${COMPONENT_TARGET_NAME} PRIVATE ${COMPONENT_PRIVATE_LINKS})
+    if(COMPONENT_LINKS)
+        target_link_libraries(${COMPONENT_TARGET_NAME} ${COMPONENT_LINKS})
     endif()
 
     #-----------Generate Primary Component Header------------
 
     # Generate include statements
-    foreach(api_header ${COMPONENT_INCLUDE_HEADERS})
+    foreach(api_header ${COMPONENT_HEADERS_PUBLIC})
         set(PRIM_COMP_HEADER_INCLUDES "${PRIM_COMP_HEADER_INCLUDES}#include <${PROJECT_NAME_LC}/${COMPONENT_NAME_LC}/${api_header}>\n")
     endforeach()
 
@@ -213,4 +308,4 @@ macro(register_qx_component)
         FILE "${PROJECT_BINARY_DIR}/cmake/${COMPONENT_NAME}/${PROJECT_NAME}${COMPONENT_NAME}Targets.cmake"
         NAMESPACE ${PROJECT_NAME}::
     )
-endmacro()
+endfunction()

@@ -101,27 +101,22 @@ include(OB/VerboseVersioning)
 setup_verbose_versioning(PROJECT_VERSION_VERBOSE)
 
 #------------Enumerate Components----------------
-
 get_subdirectory_list(${COMPONENTS_PATH} LIB_COMPONENTS)
-set(AVAILABLE_COMPONENTS ${LIB_COMPONENTS})
-
-# Qt package components
-set(QT_FIND_COMPONENTS
-    Core
-    Gui
-    Network
-    Widgets
-    Xml
-)
+foreach(comp ${LIB_COMPONENTS})
+    string_to_proper_case("${comp}" COMP_PC)
+    list(APPEND AVAILABLE_COMPONENTS "${COMP_PC}")
+endforeach()
 
 if(CMAKE_SYSTEM_NAME STREQUAL Windows)
-    list(REMOVE_ITEM AVAILABLE_COMPONENTS linux)
+    list(REMOVE_ITEM AVAILABLE_COMPONENTS "Linux")
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL Linux)
-    list(REMOVE_ITEM AVAILABLE_COMPONENTS windows)
-    list(REMOVE_ITEM AVAILABLE_COMPONENTS windows-gui)
+    list(REMOVE_ITEM AVAILABLE_COMPONENTS "Windows")
+    list(REMOVE_ITEM AVAILABLE_COMPONENTS "Windows-gui")
 endif()
+
+message(STATUS "Available Qx components: ${AVAILABLE_COMPONENTS}")
 
 #------------Setup user options----------------
 
@@ -129,11 +124,33 @@ endif()
 option(QX_DOCS_TARGET "Build Qx documentation" OFF)
 set(QX_COMPONENTS "${AVAILABLE_COMPONENTS}" CACHE STRING "Qx components to configure")
 
+# Confirm user component choices are valid and normalize casing
+foreach(sel_comp ${QX_COMPONENTS})
+    string_to_proper_case("${sel_comp}" SEL_COMP_PC)
+    if(NOT SEL_COMP_PC IN_LIST AVAILABLE_COMPONENTS)
+        message(FATAL_ERROR "${SEL_COMP_PC} is not an available ${PROJECT_NAME} component!")
+    endif()
+
+    list(APPEND QX_COMPONENTS_NORMALIZED "${SEL_COMP_PC}")
+endforeach()
+
+
+message(STATUS "Selected Qx components: ${QX_COMPONENTS_NORMALIZED}")
+
 #================= Top Level Build =========================
+
+# Determine full component list
+include(Qx/ComponentHelper)
+qx_enumerate_sibling_tree("${QX_COMPONENTS_NORMALIZED}" FULL_COMPONENT_LIST)
+message(STATUS "Configured Qx components: ${FULL_COMPONENT_LIST}")
+
+# Determine all Qt dependencies
+qx_get_all_qt_depends("${FULL_COMPONENT_LIST}" ALL_QT_COMPONENTS)
+message(STATUS "All Qx Qt component dependencies: ${ALL_QT_COMPONENTS}")
 
 # Find Qt package
 include(OB/BetterFindQt6)
-find_qt6_package(REQUIRED COMPONENTS ${QT_FIND_COMPONENTS})
+find_qt6_package(REQUIRED COMPONENTS ${ALL_QT_COMPONENTS})
 
 #--------------------Package Config-----------------------
 
@@ -154,25 +171,9 @@ write_basic_package_version_file(
 #================= Process Componets =======================
 
 # Configure requested components
-foreach(component ${QX_COMPONENTS})
+foreach(component ${FULL_COMPONENT_LIST})
     string(TOLOWER ${component} component_lc)
-
-    # Confirm component is valid
-    list(FIND AVAILABLE_COMPONENTS ${component_lc} __COMP_IDX)
-    if(__COMP_IDX EQUAL -1)
-        message(FATAL_ERROR "${component_lc} is not a valid ${PROJECT_NAME} component!")
-    endif()
-
-    # Only procceed if component is valid wasn't already added as a dependency
-    if(NOT TARGET "${PROJECT_NAME_LC}_${component_lc}")
-        add_subdirectory(${COMPONENTS_PATH}/${component_lc})
-
-        # Configure the components sibling dependencies
-        while(QX_COMP_CONFIG_QUEUE)
-            list(POP_FRONT QX_COMP_CONFIG_QUEUE dependency_comp)
-            add_subdirectory(${COMPONENTS_PATH}/${dependency_comp})
-        endwhile()
-    endif()
+    add_subdirectory(${COMPONENTS_PATH}/${component_lc})
 endforeach()
 
 #================ Build Documentation ======================

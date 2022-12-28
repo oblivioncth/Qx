@@ -1,26 +1,22 @@
 #================= Setup Component ==========================
+set(COMPONENT_NAME "Gui")
 
-set(COMPONENT_LIB_TYPE STATIC)
+qx_get_component_qt_depends("${COMPONENT_NAME}" COMPONENT_QT_DEPENDS)
+qx_get_component_sibling_depends("${COMPONENT_NAME}" COMPONENT_SIBLING_DEPENDS)
 
-################# Common Build #################
-
-# Headers
-set(COMPONENT_INCLUDE_HEADERS
-    qx-color.h
+qx_register_component(
+    NAME "${COMPONENT_NAME}"
+    LIB_TYPE "STATIC"
+    DEPENDS_QT ${COMPONENT_QT_DEPENDS}
+    DEPENDS_SIBLINGS ${COMPONENT_SIBLING_DEPENDS}
+    HEADERS
+        PUBLIC
+            qx-color.h
+    IMPLEMENTATION
+        qx-color.cpp
+    LINKS
+        PUBLIC
+            Qt6::Core
+            Qt6::Gui
 )
-
-# Source Files
-set(COMPONENT_IMPL
-    qx-color.cpp
-)
-
-# Links
-set(COMPONENT_PUBLIC_LINKS
-    Qt6::Core
-    Qt6::Gui
-)
-
-#=============== Component Handler =======================
-include(Qx/ComponentHelper)
-register_qx_component()
 
