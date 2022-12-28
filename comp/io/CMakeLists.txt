@@ -1,49 +1,42 @@
 #================= Setup Component ==========================
+set(COMPONENT_NAME "Io")
 
-set(COMPONENT_LIB_TYPE STATIC)
+qx_get_component_qt_depends("${COMPONENT_NAME}" COMPONENT_QT_DEPENDS)
+qx_get_component_sibling_depends("${COMPONENT_NAME}" COMPONENT_SIBLING_DEPENDS)
 
-################# Common Build #################
-
-# Headers
-set(COMPONENT_INCLUDE_HEADERS
-    qx-applicationlogger.h
-    qx-common-io.h
-    qx-filestreamreader.h
-    qx-filestreamwriter.h
-    qx-ioopreport.h
-    qx-textpos.h
-    qx-textquery.h
-    qx-textstream.h
-    qx-textstreamreader.h
-    qx-textstreamwriter.h
+qx_register_component(
+    NAME "${COMPONENT_NAME}"
+    LIB_TYPE "STATIC"
+    DEPENDS_QT ${COMPONENT_QT_DEPENDS}
+    DEPENDS_SIBLINGS ${COMPONENT_SIBLING_DEPENDS}
+    HEADERS
+        PRIVATE
+            qx-common-io_p.h
+        PUBLIC
+            qx-applicationlogger.h
+            qx-common-io.h
+            qx-filestreamreader.h
+            qx-filestreamwriter.h
+            qx-ioopreport.h
+            qx-textpos.h
+            qx-textquery.h
+            qx-textstream.h
+            qx-textstreamreader.h
+            qx-textstreamwriter.h
+    IMPLEMENTATION
+        qx-applicationlogger.cpp
+        qx-common-io.cpp
+        qx-common-io_p.cpp
+        qx-filestreamreader.cpp
+        qx-filestreamwriter.cpp
+        qx-ioopreport.cpp
+        qx-textpos.cpp
+        qx-textquery.cpp
+        qx-textstream.cpp
+        qx-textstreamreader.cpp
+        qx-textstreamwriter.cpp
+    LINKS
+        PUBLIC
+            Qt::Core
+            Qx::Core
 )
-
-set(COMPONENT_PRIVATE_HEADERS
-    qx-common-io_p.h
-)
-
-# Source Files
-set(COMPONENT_IMPL
-    qx-applicationlogger.cpp
-    qx-common-io.cpp
-    qx-common-io_p.cpp
-    qx-filestreamreader.cpp
-    qx-filestreamwriter.cpp
-    qx-ioopreport.cpp
-    qx-textpos.cpp
-    qx-textquery.cpp
-    qx-textstream.cpp
-    qx-textstreamreader.cpp
-    qx-textstreamwriter.cpp
-)
-
-# Links
-set(COMPONENT_PUBLIC_LINKS
-    Qt::Core
-    Qx::Core
-)
-
-#=============== Component Handler =======================
-include(Qx/ComponentHelper)
-register_qx_component()
-
