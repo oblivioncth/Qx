@@ -122,12 +122,14 @@ endif()
 option(QX_DOCS_TARGET "Build Qx documentation" OFF)
 set(QX_COMPONENTS "${AVAILABLE_COMPONENTS}" CACHE STRING "Qx components to configure")
 
-# Confirm user component choices are valid
+# Confirm user component choices are valid and normalize casing
 foreach(sel_comp ${QX_COMPONENTS})
     string_to_proper_case("${sel_comp}" SEL_COMP_PC)
     if(NOT SEL_COMP_PC IN_LIST AVAILABLE_COMPONENTS)
         message(FATAL_ERROR "${SEL_COMP_PC} is not an available ${PROJECT_NAME} component!")
     endif()
+
+    list(APPEND QX_COMPONENTS_NORMALIZED "${SEL_COMP_PC}")
 endforeach()
 
 
@@ -135,7 +137,7 @@ endforeach()
 
 # Determine full component list
 include(Qx/ComponentHelper)
-qx_enumerate_sibling_tree("${QX_COMPONENTS}" FULL_COMPONENT_LIST)
+qx_enumerate_sibling_tree("${QX_COMPONENTS_NORMALIZED}" FULL_COMPONENT_LIST)
 
 # Determine all Qt dependencies
 qx_get_all_qt_depends("${FULL_COMPONENT_LIST}" ALL_QT_COMPONENTS)
