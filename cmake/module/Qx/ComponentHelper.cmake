@@ -162,7 +162,7 @@ function(qx_register_component)
     endif()
 
     if(COMPONENT_IMPLEMENTATION)
-        foreach(impl ${COMPONENT_IMPL})
+        foreach(impl ${COMPONENT_IMPLEMENTATION})
             # Ignore not relavent system specific implementation
             string(REGEX MATCH [[_win\.cpp$]] IS_WIN_IMPL "${impl}")
             string(REGEX MATCH [[_linux\.cpp$]] IS_LINUX_IMPL "${impl}")
