@@ -122,6 +122,15 @@ endif()
 option(QX_DOCS_TARGET "Build Qx documentation" OFF)
 set(QX_COMPONENTS "${AVAILABLE_COMPONENTS}" CACHE STRING "Qx components to configure")
 
+# Confirm user component choices are valid
+foreach(sel_comp ${QX_COMPONENTS})
+    string_to_proper_case("${sel_comp}" SEL_COMP_PC)
+    if(NOT SEL_COMP_PC IN_LIST AVAILABLE_COMPONENTS)
+        message(FATAL_ERROR "${SEL_COMP_PC} is not an available ${PROJECT_NAME} component!")
+    endif()
+endforeach()
+
+
 #================= Top Level Build =========================
 
 # Determine full component list
