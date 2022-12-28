@@ -108,12 +108,12 @@ foreach(comp ${LIB_COMPONENTS})
 endforeach()
 
 if(CMAKE_SYSTEM_NAME STREQUAL Windows)
-    list(REMOVE_ITEM AVAILABLE_COMPONENTS linux)
+    list(REMOVE_ITEM AVAILABLE_COMPONENTS "Linux")
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL Linux)
-    list(REMOVE_ITEM AVAILABLE_COMPONENTS windows)
-    list(REMOVE_ITEM AVAILABLE_COMPONENTS windows-gui)
+    list(REMOVE_ITEM AVAILABLE_COMPONENTS "Windows")
+    list(REMOVE_ITEM AVAILABLE_COMPONENTS "Windows-gui")
 endif()
 
 #------------Setup user options----------------
