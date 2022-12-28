@@ -64,8 +64,7 @@ function(qx_enumerate_sibling_tree components return)
         string_to_proper_case("${component}" COMPONENT_PC)
 
         # Check if component has already been processed
-        list(FIND FULL_COMPONENTS "${COMPONENT_PC}" EXISTING_IDX)
-        if(NOT EXISTING_IDX EQUAL -1)
+        if(COMPONENT_PC IN_LIST FULL_COMPONENTS)
             continue()
         endif()
 
