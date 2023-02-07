@@ -40,7 +40,7 @@ list(APPEND CMAKE_MODULE_PATH "${PROJ_SCRIPTS_PATH}/module")
 
 # Get helper scripts
 include(Qx/FetchOBCMake)
-fetch_ob_cmake("v0.1")
+fetch_ob_cmake("v0.2")
 
 # Include utility functions
 include(OB/Utility)
