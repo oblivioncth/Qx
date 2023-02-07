@@ -441,7 +441,7 @@ IoOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const
 
     // Ensure start position is valid
     if(query.startPosition().isNull())
-        throw std::invalid_argument("Error: The start position cannot be null!");
+        qFatal("The start position cannot be null!");
 
     // If for whatever reason hit limit is 0, or the query is empty, return
     if(query.hitLimit() == 0 || query.string().count() == 0)
@@ -586,7 +586,7 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
 {
     // Ensure start position is valid
     if(startPos.isNull())
-        throw std::invalid_argument("Error: The start position cannot be null!");
+        qFatal("The start position cannot be null!");
 
     // Empty buffer
     returnBuffer = QString();
@@ -703,9 +703,9 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
 
     // Ensure positions are valid
     if(startPos.isNull() || endPos.isNull())
-        throw std::invalid_argument("Error: The start and end positions cannot be null!");
+        qFatal("The start and end positions cannot be null!");
     else if(startPos > endPos)
-        throw std::invalid_argument("Error: endPos must be greater than or equal to startPos for Qx::readTextFromFile()");
+        qFatal("endPos must be greater than or equal to startPos for Qx::readTextFromFile()");
     //TODO: create exception class that prints error and stashes the exception properly
 
     // Empty buffer
@@ -840,9 +840,9 @@ IoOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, Index32 
 {
     // Ensure positions are valid
     if(startLine.isNull() || endLine.isNull())
-        throw std::invalid_argument("Error: The start and end lines cannot be null!");
+        qFatal("The start and end lines cannot be null!");
     else if(startLine > endLine)
-        throw std::invalid_argument("Error: endLine must be greater than or equal to startLine for Qx::readTextFromFile()");
+        qFatal("endLine must be greater than or equal to startLine for Qx::readTextFromFile()");
 
      // Empty buffer
      returnBuffer = QStringList();
@@ -924,7 +924,7 @@ namespace
 
         // Ensure position is valid
         if(startPos.isNull())
-            throw std::invalid_argument("Error: The start position cannot be null!");
+            qFatal("The start position cannot be null!");
 
         // File for use with other public functions
         QFile auxFile(textFile->fileName());
@@ -1155,9 +1155,9 @@ IoOpReport deleteTextFromFile(QFile& textFile, TextPos startPos, TextPos endPos)
 
     // Ensure positions are valid
     if(startPos.isNull() || endPos.isNull())
-        throw std::invalid_argument("Error: The start and end positions cannot be null!");
+        qFatal("The start and end positions cannot be null!");
     else if(startPos > endPos)
-        throw std::invalid_argument("Error: endPos must be greater than or equal to startPos for Qx::deleteTextFromFile()");
+        qFatal("endPos must be greater than or equal to startPos for Qx::deleteTextFromFile()");
         //TODO: create exception class that prints error and stashes the exception properly
 
     // Check file
@@ -1432,9 +1432,9 @@ IoOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, Index64 star
 {
     // Ensure positions are valid
     if(startPos.isNull() || endPos.isNull())
-        throw std::invalid_argument("Error: The start and end positions cannot be null!");
+        qFatal("The start and end positions cannot be null!");
     else if(startPos > endPos)
-        throw std::invalid_argument("Error: endPos must be greater than or equal to startPos for Qx::readBytesFromFile()");
+        qFatal("endPos must be greater than or equal to startPos for Qx::readBytesFromFile()");
 
     // Empty buffer
     returnBuffer.clear();
@@ -1501,7 +1501,7 @@ namespace
     {
         // Ensure start position is valid
         if(startPos.isNull())
-            throw std::invalid_argument("Error: The start position cannot be null!");
+            qFatal("The start position cannot be null!");
 
         // File for use with other public functions
         QFile auxFile(file->fileName());

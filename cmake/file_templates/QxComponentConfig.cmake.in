@@ -4,7 +4,7 @@ if(NOT DEFINED __@PROJECT_NAME_UC@_@COMPONENT_NAME_UC@)
     set(__@PROJECT_NAME_UC@_@COMPONENT_NAME_UC@ TRUE)
 
     # Inter-component dependencies (inserted when this file was configured)
-    set(__@PROJECT_NAME_UC@_@COMPONENT_NAME_UC@_SIBLING_DEPENDS @COMPONENT_SIBLING_DEPENDS@)
+    set(__@PROJECT_NAME_UC@_@COMPONENT_NAME_UC@_SIBLING_DEPENDS @COMPONENT_DEPENDS_SIBLINGS@)
 
     # Import above dependencies first
     foreach(sibling ${__@PROJECT_NAME_UC@_@COMPONENT_NAME_UC@_SIBLING_DEPENDS})
@@ -13,7 +13,7 @@ if(NOT DEFINED __@PROJECT_NAME_UC@_@COMPONENT_NAME_UC@)
     endforeach()
 
     # Qt dependencies (inserted when this file was configured)
-    set(__@PROJECT_NAME_UC@_@COMPONENT_NAME_UC@_QT_DEPENDS @COMPONENT_QT_DEPENDS@)
+    set(__@PROJECT_NAME_UC@_@COMPONENT_NAME_UC@_QT_DEPENDS @COMPONENT_DEPENDS_QT@)
     if(__@PROJECT_NAME_UC@_@COMPONENT_NAME_UC@_QT_DEPENDS)
         find_dependency(Qt6 REQUIRED COMPONENTS ${__@PROJECT_NAME_UC@_@COMPONENT_NAME_UC@_QT_DEPENDS})
     endif()

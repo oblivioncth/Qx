@@ -73,7 +73,7 @@ If newer to working with Qt, it is easiest to build from within Qt creator as it
 
 The CMake project is designed to be used with multi-configuration generators such as Visual Studio or Ninja Multi-Config (recommended), and may require some tweaking to work with single configuration generators.
 
-If you only need a subset of Qx's components, the **QX_COMPONENTS** cache variable can be set to a semicolon separated list of components. Only these components and their required dependencies will be configured, which can save on build time.
+If you only need a subset of Qx's components, the **QX_COMPONENTS** cache variable can be set to a semicolon or whitespace separated list of components. Only these components and their required dependencies will be configured, which can save on build time.
 
 #### CMake Targets:
 
@@ -89,6 +89,11 @@ If you only need a subset of Qx's components, the **QX_COMPONENTS** cache variab
 - `qx_<lowercase_component_name>` - Installs a specific Qx component
 
 If Qx is configured as a sub-project, its install components are automatically removed from the `all` component, as to not pollute the install directory of the top-level project.
+
+#### CMake Options:
+
+ - `QX_DOCS_TARGET` - Set to `ON` in order to generate the documentation target
+ - `QX_COMPONENTS` - Set to a semicolon/whitespace delimited list of components to limit configuration to those components only
 
 #### Documentation:
 In order for the `qx_docs` target to be generated the CMake cache variable **QX_DOCS_TARGET** must be set to *ON* when CMake is invoked:

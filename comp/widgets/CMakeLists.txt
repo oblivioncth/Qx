@@ -1,38 +1,31 @@
 #================= Setup Component ==========================
+set(COMPONENT_NAME "Widgets")
 
-set(COMPONENT_LIB_TYPE STATIC)
+qx_get_component_qt_depends("${COMPONENT_NAME}" COMPONENT_QT_DEPENDS)
+qx_get_component_sibling_depends("${COMPONENT_NAME}" COMPONENT_SIBLING_DEPENDS)
 
-################# Common Build #################
-
-# Headers
-set(COMPONENT_INCLUDE_HEADERS
-    qx-common-widgets.h
-    qx-logindialog.h
-    qx-standarditemmodel.h
-    qx-treeinputdialog.h
+qx_register_component(
+    NAME "${COMPONENT_NAME}"
+    LIB_TYPE "STATIC"
+    DEPENDS_QT ${COMPONENT_QT_DEPENDS}
+    DEPENDS_SIBLINGS ${COMPONENT_SIBLING_DEPENDS}
+    HEADERS
+        PRIVATE
+            qx-common-widgets_p.h
+        PUBLIC
+            qx-common-widgets.h
+            qx-logindialog.h
+            qx-standarditemmodel.h
+            qx-treeinputdialog.h
+    IMPLEMENTATION
+        qx-common-widgets.cpp
+        qx-common-widgets_p.cpp
+        qx-logindialog.cpp
+        qx-standarditemmodel.cpp
+        qx-treeinputdialog.cpp
+    LINKS
+        PUBLIC
+            Qt6::Core
+            Qt6::Widgets
+            Qx::Core
 )
-
-set(COMPONENT_PRIVATE_HEADERS
-    qx-common-widgets_p.h
-)
-
-# Source Files
-set(COMPONENT_IMPL
-    qx-common-widgets.cpp
-    qx-common-widgets_p.cpp
-    qx-logindialog.cpp
-    qx-standarditemmodel.cpp
-    qx-treeinputdialog.cpp
-)
-
-# Links
-set(COMPONENT_PUBLIC_LINKS
-    Qt6::Core
-    Qt6::Widgets
-    Qx::Core
-)
-
-#=============== Component Handler =======================
-include(Qx/ComponentHelper)
-register_qx_component()
-

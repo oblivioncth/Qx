@@ -5,6 +5,9 @@
 #include <stdexcept>
 #include <unordered_set>
 
+// Qt Includes
+#include <QtGlobal>
+
 // Extra-component Includes
 #include "qx/utility/qx-concepts.h"
 
@@ -135,7 +138,7 @@ template<typename T>
 T constrainedDiv(T a, T b, T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max())
 {
 	if(b == 0)
-		throw std::logic_error("Divide by zero");
+        qFatal("Divide by zero");
 
 	if((a == std::numeric_limits<T>::min()) && (b == -1))
 		return max; // True overflow
@@ -157,7 +160,7 @@ template<typename T>
 T constrainedDiv(T a, T b, T max = std::numeric_limits<T>::max())
 {
 	if(b == 0)
-		throw std::logic_error("Divide by zero");
+        qFatal("Divide by zero");
 
 	T result = a/b;
 
