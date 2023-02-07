@@ -15,7 +15,7 @@ set(TRUE_CMAKE_MINIMUM_REQUIRED ${CMAKE_MINIMUM_REQUIRED_VERSION})
 # avoided and only used for hotfixes. DON'T USE TRAILING
 # ZEROS IN VERSIONS
 project(Qx
-    VERSION 0.4.2
+    VERSION 0.4.3
     LANGUAGES CXX
     DESCRIPTION "Qt Extensions Library"
 )
