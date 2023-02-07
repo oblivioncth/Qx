@@ -5,6 +5,9 @@
 #include <stdexcept>
 #include <unordered_set>
 
+// Qt Includes
+#include <QtGlobal>
+
 // Extra-component Includes
 #include "qx/utility/qx-concepts.h"
 
