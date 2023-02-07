@@ -664,7 +664,7 @@ void AsyncDownloadManager::readyReadHandler()
 
     // Ensure the signal that triggered this slot belongs to the above class by checking for null pointer
     if(senderNetworkReply == nullptr)
-        throw std::runtime_error("Pointer conversion to network reply failed");
+        qFatal("Pointer conversion to network reply failed");
 
     // Write available data
     std::shared_ptr<FileStreamWriter> writer = mActiveWriters[senderNetworkReply];
@@ -690,7 +690,7 @@ void AsyncDownloadManager::downloadProgressHandler(qint64 bytesCurrent, qint64 b
 
     // Ensure the signal that triggered this slot belongs to the above class by checking for null pointer
     if(senderNetworkReply == nullptr)
-        throw std::runtime_error("Pointer conversion to network reply failed");
+        qFatal("Pointer conversion to network reply failed");
 
     // Get associated task
     DownloadTask task = mActiveTasks.value(senderNetworkReply);
@@ -760,7 +760,7 @@ void AsyncDownloadManager::sizeQueryFinishedHandler(QNetworkReply* reply)
                         recordFinishedDownload(DownloadOpReport::abortedDownload(task));
                     break;
                 default:
-                    throw std::runtime_error("Illegal usage of aborted download handler");
+                    qFatal("Illegal usage of aborted download handler");
             }
         }
         else // Other error
@@ -815,7 +815,7 @@ void AsyncDownloadManager::downloadFinishedHandler(QNetworkReply* reply)
                         recordFinishedDownload(DownloadOpReport::abortedDownload(task));
                     break;
                 default:
-                    throw std::runtime_error("Illegal usage of aborted download handler");
+                    qFatal("Illegal usage of aborted download handler");
             }
         }
         else // Other error

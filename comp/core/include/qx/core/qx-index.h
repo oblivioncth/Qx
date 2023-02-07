@@ -187,7 +187,7 @@ public:
     Index operator/(const Index& other)
     {
         if(other.mValue == 0)
-            throw std::logic_error("Divide by zero");
+            qFatal("Divide by zero");
 
         if(other.mType == Type::End)
             return mType == Type::End ? 1 : 0;
@@ -201,7 +201,7 @@ public:
 //    Index operator/(const N& integer)
 //    {
 //        if(integer == 0)
-//            throw std::logic_error("Divide by zero");
+//            qFatal("Divide by zero");
 
 //        if(mType == Type::End)
 //            return LAST;

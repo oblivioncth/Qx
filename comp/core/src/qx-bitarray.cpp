@@ -112,7 +112,7 @@ void BitArray::append(bool bit)
 void BitArray::replace(const BitArray& bits, int start, int length)
 {
     if(start < 0 || start >= count())
-        throw std::out_of_range("Least significant bit index was outside BitArray contents");
+        qFatal("Least significant bit index was outside BitArray contents");
 
     // Stop when end of bits array, this array, or length is reached
     for(int i = start, j = 0; i < count() && j < bits.count() && j != length - 1; i++, j++)
@@ -137,7 +137,7 @@ void BitArray::replace(const BitArray& bits, int start, int length)
 BitArray BitArray::extract(int start, int length)
 {
     if(start < 0 || start >= count())
-        throw std::out_of_range("Least significant bit index was outside BitArray contents");
+        qFatal("Least significant bit index was outside BitArray contents");
 
     // Constrain length to bounds
     int maxLength = count() - start;
