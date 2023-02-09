@@ -45,6 +45,7 @@ public:
     bool atEnd() const;
     bool autoDetectUnicode() const;
     QStringConverter::Encoding encoding() const;
+    const QFile* file() const;
     int integerBase() const;
     QLocale locale() const;
     qint64 pos() const;

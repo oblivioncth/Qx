@@ -132,6 +132,13 @@ void FileStreamWriter::unsetFile()
 QDataStream::ByteOrder FileStreamWriter::byteOrder() const { return mStreamWriter.byteOrder(); }
 
 /*!
+ *  Returns an immutable pointer to the file managed by the stream.
+ *
+ * @sa filePath().
+ */
+const QFile* FileStreamWriter::file() const { return mFile; }
+
+/*!
  *  Returns the floating point precision of the file stream reader.
  *
  *  @sa setFloatingPointPrecision().
