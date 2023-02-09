@@ -34,7 +34,7 @@ jobs:
       with:
         version: 6.4.0
         os: linux
-        compiler: clang
+        compiler: clang12
         linkage: ${{ matrix.qt_linkage }}
         path: ${{ env.qt_install_dir }}
         credentials: ${{ secrets.qt_ffynnon_cred }}
