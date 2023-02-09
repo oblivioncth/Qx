@@ -48,6 +48,7 @@ public:
     QStringConverter::Encoding encoding() const;
     QTextStream::FieldAlignment	fieldAlignment() const;
     int	fieldWidth() const;
+    const QFile* file() const;
     void flush();
     bool generateByteOrderMark() const;
     int integerBase() const;

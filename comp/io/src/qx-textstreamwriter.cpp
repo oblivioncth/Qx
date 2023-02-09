@@ -149,6 +149,13 @@ QTextStream::FieldAlignment	TextStreamWriter::fieldAlignment() const { return mS
 int	TextStreamWriter::fieldWidth() const { return mStreamWriter.fieldWidth(); }
 
 /*!
+ *  Returns an immutable pointer to the file managed by the stream.
+ *
+ * @sa filePath().
+ */
+const QFile* TextStreamWriter::file() const { return mFile; }
+
+/*!
  *  Flushes any buffered data waiting to be written to the device.
  *
  *  If the stream was constructed with WriteOption::Unbuffered, this function does nothing.

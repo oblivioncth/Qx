@@ -106,6 +106,13 @@ bool FileStreamReader::atEnd() const { return mStreamReader.atEnd(); }
 QDataStream::ByteOrder FileStreamReader::byteOrder() const { return mStreamReader.byteOrder(); }
 
 /*!
+ *  Returns an immutable pointer to the file managed by the stream.
+ *
+ * @sa filePath().
+ */
+const QFile* FileStreamReader::file() const { return mFile; }
+
+/*!
  *  Returns the floating point precision of the file stream reader.
  *
  *  @sa setFloatingPointPrecision().

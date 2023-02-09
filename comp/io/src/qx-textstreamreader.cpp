@@ -112,6 +112,13 @@ bool TextStreamReader::autoDetectUnicode() const { return mStreamReader.autoDete
 QStringConverter::Encoding TextStreamReader::encoding() const { return mStreamReader.encoding(); }
 
 /*!
+ *  Returns an immutable pointer to the file managed by the stream.
+ *
+ * @sa filePath().
+ */
+const QFile* TextStreamReader::file() const { return mFile; }
+
+/*!
  * Returns the current base of integers. @c 0 means that the base is @c 10 (decimal) when generating numbers.
  *
  * @sa setIntegerBase(), and QString::number().

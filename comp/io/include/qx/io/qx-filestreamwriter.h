@@ -44,6 +44,7 @@ private:
 public:
     // Stock functions
     QDataStream::ByteOrder byteOrder() const;
+    const QFile* file() const;
     QDataStream::FloatingPointPrecision floatingPointPrecision() const;
     void resetStatus();
     void setByteOrder(QDataStream::ByteOrder bo);

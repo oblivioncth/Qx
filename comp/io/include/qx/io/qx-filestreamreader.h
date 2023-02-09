@@ -46,6 +46,7 @@ public:
     // Stock functions
     bool atEnd() const;
     QDataStream::ByteOrder byteOrder() const;
+    const QFile* file() const;
     QDataStream::FloatingPointPrecision floatingPointPrecision() const;
     IoOpReport readRawData(QByteArray& data, int len);
     void resetStatus();
