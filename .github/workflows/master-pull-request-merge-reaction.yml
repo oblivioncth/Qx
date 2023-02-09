@@ -5,6 +5,7 @@ on:
     branches:
     - 'master'
 env:
+  doc_artifact_path: ${{ github.workspace }}/DocArtifact
   artifacts_path: ${{ github.workspace }}/Artifacts
   zips_path: ${{ github.workspace }}/Zips
   
@@ -81,14 +82,14 @@ jobs:
     - name: Download built shared Qx artifact
       uses: actions/download-artifact@v3
       with:
-        name: ${{ needs.build_qx_release_windows.outputs.qt_shared_artifact_name }}
-        path: ${{ env.qx_qtd_win_artifact_path }}
+        name: ${{ needs.build_qx_release_windows.outputs.doc_artifact_name }}
+        path: ${{ env.doc_artifact_path }}
     - name: Upload docs to gh-pages
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_branch: gh-pages
-        publish_dir: ${{ env.qx_qtd_win_artifact_path }}/doc/html
+        publish_dir: ${{ env.doc_artifact_path }}/doc/html
         destination_dir: ./docs
         allow_empty_commit: true # So that doc build date is always roughly synced with latest build date
         enable_jekyll: false
