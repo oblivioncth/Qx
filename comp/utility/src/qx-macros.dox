@@ -11,3 +11,15 @@
  *
  *  This function-like macro defines a qHash() overload for the provided scoped-enum type @a T.
  */
+
+/*!
+ *  @def QSL
+ *
+ *  This convenience macro is an alias for QStringLiteral.
+ */
+
+/*!
+ *  @def QBAL
+ *
+ *  This convenience macro is an alias for QByteArrayLiteral.
+ */
