@@ -6,4 +6,7 @@ inline size_t qHash(const T& t, size_t seed) { \
     return ::qHash(static_cast<typename std::underlying_type<T>::type>(t), seed); \
 }
 
+#define QSL QStringLiteral
+#define QBAL QByteArrayLiteral
+
 #endif // QX_MACROS_H
