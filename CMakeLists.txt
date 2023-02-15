@@ -1,7 +1,7 @@
 #================= Project Setup ==========================
 
 # CMake
-cmake_minimum_required(VERSION 3.25.0)
+cmake_minimum_required(VERSION 3.24.0)
 if(NOT ${GENERATOR_IS_MULTI_CONFIG})
     message(FATAL_ERROR "This project currently only supports multi-config generators!")
 endif()
@@ -179,6 +179,11 @@ endforeach()
 #================ Build Documentation ======================
 
 if(QX_DOCS_TARGET)
+    # Requires higher CMake version
+    if("${CMAKE_VERSION}" VERSION_LESS "3.25.0")
+        message(FATAL_ERROR "CMake 3.25.0 or greater is required to build Qx documentation!")
+    endif()
+
     # Find Doxygen package
     find_package(Doxygen 1.9.4 REQUIRED
                  COMPONENTS dot
