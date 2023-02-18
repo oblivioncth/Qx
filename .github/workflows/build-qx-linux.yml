@@ -15,12 +15,30 @@ jobs:
   build-qx:
     name: Build Qx - Linux (Debug/Release)
     strategy:
+      fail-fast: false
       matrix:
+        os: [ubuntu-20.04, ubuntu-22.04]
+        compiler: [gcc, clang]
         qt_linkage: [shared, static]
-    runs-on: ubuntu-20.04
+        include:
+          - os: ubuntu-20.04
+            compiler: gcc
+            c_comp: gcc-10
+            cxx_comp: g++-10
+          - os: ubuntu-20.04
+            compiler: clang
+            c_comp: clang-12
+            cxx_comp: clang++-12 
+          - os: ubuntu-22.04
+            compiler: gcc
+            c_comp: gcc-12
+            cxx_comp: g++-12
+          - os: ubuntu-22.04
+            compiler: clang
+            c_comp: clang-14
+            cxx_comp: clang++-14 
+    runs-on: ${{ matrix.os }}
     env:
-      c_comp: clang-12
-      cxx_comp: clang++-12
       cmake_gen: Ninja Multi-Config
     steps:
     - name: Set derived variables with shell because GitHub Actions env context sucks
@@ -61,7 +79,7 @@ jobs:
       working-directory: ${{ env.qx_src_dir }}
       run: |
         echo Configuring CMake...
-        "$qt_cmake" -G "$cmake_gen" -S "$qx_src_dir" -B "$qx_build_dir" -D QX_DOCS_TARGET=ON -D CMAKE_CXX_COMPILER="$cxx_comp" -D CMAKE_C_COMPILER="$c_comp"
+        "$qt_cmake" -G "$cmake_gen" -S "$qx_src_dir" -B "$qx_build_dir" -D QX_DOCS_TARGET=ON -D CMAKE_CXX_COMPILER="${{ matrix.cxx_comp }}" -D CMAKE_C_COMPILER="${{ matrix.c_comp }}"
         echo Changing to build directory...
         cd "$qx_build_dir"
         echo Building Qx debug...
@@ -81,7 +99,7 @@ jobs:
       id: get_artifact_name
       run: |
         cpack_name=$(find "${{ env.qx_package_path }}" -type f -name "*.zip")
-        artifact_name=$(basename "$cpack_name" .zip)
+        artifact_name="$(basename "$cpack_name" .zip) [${{ matrix.cxx_comp }}]"
         echo "current_artifact_name=$artifact_name" >> $GITHUB_ENV
     - name: Upload Qx build artifact
       uses: actions/upload-artifact@v3
