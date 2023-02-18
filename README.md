@@ -31,37 +31,12 @@ Either way you'll then need to explore the [documentation](https://oblivioncth.g
 
 ## Pre-built Releases/Artifacts
 
-Releases and some workflows currently provide builds of Qx in the following configurations:
-
-1) - Windows (windows-latest)
-    - MSVC (latest)
-    - Debug & Release
-    - Static Linkage
-    - Statically Linked Qt
->>
-2) - Windows (windows-latest)
-    - MSVC (latest)
-	- Debug & Release
-	- Static Linkage
-	- Dynamically Linked Qt
-
->>
-3) - Ubuntu (ubuntu-latest)
-    - Clang-12
-	- Debug & Release
-	- Static Linkage
-	- Dynamically Linked Qt
-	
->>
-4) - Ubuntu (ubuntu-latest)
-    - Clang-12
-	- Debug & Release
-	- Static Linkage
-	- Statically Linked Qt
+Releases and some workflows currently provide builds of Qx in various combinations of platforms and compilers. View the repository [Actions](https://github.com/oblivioncth/Qx/actions) to see examples.
 
 For all builds, Qt was configured as follows (excluding defaults):
 
  - Release
+ - linux-clang
  - Shared/Static Linkage
  - Modules: qtbase, qtimageformats, qtnetworkauth, qtsvg, qt5compat
  - Features: relocatable
