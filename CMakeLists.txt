@@ -40,7 +40,7 @@ list(APPEND CMAKE_MODULE_PATH "${PROJ_SCRIPTS_PATH}/module")
 
 # Get helper scripts
 include(Qx/FetchOBCMake)
-fetch_ob_cmake("v0.2")
+fetch_ob_cmake("8e20cc55aefba251d3436b6e16db71caadd0393e")
 
 # Include utility functions
 include(OB/Utility)
@@ -98,7 +98,7 @@ set(PACKAGE_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/out/dist")
 
 # Versioning
 include(OB/VerboseVersioning)
-setup_verbose_versioning(PROJECT_VERSION_VERBOSE)
+ob_setup_verbose_versioning(PROJECT_VERSION_VERBOSE)
 
 #------------Enumerate Components----------------
 get_subdirectory_list(${COMPONENTS_PATH} LIB_COMPONENTS)
@@ -150,7 +150,7 @@ message(STATUS "All Qx Qt component dependencies: ${ALL_QT_COMPONENTS}")
 
 # Find Qt package
 include(OB/BetterFindQt6)
-find_qt6_package(REQUIRED COMPONENTS ${ALL_QT_COMPONENTS})
+ob_find_qt6_package(REQUIRED COMPONENTS ${ALL_QT_COMPONENTS})
 
 #--------------------Package Config-----------------------
 
@@ -230,7 +230,7 @@ if(QX_DOCS_TARGET)
 
     # Determine Qt related doc paths
     include(OB/QtDocsHelper)
-    configure_qt_doc_link(${Qt6_PREFIX_PATH})
+    ob_configure_qt_doc_link(${Qt6_PREFIX_PATH})
 
     # Set Doxygen parameters
     include(${DOC_SCRIPTS_PATH}/doxyconf.cmake)
