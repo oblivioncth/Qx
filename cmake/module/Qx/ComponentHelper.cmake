@@ -61,7 +61,7 @@ endfunction()
 function(qx_enumerate_sibling_tree components return)
     foreach(component ${components})
         # Ensure consistant case to avoid duplicates in list
-        string_to_proper_case("${component}" COMPONENT_PC)
+        ob_string_to_proper_case("${component}" COMPONENT_PC)
 
         # Check if component has already been processed
         if(COMPONENT_PC IN_LIST FULL_COMPONENTS)
@@ -136,7 +136,7 @@ function(qx_register_component)
 
     #================= Setup ==========================
 
-    create_header_guard(${PROJECT_NAME} ${COMPONENT_NAME} COMPONENT_HEADER_GUARD)
+    ob_create_header_guard(${PROJECT_NAME} ${COMPONENT_NAME} COMPONENT_HEADER_GUARD)
 
     # Name here needs to be as unique as possible for when this project is inlcuded
     # in another via FetchContent or add_subdirectory (prevent target clashes)

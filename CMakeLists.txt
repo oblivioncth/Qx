@@ -40,7 +40,7 @@ list(APPEND CMAKE_MODULE_PATH "${PROJ_SCRIPTS_PATH}/module")
 
 # Get helper scripts
 include(Qx/FetchOBCMake)
-fetch_ob_cmake("8e20cc55aefba251d3436b6e16db71caadd0393e")
+fetch_ob_cmake("e74436d4f81a97fc9607b687042eba36b19ec3a9")
 
 # Include utility functions
 include(OB/Utility)
@@ -51,7 +51,7 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
 else()
   set(TARGET_ARCH x86)
 endif()
-get_proper_system_name(PROPER_SYSTEM_NAME)
+ob_get_proper_system_name(PROPER_SYSTEM_NAME)
 
 #--------------Top Level Project Setup-------------
 
@@ -101,9 +101,9 @@ include(OB/VerboseVersioning)
 ob_setup_verbose_versioning(PROJECT_VERSION_VERBOSE)
 
 #------------Enumerate Components----------------
-get_subdirectory_list(${COMPONENTS_PATH} LIB_COMPONENTS)
+ob_get_subdirectory_list(${COMPONENTS_PATH} LIB_COMPONENTS)
 foreach(comp ${LIB_COMPONENTS})
-    string_to_proper_case("${comp}" COMP_PC)
+    ob_string_to_proper_case("${comp}" COMP_PC)
     list(APPEND AVAILABLE_COMPONENTS "${COMP_PC}")
 endforeach()
 
@@ -126,7 +126,7 @@ set(QX_COMPONENTS "${AVAILABLE_COMPONENTS}" CACHE STRING "Qx components to confi
 
 # Confirm user component choices are valid and normalize casing
 foreach(sel_comp ${QX_COMPONENTS})
-    string_to_proper_case("${sel_comp}" SEL_COMP_PC)
+    ob_string_to_proper_case("${sel_comp}" SEL_COMP_PC)
     if(NOT SEL_COMP_PC IN_LIST AVAILABLE_COMPONENTS)
         message(FATAL_ERROR "${SEL_COMP_PC} is not an available ${PROJECT_NAME} component!")
     endif()
