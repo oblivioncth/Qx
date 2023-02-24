@@ -193,7 +193,7 @@ function(qx_register_component)
     if(COMPONENT_HEADERS_PUBLIC)
         # Build pathed include file list
         foreach(api_header ${COMPONENT_HEADERS_PUBLIC})
-            set(pathed_api_headers ${pathed_api_headers} "include/${PROJECT_NAME_LC}/${COMPONENT_NAME_LC}/${api_header}")
+            list(APPEND pathed_api_headers "include/${PROJECT_NAME_LC}/${COMPONENT_NAME_LC}/${api_header}")
         endforeach()
 
         # Group include files with their parent directories stripped
@@ -211,7 +211,7 @@ function(qx_register_component)
     if(COMPONENT_DOC_ONLY)
         # Build pathed include file list
         foreach(doc ${COMPONENT_DOC_ONLY})
-            set(pathed_docs ${pathed_docs} "src/${doc}")
+            list(APPEND pathed_docs "src/${doc}")
         endforeach()
 
         # Group include files with their parent directories stripped
@@ -233,13 +233,14 @@ function(qx_register_component)
     #-----------Generate Primary Component Header------------
 
     # Generate include statements
+    set(PRIM_COMP_HEADER_INCLUDES "") # Avoid unused warning
     foreach(api_header ${COMPONENT_HEADERS_PUBLIC})
         set(PRIM_COMP_HEADER_INCLUDES "${PRIM_COMP_HEADER_INCLUDES}#include <${PROJECT_NAME_LC}/${COMPONENT_NAME_LC}/${api_header}>\n")
     endforeach()
 
     # Copy template with modifications
     configure_file(
-        "${FILE_TEMPLATES_PATH}/primary_component_header.h.in"
+        "${PROJECT_FILE_TEMPLATES}/primary_component_header.h.in"
         "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME_LC}/${COMPONENT_NAME_LC}.h"
         @ONLY
         NEWLINE_STYLE UNIX
@@ -248,9 +249,10 @@ function(qx_register_component)
     #--------------------Package Config-----------------------
 
     # Create config file
-    configure_file("${FILE_TEMPLATES_PATH}/${PROJECT_NAME}ComponentConfig.cmake.in"
+    configure_package_config_file(
+        "${PROJECT_FILE_TEMPLATES}/${PROJECT_NAME}ComponentConfig.cmake.in"
         "${PROJECT_BINARY_DIR}/cmake/${COMPONENT_NAME}/${PROJECT_NAME}${COMPONENT_NAME}Config.cmake"
-        @ONLY
+        INSTALL_DESTINATION "cmake/${COMPONENT_NAME}"
     )
 
     #---------- Configure Target Properties------------------

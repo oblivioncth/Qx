@@ -1,7 +1,7 @@
 /* [@PROJECT_NAME@]
  * Version: @PROJECT_VERSION_VERBOSE@
  * Qt Version: @Qt6_VERSION@
- * Platform: @PROPER_SYSTEM_NAME@
+ * Platform: @CMAKE_SYSTEM_NAME@
  * Build Date: @BUILD_DATE_TIME@
  * Component: @COMPONENT_NAME@
 */
