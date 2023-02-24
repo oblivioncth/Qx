@@ -2,9 +2,6 @@
 
 # CMake
 cmake_minimum_required(VERSION 3.24.0)
-if(NOT ${GENERATOR_IS_MULTI_CONFIG})
-    message(FATAL_ERROR "This project currently only supports multi-config generators!")
-endif()
 
 # Get helper scripts
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FetchOBCMake.cmake)
