@@ -1,6 +1,9 @@
 #ifndef QX_FILESTREAMREADER_H
 #define QX_FILESTREAMREADER_H
 
+// Shared Lib Support
+#include "qx/io/qx_io_export.h"
+
 // Qt Includes
 #include <QDataStream>
 #include <QFile>
@@ -14,7 +17,7 @@
 namespace Qx
 {
 
-class FileStreamReader // Specialized wrapper for QDataStream
+class QX_IO_EXPORT FileStreamReader // Specialized wrapper for QDataStream
 {
 //-Class Variables------------------------------------------------------------------------------------------------
 private:

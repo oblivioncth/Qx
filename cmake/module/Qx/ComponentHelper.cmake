@@ -82,6 +82,7 @@ function(qx_enumerate_sibling_tree components return)
     set(${return} "${FULL_COMPONENTS}" PARENT_SCOPE)
 endfunction()
 
+# Respects BUILD_SHARED_LIBS if LIB_TYPE is undefined
 function(qx_register_component)
     #=============== Parse Arguments ==================
 
@@ -124,8 +125,15 @@ function(qx_register_component)
     if(NOT DEFINED COMPONENT_NAME)
         message(FATAL_ERROR "A name for the component must be provided!")
     endif()
-    if(NOT DEFINED COMPONENT_LIB_TYPE)
-        message(FATAL_ERROR "A lib type for the component must be provided!")
+
+    # This follows the value of BUILD_SHARED_LIB but while passing the explicit lib type to add_library()
+    # in case more control is needed at a later step (i.e. the lib type needs to be checked)
+    if(DEFINED COMPONENT_LIB_TYPE)
+        set(lib_type "${COMPONENT_LIB_TYPE}")
+    elseif(BUILD_SHARED_LIBS)
+        set(lib_type "SHARED")
+    else()
+        set(lib_type "STATIC")
     endif()
 
     #============ Additional Variable Prep ============
@@ -143,7 +151,7 @@ function(qx_register_component)
     set(COMPONENT_TARGET_NAME ${PROJECT_NAME_LC}_${COMPONENT_NAME_LC})
 
     # Make lib target
-    qt_add_library(${COMPONENT_TARGET_NAME} ${COMPONENT_LIB_TYPE})
+    qt_add_library(${COMPONENT_TARGET_NAME} ${lib_type})
 
     # Make alias target so target can be referred to with its friendly
     # export name both internally and when part of another build tree
@@ -176,7 +184,7 @@ function(qx_register_component)
     endif()
 
     # Includes
-    if(${COMPONENT_LIB_TYPE} STREQUAL "INTERFACE")
+    if(${lib_type} STREQUAL "INTERFACE")
         target_include_directories(${COMPONENT_TARGET_NAME} INTERFACE
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
@@ -205,6 +213,46 @@ function(qx_register_component)
         # Add include files as private target source so that they aren't built nor marked as a dependency,
         # but are shown with the target in the IDE
         target_sources(${COMPONENT_TARGET_NAME} PRIVATE ${pathed_api_headers})
+    endif()
+
+    # Shared library support
+    if(NOT "${lib_type}" STREQUAL "INTERFACE")
+        # Setup export decorator macros as require by Windows, but use the benefit on all supported platforms.
+        # An alternative to this is to set CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS to TRUE, which handles all exports
+        # and imports automatically, but doesn't provide the same speed benefits and still requires manual
+        # marking of global data members (i.e. it only covers classes and functions). So if we have to mark those
+        # anyway, mind as well do everything.
+
+        # This isn't explained at all in the CMake docs for GenerateExportHeader, but the purpose of the
+        # following propety settings is to make non-Windows compilers match the behavioor of windows in
+        # regards to symbol visibility by default. Normally, on Windows when compiling shared libraries
+        # all symbols are private by default, while on compilers like GCC, the symbols are all public by
+        # default.
+        #
+        # Symbols that are explicitly marked as public benefit from better code generation and faster
+        # initialization time. Since the manual marking must be done on Windows anyway, it makes sense
+        # to private everything by default on other platforms as well in order to gain these benefits from
+        # the manual export marks. These properties mark symbols and inline symbols as hidden on for the
+        # non-windows compilers that support said options.
+        set_target_properties(${COMPONENT_TARGET_NAME}
+            PROPERTIES
+                CXX_VISIBILITY_PRESET "hidden"
+                VISIBILITY_INLINES_HIDDEN 1
+        )
+
+        # Generate Export Header
+        include(GenerateExportHeader)
+
+        # The STATIC_DEFINE portion of this function only needs to be used if the project is setup to build the
+        # static and shared versions of the library from the same configuration, as then only one header is
+        # generated and used for both. We don't do this however, and the header generation is smart enough to
+        # resolve the macros to empty strings when configuring a static library
+        generate_export_header(${COMPONENT_TARGET_NAME}
+            EXPORT_FILE_NAME "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME_LC}/${COMPONENT_NAME_LC}/${PROJECT_NAME_LC}_${COMPONENT_NAME_LC}_export.h"
+        )
+
+        # The above function also ensure the correct definition is set on the target to use the EXPORT variant
+        # of the macro value instead of the IMPORT variant
     endif()
 
     # Doc
@@ -281,9 +329,9 @@ function(qx_register_component)
         DESTINATION "include/${COMPONENT_NAME_LC}/"
         ${SUB_PROJ_EXCLUDE_FROM_ALL} # "EXCLUDE_FROM_ALL" if project is not top-level
     )
-    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME_LC}/${COMPONENT_NAME_LC}.h"
+    install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/include/"
         COMPONENT ${COMPONENT_TARGET_NAME}
-        DESTINATION "include/${COMPONENT_NAME_LC}/${PROJECT_NAME_LC}"
+        DESTINATION "include/${COMPONENT_NAME_LC}/"
         ${SUB_PROJ_EXCLUDE_FROM_ALL} # "EXCLUDE_FROM_ALL" if project is not top-level
     )
 

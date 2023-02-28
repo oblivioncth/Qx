@@ -1,13 +1,16 @@
 #ifndef QX_STANDARDITEMMODEL_H
 #define QX_STANDARDITEMMODEL_H
 
+// Shared Lib Support
+#include "qx/widgets/qx_widgets_export.h"
+
 // Qt Includes
 #include <QStandardItemModel>
 
 namespace Qx
 {
 	
-class StandardItemModel : public QStandardItemModel
+class QX_WIDGETS_EXPORT StandardItemModel : public QStandardItemModel
 {
 //-Instance Members---------------------------------------------------------------------------------------------------
 private:

@@ -1,13 +1,16 @@
 #ifndef QX_TEXTPOS_H
 #define QX_TEXTPOS_H
 
+// Shared Lib Support
+#include "qx/io/qx_io_export.h"
+
 // Extra-component Includes
 #include "qx/core/qx-index.h"
 
 namespace Qx
 {
 
-class TextPos
+class QX_IO_EXPORT TextPos
 {
 //-Class Types------------------------------------------------------------------------------------------------------
 public:

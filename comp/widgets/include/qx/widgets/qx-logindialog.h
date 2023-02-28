@@ -1,6 +1,9 @@
 #ifndef QX_LOGINDIALOG_H
 #define QX_LOGINDIALOG_H
 
+// Shared Lib Support
+#include "qx/widgets/qx_widgets_export.h"
+
 // Qt Includes
 #include <QDialog>
 #include <QLabel>
@@ -10,7 +13,7 @@
 namespace Qx
 {
 
-class LoginDialog : public QDialog
+class QX_WIDGETS_EXPORT LoginDialog : public QDialog
 {
 //-QObject Macro (Required for all QObject Derived Classes)-----------------------------------------------------------
     Q_OBJECT

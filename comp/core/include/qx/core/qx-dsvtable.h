@@ -1,6 +1,9 @@
 #ifndef QX_DSVTABLE_H
 #define QX_DSVTABLE_H
 
+// Shared Lib Support
+#include "qx/core/qx_core_export.h"
+
 // Qt Includes
 #include <QVariant>
 #include <QSize>
@@ -11,7 +14,7 @@
 namespace Qx
 {
 
-class DsvParseError
+class QX_CORE_EXPORT DsvParseError
 {
 //-Class Enum-----------------------------------------------------------------------------------------------------------
 public:
@@ -50,7 +53,7 @@ public:
     qsizetype offset() const;
 };
 
-class DsvTable : public Table<QVariant>
+class QX_CORE_EXPORT DsvTable : public Table<QVariant>
 {
 //-Constructor----------------------------------------------------------------------------------------------
 public:

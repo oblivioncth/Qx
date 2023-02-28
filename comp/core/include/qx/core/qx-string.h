@@ -1,6 +1,9 @@
 #ifndef QX_STRING_H
 #define QX_STRING_H
 
+// Shared Lib Support
+#include "qx/core/qx_core_export.h"
+
 // Qt Includes
 #include <QString>
 #include <QCryptographicHash>
@@ -11,7 +14,7 @@
 namespace Qx
 {
 
-class String
+class QX_CORE_EXPORT String
 {
 //-Class Functions----------------------------------------------------------------------------------------------
 public:

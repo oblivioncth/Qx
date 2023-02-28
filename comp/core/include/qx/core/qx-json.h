@@ -1,6 +1,9 @@
 #ifndef QX_JSON_H
 #define QX_JSON_H
 
+// Shared Lib Support
+#include "qx/core/qx_core_export.h"
+
 // Qt Includes
 #include <QString>
 #include <QJsonValueRef>
@@ -11,7 +14,7 @@
 namespace Qx
 {
 
-class Json
+class QX_CORE_EXPORT Json
 {
 //-Class Members-------------------------------------------------------------------------------------------------
 private:

@@ -1,6 +1,9 @@
 #ifndef QX_FILESTREAMWRITER_H
 #define QX_FILESTREAMWRITER_H
 
+// Shared Lib Support
+#include "qx/io/qx_io_export.h"
+
 // Qt Includes
 #include <QDataStream>
 #include <QFile>
@@ -11,7 +14,7 @@
 namespace Qx
 {
 	
-class FileStreamWriter // Specialized wrapper for QDataStream
+class QX_IO_EXPORT FileStreamWriter // Specialized wrapper for QDataStream
 {
 //-Class Variables------------------------------------------------------------------------------------------------
 private:

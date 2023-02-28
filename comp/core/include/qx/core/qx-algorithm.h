@@ -1,6 +1,9 @@
 #ifndef QX_ALGORITHM_H
 #define QX_ALGORITHM_H
 
+// Shared Lib Support
+#include "qx/core/qx_core_export.h"
+
 // Standard Library Includes
 #include <stdexcept>
 #include <unordered_set>
@@ -14,12 +17,12 @@
 namespace Qx
 {
 //-Namespace Functions----------------------------------------------------------------------------------------------------
-int abs(int n);
-unsigned int abs(unsigned int n);
-long abs(long n);
-unsigned long abs(unsigned long n);
-long long abs (long long n);
-unsigned long long abs(unsigned long long n);
+QX_CORE_EXPORT int abs(int n);
+QX_CORE_EXPORT unsigned int abs(unsigned int n);
+QX_CORE_EXPORT long abs(long n);
+QX_CORE_EXPORT unsigned long abs(unsigned long n);
+QX_CORE_EXPORT long long abs (long long n);
+QX_CORE_EXPORT unsigned long long abs(unsigned long long n);
 
 template<typename T>
     requires std::integral<T>

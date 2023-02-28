@@ -1,13 +1,16 @@
 #ifndef QX_APPLICATION_DESKTOP_ENTRY_H
 #define QX_APPLICATION_DESKTOP_ENTRY_H
 
+// Shared Lib Support
+#include "qx/linux/qx_linux_export.h"
+
 // Intra-component Includes
 #include "qx/linux/qx-desktopentry.h"
 
 namespace Qx
 {
 
-class DesktopAction
+class QX_LINUX_EXPORT DesktopAction
 {
 //-Instance Members-------------------------------------------------------------------------------------------------
 private:
@@ -33,7 +36,7 @@ public:
     void setExec(const QString& exec);
 };
 
-class ApplicationDesktopEntry : public DesktopEntry
+class QX_LINUX_EXPORT ApplicationDesktopEntry : public DesktopEntry
 {
 //-Class Members-------------------------------------------------------------------------------------------------
 private:

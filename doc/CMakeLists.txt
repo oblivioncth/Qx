@@ -5,7 +5,7 @@ include(OB/Documentation)
 foreach(component ${LIB_COMPONENTS})
     list(APPEND COMPONENT_DOC_ROOTS "${COMPONENTS_PATH}/${component}/doc")
     list(APPEND COMPONENT_DOC_INPUT "${COMPONENTS_PATH}/${component}/src")
-    list(APPEND COMPONENT_DOC_INPUT "${COMPONENTS_PATH}/${component}/${CMAKE_INSTALL_INCLUDEDIR}")
+    list(APPEND COMPONENT_DOC_INPUT "${COMPONENTS_PATH}/${component}/include")
 endforeach()
 
 # Set project specific doxygen overrides

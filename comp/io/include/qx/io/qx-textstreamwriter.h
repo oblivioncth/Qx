@@ -1,6 +1,9 @@
 #ifndef QX_TEXTSTREAMWRITER_H
 #define QX_TEXTSTREAMWRITER_H
 
+// Shared Lib Support
+#include "qx/io/qx_io_export.h"
+
 // Qt Includes
 #include <QTextStream>
 #include <QFile>
@@ -12,7 +15,7 @@
 namespace Qx
 {
 
-class TextStreamWriter
+class QX_IO_EXPORT TextStreamWriter
 {
 //-Class Variables------------------------------------------------------------------------------------------------
 private:
