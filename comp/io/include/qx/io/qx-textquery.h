@@ -1,6 +1,9 @@
 #ifndef QX_TEXTQUERY_H
 #define QX_TEXTQUERY_H
 
+// Shared Lib Support
+#include "qx/io/qx_io_export.h"
+
 // Qt Includes
 #include <QString>
 
@@ -10,7 +13,7 @@
 namespace Qx
 {
 	
-class TextQuery
+class QX_IO_EXPORT TextQuery
 {
 //-Instance Variables------------------------------------------------------------------------------------------------
 private:

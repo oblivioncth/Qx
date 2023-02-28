@@ -1,6 +1,9 @@
 #ifndef QX_WINDOWS_COMMON_H
 #define QX_WINDOWS_COMMON_H
 
+// Shared Lib Support
+#include "qx/windows/qx_windows_export.h"
+
 // Qt Includes
 #include <QString>
 
@@ -14,7 +17,7 @@ namespace Qx
 {
 
 //-Namespace Structs---------------------------------------------------------------------------------------------------------------
-struct ShortcutProperties
+struct QX_WINDOWS_EXPORT ShortcutProperties
 {
     enum ShowMode {
         NORMAL,
@@ -34,7 +37,7 @@ struct ShortcutProperties
 //-Namespace Functions-------------------------------------------------------------------------------------------------------------
 
 // Processes
-QList<DWORD> processThreadIds(DWORD processId);
+QX_WINDOWS_EXPORT QList<DWORD> processThreadIds(DWORD processId);
 
 /* TODO: DWORD processMainThreadId(DWORD processId);
  *
@@ -45,22 +48,22 @@ QList<DWORD> processThreadIds(DWORD processId);
  * See https://docs.microsoft.com/en-us/windows/win32/psapi/module-information
  */
 
-bool processIsRunning(HANDLE processHandle);
+QX_WINDOWS_EXPORT bool processIsRunning(HANDLE processHandle);
 
-GenericError processIsElevated(bool& elevated);
-GenericError processIsElevated(bool& elevated, HANDLE processHandle);
-GenericError processIsElevated(bool& elevated, DWORD processId);
+QX_WINDOWS_EXPORT GenericError processIsElevated(bool& elevated);
+QX_WINDOWS_EXPORT GenericError processIsElevated(bool& elevated, HANDLE processHandle);
+QX_WINDOWS_EXPORT GenericError processIsElevated(bool& elevated, DWORD processId);
 
-GenericError cleanKillProcess(HANDLE processHandle);
-GenericError forceKillProcess(HANDLE processHandle);
+QX_WINDOWS_EXPORT GenericError cleanKillProcess(HANDLE processHandle);
+QX_WINDOWS_EXPORT GenericError forceKillProcess(HANDLE processHandle);
 
 // Error codes
-GenericError translateHresult(HRESULT res);
-GenericError translateNtstatus(NTSTATUS stat);
-GenericError getLastError();
+QX_WINDOWS_EXPORT GenericError translateHresult(HRESULT res);
+QX_WINDOWS_EXPORT GenericError translateNtstatus(NTSTATUS stat);
+QX_WINDOWS_EXPORT GenericError getLastError();
 
 // Filesystem
-GenericError createShortcut(QString shortcutPath, ShortcutProperties sp);
+QX_WINDOWS_EXPORT GenericError createShortcut(QString shortcutPath, ShortcutProperties sp);
 
 }
 

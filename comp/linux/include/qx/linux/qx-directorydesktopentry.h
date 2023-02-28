@@ -1,13 +1,16 @@
 #ifndef QX_DIRECTORY_DESKTOP_ENTRY_H
 #define QX_DIRECTORY_DESKTOP_ENTRY_H
 
+// Shared Lib Support
+#include "qx/linux/qx_linux_export.h"
+
 // Intra-component Includes
 #include "qx/linux/qx-desktopentry.h"
 
 namespace Qx
 {
 
-class DirectoryDesktopEntry : public DesktopEntry
+class QX_LINUX_EXPORT DirectoryDesktopEntry : public DesktopEntry
 {
 //-Class Members-------------------------------------------------------------------------------------------------
 private:

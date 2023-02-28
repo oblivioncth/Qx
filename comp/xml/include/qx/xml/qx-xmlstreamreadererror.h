@@ -1,6 +1,9 @@
 #ifndef QX_STREAMREADERERROR_H
 #define QX_STREAMREADERERROR_H
 
+// Shared Lib Support
+#include "qx/xml/qx_xml_export.h"
+
 // Qt Includes
 #include <QXmlStreamReader>
 #include <QHash>
@@ -8,7 +11,7 @@
 namespace Qx
 {
 	
-class XmlStreamReaderError
+class QX_XML_EXPORT XmlStreamReaderError
 {
 //-Class Members--------------------------------------------------------------------------------------------------
 private:

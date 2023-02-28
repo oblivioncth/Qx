@@ -1,6 +1,9 @@
 #ifndef QX_DESKTOP_ENTRY_H
 #define QX_DESKTOP_ENTRY_H
 
+// Shared Lib Support
+#include "qx/linux/qx_linux_export.h"
+
 // Qt Includes
 #include <QString>
 #include <QUrl>
@@ -16,7 +19,7 @@ namespace Qx
  * booleans.
  */
 
-class DesktopEntry
+class QX_LINUX_EXPORT DesktopEntry
 {
 //-Class Members----------------------------------------------------------------------------------------------------
 private:

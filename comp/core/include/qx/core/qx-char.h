@@ -1,13 +1,16 @@
 #ifndef QX_CHAR_H
 #define QX_CHAR_H
 
+// Shared Lib Support
+#include "qx/core/qx_core_export.h"
+
 // Qt Includes
 #include <QChar>
 
 namespace Qx
 {
 	
-class Char
+class QX_CORE_EXPORT Char
 {
 //-Class Functions----------------------------------------------------------------------------------------------
 public:

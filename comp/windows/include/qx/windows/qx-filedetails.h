@@ -1,6 +1,9 @@
 #ifndef QX_FILEDETAILS_H
 #define QX_FILEDETAILS_H
 
+// Shared Lib Support
+#include "qx/windows/qx_windows_export.h"
+
 // Qt Includes
 #include <QString>
 #include <QHash>
@@ -15,7 +18,7 @@
 namespace Qx
 {
 
-class FileDetails
+class QX_WINDOWS_EXPORT FileDetails
 {
 //-Class Structs---------------------------------------------------------------------------------------------------------
 public:
@@ -24,8 +27,8 @@ public:
         QString language;
         QString codePage;
 
-        friend bool operator== (const Translation& lhs, const Translation& rhs) noexcept;
-        friend size_t qHash(const Translation& key, size_t seed) noexcept;
+        friend QX_WINDOWS_EXPORT bool operator== (const Translation& lhs, const Translation& rhs) noexcept;
+        friend QX_WINDOWS_EXPORT size_t qHash(const Translation& key, size_t seed) noexcept;
     };
 
     struct StringTable

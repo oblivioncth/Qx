@@ -3,12 +3,7 @@
 # CMake
 cmake_minimum_required(VERSION 3.24.0)
 
-# Get helper scripts
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FetchOBCMake.cmake)
-fetch_ob_cmake("6e48f2794013848bd371c45a070ebcdf4b28100e")
-
 # Project
-include(OB/ProjectSetup)
 # NOTE: For versions stick to w.x.y.z, where z is generally
 # avoided and only used for hotfixes. DON'T USE TRAILING
 # ZEROS IN VERSIONS
@@ -17,6 +12,13 @@ project(Qx
     LANGUAGES CXX
     DESCRIPTION "Qt Extensions Library"
 )
+
+# Get helper scripts
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FetchOBCMake.cmake)
+fetch_ob_cmake("6e48f2794013848bd371c45a070ebcdf4b28100e")
+
+# Initialize project according to standard rules
+include(OB/ProjectSetup)
 ob_standard_project_setup()
 
 # C++
@@ -58,6 +60,7 @@ message(STATUS "Available Qx components: ${AVAILABLE_COMPONENTS}")
 # Configuration options
 option(QX_DOCS "Build Qx documentation" OFF)
 set(QX_COMPONENTS "${AVAILABLE_COMPONENTS}" CACHE STRING "Qx components to configure")
+option(BUILD_SHARED_LIBS "Build the shared flavor of Qx" OFF)
 
 # Confirm user component choices are valid and normalize casing
 if(NOT QX_COMPONENTS)

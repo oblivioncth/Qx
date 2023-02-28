@@ -1,6 +1,9 @@
 #ifndef QX_DOWNLOADMANAGER_H
 #define QX_DOWNLOADMANAGER_H
 
+// Shared Lib Support
+#include "qx/network/qx_network_export.h"
+
 // Qt Includes
 #include <QEventLoop>
 #include <QNetworkAccessManager>
@@ -40,7 +43,7 @@ namespace Qx
 class AsyncDownloadManager;
 class SyncDownloadManager;
 
-class DownloadManagerReport
+class QX_NETWORK_EXPORT DownloadManagerReport
 {
 
 friend AsyncDownloadManager;
@@ -105,7 +108,7 @@ private:
     };
 };
 
-class AsyncDownloadManager: public QObject
+class QX_NETWORK_EXPORT AsyncDownloadManager: public QObject
 {
 //-QObject Macro (Required for all QObject Derived Classes)-----------------------------------------------------------
     Q_OBJECT
@@ -245,7 +248,7 @@ signals:
     void finished(Qx::DownloadManagerReport report);
 };
 
-class SyncDownloadManager: public QObject
+class QX_NETWORK_EXPORT SyncDownloadManager: public QObject
 {
 //-QObject Macro (Required for all QObject Derived Classes)-----------------------------------------------------------
     Q_OBJECT

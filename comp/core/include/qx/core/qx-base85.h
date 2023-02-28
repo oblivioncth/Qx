@@ -1,6 +1,9 @@
 #ifndef QX_BASE85_H
 #define QX_BASE85_H
 
+// Shared Lib Support
+#include "qx/core/qx_core_export.h"
+
 // Inner-component Includes
 #include "qx/core/qx-char.h"
 
@@ -18,7 +21,7 @@
 namespace Qx
 {
 
-class Base85Encoding
+class QX_CORE_EXPORT Base85Encoding
 {
 //-Class Enum-----------------------------------------------------------------------------------------------------------
 public:
@@ -128,7 +131,7 @@ public:
     bool operator!=(const Base85Encoding& other) const;
 };
 
-class Base85ParseError
+class QX_CORE_EXPORT Base85ParseError
 {
 //-Class Enum-----------------------------------------------------------------------------------------------------------
 public:
@@ -169,7 +172,7 @@ public:
     qsizetype offset() const;
 };
 
-class Base85
+class QX_CORE_EXPORT Base85
 {
 //-Class Variables------------------------------------------------------------------------------------------------------
 private:

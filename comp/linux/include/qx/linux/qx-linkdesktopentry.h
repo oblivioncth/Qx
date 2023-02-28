@@ -1,13 +1,16 @@
 #ifndef QX_LINK_DESKTOP_ENTRY_H
 #define QX_LINK_DESKTOP_ENTRY_H
 
+// Shared Lib Support
+#include "qx/linux/qx_linux_export.h"
+
 // Intra-component Includes
 #include "qx/linux/qx-desktopentry.h"
 
 namespace Qx
 {
 
-class LinkDesktopEntry : public DesktopEntry
+class QX_LINUX_EXPORT LinkDesktopEntry : public DesktopEntry
 {
 //-Class Members-------------------------------------------------------------------------------------------------
 private:

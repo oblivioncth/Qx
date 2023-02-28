@@ -1,13 +1,16 @@
 #ifndef QX_VERSIONNUMBER_H
 #define QX_VERSIONNUMBER_H
 
+// Shared Lib Support
+#include "qx/core/qx_core_export.h"
+
 // Qt Includes
 #include <QVersionNumber>
 
 namespace Qx
 {
 
-class VersionNumber : public QVersionNumber
+class QX_CORE_EXPORT VersionNumber : public QVersionNumber
 {
 //-Constructor-------------------------------------------------------------------------------------------------
 public:

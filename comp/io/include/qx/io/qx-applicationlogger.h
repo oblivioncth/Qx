@@ -1,6 +1,9 @@
 #ifndef APPLICATIONLOGGER_H
 #define APPLICATIONLOGGER_H
 
+// Shared Lib Support
+#include "qx/io/qx_io_export.h"
+
 // Qt Includes
 #include <QString>
 #include <QStringList>
@@ -15,7 +18,7 @@ class QCoreApplication;
 namespace Qx
 {
 
-class ApplicationLogger
+class QX_IO_EXPORT ApplicationLogger
 {
 //-Class Variables----------------------------------------------------------------------------------------------------
 private:
