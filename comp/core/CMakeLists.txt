@@ -1,42 +1,33 @@
-#================= Setup Component ==========================
-set(COMPONENT_NAME "Core")
-
-qx_get_component_qt_depends("${COMPONENT_NAME}" COMPONENT_QT_DEPENDS)
-qx_get_component_sibling_depends("${COMPONENT_NAME}" COMPONENT_SIBLING_DEPENDS)
-
-qx_register_component(
-    NAME "${COMPONENT_NAME}"
-    DEPENDS_QT ${COMPONENT_QT_DEPENDS}
-    DEPENDS_SIBLINGS ${COMPONENT_SIBLING_DEPENDS}
-    HEADERS
-        PRIVATE
-            qx-json_p.h
-        PUBLIC
-            qx-algorithm.h
-            qx-array.h
-            qx-base85.h
-            qx-bitarray.h
-            qx-bytearray.h
-            qx-char.h
-            qx-cumulation.h
-            qx-datetime.h
-            qx-dsvtable.h
-            qx-freeindextracker.h
-            qx-genericerror.h
-            qx-groupedprogressmanager.h
-            qx-index.h
-            qx-integrity.h
-            qx-iostream.h
-            qx-json.h
-            qx-list.h
-            qx-progressgroup.h
-            qx-table.h
-            qx-versionnumber.h
-            qx-regularexpression.h
-            qx-setonce.h
-            qx-string.h
-            qx-system.h
-            qx-traverser.h
+#================= Add Component ==========================
+qx_add_component("Core"
+    HEADERS_PRIVATE
+        qx-json_p.h
+    HEADERS_API
+        qx-algorithm.h
+        qx-array.h
+        qx-base85.h
+        qx-bitarray.h
+        qx-bytearray.h
+        qx-char.h
+        qx-cumulation.h
+        qx-datetime.h
+        qx-dsvtable.h
+        qx-freeindextracker.h
+        qx-genericerror.h
+        qx-groupedprogressmanager.h
+        qx-index.h
+        qx-integrity.h
+        qx-iostream.h
+        qx-json.h
+        qx-list.h
+        qx-progressgroup.h
+        qx-table.h
+        qx-versionnumber.h
+        qx-regularexpression.h
+        qx-setonce.h
+        qx-string.h
+        qx-system.h
+        qx-traverser.h
     IMPLEMENTATION
         qx-algorithm.cpp
         qx-base85.cpp

@@ -1,16 +1,7 @@
-#================= Setup Component ==========================
-set(COMPONENT_NAME "Gui")
-
-qx_get_component_qt_depends("${COMPONENT_NAME}" COMPONENT_QT_DEPENDS)
-qx_get_component_sibling_depends("${COMPONENT_NAME}" COMPONENT_SIBLING_DEPENDS)
-
-qx_register_component(
-    NAME "${COMPONENT_NAME}"
-    DEPENDS_QT ${COMPONENT_QT_DEPENDS}
-    DEPENDS_SIBLINGS ${COMPONENT_SIBLING_DEPENDS}
-    HEADERS
-        PUBLIC
-            qx-color.h
+#================= Add Component ==========================
+qx_add_component("Gui"
+    HEADERS_API
+        qx-color.h
     IMPLEMENTATION
         qx-color.cpp
     LINKS
@@ -18,4 +9,3 @@ qx_register_component(
             Qt6::Core
             Qt6::Gui
 )
-

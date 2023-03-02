@@ -15,10 +15,10 @@ project(Qx
 
 # Get helper scripts
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FetchOBCMake.cmake)
-fetch_ob_cmake("6e48f2794013848bd371c45a070ebcdf4b28100e")
+fetch_ob_cmake("4ecea8f52894e9434582a8f55c782c04c8c105e2")
 
 # Initialize project according to standard rules
-include(OB/ProjectSetup)
+include(OB/Project)
 ob_standard_project_setup()
 
 # C++
@@ -60,7 +60,6 @@ message(STATUS "Available Qx components: ${AVAILABLE_COMPONENTS}")
 # Configuration options
 option(QX_DOCS "Build Qx documentation" OFF)
 set(QX_COMPONENTS "${AVAILABLE_COMPONENTS}" CACHE STRING "Qx components to configure")
-option(BUILD_SHARED_LIBS "Build the shared flavor of Qx" OFF)
 
 # Confirm user component choices are valid and normalize casing
 if(NOT QX_COMPONENTS)
@@ -96,20 +95,9 @@ ob_find_qt6_package(REQUIRED COMPONENTS ${ALL_QT_COMPONENTS})
 
 #--------------------Package Config-----------------------
 
-include(CMakePackageConfigHelpers)
-
-# Create config file
-configure_package_config_file(
-    "${PROJECT_FILE_TEMPLATES}/${PROJECT_NAME}Config.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}Config.cmake"
-    INSTALL_DESTINATION "cmake"
-)
-
-# Create version config file
-write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}ConfigVersion.cmake"
-    VERSION ${PROJECT_VERSION}
-    COMPATIBILITY SameMinorVersion
+ob_standard_project_package_config(
+    COMPATIBILITY "SameMinorVersion"
+    CONFIG CUSTOM "${PROJECT_FILE_TEMPLATES}/${PROJECT_NAME}Config.cmake.in"
 )
 
 #================= Process Componets =======================
@@ -134,7 +122,7 @@ endif()
 
 #================= Top Level Install =======================
 
-ob_standard_project_install()
+ob_standard_project_misc_install()
 
 #====================== Package ==============================
 
