@@ -1,13 +1,16 @@
 #ifndef QX_BITARRAY_H
 #define QX_BITARRAY_H
 
+// Shared Lib Support
+#include "qx/core/qx_core_export.h"
+
 // Qt Includes
 #include <QBitArray>
 
 namespace Qx
 {
 	
-class BitArray : public QBitArray
+class QX_CORE_EXPORT BitArray : public QBitArray
 {
 //-Constructor--------------------------------------------------------------------------------------------------
 public:

@@ -1,6 +1,9 @@
 #ifndef QX_GENERICERROR_H
 #define QX_GENERICERROR_H
 
+// Shared Lib Support
+#include "qx/core/qx_core_export.h"
+
 // Qt Includes
 #include <QHash>
 #include <QString>
@@ -10,7 +13,7 @@
 namespace Qx
 {
 
-class GenericError
+class QX_CORE_EXPORT GenericError
 {
 //-Class Enums-----------------------------------------------------------------------------------------------
 public:
@@ -61,11 +64,11 @@ public:
     GenericError& setDetailedInfo(QString detailedInfo);
 
 //-Friend Functions------------------------------------------------------------------------------------------------
-friend QTextStream& operator<<(QTextStream& ts, const GenericError& ge);
+friend QX_CORE_EXPORT QTextStream& operator<<(QTextStream& ts, const GenericError& ge);
 };
 
 //-Non-member/Related Functions------------------------------------------------------------------------------------
-QTextStream& operator<<(QTextStream& ts, const GenericError& ge);
+QX_CORE_EXPORT QTextStream& operator<<(QTextStream& ts, const GenericError& ge);
 
 }
 

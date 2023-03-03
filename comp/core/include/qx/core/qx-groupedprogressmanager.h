@@ -1,6 +1,9 @@
 #ifndef QX_GROUPEDPROGRESSMANAGER_H
 #define QX_GROUPEDPROGRESSMANAGER_H
 
+// Shared Lib Support
+#include "qx/core/qx_core_export.h"
+
 // Qt Includes
 #include <QObject>
 #include <QHash>
@@ -11,7 +14,7 @@
 namespace Qx
 {
 
-class GroupedProgressManager : public QObject
+class QX_CORE_EXPORT GroupedProgressManager : public QObject
 {
 //-QObject Macro (Required for all QObject Derived Classes)-----------------------------------------------------------
     Q_OBJECT

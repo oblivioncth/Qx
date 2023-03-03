@@ -1,6 +1,9 @@
 #ifndef QX_TASKBARBUTTON_H
 #define QX_TASKBARBUTTON_H
 
+// Shared Lib Support
+#include "qx/windows-gui/qx_windows-gui_export.h"
+
 // Qt Includes
 #include <QObject>
 #include <QWindow>
@@ -8,11 +11,10 @@
 // Windows Forward Declarations
 struct ITaskbarList4;
 
-
 namespace Qx
 {
 
-class TaskbarButton : public QObject
+class QX_WINDOWS_GUI_EXPORT TaskbarButton : public QObject
 {
 //-QObject Macro (Required for all QObject Derived Classes)-----------------------------------------------------------
     Q_OBJECT

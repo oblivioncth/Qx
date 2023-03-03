@@ -1,13 +1,16 @@
 #ifndef QX_DATETIME_H
 #define QX_DATETIME_H
 
+// Shared Lib Support
+#include "qx/core/qx_core_export.h"
+
 // Qt Includes
 #include <QDateTime>
 
 namespace Qx
 {
 
-class DateTime
+class QX_CORE_EXPORT DateTime
 {
 //-Class Variables----------------------------------------------------------------------------------------------
 private:

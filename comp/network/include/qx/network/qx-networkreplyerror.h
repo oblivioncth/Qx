@@ -1,6 +1,9 @@
 #ifndef QX_NETWORKREPLYERROR_H
 #define QX_NETWORKREPLYERROR_H
 
+// Shared Lib Support
+#include "qx/network/qx_network_export.h"
+
 // Qt Includes
 #include <QNetworkReply>
 #include <QUrl>
@@ -9,7 +12,7 @@
 namespace Qx
 {
 	
-class NetworkReplyError
+class QX_NETWORK_EXPORT NetworkReplyError
 {
 //-Instance Members----------------------------------------------------------------------------------------------
 private:

@@ -9,7 +9,7 @@ Requirements
 
  - An x64, C++@CMAKE_CXX_STANDARD@ capable compiler
  - Qt6
- - CMake @TRUE_CMAKE_MINIMUM_REQUIRED@ or greater
+ - CMake @PROJECT_CMAKE_MINIMUM_REQUIRED_VERSION@ or greater
  - Windows 10/11 or Linux (only tested on Ubuntu)
 
 Packaging

@@ -1,6 +1,9 @@
 #ifndef QX_PROGRESSGROUP_H
 #define QX_PROGRESSGROUP_H
 
+// Shared Lib Support
+#include "qx/core/qx_core_export.h"
+
 // Qt Includes
 #include <QObject>
 #include <QString>
@@ -9,7 +12,7 @@
 namespace Qx
 {
 
-class ProgressGroup : public QObject
+class QX_CORE_EXPORT ProgressGroup : public QObject
 {
 //-QObject Macro (Required for all QObject Derived Classes)-----------------------------------------------------------
     Q_OBJECT

@@ -31,12 +31,14 @@ Either way you'll then need to explore the [documentation](https://oblivioncth.g
 
 ## Pre-built Releases/Artifacts
 
-Releases and some workflows currently provide builds of Qx in various combinations of platforms and compilers. View the repository [Actions](https://github.com/oblivioncth/Qx/actions) to see examples.
+Releases and some workflows currently provide builds of Qx in various combinations of platforms and compilers. View the repository [Actions](https://github.com/oblivioncth/Qx/actions) or [Releases](https://github.com/oblivioncth/Qx/releases) to see examples.
 
 For all builds, Qt was configured as follows (excluding defaults):
 
  - Release
- - linux-clang
+ - Compiler
+    - Windows: win32-msvc
+    - Linux: linux-clang
  - Shared/Static Linkage
  - Modules: qtbase, qtimageformats, qtnetworkauth, qtsvg, qt5compat
  - Features: relocatable

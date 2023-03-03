@@ -1,6 +1,9 @@
 #ifndef QX_BYTEARRAY_H
 #define QX_BYTEARRAY_H
 
+// Shared Lib Support
+#include "qx/core/qx_core_export.h"
+
 // Standard Library Includes
 #include <concepts>
 
@@ -14,7 +17,7 @@
 namespace Qx
 {
 	
-class ByteArray
+class QX_CORE_EXPORT ByteArray
 {
 //-Class Functions----------------------------------------------------------------------------------------------
 public:

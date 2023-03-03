@@ -1,6 +1,9 @@
 #ifndef QX_TEXTSTREAMREADER_H
 #define QX_TEXTSTREAMREADER_H
 
+// Shared Lib Support
+#include "qx/io/qx_io_export.h"
+
 // Qt Includes
 #include <QTextStream>
 #include <QFile>
@@ -12,7 +15,7 @@
 namespace Qx
 {
 
-class TextStreamReader
+class QX_IO_EXPORT TextStreamReader
 {
 //-Class Variables------------------------------------------------------------------------------------------------
 private:

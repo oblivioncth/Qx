@@ -1,6 +1,9 @@
 #ifndef QX_TREEINPUTDIALOG_H
 #define QX_TREEINPUTDIALOG_H
 
+// Shared Lib Support
+#include "qx/widgets/qx_widgets_export.h"
+
 // Qt Includes
 #include <QDialog>
 #include <QTreeView>
@@ -9,7 +12,7 @@
 namespace Qx
 {
 	
-class TreeInputDialog : public QDialog
+class QX_WIDGETS_EXPORT TreeInputDialog : public QDialog
 {
 //-QObject Macro (Required for all QObject Derived Classes)-----------------------------------------------------------
     Q_OBJECT

@@ -1,6 +1,9 @@
 #ifndef QX_IOOPREPORT_H
 #define QX_IOOPREPORT_H
 
+// Shared Lib Support
+#include "qx/io/qx_io_export.h"
+
 // Qt Includes
 #include <QStringList>
 #include <QHash>
@@ -25,7 +28,7 @@ enum IoOpTargetType { IO_FILE, IO_DIR };
 
 
 //-Classes--------------------------------------------------------------------------------------------
-class IoOpReport
+class QX_IO_EXPORT IoOpReport
 {
 //-Class Members----------------------------------------------------------------------------------------------------
 private:

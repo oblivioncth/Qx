@@ -1,6 +1,9 @@
 #ifndef QX_TEXTSTREAM_H
 #define QX_TEXTSTREAM_H
 
+// Shared Lib Support
+#include "qx/io/qx_io_export.h"
+
 // Qt Includes
 #include <QTextStream>
 #include <QIODevice>
@@ -8,7 +11,7 @@
 namespace Qx
 {
 
-class TextStream : public QTextStream
+class QX_IO_EXPORT TextStream : public QTextStream
 {
 //-Instance Variables------------------------------------------------------------------------------------------------
 private:

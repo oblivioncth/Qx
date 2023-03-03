@@ -1,6 +1,9 @@
 #ifndef QX_COMMON_H
 #define QX_COMMON_H
 
+// Shared Lib Support
+#include "qx/network/qx_network_export.h"
+
 // Qt Includes
 #include <QUrl>
 
@@ -10,20 +13,19 @@
 namespace Qx
 {
 
-
 //-Namespace Structs------------------------------------------------------------------------------------------------------------
-struct DownloadTask
+struct QX_NETWORK_EXPORT DownloadTask
 {
     QUrl target;
     QString dest;
 
-    friend bool operator== (const DownloadTask& lhs, const DownloadTask& rhs) noexcept;
-    friend size_t qHash(const DownloadTask& key, size_t seed) noexcept;
+    friend QX_NETWORK_EXPORT bool operator== (const DownloadTask& lhs, const DownloadTask& rhs) noexcept;
+    friend QX_NETWORK_EXPORT size_t qHash(const DownloadTask& key, size_t seed) noexcept;
 };
 
 
 //-Namespace Classes------------------------------------------------------------------------------------------------------------
-class DownloadOpReport
+class QX_NETWORK_EXPORT DownloadOpReport
 {
 //-Class Enums------------------------------------------------------------------------------------------------------
 public:
