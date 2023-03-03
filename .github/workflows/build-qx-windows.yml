@@ -69,7 +69,7 @@ jobs:
         cd "%qx_build_dir%"
         echo "Building Qx Debug..."
         cmake --build . --target all --config Debug
-        echo "Building Qx Relase & Docs ..."
+        echo "Building Qx Relase/Docs ..."
         cmake --build . --target all --config Release
         echo "Installing Qx Debug"
         cmake --install . --config Debug
