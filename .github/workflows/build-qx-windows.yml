@@ -19,6 +19,7 @@ jobs:
   build-qx:
     name: Build Qx - Windows (Debug/Release)
     strategy:
+      fail-fast: false
       matrix:
         lib_linkage: [shared, static]
         include:
