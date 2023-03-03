@@ -99,16 +99,16 @@ function(qx_add_component COMPONENT_NAME)
     string(TIMESTAMP BUILD_DATE_TIME "%Y-%m-%d @ %H:%M:%S ")
 
     # Create header guard
-    ob_create_header_guard(${PROJECT_NAME} ${COMPONENT_NAME} COMPONENT_HEADER_GUARD)
+    ob_create_header_guard(${PROJECT_NAMESPACE} ${COMPONENT_NAME} COMPONENT_HEADER_GUARD)
 
     # Generate include list
     set(COMPONENT_HEADER_INCLUDES "") # Avoid unused warning
     foreach(api_header ${COMPONENT_HEADERS_API})
-        set(COMPONENT_HEADER_INCLUDES "${COMPONENT_HEADER_INCLUDES}#include <${PROJECT_NAME_LC}/${COMPONENT_NAME_LC}/${api_header}>\n")
+        set(COMPONENT_HEADER_INCLUDES "${COMPONENT_HEADER_INCLUDES}#include <${PROJECT_NAMESPACE_LC}/${COMPONENT_NAME_LC}/${api_header}>\n")
     endforeach()
 
     # Copy template with modifications
-    set(gen_output_rel_path "${PROJECT_NAME_LC}/${COMPONENT_NAME_LC}.h")
+    set(gen_output_rel_path "${PROJECT_NAMESPACE_LC}/${COMPONENT_NAME_LC}.h")
     configure_file(
         "${PROJECT_FILE_TEMPLATES}/primary_component_header.h.in"
         "${CMAKE_CURRENT_BINARY_DIR}/include/${gen_output_rel_path}"
@@ -122,15 +122,15 @@ function(qx_add_component COMPONENT_NAME)
 
     # --------------------- Add Library -----------------------
     include(OB/Library)
-    ob_add_standard_library("${PROJECT_NAME_LC}_${COMPONENT_NAME_LC}"
+    ob_add_standard_library("${PROJECT_NAMESPACE_LC}_${COMPONENT_NAME_LC}"
         NAMESPACE "${PROJECT_NAMESPACE}"
         ALIAS "${COMPONENT_NAME}"
         TYPE "${COMPONENT_TYPE}"
-        EXPORT_HEADER "${PROJECT_NAME_LC}/${COMPONENT_NAME_LC}/${PROJECT_NAME_LC}_${COMPONENT_NAME_LC}_export.h"
+        EXPORT_HEADER "${PROJECT_NAMESPACE_LC}/${COMPONENT_NAME_LC}/${PROJECT_NAMESPACE_LC}_${COMPONENT_NAME_LC}_export.h"
         HEADERS_PRIVATE
             ${COMPONENT_HEADERS_PRIVATE}
         HEADERS_API
-            COMMON "${PROJECT_NAME_LC}/${COMPONENT_NAME_LC}"
+            COMMON "${PROJECT_NAMESPACE_LC}/${COMPONENT_NAME_LC}"
             FILES ${COMPONENT_HEADERS_API}
         HEADERS_API_GEN
             FILES ${gen_output_rel_path}
@@ -140,6 +140,6 @@ function(qx_add_component COMPONENT_NAME)
             ${COMPONENT_DOC_ONLY}
         LINKS
             ${COMPONENT_LINKS}
-        CONFIG CUSTOM "${PROJECT_FILE_TEMPLATES}/${PROJECT_NAME}ComponentConfig.cmake.in"
+        CONFIG CUSTOM "${PROJECT_FILE_TEMPLATES}/${PROJECT_NAMESPACE}ComponentConfig.cmake.in"
     )
 endfunction()

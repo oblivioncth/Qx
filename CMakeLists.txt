@@ -15,7 +15,7 @@ project(Qx
 
 # Get helper scripts
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FetchOBCMake.cmake)
-fetch_ob_cmake("50930b8f6875795d5f981789ed4cf988933465d9")
+fetch_ob_cmake("a98538b14c951fc8c8acc236c35c2cfa3be1821d")
 
 # Initialize project according to standard rules
 include(OB/Project)
@@ -97,7 +97,7 @@ ob_find_qt6_package(REQUIRED COMPONENTS ${ALL_QT_COMPONENTS})
 
 ob_standard_project_package_config(
     COMPATIBILITY "SameMinorVersion"
-    CONFIG CUSTOM "${PROJECT_FILE_TEMPLATES}/${PROJECT_NAME}Config.cmake.in"
+    CONFIG CUSTOM "${PROJECT_FILE_TEMPLATES}/${PROJECT_NAMESPACE}Config.cmake.in"
 )
 
 #================= Process Componets =======================
@@ -116,7 +116,7 @@ if(QX_DOCS)
         message(FATAL_ERROR "CMake 3.25.0 or greater is required to build the ${PROJECT_NAME} documentation!")
     endif()
 
-    set(DOC_TARGET_NAME ${PROJECT_NAME_LC}_docs)
+    set(DOC_TARGET_NAME ${PROJECT_NAMESPACE_LC}_docs)
     add_subdirectory(doc)
 endif()
 
