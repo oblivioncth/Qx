@@ -15,7 +15,7 @@ project(Qx
 
 # Get helper scripts
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FetchOBCMake.cmake)
-fetch_ob_cmake("eaccb51abbf064d2bf7012dbff58413d8a328988")
+fetch_ob_cmake("50930b8f6875795d5f981789ed4cf988933465d9")
 
 # Initialize project according to standard rules
 include(OB/Project)
@@ -129,5 +129,5 @@ ob_standard_project_misc_install()
 include(OB/Packaging)
 ob_standard_project_package(
     VENDOR "oblivioncth"
-    SUFFIX "_(Qt${Qt6_VERSION}-${Qt6_LINKAGE})"
+    SUFFIX "_(Qt${Qt6_VERSION})"
 )
