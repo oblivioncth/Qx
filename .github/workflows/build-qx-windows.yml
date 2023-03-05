@@ -17,7 +17,7 @@ env:
 
 jobs:
   build-qx:
-    name: Build Qx - Windows (Debug/Release)
+    name: Build Qx - Windows (Release)
     strategy:
       fail-fast: false
       matrix:
@@ -68,16 +68,12 @@ jobs:
         CALL "${{ env.qt_cmake }}" -G "${{ env.cmake_gen }}" -S "${{ env.qx_src_dir}}" -B "${{ env.qx_build_dir }}" -D QX_DOCS=ON -D BUILD_SHARED_LIBS=${{ matrix.cmake_bsl }}
         echo "Changing to build directory..."
         cd "%qx_build_dir%"
-        echo "Building Qx Debug..."
-        cmake --build . --target all --config Debug
         echo "Building Qx Relase/Docs ..."
         cmake --build . --target all --config Release
-        echo "Installing Qx Debug"
-        cmake --install . --config Debug
         echo "Installing Qx Release/Docs..."
         cmake --install . --config Release
         echo "Packaging Qx..."
-        cpack -C "Debug;Release"
+        cpack -C "Release"
         echo "Build complete."
     - name: Get Qx artifact name
       run: |
