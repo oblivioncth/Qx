@@ -49,9 +49,14 @@ jobs:
         linkage: ${{ matrix.lib_linkage }}
         path: ${{ env.qt_install_dir }}
         credentials: ${{ secrets.qt_ffynnon_cred }}
-    - name: Install Doxygen & Graphviz
+    - name: Install Doxygen
+      uses: oblivioncth/actions/general/cache-and-install-doxygen-from-ffynnon@dev
+      with:
+        version: 1.9.4
+        os: windows
+        credentials: ${{ secrets.qt_ffynnon_cred }}
+    - name: Install Graphviz
       run: |
-        choco install doxygen.install --version 1.9.4
         choco install graphviz
     - name: Checkout Qx
       uses: actions/checkout@v3
