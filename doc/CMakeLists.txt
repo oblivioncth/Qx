@@ -14,8 +14,7 @@ set(DOXYGEN_HTML_COLORSTYLE_SAT 255)
 set(DOXYGEN_HTML_COLORSTYLE_GAMMA 80)
 
 # Setup documentation
-ob_standard_documentation(
-    TARGET_NAME "${DOC_TARGET_NAME}"
+ob_standard_documentation(${DOC_TARGET_NAME}
     DOXY_VER 1.9.4
     PROJ_NAME "${PROJECT_NAME}"
     QT_PREFIX "${Qt6_PREFIX_PATH}"
