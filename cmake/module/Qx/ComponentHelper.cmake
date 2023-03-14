@@ -10,6 +10,7 @@ function(__qx_get_component_path component return)
 endfunction()
 
 function(__qx_get_depends_from_file file_path return)
+    set(DEPENDS "") # Avoids uninitialized var warning
     if(EXISTS "${file_path}")
         file(STRINGS "${file_path}" DEPENDS REGEX [[[^ \t\v\r\n]+]])
     endif()
@@ -67,6 +68,9 @@ function(qx_add_component COMPONENT_NAME)
     #=============== Parse Arguments ==================
 
     # Function inputs
+    set(oneValueArgs
+    )
+
     set(multiValueArgs
         HEADERS_PRIVATE
         HEADERS_API
