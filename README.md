@@ -29,6 +29,16 @@ Building from source is recommended as this library can easily be integrated as 
 
 Either way you'll then need to explore the [documentation](https://oblivioncth.github.io/Qx/index.html), which expands on acquiring, setting up, and using Qx.
 
+### Summary
+
+ - C++20
+ - CMake 3.23.0
+
+### Dependencies
+- Qt6
+- [OBCMake](https://github.com/oblivioncth/OBCmake) (build script support, fetched automatically)
+- [Doxygen](https://www.doxygen.nl/)  (for documentation)
+
 ## Pre-built Releases/Artifacts
 
 Releases and some workflows currently provide builds of Qx in various combinations of platforms and compilers. View the repository [Actions](https://github.com/oblivioncth/Qx/actions) or [Releases](https://github.com/oblivioncth/Qx/releases) to see examples.
