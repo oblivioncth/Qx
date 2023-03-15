@@ -111,11 +111,6 @@ endforeach()
 #================ Build Documentation ======================
 
 if(QX_DOCS)
-    # Requires higher CMake version
-    if("${CMAKE_VERSION}" VERSION_LESS "3.25.0")
-        message(FATAL_ERROR "CMake 3.25.0 or greater is required to build the ${PROJECT_NAME} documentation!")
-    endif()
-
     set(DOC_TARGET_NAME ${PROJECT_NAMESPACE_LC}_docs)
     add_subdirectory(doc)
 endif()
