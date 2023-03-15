@@ -58,8 +58,9 @@ message(STATUS "Available Qx components: ${AVAILABLE_COMPONENTS}")
 #------------Setup user options----------------
 
 # Configuration options
-option(QX_DOCS "Build Qx documentation" OFF)
 set(QX_COMPONENTS "${AVAILABLE_COMPONENTS}" CACHE STRING "Qx components to configure")
+option(QX_DOCS "Build Qx documentation" OFF)
+option(BUILD_SHARED_LIBS "Build shared libraries." OFF) # Redundant due to OB, but explicit
 
 # Confirm user component choices are valid and normalize casing
 if(NOT QX_COMPONENTS)
