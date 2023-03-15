@@ -14,6 +14,9 @@ class Table
 //-Iterators------------------------------------------------------------------------------------------------
 public:
     typedef typename QList<QList<T>>::const_iterator row_iterator;
+    /* TODO: Add more iterators, expects ones, as well as one that traversers each element
+     * from top left to bottom right
+     */
 
 //-Instance Variables---------------------------------------------------------------------------------------
 protected:
