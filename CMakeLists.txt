@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 3.23.0...3.25.0)
 # avoided and only used for hotfixes. DON'T USE TRAILING
 # ZEROS IN VERSIONS
 project(Qx
-    VERSION 0.4.3
+    VERSION 0.5
     LANGUAGES CXX
     DESCRIPTION "Qt Extensions Library"
 )
