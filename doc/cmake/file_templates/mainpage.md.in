@@ -10,7 +10,9 @@ Requirements
  - An x64, C++@CMAKE_CXX_STANDARD@ capable compiler
  - Qt6
  - CMake @PROJECT_CMAKE_MINIMUM_REQUIRED_VERSION@ or greater
- - Windows 10/11 or Linux (only tested on Ubuntu)
+ - OS
+	 - Windows 10 or above
+	 - Linux (untested on more general Unix systems)
 
 Packaging
 ----------
@@ -25,6 +27,10 @@ When importing the library package with CMake it is recommended to only include 
 find_package(Qx REQUIRED COMPONENTS Core Network)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 An imported component that depends on other Qx components will always cause said components to automatically be imported, even if they are not explicitly specified. Likewise, targets that link to interdependent components will automatically be linked to dependency components as necessary.
+
+Qx is also composed to gracefully support CMake’s FetchContent mechanism. All exportable targets are named to match their corresponding component when packaged, and feature alias targets with the same names when building. This allows consumers to access the targets via the same name regardless of whether they are using a pre-built package of Qx or building it as a sub-project.
+
+For example, the  `Core`  component corresponds to the  `qx_core`  target, which can also be referred to via  `Qx::Core`.
 
 Getting Started
 ---------------
@@ -75,27 +81,28 @@ The CMake project is designed to be used with multi-configuration generators suc
 
 If you only need a subset of Qx's components, the **QX_COMPONENTS** cache variable can be set to a semicolon or whitespace separated list of components. Only these components and their required dependencies will be configured, which can save on build time.
 
+#### CMake Options:
+
+ - `QX_DOCS` - Set to `ON` in order to generate the documentation target (OFF)
+ - `QX_COMPONENTS` - Set to a semicolon/whitespace delimited list of components to limit configuration to those components only ([all-components])
+- `BUILD_SHARED_LIBS` - Build Qx as a shared libraries instead of a static ones (OFF)
+- 
 #### CMake Targets:
 
  - `all` - Builds all Qx components (the entire library) and documentation if enabled
  - `install` - Installs the build output into `CMAKE_INSTALL_PREFIX`
- - `@DOC_TARGET_NAME@` - Builds the Qx documentation
- - `@PROJECT_NAMESPACE_LC@_<lowercase_component_name>` - Builds a specific Qx component
+ - `qx_docs` - Builds the Qx documentation
+ - `qx_<lowercase_component_name>` - Builds a specific Qx component
 
 #### CMake Install Components:
-- `@PROJECT_NAMESPACE_LC@` - Installs top-level files (README.md, CMake package configuration files, etc.)
-- `@DOC_TARGET_NAME@` - Installs documentation
-- `@PROJECT_NAMESPACE_LC@_<lowercase_component_name>` - Installs a specific Qx component
+- `qx` - Installs top-level files (README.md, CMake package configuration files, etc.)
+- `qx_docs` - Installs the Qx documentation
+- `qx_<lowercase_component_name>` - Installs a specific Qx component
 
 If Qx is configured as a sub-project, its install components are automatically removed from the `all` component, as to not pollute the install directory of the top-level project.
 
-#### CMake Options:
-
- - `QX_DOCS` - Set to `ON` in order to generate the documentation target
- - `QX_COMPONENTS` - Set to a semicolon/whitespace delimited list of components to limit configuration to those components only
-
 #### Documentation:
-In order for the `@DOC_TARGET_NAME@` target to be generated the CMake cache variable **QX_DOCS** must be set to *ON* when CMake is invoked:
+In order for the `qx_docs` target to be generated the CMake cache variable **QX_DOCS** must be set to *ON* when CMake is invoked:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 cmake.exe (...) -D QX_DOCS=ON
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -214,4 +221,4 @@ target_link_libraries(SomeExe
 )
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This approach will avoid concerns of ensuring compatibility between Qt configurations for your project and Qx, since both will be built with the same copy of Qt.
+This approach will avoid concerns of ensuring compatibility between Qt configurations for your project and Qx, since both will be built with the same copy of Qt. It also allows for more flexibility in downstream projects as they can more easily alter the configuration of Qx on-the-fly as needed.
