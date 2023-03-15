@@ -23,14 +23,20 @@ if(@PROJECT_NAMESPACE@_FIND_COMPONENTS)
 
         if (";${__@PROJECT_NAMESPACE_UC@_AVAILABLE_COMPONENTS};" MATCHES ";${req_component_config};")
             message(STATUS "[@PROJECT_NAME@] Including matched component: ${req_component}.")
+            set(@PROJECT_NAMESPACE@_${req_component}_FOUND True) 
             include("${CMAKE_CURRENT_LIST_DIR}/${req_component_config}")
-        elseif(@PROJECT_NAMESPACE@_FIND_REQUIRED_${req_component}})
-            set(@PROJECT_NAMESPACE@_FOUND False)
-            set(@PROJECT_NAMESPACE@_NOT_FOUND_MESSAGE "Unsupported component: ${req_component}")
+        elseif()
+            message(STATUS "[@PROJECT_NAME@] Unavailable component: ${req_component}"
+            set(@PROJECT_NAMESPACE@_${req_component}_FOUND False) 
+        
+            if(@PROJECT_NAMESPACE@_FIND_REQUIRED_${req_component}})
+                set(@PROJECT_NAMESPACE@_FOUND False)
+                set(@PROJECT_NAMESPACE@_NOT_FOUND_MESSAGE "Missing component: ${req_component}")
+            endif()
         endif()
     endforeach()
 else() # Components were not requested
-    message(STATUS "[@PROJECT_NAME@] No components were requested.")
+    message(STATUS "[Qx] No components were requested. Importing all available.")
 
     # Add all components
     foreach(component_config ${__@PROJECT_NAMESPACE_UC@_AVAILABLE_COMPONENTS})
