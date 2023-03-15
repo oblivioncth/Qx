@@ -1,6 +1,6 @@
 function(__qx_get_component_path component return)
     string(TOLOWER "${component}" COMPONENT_LC)
-    set(COMPONENT_PATH "${PROJECT_SOURCE_DIR}/comp/${COMPONENT_LC}")
+    set(COMPONENT_PATH "${COMPONENTS_PATH}/${COMPONENT_LC}")
 
     if(NOT EXISTS "${COMPONENT_PATH}")
         message(FATAL_ERROR "${component} is not the name of a Qx component!")

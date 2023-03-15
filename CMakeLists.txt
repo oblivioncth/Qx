@@ -33,7 +33,7 @@ set(CMAKE_AUTOUIC ON)
 #--------------------Setup Paths-------------------
 
 # Component libraries
-set(COMPONENTS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/comp")
+set(COMPONENTS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 
 #------------Enumerate Components----------------
 include(OB/Utility)
