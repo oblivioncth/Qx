@@ -85,8 +85,8 @@ If you only need a subset of Qx's components, the **QX_COMPONENTS** cache variab
 
  - `QX_DOCS` - Set to `ON` in order to generate the documentation target (OFF)
  - `QX_COMPONENTS` - Set to a semicolon/whitespace delimited list of components to limit configuration to those components only ([all-components])
-- `BUILD_SHARED_LIBS` - Build Qx as a shared libraries instead of a static ones (OFF)
-- 
+ - `BUILD_SHARED_LIBS` - Build Qx as a shared libraries instead of a static ones (OFF)
+
 #### CMake Targets:
 
  - `all` - Builds all Qx components (the entire library) and documentation if enabled

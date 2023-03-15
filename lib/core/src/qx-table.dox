@@ -460,7 +460,7 @@ namespace Qx
  *  @endparblock
  *
  *  @parblock
- *  @warning due to technical limitations, the reserve space specified for the height of @a size
+ *  @warning Due to technical limitations, the reserve space specified for the width of @a size
  *  will only apply to existing rows, and not any that are only reserved. This may be resolved in a future version.
  *  @endparblock
  *
