@@ -7,6 +7,9 @@
 // Extra-component Includes
 #include "qx/utility/qx-concepts.h"
 
+// TODO: These functions are pretty underwhelming, see if more flexible ones that make use
+// of range/iterator based functions from std can be made instead.
+
 namespace Qx
 {
 	
@@ -15,10 +18,10 @@ class Array
 //-Class Functions----------------------------------------------------------------------------------------------
 public:
     template <typename T, int N>
-    static constexpr int constDim(T(&)[N]) { return N; } // Allows using the size of a const array at runtime
+    static constexpr int constDim(const T(&)[N]) { return N; } // Allows using the size of a const array at runtime
 
     template <typename T, int N>
-    static int indexOf(T(&array) [N], T query)
+    static int indexOf(const T(&array) [N], const T query)
     {
         for(int i = 0; i < N; i++)
             if(array[i] == query)
@@ -29,7 +32,7 @@ public:
 
     template<typename T, int N>
         requires arithmetic<T>
-    static T maxOf(T(&array) [N])
+    static T maxOf(const T(&array) [N])
     {
        T max = array[0];
 
@@ -42,7 +45,7 @@ public:
 
     template<typename T, int N>
         requires arithmetic<T>
-    static T minOf(T(&array) [N])
+    static T minOf(const T(&array) [N])
     {
         T min = array[0];
 
@@ -54,7 +57,7 @@ public:
     }
 
     template<typename T, int N>
-    static T mostFrequent(T(&array) [N])
+    static T mostFrequent(const T(&array) [N])
     {
         // Load all array elements into a hash
         QHash<T,int> hash;
