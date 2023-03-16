@@ -75,10 +75,10 @@ jobs:
         cd "%qx_build_dir%"
         echo "Building Qx Relase/Docs ..."
         cmake --build . --target all --config Release
-        echo "Installing Qx Release/Docs..."
-        cmake --install . --config Release
         echo "Running tests..."
         cmake --build . --target test --config Release
+        echo "Installing Qx Release/Docs..."
+        cmake --install . --config Release
         echo "Packaging Qx..."
         cpack -C "Release"
         echo "Build complete."
