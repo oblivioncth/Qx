@@ -15,7 +15,7 @@ project(Qx
 
 # Get helper scripts
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FetchOBCMake.cmake)
-fetch_ob_cmake("828226de901dfeb342940c7240ffc54f4862faab")
+fetch_ob_cmake("40d8ae9a3a28244418e2f952f6a3fb3c629c2b5b")
 
 # Initialize project according to standard rules
 include(OB/Project)
@@ -59,7 +59,8 @@ message(STATUS "Available Qx components: ${AVAILABLE_COMPONENTS}")
 
 # Configuration options
 set(QX_COMPONENTS "${AVAILABLE_COMPONENTS}" CACHE STRING "Qx components to configure")
-option(QX_DOCS "Build Qx documentation" OFF)
+option(QX_DOCS "Build Qx documentation." OFF)
+option(QX_TESTS "Build the Qx tests." OFF)
 option(BUILD_SHARED_LIBS "Build shared libraries." OFF) # Redundant due to OB, but explicit
 
 # Confirm user component choices are valid and normalize casing
@@ -82,12 +83,16 @@ message(STATUS "Selected Qx components: ${QX_COMPONENTS_NORMALIZED}")
 
 # Determine full component list
 include(Qx/ComponentHelper)
-qx_enumerate_sibling_tree("${QX_COMPONENTS_NORMALIZED}" FULL_COMPONENT_LIST)
-message(STATUS "Configured Qx components: ${FULL_COMPONENT_LIST}")
+qx_enumerate_sibling_tree("${QX_COMPONENTS_NORMALIZED}" QX_COMPONENTS_FULL)
+message(STATUS "Configured Qx components: ${QX_COMPONENTS_FULL}")
 
 # Determine all Qt dependencies
-qx_get_all_qt_depends("${FULL_COMPONENT_LIST}" ALL_QT_COMPONENTS)
+qx_get_all_qt_depends("${QX_COMPONENTS_FULL}" ALL_QT_COMPONENTS)
 message(STATUS "All Qx Qt component dependencies: ${ALL_QT_COMPONENTS}")
+
+if(QX_TESTS)
+    list(APPEND ALL_QT_COMPONENTS Test)
+endif()
 
 # Find Qt package
 add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060000)
@@ -104,7 +109,7 @@ ob_standard_project_package_config(
 #================= Process Componets =======================
 
 # Configure requested components
-foreach(component ${FULL_COMPONENT_LIST})
+foreach(component ${QX_COMPONENTS_FULL})
     string(TOLOWER ${component} component_lc)
     add_subdirectory(${COMPONENTS_PATH}/${component_lc})
 endforeach()
@@ -114,6 +119,14 @@ endforeach()
 if(QX_DOCS)
     set(DOC_TARGET_NAME ${PROJECT_NAMESPACE_LC}_docs)
     add_subdirectory(doc)
+endif()
+
+#================ Build Documentation ======================
+if(QX_TESTS)
+    enable_testing()
+    set(TESTS_TARGET_PREFIX ${PROJECT_NAMESPACE_LC})
+    set(TESTS_COMMON_TARGET "${TESTS_TARGET_PREFIX}_tst_common")
+    add_subdirectory(tests)
 endif()
 
 #================= Top Level Install =======================

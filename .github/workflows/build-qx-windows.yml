@@ -70,13 +70,15 @@ jobs:
         echo "Setup C++ Build Environment..."
         CALL "${{ env.vs_dir }}\Common7\Tools\VsDevCmd.bat" -arch=amd64
         echo "Configure CMake using Qt wrapper..."
-        CALL "${{ env.qt_cmake }}" -G "${{ env.cmake_gen }}" -S "${{ env.qx_src_dir}}" -B "${{ env.qx_build_dir }}" -D QX_DOCS=ON -D BUILD_SHARED_LIBS=${{ matrix.cmake_bsl }}
+        CALL "${{ env.qt_cmake }}" -G "${{ env.cmake_gen }}" -S "${{ env.qx_src_dir}}" -B "${{ env.qx_build_dir }}" -D QX_DOCS=ON -D QX_TESTS=ON -D BUILD_SHARED_LIBS=${{ matrix.cmake_bsl }}
         echo "Changing to build directory..."
         cd "%qx_build_dir%"
         echo "Building Qx Relase/Docs ..."
         cmake --build . --target all --config Release
         echo "Installing Qx Release/Docs..."
         cmake --install . --config Release
+        echo "Running tests..."
+        cmake --build . --target test --config Release
         echo "Packaging Qx..."
         cpack -C "Release"
         echo "Build complete."

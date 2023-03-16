@@ -59,6 +59,13 @@ public:
     template<typename T, int N>
     static T mostFrequent(const T(&array) [N])
     {
+        /* TODO: The use of a hash here means that if more
+         * than one element is tied for the highest frequency that
+         * the one this function returns will essentially be random
+         * instead of something well defined like always being
+         * the first one.
+         */
+
         // Load all array elements into a hash
         QHash<T,int> hash;
         for(int i = 0; i < N; i++)
