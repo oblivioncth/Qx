@@ -54,7 +54,7 @@ public:
         if((jv = jObject.value(key)).isUndefined())
             return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(typeString<T>(), key), ERR_KEY_DOESNT_EXIST.arg(key));
 
-        if(isType<T>(jv))
+        if(!isType<T>(jv))
         {
             QString ts = typeString<T>();
             return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(ts, key), ERR_KEY_TYPE_MISMATCH.arg(key, ts));
