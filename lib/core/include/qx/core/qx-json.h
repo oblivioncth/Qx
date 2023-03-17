@@ -30,10 +30,10 @@ private:
     // Errors
     static inline const QString ERR_RETRIEVING_VALUE = QSL("JSON Error: Could not retrieve the %1 value from key '%2'.");
     static inline const QString ERR_KEY_DOESNT_EXIST = QSL("The key '%1' does not exist.");
-    static inline const QString ERR_KEY_TYPE_MISMATCH = QSL("The key '%1' holds a value of a different type.");
+    static inline const QString ERR_KEY_TYPE_MISMATCH = QSL("The key '%1' holds a value of a different type than '%2'.");
     static inline const QString ERR_CONVERTING_ARRAY_LIST = QSL("JSON Error: Could not convert JSON array to a list of %1.");
     static inline const QString ERR_CONVERTING_ARRAY_SET = QSL("JSON Error: Could not convert JSON array to a set of %1.");
-    static inline const QString ERR_VALUE_TYPE_MISMATCH = QSL("The array contained a value of a different type.");
+    static inline const QString ERR_VALUE_TYPE_MISMATCH = QSL("The array contained a value of a different type than '%2'.");
 
 //-Class Functions-----------------------------------------------------------------------------------------------
 private:
@@ -55,7 +55,10 @@ public:
             return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(typeString<T>(), key), ERR_KEY_DOESNT_EXIST.arg(key));
 
         if(isType<T>(jv))
-            return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(typeString<T>(), key), ERR_KEY_TYPE_MISMATCH.arg(key));
+        {
+            QString ts = typeString<T>();
+            return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(ts, key), ERR_KEY_TYPE_MISMATCH.arg(key, ts));
+        }
         else
             valueBuffer = toType<T>(jv);
 
@@ -76,7 +79,8 @@ public:
             else
             {
                 valueBuffer.clear();
-                return GenericError(GenericError::Error, ERR_CONVERTING_ARRAY_LIST.arg(typeString<T>()), ERR_VALUE_TYPE_MISMATCH);
+                QString ts = typeString<T>();
+                return GenericError(GenericError::Error, ERR_CONVERTING_ARRAY_LIST.arg(ts), ERR_VALUE_TYPE_MISMATCH.arg(ts));
             }
         }
 
@@ -97,7 +101,8 @@ public:
             else
             {
                 valueBuffer.clear();
-                return GenericError(GenericError::Error, ERR_CONVERTING_ARRAY_SET.arg(typeString<T>()), ERR_VALUE_TYPE_MISMATCH);
+                QString ts = typeString<T>();
+                return GenericError(GenericError::Error, ERR_CONVERTING_ARRAY_SET.arg(ts), ERR_VALUE_TYPE_MISMATCH.arg(ts));
             }
         }
 
