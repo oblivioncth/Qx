@@ -1,0 +1,19 @@
+#================= Add Component ==========================
+qx_add_component("Windows"
+    HEADERS_API
+        qx-common-windows.h
+        qx-filedetails.h
+        qx-windefs.h
+    IMPLEMENTATION
+        qx-common-windows.cpp
+        qx-filedetails.cpp
+    DOC_ONLY
+        qx-windefs.dox
+    LINKS
+        PRIVATE
+            Qx::Io
+        PUBLIC
+            Qt6::Core
+            Version.lib
+            Qx::Core
+)

@@ -5,10 +5,9 @@ on:
     branches:
     - 'master'
 env:
-  qx_qtd_win_artifact_path: ${{ github.workspace }}/QxQtDWin
-  qx_qts_win_artifact_path: ${{ github.workspace }}/QxQtSWin
-  qx_qtd_linux_artifact_path: ${{ github.workspace }}/QxQtDLinux
-  qx_qts_linux_artifact_path: ${{ github.workspace }}/QxQtSLinux
+  doc_artifact_path: ${{ github.workspace }}/DocArtifact
+  artifacts_path: ${{ github.workspace }}/Artifacts
+  zips_path: ${{ github.workspace }}/Zips
   
 jobs:
   tag_master_and_sync_dev:
@@ -16,7 +15,7 @@ jobs:
     if: github.event.pull_request.merged == true
     runs-on: windows-latest
     outputs:
-      version_tag: ${{ steps.tag_master.outputs.new_tag }}
+      new_version: ${{ steps.get-proj-ver.outputs.version }}
     steps:
     - name: Get project version
       id: get-proj-ver
@@ -27,36 +26,19 @@ jobs:
       id: proj-checkout
       uses: oblivioncth/actions/git/smart-checkout@dev
     - name: Tag master with new version tag
-      id: tag_master
-      working-directory: ${{ steps.proj-checkout.outputs.path }}
-      env:
-        new_version: ${{ steps.get-proj-ver.outputs.version }}
-      run: |
-        $new_tag = "v${Env:new_version}"
-        echo "new_tag=$new_tag" >> $Env:GITHUB_OUTPUT
-        git tag -a $new_tag -m "Release $new_tag"
-        git push --tags
+      uses: oblivioncth/actions/git/tag@dev
+      with:
+        tag: 'v${{ steps.get-proj-ver.outputs.version }}'
+        message: 'Release v${{ steps.get-proj-ver.outputs.version }}'
     - name: Move 'latest' tag
-      working-directory: ${{ steps.proj-checkout.outputs.path }}
-      run: |
-        echo "Checking for 'latest' tag..."
-        if(git tag -l latest){
-          echo "Removing previous 'latest' tag..."
-          git tag -d latest # Delete tag locally
-          git push origin :refs/tags/latest # Delete tag remotely
-        }
-        else{
-          echo "No tag to remove."
-        }
-        git tag -a latest -m "Latest Release"
-        git push origin latest
+      uses: oblivioncth/actions/git/move-latest-tag@dev
     - name: Fast-forward merge master into to dev
       if: always()
-      working-directory: ${{ steps.proj-checkout.outputs.path }}
-      run: |
-        git checkout dev
-        git merge master --ff-only
-        git push
+      uses: oblivioncth/actions/git/merge-branches@dev
+      with:
+        source_branch: master
+        target_branch: dev
+        ff: only
   
   build_qx_release_windows:
     name: Build Qx Release (Windows)
@@ -83,14 +65,14 @@ jobs:
     - name: Download built shared Qx artifact
       uses: actions/download-artifact@v3
       with:
-        name: ${{ needs.build_qx_release_windows.outputs.qt_shared_artifact_name }}
-        path: ${{ env.qx_qtd_win_artifact_path }}
+        name: ${{ needs.build_qx_release_windows.outputs.doc_artifact_name }}
+        path: ${{ env.doc_artifact_path }}
     - name: Upload docs to gh-pages
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_branch: gh-pages
-        publish_dir: ${{ env.qx_qtd_win_artifact_path }}/doc/html
+        publish_dir: ${{ env.doc_artifact_path }}/doc/html
         destination_dir: ./docs
         allow_empty_commit: true # So that doc build date is always roughly synced with latest build date
         enable_jekyll: false
@@ -101,51 +83,30 @@ jobs:
     name: Create GitHub release
     needs: [update-docs, build_qx_release_windows, build_qx_release_linux, tag_master_and_sync_dev]
     if: github.event.pull_request.merged == true
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
-    - name: Set release artifact names
-      run: |
-        echo "release_qtd_win_package_name=${{ needs.build_qx_release_windows.outputs.qt_shared_artifact_name }}" >> $Env:GITHUB_ENV
-        echo "release_qts_win_package_name=${{ needs.build_qx_release_windows.outputs.qt_static_artifact_name }}" >> $Env:GITHUB_ENV
-        echo "release_qtd_linux_package_name=${{ needs.build_qx_release_linux.outputs.qt_shared_artifact_name }}" >> $Env:GITHUB_ENV
-        echo "release_qts_linux_package_name=${{ needs.build_qx_release_linux.outputs.qt_static_artifact_name }}" >> $Env:GITHUB_ENV
-    - name: Download built shared Qx artifact (Windows)
+    - name: Download built Qx artifacts
       uses: actions/download-artifact@v3
       with:
-        name: ${{ env.release_qtd_win_package_name }}
-        path: ${{ env.qx_qtd_win_artifact_path }}
-    - name: Download built static Qx artifact (Windows)
-      uses: actions/download-artifact@v3
-      with:
-        name: ${{ env.release_qts_win_package_name }}
-        path: ${{ env.qx_qts_win_artifact_path }}
-    - name: Download built shared Qx artifact (Linux)
-      uses: actions/download-artifact@v3
-      with:
-        name: ${{ env.release_qtd_linux_package_name }}
-        path: ${{ env.qx_qtd_linux_artifact_path }}
-    - name: Download built static Qx artifact (Linux)
-      uses: actions/download-artifact@v3
-      with:
-        name: ${{ env.release_qts_linux_package_name }}
-        path: ${{ env.qx_qts_linux_artifact_path }}
+        path: ${{ env.artifacts_path }}
     - name: Zip up release artifacts
+      shell: pwsh
       run: |
-        7z a "${{ env.release_qtd_win_package_name }}.zip" "${{ env.qx_qtd_win_artifact_path }}/*"
-        7z a "${{ env.release_qts_win_package_name }}.zip" "${{ env.qx_qts_win_artifact_path }}/*"
-        7z a "${{ env.release_qtd_linux_package_name }}.zip" "${{ env.qx_qtd_linux_artifact_path }}/*"
-        7z a "${{ env.release_qts_linux_package_name }}.zip" "${{ env.qx_qts_linux_artifact_path }}/*"
+        $artifact_folders = Get-ChildItem -Directory -Path "${{ env.artifacts_path }}"
+        foreach($art_dir in $artifact_folders)
+        {
+          $name = $art_dir.name
+          $path = $art_dir.fullname
+          7z a "${{ env.zips_path }}/${name}.zip" "${path}/*"
+        }
     - name: Generate release
       uses: softprops/action-gh-release@v1
       with:
-        name: "Qx Release ${{ needs.tag_master_and_sync_dev.outputs.version_tag }}"
-        tag_name: "${{ needs.tag_master_and_sync_dev.outputs.version_tag }}"
+        name: "Qx Release v${{ needs.tag_master_and_sync_dev.outputs.new_version }}"
+        tag_name: "v${{ needs.tag_master_and_sync_dev.outputs.new_version }}"
         fail_on_unmatched_files: true
         generate_release_notes: true
         files: |
-          ${{ env.release_qtd_win_package_name }}.zip
-          ${{ env.release_qts_win_package_name }}.zip
-          ${{ env.release_qtd_linux_package_name }}.zip
-          ${{ env.release_qts_linux_package_name }}.zip
+          ${{ env.zips_path }}/*.zip
     
         

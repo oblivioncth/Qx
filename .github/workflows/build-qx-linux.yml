@@ -5,15 +5,7 @@ on:
       qt_ffynnon_cred:
         description: 'Credentials for getting Qt from Ffynnon'
         required: true
-    outputs:
-      qt_shared_artifact_name:
-        description: "Qx (Qt shared) build artifact"
-        value: ${{ jobs.build-qx.outputs.qt_shared_artifact_name }}
-      qt_static_artifact_name:
-        description: "Qx (Qt static) build artifact"
-        value: ${{ jobs.build-qx.outputs.qt_static_artifact_name }}
 env:
-  general_download_dir: ${{ github.workspace }}/Download
   qt_install_dir: ${{ github.workspace }}/Qt/Install
   qx_src_suffix: Qx/Source
   qx_src_dir: ${{ github.workspace }}/Qx/Source
@@ -21,18 +13,41 @@ env:
 
 jobs:
   build-qx:
-    name: Build Qx - Linux (Debug/Release)
+    name: Build Qx - Linux (Release)
     strategy:
+      fail-fast: false
       matrix:
-        qt_linkage: [shared, static]
-    runs-on: ubuntu-20.04
+        os: [ubuntu-20.04, ubuntu-22.04]
+        compiler: [gcc, clang]
+        lib_linkage: [shared, static]
+        include:
+          - os: ubuntu-20.04
+            compiler: gcc
+            c_comp: gcc-10
+            cxx_comp: g++-10
+            qt_comp: clang12
+          - os: ubuntu-20.04
+            compiler: clang
+            c_comp: clang-12
+            cxx_comp: clang++-12
+            qt_comp: clang12            
+          - os: ubuntu-22.04
+            compiler: gcc
+            c_comp: gcc-12
+            cxx_comp: g++-12
+            qt_comp: clang14
+          - os: ubuntu-22.04
+            compiler: clang
+            c_comp: clang-14
+            cxx_comp: clang++-14
+            qt_comp: clang14
+          - lib_linkage: shared
+            cmake_bsl: ON
+          - lib_linkage: static
+            cmake_bsl: OFF
+    runs-on: ${{ matrix.os }}
     env:
-      c_comp: clang-12
-      cxx_comp: clang++-12
       cmake_gen: Ninja Multi-Config
-    outputs:
-      qt_shared_artifact_name: ${{ steps.get_artifact_name.outputs.qt_shared_artifact_name }}
-      qt_static_artifact_name: ${{ steps.get_artifact_name.outputs.qt_static_artifact_name }}
     steps:
     - name: Set derived variables with shell because GitHub Actions env context sucks
       run: |
@@ -43,10 +58,10 @@ jobs:
     - name: Install Qt (custom build)
       uses: oblivioncth/actions/general/install-and-cache-qt-from-ffynnon@dev
       with:
-        version: 6.4.0
+        version: 6.4.2
         os: linux
-        compiler: clang
-        linkage: ${{ matrix.qt_linkage }}
+        compiler: ${{ matrix.qt_comp }}
+        linkage: ${{ matrix.lib_linkage }}
         path: ${{ env.qt_install_dir }}
         credentials: ${{ secrets.qt_ffynnon_cred }}
     - name: Install OpenGL lib
@@ -63,6 +78,9 @@ jobs:
       run: sudo apt-get install ninja-build
     - name: Install Harfbuzz
       run: sudo apt-get install libharfbuzz-dev
+    - name: Install EGL [22.04]
+      if: matrix.os == 'ubuntu-22.04'
+      run: sudo apt-get install libegl1-mesa-dev
     - name: Checkout Qx
       uses: actions/checkout@v3
       with:
@@ -72,32 +90,27 @@ jobs:
       working-directory: ${{ env.qx_src_dir }}
       run: |
         echo Configuring CMake...
-        "$qt_cmake" -G "$cmake_gen" -S "$qx_src_dir" -B "$qx_build_dir" -D QX_DOCS_TARGET=ON -D CMAKE_CXX_COMPILER="$cxx_comp" -D CMAKE_C_COMPILER="$c_comp"
+        "$qt_cmake" -G "$cmake_gen" -S "$qx_src_dir" -B "$qx_build_dir" -D BUILD_SHARED_LIBS="${{ matrix.cmake_bsl }}" -D QX_DOCS=ON -D QX_TESTS=ON -D CMAKE_CXX_COMPILER="${{ matrix.cxx_comp }}" -D CMAKE_C_COMPILER="${{ matrix.c_comp }}"
         echo Changing to build directory...
         cd "$qx_build_dir"
-        echo Building Qx debug...
-        cmake --build . --target all --config Debug
-        echo Building Qx release...
+        echo Building Qx Release/Docs...
         cmake --build . --target all --config Release
-        echo Building Qx docs...
-        cmake --build . --target qx_docs --config Release
-        echo Installing Qx Debug
-        cmake --build . --target install --config Debug
+        echo "Running tests..."
+        ctest -C Release --output-on-failure
         echo Installing Qx Release/Docs...
-        cmake --build . --target install --config Release
+        cmake --install . --config Release
         echo Packaging Qx...
-        cpack -C "Debug;Release"
+        cpack -C "Release"
         echo Build complete.
     - name: Get Qx artifact name
       id: get_artifact_name
       run: |
         cpack_name=$(find "${{ env.qx_package_path }}" -type f -name "*.zip")
-        artifact_name=$(basename "$cpack_name" .zip)
-        echo "qx_current_artifact_name=$artifact_name" >> $GITHUB_ENV
-        echo "qt_${{ matrix.qt_linkage }}_artifact_name=$artifact_name" >> $GITHUB_OUTPUT
+        artifact_name="$(basename "$cpack_name" .zip) [${{ matrix.cxx_comp }}]"
+        echo "current_artifact_name=$artifact_name" >> $GITHUB_ENV
     - name: Upload Qx build artifact
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ env.qx_current_artifact_name }}
+        name: ${{ env.current_artifact_name }}
         path: ${{ env.qx_install_path }}
         if-no-files-found: error

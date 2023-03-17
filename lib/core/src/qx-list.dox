@@ -1,0 +1,34 @@
+namespace Qx
+{
+//===============================================================================================================
+// List
+//===============================================================================================================
+
+/*!
+ *  @class List qx/core/qx-list.h
+ *  @ingroup qx-core
+ *
+ *  @brief The List class is a collection of static functions pertaining to lists.
+ */
+
+//-Class Functions----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn QList<T>* List::subListThatContains(T element, QList<QList<T>*> listOfLists)
+ *
+ *  Returns a pointer to the first list found within @a listOfLists that contains @a element, or @c nullptr if
+ *  none were found.
+ */
+
+/*!
+ *  @fn QList<T> List::difference(QList<T>& listA, QList<T>& listB)
+ *
+ *  Returns a new list that contains the elements of @a listA that are not present in @a listB.
+ */
+
+/*!
+ *  @fn QList<T*> List::static_pointer_cast(const QList<F*> fromList)
+ *
+ *  Returns a new list with each pointer in @a fromList converted to T* using @c static_cast<T*>(F*).
+ */
+}

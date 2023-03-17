@@ -1,0 +1,55 @@
+namespace Qx
+{
+//===============================================================================================================
+// ByteArray
+//===============================================================================================================
+
+/*!
+ *  @class ByteArray qx/core/qx-bytearray.h
+ *  @ingroup qx-core
+ *
+ *  @brief The ByteArray class is a collection of static functions pertaining to QByteArray.
+ */
+
+//-Class Functions----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn QByteArray ByteArray::fromPrimitive(T primitive, QSysInfo::Endian endianness = QSysInfo::ByteOrder)
+ *
+ *  Creates a byte array from the integer value @a primitive, using @a endianness byte-ordering if @a T requires
+ *  multiple bytes to store, and returns it.
+ *
+ *  @note The exact representation for floating-point types depends on the underlying system, but most often
+ *  the IEEE-754 standard is used.
+ */
+
+/*!
+ *  @fn QByteArray ByteArray::fromPrimitive<bool>(bool primitive, QSysInfo::Endian endianness)
+ *  @overload
+ *
+ *  Template specialization of the above for <tt>T == bool</tt>.
+ *
+ *  Returns a byte array consisting of the single byte @c 0x01 or @c 0x00 for @c true and @c false respectively.
+ *
+ *  @a endianness is ignored.
+ */
+
+/*!
+ *  @fn T ByteArray::toPrimitive(QByteArray ba, QSysInfo::Endian endianness = QSysInfo::ByteOrder)
+ *
+ *  Returns the raw binary data in @a ba reinterpreted as fundamental type @a T, according to the byte-order
+ *  specified by @a endianness for multi-byte values.
+ *
+ *  If the requested type is not large enough to store the reinterpreted contents of @a ba, the conversion will
+ *  be performed on the first n-bytes that will fit instead.
+ *
+ *  If the requested type is stored using more bytes than are present within @a ba, the conversion will be
+ *  performed as if @a ba was padded with zeros to reach that size, in accordance with @a endianness,
+ *
+ *  @note When <tt>T == bool</tt>, this function will return @c false if the first byte of @a ba is zero, or
+ *  @c true if it is any other value.
+ *
+ *  @note The exact interpretation for floating-point types depends on the underlying system, but most often
+ *  the IEEE-754 standard is used.
+ */
+}

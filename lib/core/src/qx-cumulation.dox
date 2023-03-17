@@ -1,0 +1,176 @@
+namespace Qx
+{
+//===============================================================================================================
+// Cumulation
+//===============================================================================================================
+
+/*!
+ *  @class Cumulation qx/core/qx-cumulation.h
+ *  @ingroup qx-core
+ *
+ *  @brief The Cumulation template class tracks the sum of multiple key-value components that can be changed
+ *  independently.
+ *
+ *  A cumulation is a collection of key-value pairs (where V is any arithmetic type) with which the sum of all
+ *  contained values is always known, and any individual value can be added, removed, or updated through its
+ *  corresponding key.
+ *
+ *  Additionally, a cumulation can have optional scalers applied to its components in order to differently
+ *  weight their individual effect on the total.
+ *
+ *  This is generally useful for keeping a running total, but when a previously added value may need to be
+ *  revised later, such as when tracking the overall progress of multiple downloads from a server using their
+ *  individual progress as components.
+ */
+
+//-Constructor----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ * @fn Cumulation<K, V>::Cumulation()
+ *
+ *  Creates an empty cumulation with a total of zero.
+ */
+
+//-Class Functions----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn void Cumulation<K, V>::insert(K component, V value, V scaler = 1)
+ *
+ *  Inserts a new component with key @a component, value @a value, and scaler @a scaler.
+ *
+ *  If there is already a component with the same key, that component's value and scaler are replaced with
+ *  @a value and @a scaler respectively.
+ */
+
+/*!
+ *  @fn void Cumulation<K, V>::setValue(K component, V value)
+ *
+ *  Sets the value of @a component to @a value.
+ *
+ *  If the cumulation does not contain the specified component it will be added with a value of
+ *  @a value and a scaler of 1.
+ */
+
+/*!
+ *  @fn void Cumulation<K, V>::setScaler(K component, V scaler)
+ *
+ *  Sets the scaler of @a component to @a scaler.
+ *
+ *  The amount that a component contributes to a cumulation's total is its value multiplied
+ *  by its scaler.
+ *
+ *  If the cumulation does not contain the specified component it will be added with a value of
+ *  0 and a scaler of @a scaler.
+ */
+
+/*!
+ *  @fn void Cumulation<K, V>::increase(K component, V amount)
+ *
+ *  Adds @a amount to the value of @a component.
+ *
+ *  If the cumulation does not contain the specified component it will be added with a value of
+ *  @a amount and a scaler of 1.
+ */
+
+/*!
+*  @fn void Cumulation<K, V>::reduce(K component, V amount)
+*
+*  Subtracts @a amount from the value of @a component.
+*
+*  If the cumulation does not contain the specified component it will be added with a value of
+*  <em>-amount</em> and a scaler of 1.
+*/
+
+/*!
+ *  @fn V Cumulation<K, V>::increment(K component)
+ *
+ *  Increments the value of the given @a component and returns the new total.
+ *
+ *  If the cumulation does not contain the specified component it will be added with a value of
+ *  1 and a scaler of 1.
+ */
+
+/*!
+ *  @fn V Cumulation<K, V>::decrement(K component)
+ *
+ *  Decrements the value of the given @a component and returns the new total.
+ *
+ *  If the cumulation does not contain the specified component it will be added with a value of
+ *  -1 and a scaler of 1.
+ */
+
+/*!
+ *  @fn void Cumulation<K, V>::remove(K component)
+ *
+ *  Removes the value associated with the key @a component from the cumulation, if it exists.
+ */
+
+/*!
+ *  @fn void Cumulation<K, V>::clear()
+ *
+ *  Removes all keys/values from the cumulation, resulting in a total of zero.
+ */
+
+/*!
+ *  @fn bool Cumulation<K, V>::contains(K component) const
+ *
+ *  Returns @c true if the cumulation contains a value associated with the key @a component; otherwise returns
+ *  @c false.
+ */
+
+/*!
+ *  @fn V Cumulation<K, V>::value(K component) const
+ *
+ *  Returns the value of @a component, or a default-constructed value if not present.
+ */
+
+/*!
+ *  @fn V Cumulation<K, V>::total() const
+ *
+ *  Returns the current total of the cumulation, which is the sum of all its component values.
+ */
+
+/*!
+ * @fn QList<K> Cumulation<K, V>::components() const
+ *
+ *  Returns a list containing all the components in the cumulation, in an arbitrary order.
+ *
+ *  This function creates a new list, in linear time.
+ */
+
+/*!
+ * @fn qsizetype Cumulation<K, V>::count() const
+ *
+ *  Returns that number of components that compose the cumulation.
+ */
+
+/*!
+ * @fn bool Cumulation<K, V>::isEmpty() const
+ *
+ *  Returns @c true if the cumulation has no components; otherwise, returns @c false.
+ */
+
+/*!
+ *  @fn V Cumulation<K, V>::mean() const
+ *
+ *  Returns the current mean of the cumulation, which is the sum of all its component values divided the
+ *  number of components, or zero if the cumulation is empty.
+ *
+ *  If @a V is an integral type, the result is rounded to the nearest integer.
+ */
+
+/*!
+ *  @fn V Cumulation<K, V>::operator==(const Cumulation& other) const
+ *
+ *  Returns @c true if this Cumulation and @a other Cumulation are the same;
+ *  otherwise, returns @c false.
+ */
+
+/*!
+ *  @fn V Cumulation<K, V>::operator!=(const Cumulation& other) const
+ *
+ *  Returns @c true if this Cumulation and @a other Cumulation are not the same;
+ *  otherwise, returns @c false.
+ */
+
+}

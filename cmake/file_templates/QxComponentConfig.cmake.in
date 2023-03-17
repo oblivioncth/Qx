@@ -1,26 +1,26 @@
 # Guard against multiple imports
-if(NOT DEFINED __@PROJECT_NAME_UC@_@COMPONENT_NAME_UC@)
+if(NOT DEFINED __@PROJECT_NAMESPACE_UC@_@COMPONENT_NAME_UC@)
     message(VERBOSE "[@PROJECT_NAME@] Importing component: @COMPONENT_NAME@...")
-    set(__@PROJECT_NAME_UC@_@COMPONENT_NAME_UC@ TRUE)
+    set(__@PROJECT_NAMESPACE_UC@_@COMPONENT_NAME_UC@ TRUE)
 
     # Inter-component dependencies (inserted when this file was configured)
-    set(__@PROJECT_NAME_UC@_@COMPONENT_NAME_UC@_SIBLING_DEPENDS @COMPONENT_DEPENDS_SIBLINGS@)
+    set(__@PROJECT_NAMESPACE_UC@_@COMPONENT_NAME_UC@_SIBLING_DEPENDS @COMPONENT_DEPENDS_SIBLINGS@)
 
     # Import above dependencies first
-    foreach(sibling ${__@PROJECT_NAME_UC@_@COMPONENT_NAME_UC@_SIBLING_DEPENDS})
+    foreach(sibling ${__@PROJECT_NAMESPACE_UC@_@COMPONENT_NAME_UC@_SIBLING_DEPENDS})
         message(VERBOSE "[@PROJECT_NAME@] Component @COMPONENT_NAME@ depends on ${sibling}")
-        include("${CMAKE_CURRENT_LIST_DIR}/../${sibling}/@PROJECT_NAME@${sibling}Config.cmake")
+        include("${CMAKE_CURRENT_LIST_DIR}/../${sibling}/@PROJECT_NAMESPACE@${sibling}Config.cmake")
     endforeach()
 
     # Qt dependencies (inserted when this file was configured)
-    set(__@PROJECT_NAME_UC@_@COMPONENT_NAME_UC@_QT_DEPENDS @COMPONENT_DEPENDS_QT@)
-    if(__@PROJECT_NAME_UC@_@COMPONENT_NAME_UC@_QT_DEPENDS)
-        find_dependency(Qt6 REQUIRED COMPONENTS ${__@PROJECT_NAME_UC@_@COMPONENT_NAME_UC@_QT_DEPENDS})
+    set(__@PROJECT_NAMESPACE_UC@_@COMPONENT_NAME_UC@_QT_DEPENDS @COMPONENT_DEPENDS_QT@)
+    if(__@PROJECT_NAMESPACE_UC@_@COMPONENT_NAME_UC@_QT_DEPENDS)
+        find_dependency(Qt6 COMPONENTS ${__@PROJECT_NAMESPACE_UC@_@COMPONENT_NAME_UC@_QT_DEPENDS})
     endif()
 
     # Import component targets
     message(VERBOSE "[@PROJECT_NAME@] Importing @COMPONENT_NAME@ targets...")
-    include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@@COMPONENT_NAME@Targets.cmake")
+    include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAMESPACE@@COMPONENT_NAME@Targets.cmake")
 else()
     message(VERBOSE "[@PROJECT_NAME@] Skipping already imported component: @COMPONENT_NAME@")
 endif()

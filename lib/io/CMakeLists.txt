@@ -1,0 +1,33 @@
+#================= Add Component ==========================
+qx_add_component("Io"
+    HEADERS_PRIVATE
+        qx-common-io_p.h
+    HEADERS_API
+        qx-applicationlogger.h
+        qx-common-io.h
+        qx-filestreamreader.h
+        qx-filestreamwriter.h
+        qx-ioopreport.h
+        qx-textpos.h
+        qx-textquery.h
+        qx-textstream.h
+        qx-textstreamreader.h
+        qx-textstreamwriter.h
+    IMPLEMENTATION
+        qx-applicationlogger.cpp
+        qx-common-io.cpp
+        qx-common-io_p.cpp
+        qx-filestreamreader.cpp
+        qx-filestreamwriter.cpp
+        qx-ioopreport.cpp
+        qx-textpos.cpp
+        qx-textquery.cpp
+        qx-textstream.cpp
+        qx-textstreamreader.cpp
+        qx-textstreamwriter.cpp
+    LINKS
+        PUBLIC
+            Qt::Core
+            Qx::Core
+)
+

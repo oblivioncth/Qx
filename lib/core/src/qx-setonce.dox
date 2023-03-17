@@ -1,0 +1,58 @@
+namespace Qx
+{
+//===============================================================================================================
+// SetOnce
+//===============================================================================================================
+
+/*!
+ *  @class SetOnce qx/core/qx-setonce.h
+ *  @ingroup qx-core
+ *
+ *  @brief The SetOnce template class acts as a container for a value that can only be set once.
+ */
+
+//-Constructor----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ * @fn SetOnce<T>::SetOnce(T initial)
+ *
+ *  Creates a SetOnce container that holds the initial value @a initial.
+ *
+ *  The container is initially unset and only holds this value until it is set.
+ */
+
+
+//-Instance Functions----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ * @fn SetOnce<T>::isSet() const
+ *
+ *  Returns @c true if the containers value has been set; otherwise returns @c false.
+ */
+
+/*!
+ * @fn const T& SetOnce<T>::value() const
+ *
+ *  Returns the current value of the container.
+ */
+
+/*!
+ * @fn void SetOnce<T>::reset()
+ *
+ *  Resets the container to its initial state.
+ *
+ *  The containers value will revert to the value specified in its constructor and will be considered unset.
+ *
+ *  @sa operator=().
+ */
+
+/*!
+ * @fn SetOnce<T>& SetOnce<T>::operator=(const T& value)
+ *
+ *  Sets the value of the container to @a value, if it is different from its initial value.
+ *
+ *  Once the containers value has been set it cannot be changed again until it is reset.
+ *
+ *  @sa reset().
+ */
+}

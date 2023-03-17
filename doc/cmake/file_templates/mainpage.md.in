@@ -1,0 +1,229 @@
+Qx {#mainpage}
+==============
+Qx is a basic C++ library built on top of the ubiquitous Qt framework, created with the intention of extending its existing functionality while following the same paradigm of its design.
+
+The library primarily consists data structures and routines that facilitate a variety of common, or otherwise reoccurring programmatic tasks, largely providing convenience, flexibility, and syntactic efficiency to developers when writing applications.
+
+Requirements
+------------
+
+ - An x64, C++@CMAKE_CXX_STANDARD@ capable compiler
+ - Qt6
+ - CMake @PROJECT_CMAKE_MINIMUM_REQUIRED_VERSION@ or greater
+ - OS
+	 - Windows 10 or above
+	 - Linux (untested on more general Unix systems)
+
+Packaging
+----------
+Qx is provided as a CMake package containing several component libraries that roughly follow the scope and grouping of Qt modules, with Core being the primary component.
+
+See the [Components Index](modules.html) for a list of available components (**NOTE**: Some of these are platform dependent).
+
+When importing the library package with CMake it is recommended to only include the components you need for a particular application in order to minimize the size of your build.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Example Qx Import
+find_package(Qx REQUIRED COMPONENTS Core Network)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+An imported component that depends on other Qx components will always cause said components to automatically be imported, even if they are not explicitly specified. Likewise, targets that link to interdependent components will automatically be linked to dependency components as necessary.
+
+Qx is also composed to gracefully support CMake’s FetchContent mechanism. All exportable targets are named to match their corresponding component when packaged, and feature alias targets with the same names when building. This allows consumers to access the targets via the same name regardless of whether they are using a pre-built package of Qx or building it as a sub-project.
+
+For example, the  `Core`  component corresponds to the  `qx_core`  target, which can also be referred to via  `Qx::Core`.
+
+Getting Started
+---------------
+1) Download the latest [Release](https://github.com/oblivioncth/Qx/releases)
+
+@note
+For a recommended alternative, see *Source Build as a Direct CMake Dependency*
+
+2) Place the package somewhere CMake can find it
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Add to a default search path or...
+set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} path\to\Qx_package)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+3) Import the package
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# When no components are specified, all available components will be imported
+find_package(Qx 0.1) # Or whichever version
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+4) Link to the required components where necessary
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+target_link_libraries(example_ui_app PUBLIC Qx::Core Qx::Widgets)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+5) Include the corresponding headers in your code
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#include <qx/core.h>
+#include <qx/widgets.h>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It is possible to include portions of the Qx API with finer granularity by only referencing the exact headers you need in accordance with the include structure shown in the [File Index](files.html), but at first it is generally recommended to simply include the main header for each component you use as shown.
+
+6) Review the rest of the documentation. A good place to start is the [Core](#qx-core) component.
+
+@note
+When building a project that uses Qx, it is important to do so with a configuration of Qt that has binary compatibility with the one that was used to build a given version of Qx. Excluding potential bugs, luckily this is easy as Qt advertises binary compatibility within each major version.
+
+Building From Source
+--------------------
+The latest *generally* stable source is available in the 'master' branch of https://github.com/oblivioncth/Qx, while the most up-to-date source can be found in the 'dev' branch.
+
+The requirements for building from Git are the same as for using Qx, with the obvious exception that Doxygen (as well as Graphviz) is also needed to build the documentation.
+
+If newer to working with Qt, it is easiest to build from within Qt creator as it handles a large portion of environment setup, including adding Qt to CMake's package search list, automatically. Simply make sure that a kit is configured in Qt Creator that uses a compatible version of Qt, open the CMakeLists.txt file as a project, and build with the desired configuration.
+
+The CMake project is designed to be used with multi-configuration generators such as Visual Studio or Ninja Multi-Config (recommended), and may require some tweaking to work with single configuration generators.
+
+If you only need a subset of Qx's components, the **QX_COMPONENTS** cache variable can be set to a semicolon or whitespace separated list of components. Only these components and their required dependencies will be configured, which can save on build time.
+
+#### CMake Options:
+
+ - `QX_DOCS` - Set to `ON` in order to generate the documentation target (OFF)
+ - `QX_COMPONENTS` - Set to a semicolon/whitespace delimited list of components to limit configuration to those components only ([all-components])
+ - `QX_TESTS` = Set to `ON` in order to generate the test targets (OFF)
+ - `BUILD_SHARED_LIBS` - Build Qx as a shared libraries instead of a static ones (OFF)
+
+#### CMake Targets:
+
+ - `all` - Builds all Qx components (the entire library) and documentation if enabled
+ - `install` - Installs the build output into `CMAKE_INSTALL_PREFIX`
+ - `qx_docs` - Builds the Qx documentation
+ - `qx_<lowercase_component_name>` - Builds a specific Qx component
+ - `qx_tst_...` - Builds the various test targets. To actually run tests, just build the general CMake tests target `test`.
+
+#### CMake Install Components:
+- `qx` - Installs top-level files (README.md, CMake package configuration files, etc.)
+- `qx_docs` - Installs the Qx documentation
+- `qx_<lowercase_component_name>` - Installs a specific Qx component
+
+If Qx is configured as a sub-project, its install components are automatically removed from the `all` component, as to not pollute the install directory of the top-level project.
+
+#### Documentation:
+In order for the `qx_docs` target to be generated the CMake cache variable **QX_DOCS** must be set to *ON* when CMake is invoked:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cmake.exe (...) -D QX_DOCS=ON
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Qx documentation supports two optional, but highly recommended features:
+ - Linking to Qt documentation
+ - Generating a Qt Compressed Help (.qch) file for use in Qt Creator
+
+In order to enable these features, the CMake variables **QT_DOCS_DIR** and **QT_HELP_GEN_PATH** respectively must be available. Qx tries to set them automatically according to the following defaults, but these can be overridden by passing definitions for the variables to CMake on the command line via @c -D.
+
+    # Optional documentation defaults
+    # Here <QT_ROOT> refers to the install directory of a given Qt build
+    QT_DOCS_DIR: <QT_ROOT>/doc
+    (Windows) QT_HELP_GEN_PATH: <QT_ROOT>/bin/qhelpgenerator.exe
+	(Linux) QT_HELP_GEN_PATH: <QT_ROOT>/libexec/qhelpgenerator
+
+If supplying **QT_DOCS_DIR** manually, it must be set to the root path that contains documentation for the Qt version you are building with. It should look something like this:
+
+    doc/
+    ├── config
+    ├── global
+    ├── qdoc
+    ├── qmake
+    ├── qtcmake
+    ├── qtconcurrent
+    ├── qtcore
+    ├── ...
+    ├── qdoc.qch
+    ├── qmake.qch
+    └── ...
+
+    # In this case QT_DOCS_DIR should point to the directory 'doc'.
+
+The path for this documentation varies depending on how you obtained Qt, but is generally placed in one of two locations:
+
+    # Official Qt Builds from Maintenance Tool/Installer
+    <QT_SOFTWARE>/Docs/Qt-<QT_VERSION>
+
+    # Self-built Qt
+    <QT_ROOT>/doc
+
+    # NOTE:
+    # By default on Windows <QT_SOFTWARE> is C:\Program Files\Qt
+    # On Linux it is often /usr/local/Qt
+
+#### Tests:
+The project contains a suite of tests to ensure that the library functions as intended. They will be expanded upon as the library matures.
+
+#### Package
+By default, the CMakeLists project configures CPack to create an artifact ZIP containing the binaries for Debug and Release configurations, as well as documentation.
+
+The following is the general build process required to successfully generate this package via a shadow build on Windows:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# Set the environment variables that follow as desired
+
+# Setup C++ Build Environment
+CALL "%VS_PATH%\Common7\Tools\VsDevCmd.bat" -arch=amd64
+
+# Configure CMake using Qt wrapper
+CALL "%Qt_ROOT%\bin\qt-cmake" -G "Ninja Multi-Config" -S "%Qx_SOURCE_DIR%" -B "%Qx_BUILD_DIR%" -D QX_DOCS=ON
+
+# Go to Build directory
+cd /D "%Qx_BUILD_DIR%"
+
+# Build the Debug/Release libraries and documentation
+cmake.exe --build . --target all --config Debug
+cmake.exe --build . --target all --config Release
+
+# Install Debug/Release libraries and documentation
+cmake --install . --config Debug
+cmake --install . --config Release
+
+# Create the output package
+cpack.exe -C Debug;Release
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This example can easily be adapted to bash for builds on Linux.
+
+By default, build artifacts are placed into `<BUILD_DIR>/out`.
+
+
+Source Build as a Direct CMake Dependency
+-----------------------------------------
+If you want to use Qx compiled from source directly as a dependency in your CMake project and don't care about the intermediary redistributables, it is recommended to do the following.
+
+Create 'FetchQx.cmake' and add it to CMAKE_MODULE_PATH:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# FetchQx.cmake - REQUIRES GIT
+
+# This will checkout Qx, make its targets available directly at configure time without needing to call
+# find_package(), and automatically build it as a dependency at build time.
+
+function(fetch_qx git_ref)
+    include(FetchContent)
+    FetchContent_Declare(Qx
+        GIT_REPOSITORY "https://github.com/oblivioncth/Qx"
+        GIT_TAG ${git_ref}
+    )
+    FetchContent_MakeAvailable(Qx)
+endfunction()
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Then in your CMake project:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+include(FetchQx)
+fetch_qx(4e1e4b7448cefe6f5e14c1b89a7c324fcb3036cf) # Get Qx v0.1
+
+add_executable(SomeExe
+    ...
+)
+
+target_link_libraries(SomeExe
+    PRIVATE
+        Qx::Core
+        Qx::Widgets
+)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This approach will avoid concerns of ensuring compatibility between Qt configurations for your project and Qx, since both will be built with the same copy of Qt. It also allows for more flexibility in downstream projects as they can more easily alter the configuration of Qx on-the-fly as needed.
