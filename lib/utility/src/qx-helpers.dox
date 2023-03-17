@@ -8,7 +8,7 @@
 
 //Non-namespace Functions----------------------------------------------------------
 /*!
- *  @fn template <typename T> const T qxAsConst(T&& t)
+ *  @fn const T qxAsConst(T&& t)
  *
  *  Serves the same purpose as qAsConst() (preventing implicitly-shared Qt containers from
  *  detaching), but this version works for rvalues, albeit with some efficiency concerns
@@ -16,7 +16,7 @@
  */
 
 /*!
- *  @fn template <typename T> typename std::add_const<T>::type qxAsConst(T& t)
+ *  @fn std::add_const<T>::type qxAsConst(T& t)
  *  @overload
  *
  *  Equivalent to qAsConst(T& t).
@@ -28,7 +28,7 @@
 
 
 /*!
- *  @fn template <typename T> void qxDelete(T*& pointer)
+ *  @fn void qxDelete(T*& pointer)
  *
  *  Calls @c delete on @a pointer and then sets it to @c nullptr .
  */

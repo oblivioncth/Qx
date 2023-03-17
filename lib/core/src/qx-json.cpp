@@ -45,7 +45,7 @@ namespace Qx
 //Public:
 
 /*!
- *  @fn static GenericError Json::checkedKeyRetrieval(T& valueBuffer, QJsonObject jObject, const QString& key)
+ *  @fn GenericError Json::checkedKeyRetrieval(T& valueBuffer, QJsonObject jObject, const QString& key)
  *
  *  Safely retrieves the value associated with the specified key from the given JSON Object.
  *
@@ -64,7 +64,7 @@ namespace Qx
  */
 
 /*!
- *  @fn static GenericError Json::checkedArrayConversion(QList<T>& valueBuffer, QJsonArray jArray)
+ *  @fn GenericError Json::checkedArrayConversion(QList<T>& valueBuffer, QJsonArray jArray)
  *
  *  Safely transforms the provided JSON array into a list of values of its underlying type.
  *
@@ -80,7 +80,7 @@ namespace Qx
  */
 
 /*!
- * @fn static GenericError Json::checkedArrayConversion(QSet<T>& valueBuffer, QJsonArray jArray)
+ * @fn GenericError Json::checkedArrayConversion(QSet<T>& valueBuffer, QJsonArray jArray)
  *
  * @overload
  *

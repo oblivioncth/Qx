@@ -14,20 +14,20 @@ namespace Qx
 //-Class Functions----------------------------------------------------------------------------------------------
 //Public:
 /*!
- *  @fn template<typename T> static QList<T>* List::subListThatContains(T element, QList<QList<T>*> listOfLists)
+ *  @fn QList<T>* List::subListThatContains(T element, QList<QList<T>*> listOfLists)
  *
  *  Returns a pointer to the first list found within @a listOfLists that contains @a element, or @c nullptr if
  *  none were found.
  */
 
 /*!
- *  @fn template<typename T> static QList<T> List::difference(QList<T>& listA, QList<T>& listB)
+ *  @fn QList<T> List::difference(QList<T>& listA, QList<T>& listB)
  *
  *  Returns a new list that contains the elements of @a listA that are not present in @a listB.
  */
 
 /*!
- *  @fn template<typename T, typename F> requires static_castable_to<F*, T*> QList<T*> List::static_pointer_cast(const QList<F*> fromList)
+ *  @fn QList<T*> List::static_pointer_cast(const QList<F*> fromList)
  *
  *  Returns a new list with each pointer in @a fromList converted to T* using @c static_cast<T*>(F*).
  */

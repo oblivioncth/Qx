@@ -26,7 +26,7 @@ namespace Qx
 //-Constructor----------------------------------------------------------------------------------------------
 //Public:
 /*!
- * @fn template <typename K, typename V> Cumulation<K, V>::Cumulation()
+ * @fn Cumulation<K, V>::Cumulation()
  *
  *  Creates an empty cumulation with a total of zero.
  */
@@ -34,7 +34,7 @@ namespace Qx
 //-Class Functions----------------------------------------------------------------------------------------------
 //Public:
 /*!
- *  @fn template <typename K, typename V> void Cumulation<K, V>::insert(K component, V value, V scaler = 1)
+ *  @fn void Cumulation<K, V>::insert(K component, V value, V scaler = 1)
  *
  *  Inserts a new component with key @a component, value @a value, and scaler @a scaler.
  *
@@ -43,7 +43,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template <typename K, typename V> void Cumulation<K, V>::setValue(K component, V value)
+ *  @fn void Cumulation<K, V>::setValue(K component, V value)
  *
  *  Sets the value of @a component to @a value.
  *
@@ -52,7 +52,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template <typename K, typename V> void Cumulation<K, V>::setScaler(K component, V scaler)
+ *  @fn void Cumulation<K, V>::setScaler(K component, V scaler)
  *
  *  Sets the scaler of @a component to @a scaler.
  *
@@ -64,7 +64,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template <typename K, typename V> void Cumulation<K, V>::increase(K component, V amount)
+ *  @fn void Cumulation<K, V>::increase(K component, V amount)
  *
  *  Adds @a amount to the value of @a component.
  *
@@ -73,7 +73,7 @@ namespace Qx
  */
 
 /*!
-*  @fn template <typename K, typename V> void Cumulation<K, V>::reduce(K component, V amount)
+*  @fn void Cumulation<K, V>::reduce(K component, V amount)
 *
 *  Subtracts @a amount from the value of @a component.
 *
@@ -82,7 +82,7 @@ namespace Qx
 */
 
 /*!
- *  @fn template <typename K, typename V> V Cumulation<K, V>::increment(K component)
+ *  @fn V Cumulation<K, V>::increment(K component)
  *
  *  Increments the value of the given @a component and returns the new total.
  *
@@ -91,7 +91,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template <typename K, typename V> V Cumulation<K, V>::decrement(K component)
+ *  @fn V Cumulation<K, V>::decrement(K component)
  *
  *  Decrements the value of the given @a component and returns the new total.
  *
@@ -100,38 +100,38 @@ namespace Qx
  */
 
 /*!
- *  @fn template <typename K, typename V> void Cumulation<K, V>::remove(K component)
+ *  @fn void Cumulation<K, V>::remove(K component)
  *
  *  Removes the value associated with the key @a component from the cumulation, if it exists.
  */
 
 /*!
- *  @fn template <typename K, typename V> void Cumulation<K, V>::clear()
+ *  @fn void Cumulation<K, V>::clear()
  *
  *  Removes all keys/values from the cumulation, resulting in a total of zero.
  */
 
 /*!
- *  @fn template <typename K, typename V> bool Cumulation<K, V>::contains(K component) const
+ *  @fn bool Cumulation<K, V>::contains(K component) const
  *
  *  Returns @c true if the cumulation contains a value associated with the key @a component; otherwise returns
  *  @c false.
  */
 
 /*!
- *  @fn template <typename K, typename V> V Cumulation<K, V>::value(K component) const
+ *  @fn V Cumulation<K, V>::value(K component) const
  *
  *  Returns the value of @a component, or a default-constructed value if not present.
  */
 
 /*!
- *  @fn template <typename K, typename V> V Cumulation<K, V>::total() const
+ *  @fn V Cumulation<K, V>::total() const
  *
  *  Returns the current total of the cumulation, which is the sum of all its component values.
  */
 
 /*!
- * @fn template <typename K, typename V> QList<K> Cumulation<K, V>::components() const
+ * @fn QList<K> Cumulation<K, V>::components() const
  *
  *  Returns a list containing all the components in the cumulation, in an arbitrary order.
  *
@@ -139,19 +139,19 @@ namespace Qx
  */
 
 /*!
- * @fn template <typename K, typename V> qsizetype Cumulation<K, V>::count() const
+ * @fn qsizetype Cumulation<K, V>::count() const
  *
  *  Returns that number of components that compose the cumulation.
  */
 
 /*!
- * @fn template <typename K, typename V> bool Cumulation<K, V>::isEmpty() const
+ * @fn bool Cumulation<K, V>::isEmpty() const
  *
  *  Returns @c true if the cumulation has no components; otherwise, returns @c false.
  */
 
 /*!
- *  @fn template <typename K, typename V> V Cumulation<K, V>::mean() const
+ *  @fn V Cumulation<K, V>::mean() const
  *
  *  Returns the current mean of the cumulation, which is the sum of all its component values divided the
  *  number of components, or zero if the cumulation is empty.
@@ -160,14 +160,14 @@ namespace Qx
  */
 
 /*!
- *  @fn template <typename K, typename V> V Cumulation<K, V>::operator==(const Cumulation& other) const
+ *  @fn V Cumulation<K, V>::operator==(const Cumulation& other) const
  *
  *  Returns @c true if this Cumulation and @a other Cumulation are the same;
  *  otherwise, returns @c false.
  */
 
 /*!
- *  @fn template <typename K, typename V> V Cumulation<K, V>::operator!=(const Cumulation& other) const
+ *  @fn V Cumulation<K, V>::operator!=(const Cumulation& other) const
  *
  *  Returns @c true if this Cumulation and @a other Cumulation are not the same;
  *  otherwise, returns @c false.

@@ -50,7 +50,7 @@ bool String::isValidChecksum(QString checksum, QCryptographicHash::Algorithm has
 QString String::stripToHexOnly(QString string) { return string.replace(RegularExpression::ANY_NON_HEX, ""); }
 
 /*!
- *  @fn template<typename T, typename F> static QString String::join(QList<T> list, F&& toStringFunc, QString separator = "", QString prefix = "")
+ *  @fn QString String::join(QList<T> list, F&& toStringFunc, QString separator = "", QString prefix = "")
  *
  *  Joins all arbitrarily typed elements from a list into a single string with optional formatting.
  *
@@ -73,7 +73,7 @@ QString String::join(QList<QString> list, QString separator, QString prefix) // 
 }
 
 /*!
- *  @fn template<typename T, typename F> static QString String::join(QSet<T> set, F&& toStringFunc, QString separator = "", QString prefix = "")
+ *  @fn QString String::join(QSet<T> set, F&& toStringFunc, QString separator = "", QString prefix = "")
  *  @overload
  *
  *  Joins all arbitrarily typed elements from a set into a single string with optional formatting.

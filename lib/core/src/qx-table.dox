@@ -34,26 +34,26 @@ namespace Qx
 //-Constructor----------------------------------------------------------------------------------------------
 //Public:
 /*!
- * @fn template<typename T> Table<T>::Table()
+ * @fn Table<T>::Table()
  *
  *  Constructs an empty Table.
  */
 
 /*!
- *  @fn template<typename T> Table<T>::Table(QSize size)
+ *  @fn Table<T>::Table(QSize size)
  *
  *  Constructs a Table of size @a size, with every element initialized with a
  *  default-constructed value.
  */
 
 /*!
- *  @fn template<typename T> Table<T>::Table(QSize size, const T& value)
+ *  @fn Table<T>::Table(QSize size, const T& value)
  *
  *  Constructs a Table of size @a size, with every element initialized to @a value.
  */
 
 /*!
- *  @fn template<typename T> Table<T>::Table(std::initializer_list<std::initializer_list<T>> table)
+ *  @fn Table<T>::Table(std::initializer_list<std::initializer_list<T>> table)
  *
  *  Constructs a Table with a copy of each row in the initializer list @a list.
  *
@@ -64,7 +64,7 @@ namespace Qx
 //-Instance Functions----------------------------------------------------------------------------------------------
 //Public:
 /*!
- *  @fn template<typename T> T& Table<T>::at(qsizetype r, qsizetype c)
+ *  @fn T& Table<T>::at(qsizetype r, qsizetype c)
  *
  *  Returns the element at row @a r and column @a c as a modifiable reference.
  *
@@ -75,7 +75,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> const T& Table<T>::at(qsizetype r, qsizetype c) const
+ *  @fn const T& Table<T>::at(qsizetype r, qsizetype c) const
  *
  *  @overload
  *
@@ -83,7 +83,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> QSize Table<T>::capacity() const
+ *  @fn QSize Table<T>::capacity() const
  *
  *  Returns the capacity of the table as a QSize object.
  *
@@ -91,7 +91,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> QList<T> Table<T>::columnAt(qsizetype i) const
+ *  @fn QList<T> Table<T>::columnAt(qsizetype i) const
  *
  *  Returns the items in column @a i of the table as a list.
  *
@@ -101,7 +101,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> qsizetype Table<T>::columnCount() const
+ *  @fn qsizetype Table<T>::columnCount() const
  *
  *  Returns the number of columns in the table.
  *
@@ -109,7 +109,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> QList<T> Table<T>::firstColumn() const
+ *  @fn QList<T> Table<T>::firstColumn() const
  *
  *  Returns the items in the first column of the table as a list.
  *  This function assumes that the table isn't empty.
@@ -118,7 +118,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> QList<T> Table<T>::firstRow() const
+ *  @fn QList<T> Table<T>::firstRow() const
  *
  *  Returns the items in the first row of the table as a list.
  *  This function assumes that the table isn't empty.
@@ -127,13 +127,13 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> qsizetype Table<T>::height() const
+ *  @fn qsizetype Table<T>::height() const
  *
  *  Same as rowCount().
  */
 
 /*!
- *  @fn template<typename T> bool Table<T>::isEmpty() const
+ *  @fn bool Table<T>::isEmpty() const
  *
  *  Returns @c true if the table has no elements; otherwise, returns @c false.
  *
@@ -141,7 +141,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> QList<T> Table<T>::lastColumn() const
+ *  @fn QList<T> Table<T>::lastColumn() const
  *
  *  Returns the items in the last column of the table as a list.
  *  This function assumes that the table isn't empty.
@@ -150,7 +150,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> QList<T> Table<T>::lastRow() const
+ *  @fn QList<T> Table<T>::lastRow() const
  *
  *  Returns the items in the last row of the table as a list.
  *  This function assumes that the table isn't empty.
@@ -159,7 +159,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> QList<T> Table<T>::rowAt(qsizetype i) const
+ *  @fn QList<T> Table<T>::rowAt(qsizetype i) const
  *
  *  Returns the items in row @a i of the table as a list.
  *
@@ -169,7 +169,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> row_iterator Table<T>::rowBegin() const
+ *  @fn row_iterator Table<T>::rowBegin() const
  *
  *  Returns a const STL-style iterator pointing to the first row in the table.
  *
@@ -179,7 +179,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> qsizetype Table<T>::rowCount() const
+ *  @fn qsizetype Table<T>::rowCount() const
  *
  *  Returns the number of rows in the table.
  *
@@ -187,7 +187,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> row_iterator Table<T>::rowEnd() const
+ *  @fn row_iterator Table<T>::rowEnd() const
  *
  *  Returns a const STL-style iterator pointing just after the last row in the table.
  *
@@ -197,7 +197,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> Table<T> Table<T>::section(qsizetype r, qsizetype c, qsizetype height, qsizetype width) const
+ *  @fn Table<T> Table<T>::section(qsizetype r, qsizetype c, qsizetype height, qsizetype width) const
  *
  *  Returns a new Table that contains a portion of the table's elements.
  *
@@ -214,7 +214,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> QSize Table<T>::size() const
+ *  @fn QSize Table<T>::size() const
  *
  *  Returns the column count (width), and row count (height) of the table as a QSize object.
  *
@@ -222,7 +222,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> T Table<T>::value(qsizetype r, qsizetype c) const
+ *  @fn T Table<T>::value(qsizetype r, qsizetype c) const
  *
  *  Returns the element at row @a r and column @a c.
  *
@@ -232,7 +232,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> T Table<T>::value(qsizetype r, qsizetype c, const T& defaultValue) const
+ *  @fn T Table<T>::value(qsizetype r, qsizetype c, const T& defaultValue) const
  *
  *  @overload
  *
@@ -240,7 +240,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> void Table<T>::addColumns(qsizetype c)
+ *  @fn void Table<T>::addColumns(qsizetype c)
  *
  *  Appends @a c columns, with their elements initialized to default-constructed values, to the
  *  'right' end of the table.
@@ -254,7 +254,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> void Table<T>::addRows(qsizetype c)
+ *  @fn void Table<T>::addRows(qsizetype c)
  *
  *  Appends @a c columns, with their elements initialized to default-constructed values, to the
  *  'bottom' end of the table.
@@ -268,7 +268,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> void Table<T>::appendColumn(const QList<T>& c)
+ *  @fn void Table<T>::appendColumn(const QList<T>& c)
  *
  *  Appends @a c as a column to the 'right' end of the table.
  *
@@ -279,7 +279,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> void Table<T>::appendRow(const QList<T>& r)
+ *  @fn void Table<T>::appendRow(const QList<T>& r)
  *
  *  Appends @a r as a row to the 'bottom' end of the table.
  *
@@ -290,7 +290,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> void Table<T>::fill(const T& value, QSize size)
+ *  @fn void Table<T>::fill(const T& value, QSize size)
  *
  *  Assigns @a value to all items in the table. If @a size is not null (the default), the table is
  *  resized to @a size beforehand.
@@ -299,7 +299,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> void Table<T>::insertColumn(qsizetype i, const QList<T>& c)
+ *  @fn void Table<T>::insertColumn(qsizetype i, const QList<T>& c)
  *
  *  Inserts @a c as a column to column index @a i in the table. If @a i is 0, the column is prepended to the
  *  table. If @a i is columnSize(), the column is appended to the table.
@@ -311,7 +311,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> void Table<T>::insertRow(qsizetype i, const QList<T>& r)
+ *  @fn void Table<T>::insertRow(qsizetype i, const QList<T>& r)
  *
  *  Inserts @a r as a row to row index @a i in the table. If @a i is 0, the row is prepended to the
  *  table. If @a i is rowSize(), the row is appended to the table.
@@ -323,7 +323,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> void Table<T>::removeColumnAt(qsizetype i)
+ *  @fn void Table<T>::removeColumnAt(qsizetype i)
  *
  *  Removes the column @a i from the table.
  *
@@ -334,7 +334,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> void Table<T>::removeColumns(qsizetype i, qsizetype n = 1)
+ *  @fn void Table<T>::removeColumns(qsizetype i, qsizetype n = 1)
  *
  *  Removes @a n columns from the table, starting at column @a i.
  *
@@ -345,7 +345,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> void Table<T>::removeRowAt(qsizetype i)
+ *  @fn void Table<T>::removeRowAt(qsizetype i)
  *
  *  Removes the row @a i from the table.
  *
@@ -356,7 +356,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> void Table<T>::removeRows(qsizetype i, qsizetype n = 1)
+ *  @fn void Table<T>::removeRows(qsizetype i, qsizetype n = 1)
  *
  *  Removes @a n rows from the table, starting at row @a i.
  *
@@ -367,7 +367,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> void Table<T>::removeFirstColumn()
+ *  @fn void Table<T>::removeFirstColumn()
  *
  *  Removes the first column from the table. Calling this function is equivalent to calling `removeColumns(0)`.
  *  The table must have columns. To prevent failure, call columnCount() before calling this function.
@@ -379,7 +379,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> void Table<T>::removeFirstRow()
+ *  @fn void Table<T>::removeFirstRow()
  *
  *  Removes the first row from the table. Calling this function is equivalent to calling `removeRows(0)`.
  *  The table must have rows. To prevent failure, call rowCount() before calling this function.
@@ -391,7 +391,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> void Table<T>::removeLastColumn()
+ *  @fn void Table<T>::removeLastColumn()
  *
  *  Removes the last column from the table. Calling this function is equivalent to calling
  *  `removeColumns(columnCount() - 1)`. The table must have columns. To prevent failure, call
@@ -404,7 +404,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> void Table<T>::removeLastRow()
+ *  @fn void Table<T>::removeLastRow()
  *
  *  Removes the last row from the table. Calling this function is equivalent to calling
  *  `removeRows(rowCount() - 1)`. The table must have rows. To prevent failure, call
@@ -417,7 +417,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> void Table<T>::replaceColumn(qsizetype i, const QList<T>& c)
+ *  @fn void Table<T>::replaceColumn(qsizetype i, const QList<T>& c)
  *
  *  Replaces column @a i with @a c in the table.
  *
@@ -428,7 +428,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> void Table<T>::replaceRow(qsizetype i, const QList<T>& r)
+ *  @fn void Table<T>::replaceRow(qsizetype i, const QList<T>& r)
  *
  *  Replaces row @a i with @a r in the table.
  *
@@ -439,7 +439,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> void Table<T>::reserve(QSize size)
+ *  @fn void Table<T>::reserve(QSize size)
  *
  *  Attempts to allocate memory for @a size elements.
  *
@@ -468,7 +468,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> void Table<T>::resize(QSize size)
+ *  @fn void Table<T>::resize(QSize size)
  *
  *  Sets the size of the table to @a size. If @a size is greater than the current size, elements
  *  are added to each end of the table; the new elements are initialized with default-constructed values.
@@ -478,7 +478,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> void Table<T>::resizeColumns(qsizetype size)
+ *  @fn void Table<T>::resizeColumns(qsizetype size)
  *
  *  Sets the number of columns in the table to @a size. If @a size is greater than the current
  *  column count, columns are added to the 'right' end of the table; the new elements are
@@ -489,7 +489,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> void Table<T>::resizeRows(qsizetype size)
+ *  @fn void Table<T>::resizeRows(qsizetype size)
  *
  *  Sets the number of rows in the table to @a size. If @a size is greater than the current
  *  row count, rows are added to the 'bottom' end of the table; the new elements are
@@ -500,7 +500,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> void Table<T>::squeeze()
+ *  @fn void Table<T>::squeeze()
  *
  *  Releases any memory not required to store the elements.
  *
@@ -511,7 +511,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> void Table<T>::takeColumnAt(qsizetype i)
+ *  @fn void Table<T>::takeColumnAt(qsizetype i)
  *
  *  Removes column @a i and returns it.
  *
@@ -526,7 +526,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> void Table<T>::takeFirstColumn()
+ *  @fn void Table<T>::takeFirstColumn()
  *
  *  Removes the first column from the table and returns it. This function assumes the table
  *  has columns. To avoid failure, call columnCount() before calling this function.
@@ -535,7 +535,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> void Table<T>::takeFirstRow()
+ *  @fn void Table<T>::takeFirstRow()
  *
  *  Removes the first row from the table and returns it. This function assumes the table
  *  has rows. To avoid failure, call rowCount() before calling this function.
@@ -544,7 +544,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> void Table<T>::takeLastColumn()
+ *  @fn void Table<T>::takeLastColumn()
  *
  *  Removes the last column from the table and returns it. This function assumes the table
  *  has columns. To avoid failure, call columnCount() before calling this function.
@@ -553,7 +553,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> void Table<T>::takeLastRow()
+ *  @fn void Table<T>::takeLastRow()
  *
  *  Removes the last row from the table and returns it. This function assumes the table
  *  has rows. To avoid failure, call rowCount() before calling this function.
@@ -562,7 +562,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> void Table<T>::takeRowAt(qsizetype i)
+ *  @fn void Table<T>::takeRowAt(qsizetype i)
  *
  *  Removes row @a i and returns it.
  *
@@ -577,19 +577,19 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> qsizetype Table<T>::width() const
+ *  @fn qsizetype Table<T>::width() const
  *
  *  Same as columnCount().
  */
 
 /*!
- *  @fn template<typename T> bool Table<T>::operator==(const Table& other) const
+ *  @fn bool Table<T>::operator==(const Table& other) const
  *
  *  Returns @c true if the table contains the same elements as @a other; otherwise, returns @c false.
  */
 
 /*!
- *  @fn template<typename T> bool Table<T>::operator!=(const Table& other) const
+ *  @fn bool Table<T>::operator!=(const Table& other) const
  *
  *  Returns @c true if the table does not contain the same elements as @a other; otherwise, returns @c false.
  */

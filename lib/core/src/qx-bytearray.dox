@@ -14,7 +14,7 @@ namespace Qx
 //-Class Functions----------------------------------------------------------------------------------------------
 //Public:
 /*!
- *  @fn template<typename T> requires arithmetic<T> static QByteArray ByteArray::fromPrimitive(T primitive, QSysInfo::Endian endianness = QSysInfo::ByteOrder)
+ *  @fn QByteArray ByteArray::fromPrimitive(T primitive, QSysInfo::Endian endianness = QSysInfo::ByteOrder)
  *
  *  Creates a byte array from the integer value @a primitive, using @a endianness byte-ordering if @a T requires
  *  multiple bytes to store, and returns it.
@@ -24,7 +24,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<> inline QByteArray ByteArray::fromPrimitive<bool>(bool primitive, QSysInfo::Endian endianness)
+ *  @fn QByteArray ByteArray::fromPrimitive<bool>(bool primitive, QSysInfo::Endian endianness)
  *  @overload
  *
  *  Template specialization of the above for <tt>T == bool</tt>.
@@ -35,7 +35,7 @@ namespace Qx
  */
 
 /*!
- *  @fn template<typename T> requires arithmetic<T> static T ByteArray::toPrimitive(QByteArray ba, QSysInfo::Endian endianness = QSysInfo::ByteOrder)
+ *  @fn T ByteArray::toPrimitive(QByteArray ba, QSysInfo::Endian endianness = QSysInfo::ByteOrder)
  *
  *  Returns the raw binary data in @a ba reinterpreted as fundamental type @a T, according to the byte-order
  *  specified by @a endianness for multi-byte values.

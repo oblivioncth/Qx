@@ -335,7 +335,7 @@ void TextStreamWriter::setRealNumberPrecision(int precision) { mStreamWriter.set
 IoOpReport TextStreamWriter::status() const { return mStatus; }
 
 /*!
- *  @fn template<typename T> requires defines_left_shift_for<QTextStream, T> TextStreamWriter& TextStreamWriter::operator<<(T d)
+ *  @fn TextStreamWriter& TextStreamWriter::operator<<(T d)
  *
  *  Writes @a d of type @c T to the stream. Returns a reference to the stream.
  *
