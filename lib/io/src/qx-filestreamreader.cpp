@@ -250,7 +250,7 @@ IoOpReport FileStreamReader::skipRawData(int len)
 IoOpReport FileStreamReader::status() const { return mStatus; }
 
 /*!
-*  @fn template<typename T> requires defines_right_shift_for<QDataStream, T&> FileStreamReader& FileStreamReader::operator>>(T& d)
+*  @fn FileStreamReader& FileStreamReader::operator>>(T& d)
 *
 *  Reads the data type @c T into @a d, and returns a reference to the stream.
 *

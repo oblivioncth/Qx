@@ -18,7 +18,7 @@ namespace Qx
 //-Constructor----------------------------------------------------------------------------------------------
 //Public:
 /*!
- * @fn template <typename T> FreeIndexTracker<T>::FreeIndexTracker(T minIndex = 0, T maxIndex = 0, QSet<T> reservedIndices = QSet<T>())
+ * @fn FreeIndexTracker<T>::FreeIndexTracker(T minIndex = 0, T maxIndex = 0, QSet<T> reservedIndices = QSet<T>())
  *
  *  Creates an index tracker for the range @a minIndex to @a maxIndex, with the indices from @a reservedIndices
  *  already reserved.
@@ -35,70 +35,70 @@ namespace Qx
 //-Class Functions--------------------------------------------------------------------------------------------
 //Public:
 /*!
- *  @fn template <typename T> bool FreeIndexTracker<T>::isReserved(T index) const
+ *  @fn bool FreeIndexTracker<T>::isReserved(T index) const
  *
  *  Returns @c true if @a index is occupied; otherwise returns @c false.
  */
 
 /*!
- *  @fn template <typename T> T FreeIndexTracker<T>::minimum() const
+ *  @fn T FreeIndexTracker<T>::minimum() const
  *
  *  Returns the lower bound of the index tracker.
  */
 
 /*!
- *  @fn template <typename T> T FreeIndexTracker<T>::maximum() const
+ *  @fn T FreeIndexTracker<T>::maximum() const
  *
  *  Returns the upper bound of the index tracker.
  */
 
 /*!
- *  @fn template <typename T> T FreeIndexTracker<T>::firstReserved() const
+ *  @fn T FreeIndexTracker<T>::firstReserved() const
  *
  *  Returns the lowest index that is currently reserved, or -1 if all are free.
  */
 
 /*!
- *  @fn template <typename T> T FreeIndexTracker<T>::lastReserved() const
+ *  @fn T FreeIndexTracker<T>::lastReserved() const
  *
  *  Returns the highest index that is currently reserved, or -1 if all are free.
  */
 
 /*!
- *  @fn template <typename T> T FreeIndexTracker<T>::firstFree() const
+ *  @fn T FreeIndexTracker<T>::firstFree() const
  *
  *  Returns the lowest available index, or -1 if all are reserved.
  */
 
 /*!
- *  @fn template <typename T> T FreeIndexTracker<T>::lastFree() const
+ *  @fn T FreeIndexTracker<T>::lastFree() const
  *
  *  Returns the highest available index, or -1 if all are reserved.
  */
 
 /*!
- *  @fn template <typename T> bool FreeIndexTracker<T>::reserve(int index)
+ *  @fn bool FreeIndexTracker<T>::reserve(int index)
  *
  *  Attempts to mark @a index as occupied and returns @c true if successful, or @c false if the index was
  *  already reserved.
  */
 
 /*!
- *  @fn template <typename T> T FreeIndexTracker<T>::reserveFirstFree()
+ *  @fn T FreeIndexTracker<T>::reserveFirstFree()
  *
  *  Attempts to mark the lowest available index as occupied and return it if successful, or -1 if there
  *  are no free indices.
  */
 
 /*!
- *  @fn template <typename T> T FreeIndexTracker<T>::reserveLastFree()
+ *  @fn T FreeIndexTracker<T>::reserveLastFree()
  *
  *  Attempts to mark the highest available index as occupied and return it if successful, or -1 if there
  *  are no free indices.
  */
 
 /*!
- *  @fn template <typename T> bool FreeIndexTracker<T>::release(int index)
+ *  @fn bool FreeIndexTracker<T>::release(int index)
  *
  *  Attempts to mark @a index as unoccupied and returns @c true if successful, or @c false if the index was
  *  already free.

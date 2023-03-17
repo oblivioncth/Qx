@@ -14,7 +14,7 @@ namespace Qx
 //-Constructor----------------------------------------------------------------------------------------------
 //Public:
 /*!
- * @fn template<typename T> SetOnce<T>::SetOnce(T initial)
+ * @fn SetOnce<T>::SetOnce(T initial)
  *
  *  Creates a SetOnce container that holds the initial value @a initial.
  *
@@ -25,19 +25,19 @@ namespace Qx
 //-Instance Functions----------------------------------------------------------------------------------------------
 //Public:
 /*!
- * @fn template<typename T> bool SetOnce<T>::isSet() const
+ * @fn SetOnce<T>::isSet() const
  *
  *  Returns @c true if the containers value has been set; otherwise returns @c false.
  */
 
 /*!
- * @fn template<typename T> const T& SetOnce<T>::value() const
+ * @fn const T& SetOnce<T>::value() const
  *
  *  Returns the current value of the container.
  */
 
 /*!
- * @fn template<typename T> void SetOnce<T>::reset()
+ * @fn void SetOnce<T>::reset()
  *
  *  Resets the container to its initial state.
  *
@@ -47,7 +47,7 @@ namespace Qx
  */
 
 /*!
- * @fn template<typename T> SetOnce<T>& SetOnce<T>::operator=(const T& value)
+ * @fn SetOnce<T>& SetOnce<T>::operator=(const T& value)
  *
  *  Sets the value of the container to @a value, if it is different from its initial value.
  *

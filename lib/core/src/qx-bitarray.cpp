@@ -26,7 +26,7 @@ namespace Qx
 //-Class Functions----------------------------------------------------------------------------------------------
 //Public:
 /*!
- *  @fn template<typename T> requires std::integral<T> static BitArray BitArray::fromInteger(const T& integer)
+ *  @fn BitArray BitArray::fromInteger(const T& integer)
  *
  *  Converts the primitive @a integer to a bit array, with the resultant contents encoded in big-endian
  *  format if a multibyte integer type is provided.
@@ -50,7 +50,7 @@ BitArray::BitArray(int size, bool value) : QBitArray(size, value) {}
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:
 /*!
- *  @fn template<typename T> requires std::integral<T> T BitArray::toInteger()
+ *  @fn T BitArray::toInteger()
  *
  *  Converts the contents of the bit array to an integer, with the contents interpreted as being in big-endian
  *  format if a multibyte integer type is specified.
@@ -120,7 +120,7 @@ void BitArray::replace(const BitArray& bits, int start, int length)
 }
 
 /*!
- *  @fn template<typename T> requires std::integral<T> void BitArray::replace(T integer, int start = 0, int length = -1)
+ *  @fn void BitArray::replace(T integer, int start = 0, int length = -1)
  *
  *  Replace at most @a length bits at index @a start with the bits that make up @a integer.
  *

@@ -55,7 +55,7 @@ namespace Qx
 //-Class Members----------------------------------------------------------------------------------------------------
 //Public:
 /*!
- *  @var template<typename T> Index<T> Index<T>::FIRST
+ *  @var Index<T> Index<T>::FIRST
  *
  *  Used to refer to the first index of a dataset.
  *
@@ -63,7 +63,7 @@ namespace Qx
  */
 
 /*!
- *  @var template<typename T> Index<T> Index<T>::LAST
+ *  @var Index<T> Index<T>::LAST
  *
  *  Used to refer to the last index of a dataset.
  */
@@ -71,13 +71,13 @@ namespace Qx
 //-Constructor----------------------------------------------------------------------------------------------
 //Public:
 /*!
- * @fn template<typename T> Index<T>::Index()
+ * @fn Index<T>::Index()
  *
  *  Creates an null index.
  */
 
 /*!
- * @fn template<typename T> Index<T>::Index(T value)
+ * @fn Index<T>::Index(T value)
  *
  *  Creates an index with the underlying @a value.
  *
@@ -87,13 +87,13 @@ namespace Qx
 //-Instance Functions----------------------------------------------------------------------------------------------
 //Public:
 /*!
- * @fn template<typename T> bool Index<T>::isNull() const
+ * @fn bool Index<T>::isNull() const
  *
  *  Returns @c true if the index is null; otherwise returns @c false.
  */
 
 /*!
- * @fn template<typename T> bool Index<T>::isLast() const
+ * @fn bool Index<T>::isLast() const
  *
  *  Returns @c true if the index represents the last index of an arbitrary dataset; otherwise returns @c false.
  *
@@ -101,7 +101,7 @@ namespace Qx
  */
 
 /*!
- * @fn template<typename T> bool Index<T>::isLast() const
+ * @fn bool Index<T>::isLast() const
  *
  *  Returns @c true if the index represents the last index of an arbitrary dataset; otherwise returns @c false.
  *
@@ -109,20 +109,20 @@ namespace Qx
  */
 
 /*!
- * @fn template<typename T> bool Index<T>::operator==(const Index<T>& other)
+ * @fn bool Index<T>::operator==(const Index<T>& other)
  *
  *  Returns @c true if this index and @a other are both null, 'last', or have the same underlying value; otherwise
  *  returns @c false.
  */
 
 /*!
- * @fn template<typename T> bool Index<T>::operator!=(const Index<T>& other)
+ * @fn bool Index<T>::operator!=(const Index<T>& other)
  *
  *  Returns @c true if this index and @a other are not equivalent; otherwise returns @c false.
  */
 
 /*!
- * @fn template<typename T> bool Index<T>::operator<(const Index<T>& other)
+ * @fn bool Index<T>::operator<(const Index<T>& other)
  *
  *  Returns @c true if one of the following is true:
  *
@@ -134,13 +134,13 @@ namespace Qx
  */
 
 /*!
- * @fn template<typename T> bool Index<T>::operator<=(const Index<T>& other)
+ * @fn bool Index<T>::operator<=(const Index<T>& other)
  *
  *  See operator<(const Index<T>& other) and operator==(const Index<T>& other)
  */
 
 /*!
- * @fn template<typename T> bool Index<T>::operator>(const Index<T>& other)
+ * @fn bool Index<T>::operator>(const Index<T>& other)
  *
  *  Returns @c true if one of the following is true:
  *
@@ -152,85 +152,85 @@ namespace Qx
  */
 
 /*!
- * @fn template<typename T> bool Index<T>::operator>=(const Index<T>& other)
+ * @fn bool Index<T>::operator>=(const Index<T>& other)
  *
  *  See operator>(const Index<T>& other) and operator==(const Index<T>& other)
  */
 
 /*!
- * @fn template<typename T> Index<T> Index<T>::operator-(const Index<T>& other)
+ * @fn Index<T> Index<T>::operator-(const Index<T>& other)
  *
  *  Returns an index that is the difference between this index and @a other.
  */
 
 /*!
- * @fn template<typename T> Index<T>& Index<T>::operator-=(const Index<T>& other)
+ * @fn Index<T>& Index<T>::operator-=(const Index<T>& other)
  *
  *  Subtracts @a other from this index and returns a reference to this index.
  */
 
 /*!
- * @fn template<typename T> Index<T> Index<T>::operator+(const Index<T>& other)
+ * @fn Index<T> Index<T>::operator+(const Index<T>& other)
  *
  *  Returns an index that is the sum between this index and @a other.
  */
 
 /*!
- * @fn template<typename T> Index<T>& Index<T>::operator+=(const Index<T>& other)
+ * @fn Index<T>& Index<T>::operator+=(const Index<T>& other)
  *
  *  Adds @a other from this index and returns a reference to this index.
  */
 
 /*!
- * @fn template<typename T> Index<T> Index<T>::operator/(const Index<T>& other)
+ * @fn Index<T> Index<T>::operator/(const Index<T>& other)
  *
  *  Returns an index that is the quotient of this index and @a other.
  */
 
 /*!
- * @fn template<typename T> Index<T>& Index<T>::operator/=(const Index<T>& other)
+ * @fn Index<T>& Index<T>::operator/=(const Index<T>& other)
  *
  *  Divides @a other from this index and returns a reference to this index.
  */
 
 /*!
- * @fn template<typename T> Index<T> Index<T>::operator*(const Index<T>& other)
+ * @fn Index<T> Index<T>::operator*(const Index<T>& other)
  *
  *  Returns an index that is the product of this index and @a other.
  */
 
 /*!
- * @fn template<typename T> Index<T>& Index<T>::operator*=(const Index<T>& other)
+ * @fn Index<T>& Index<T>::operator*=(const Index<T>& other)
  *
  *  Multiplies @a other with this index and returns a reference to this index.
  */
 
 /*!
- * @fn template<typename T> Index<T>& Index<T>::operator++()
+ * @fn Index<T>& Index<T>::operator++()
  *
  *  Increases the index by 1, unless its 'last' or null, and returns a reference to the index.
  */
 
 /*!
- * @fn template<typename T> Index<T> Index<T>::operator++(int)
+ * @fn Index<T> Index<T>::operator++(int)
  *
  *  Increases the index by 1, unless its 'last' or null, and returns a pre-increment copy of the index.
  */
 
 /*!
- * @fn template<typename T> Index<T>& Index<T>::operator--()
+ * @fn Index<T>& Index<T>::operator--()
  *
  *  Decreases the index by 1, unless its 'last' or null, and returns a reference to the index.
  */
 
 /*!
- * @fn template<typename T> Index<T> Index<T>::operator--(int)
+ * @fn Index<T> Index<T>::operator--(int)
  *
  *  Decreases the index by 1, unless its 'last' or null, and returns a pre-decrement copy of the index.
  */
 
 /*!
- * @fn template<typename T> T Index<T>::operator*()
+ * @fn T Index<T>::operator*()
  *
  *  Returns the underlying value of the index.
  *
@@ -241,7 +241,7 @@ namespace Qx
  */
 
 /*!
- * @fn template<typename T> T Index<T>::operator*()
+ * @fn T Index<T>::operator*()
  *
  *  Returns the underlying value of the index.
  *

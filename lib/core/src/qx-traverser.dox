@@ -21,7 +21,7 @@ namespace Qx
 //-Constructor----------------------------------------------------------------------------------------------
 //Public:
 /*!
- * @fn template<typename T> Traverser<T>::Traverser(const T& traverseable)
+ * @fn Traverser<T>::Traverser(const T& traverseable)
  *
  *  Creates an traverser for iterating over @a traverseable, initialized to the beginning.
  */
@@ -29,44 +29,44 @@ namespace Qx
 //-Class Functions----------------------------------------------------------------------------------------------
 //Public:
 /*!
- *  @fn template<typename T> void Traverser<T>::advance(quint32 count = 1)
+ *  @fn void Traverser<T>::advance(quint32 count = 1)
  *
  *  Advances the traverser @a count elements, stopping at the end if it is reached.
  */
 
 /*!
- *  @fn template<typename T> void Traverser<T>::retreat(quint32 count = 1)
+ *  @fn void Traverser<T>::retreat(quint32 count = 1)
  *
  *  Reverses the traverser @a count elements, stopping at the beginning if it is reached.
  */
 
 /*!
- *  @fn template<typename T> bool Traverser<T>::atEnd() const
+ *  @fn bool Traverser<T>::atEnd() const
  *
  *  Reverses @c true if the traverser is at the end of the traversable; otherwise, returns @c false.
  */
 
 /*!
- *  @fn template<typename T> std::iter_value_t<typename T::const_iterator> Traverser<T>::currentValue() const
+ *  @fn std::iter_value_t<typename T::const_iterator> Traverser<T>::currentValue() const
  *
  *  Returns the value at the traverser's current position.
  */
 
 /*!
- *  @fn template<typename T> quint32 Traverser<T>::currentIndex() const
+ *  @fn quint32 Traverser<T>::currentIndex() const
  *
  *  Returns the traverser's current position as an index.
  */
 
 /*!
- *  @fn template<typename T> std::iter_value_t<typename T::const_iterator> Traverser<T>::lookAhead(quint32 count = 1) const
+ *  @fn std::iter_value_t<typename T::const_iterator> Traverser<T>::lookAhead(quint32 count = 1) const
  *
  *  Returns the value at the position @a count ahead of the traverser's current position if that position is
  *  valid; otherwise returns a default-constructed value.
  */
 
 /*!
- *  @fn template<typename T> std::iter_value_t<typename T::const_iterator> Traverser<T>::lookBehind(quint32 count = 1) const
+ *  @fn std::iter_value_t<typename T::const_iterator> Traverser<T>::lookBehind(quint32 count = 1) const
  *
  *  Returns the value at the position @a count behind of the traverser's current position if that position is
  *  valid; otherwise returns a default-constructed value.
