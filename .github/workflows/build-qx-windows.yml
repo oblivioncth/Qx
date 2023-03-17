@@ -89,7 +89,7 @@ jobs:
     - name: Set doc artifact name
       id: set_doc_artifact_name
       if: matrix.lib_linkage == 'static'
-      run: echo "doc_artifact_name=$current_artifact_name" >> $Env:GITHUB_OUTPUT
+      run: echo "doc_artifact_name=${{ env.current_artifact_name }}" >> $Env:GITHUB_OUTPUT
     - name: Upload Qx build artifact
       uses: actions/upload-artifact@v3
       with:

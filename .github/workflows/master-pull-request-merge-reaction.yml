@@ -60,24 +60,29 @@ jobs:
     name: Update gh-pages
     needs: [build_qx_release_windows]
     if: github.event.pull_request.merged == true
-    runs-on: windows-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.page-deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
     steps:
     - name: Download built shared Qx artifact
       uses: actions/download-artifact@v3
       with:
         name: ${{ needs.build_qx_release_windows.outputs.doc_artifact_name }}
         path: ${{ env.doc_artifact_path }}
-    - name: Upload docs to gh-pages
-      uses: peaceiris/actions-gh-pages@v3
+    - name: Setup pages
+      uses: actions/configure-pages@v3
+    - name: Upload pages artifact
+      uses: actions/upload-pages-artifact@v1
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_branch: gh-pages
-        publish_dir: ${{ env.doc_artifact_path }}/doc/html
-        destination_dir: ./docs
-        allow_empty_commit: true # So that doc build date is always roughly synced with latest build date
-        enable_jekyll: false
-        user_name: '${{ env.ci_bot_username}}'
-        user_email: '${{ env.ci_bot_email }}'
+        path: ${{ env.doc_artifact_path }}/doc/html
+    - name: Deploy pages artifact
+      id: page-deployment
+      uses: actions/deploy-pages@v1
 
   create-release:
     name: Create GitHub release
