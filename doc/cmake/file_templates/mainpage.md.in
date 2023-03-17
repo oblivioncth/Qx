@@ -170,8 +170,8 @@ cmake.exe --build . --target all --config Debug
 cmake.exe --build . --target all --config Release
 
 # Install Debug/Release libraries and documentation
-cmake --build . --target install --config Debug
-cmake --build . --target install --config Release
+cmake --install . --config Debug
+cmake --install . --config Release
 
 # Create the output package
 cpack.exe -C Debug;Release
