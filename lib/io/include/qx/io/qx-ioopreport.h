@@ -21,9 +21,9 @@ enum IoOpType { IO_OP_READ, IO_OP_WRITE, IO_OP_ENUMERATE, IO_OP_INSPECT, IO_OP_M
 enum IoOpResultType { IO_SUCCESS, IO_ERR_UNKNOWN, IO_ERR_ACCESS_DENIED, IO_ERR_WRONG_TYPE, IO_ERR_OUT_OF_RES,
                       IO_ERR_READ, IO_ERR_WRITE, IO_ERR_FATAL, IO_ERR_OPEN, IO_ERR_ABORT,
                       IO_ERR_TIMEOUT, IO_ERR_REMOVE, IO_ERR_RENAME, IO_ERR_REPOSITION,
-                      IO_ERR_RESIZE, IO_ERR_COPY, IO_ERR_DNE, IO_ERR_NULL,
-                      IO_ERR_EXISTS, IO_ERR_CANT_CREATE, IO_ERR_FILE_SIZE_MISMATCH, IO_ERR_CURSOR_OOB,
-                      IO_ERR_FILE_NOT_OPEN};
+                      IO_ERR_RESIZE, IO_ERR_COPY, IO_ERR_DNE, IO_ERR_PATH_DNE, IO_ERR_NULL,
+                      IO_ERR_EXISTS, IO_ERR_CANT_CREATE, IO_ERR_CANT_CREATE_PATH,  IO_ERR_FILE_SIZE_MISMATCH,
+                      IO_ERR_CURSOR_OOB, IO_ERR_FILE_NOT_OPEN};
 enum IoOpTargetType { IO_FILE, IO_DIR };
 
 
@@ -71,9 +71,11 @@ private:
         {IO_ERR_RESIZE, "The " + TYPE_MACRO + " could not be resized."},
         {IO_ERR_COPY, "The " + TYPE_MACRO + " could not be copied."},
         {IO_ERR_DNE, "The " + TYPE_MACRO + " does not exist."},
+        {IO_ERR_PATH_DNE, "The containing path of the " + TYPE_MACRO + " does not exist."},
         {IO_ERR_NULL, "The target is null"},
         {IO_ERR_EXISTS, "The " + TYPE_MACRO + " already exists."},
         {IO_ERR_CANT_CREATE, "The " + TYPE_MACRO + " could not be created."},
+        {IO_ERR_CANT_CREATE_PATH, "The path to the " + TYPE_MACRO + " could not be created."},
         {IO_ERR_FILE_SIZE_MISMATCH, "File size mismatch."},
         {IO_ERR_CURSOR_OOB, "File data cursor has gone out of bounds."},
         {IO_ERR_FILE_NOT_OPEN, "The file is not open."}

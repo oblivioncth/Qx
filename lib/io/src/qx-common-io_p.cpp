@@ -100,10 +100,10 @@ IoOpReport handlePathCreation(const QFileInfo& fileInfo, bool createPaths)
 
     if(!fileDir.exists())
     {
-        if(createPaths && !fileDir.mkpath("."))
-            return IoOpReport(IO_OP_WRITE, IO_ERR_CANT_CREATE, fileInfo);
-        else
-            return IoOpReport(IO_OP_WRITE, IO_ERR_DNE, fileInfo);
+        if(!createPaths)
+            return IoOpReport(IO_OP_WRITE, IO_ERR_PATH_DNE, fileInfo);
+        else if(!fileDir.mkpath("."))
+            return IoOpReport(IO_OP_WRITE, IO_ERR_CANT_CREATE_PATH, fileInfo);
     }
 
     return IoOpReport(IO_OP_WRITE, IO_SUCCESS, fileInfo);
