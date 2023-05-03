@@ -82,7 +82,7 @@ private:
     {
     //-Class Variables-----------------------------------------------------------------------------------------------
     private:
-        static inline const QString ERR_P_QUEUE_INCOMPL = "The download(s) failed to complete successfully";
+        static inline const QString ERR_P_QUEUE_INCOMPL = "The download(s) failed to complete successfully.";
         static inline const QString ERR_S_OUTCOME_FAIL = "One or more downloads failed due to the following reasons.";
         static inline const QString ERR_D_SKIP = "%1 remaining download(s) were skipped due to previous errors aborted.";
         static inline const QString ERR_D_ABORT = "%1 remaining download(s) were aborted.";
