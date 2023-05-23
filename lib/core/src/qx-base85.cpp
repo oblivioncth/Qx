@@ -80,7 +80,7 @@ namespace Qx
  *
  *  @par Custom Encodings:
  *  @parblock
- *  Custom encodings can be created from scratch by constructing a blank encoding via Base85() and then setting its
+ *  Custom encodings can be created from scratch by constructing a blank encoding via Base85Encoding() and then setting its
  *  parameters, or by modifying standard encodings via @ref Base85Encoding(StandardEncoding).
  *  @endparblock
  */
