@@ -35,6 +35,7 @@ qx_add_component("Core"
         qx-char.cpp
         qx-datetime.cpp
         qx-dsvtable.cpp
+        qx-freeindextracker.cpp
         qx-genericerror.cpp
         qx-groupedprogressmanager.cpp
         qx-integrity.cpp
@@ -49,7 +50,6 @@ qx_add_component("Core"
         qx-system_linux.cpp
         qx-system_win.cpp
     DOC_ONLY
-        qx-freeindextracker.dox
         qx-regularexpression.dox
         qx-bytearray.dox
         qx-index.dox

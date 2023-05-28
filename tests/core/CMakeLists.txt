@@ -1,1 +1,2 @@
 add_subdirectory(qx_array)
+add_subdirectory(qx_freeindextracker)
