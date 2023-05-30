@@ -13,6 +13,7 @@ class tst_qx_freeindextracker : public QObject
 
 private:
     static inline const Qx::FreeIndexTracker CMN_TRACKER = Qx::FreeIndexTracker(5, 50, {6, 7, 35, 36, 37, 38, 39, 40, 41, 50});
+    static inline const Qx::FreeIndexTracker CMN_TRACKER_FULL = Qx::FreeIndexTracker(10,12, {10,11,12});
 
 public:
     tst_qx_freeindextracker();
@@ -32,6 +33,7 @@ private slots:
     void maximum();
     void range();
     void free();
+    void isBooked();
     void firstReserved();
     void lastReserved();
     void firstFree();
@@ -89,6 +91,12 @@ void tst_qx_freeindextracker::range() { QCOMPARE(CMN_TRACKER.range(), 46); }
 
 void tst_qx_freeindextracker::free() { QCOMPARE(CMN_TRACKER.free(), 36); }
 
+void tst_qx_freeindextracker::isBooked()
+{
+    QVERIFY(!CMN_TRACKER.isBooked());
+    QVERIFY(CMN_TRACKER_FULL.isBooked());
+}
+
 void tst_qx_freeindextracker::firstReserved() { QCOMPARE(CMN_TRACKER.firstReserved(), 6); }
 
 void tst_qx_freeindextracker::lastReserved() { QCOMPARE(CMN_TRACKER.lastReserved(), 50); }
@@ -102,9 +110,7 @@ void tst_qx_freeindextracker::previousFree()
     QCOMPARE(CMN_TRACKER.previousFree(40), 34);
     QCOMPARE(CMN_TRACKER.previousFree(42), 42);
     QCOMPARE(CMN_TRACKER.previousFree(35), 34);
-
-    Qx::FreeIndexTracker full(10,12, {10,11,12});
-    QCOMPARE(full.previousFree(11), std::nullopt);
+    QCOMPARE(CMN_TRACKER_FULL.previousFree(11), std::nullopt);
 }
 
 void tst_qx_freeindextracker::nextFree()
@@ -119,9 +125,7 @@ void tst_qx_freeindextracker::nearestFree()
     QCOMPARE(CMN_TRACKER.nearestFree(40), 42);
     QCOMPARE(CMN_TRACKER.nearestFree(37), 34);
     QCOMPARE(CMN_TRACKER.nearestFree(42), 42);
-
-    Qx::FreeIndexTracker full(10,12, {10,11,12});
-    QCOMPARE(full.nearestFree(11), std::nullopt);
+    QCOMPARE(CMN_TRACKER_FULL.nearestFree(11), std::nullopt);
 }
 void tst_qx_freeindextracker::reserve()
 {
@@ -139,7 +143,7 @@ void tst_qx_freeindextracker::reserveFirstFree()
     QCOMPARE(tkr.reserveFirstFree(), 5);
     QCOMPARE(tkr.reserveFirstFree(), 8);
 
-    Qx::FreeIndexTracker full(10,12, {10,11,12});
+    Qx::FreeIndexTracker full(CMN_TRACKER_FULL);
     QCOMPARE(full.reserveFirstFree(), std::nullopt);
 }
 void tst_qx_freeindextracker::reserveLastFree()
@@ -148,7 +152,7 @@ void tst_qx_freeindextracker::reserveLastFree()
     QCOMPARE(tkr.reserveLastFree(), 49);
     QCOMPARE(tkr.reserveLastFree(), 48);
 
-    Qx::FreeIndexTracker full(10,12, {10,11,12});
+    Qx::FreeIndexTracker full(CMN_TRACKER_FULL);
     QCOMPARE(full.reserveLastFree(), std::nullopt);
 }
 void tst_qx_freeindextracker::reserveNextFree()
@@ -179,7 +183,7 @@ void tst_qx_freeindextracker::reserveNearestFree()
     QCOMPARE(tkr.reserveNearestFree(7), 8);
     QCOMPARE(tkr.free(), 32);
 
-    Qx::FreeIndexTracker full(10,12, {10,11,12});
+    Qx::FreeIndexTracker full(CMN_TRACKER_FULL);
     QCOMPARE(full.reserveNearestFree(11), std::nullopt);
 }
 

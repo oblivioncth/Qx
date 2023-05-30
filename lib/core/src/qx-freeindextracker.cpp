@@ -134,6 +134,11 @@ quint64 FreeIndexTracker::range() const { return length(mMin, mMax); }
 quint64 FreeIndexTracker::free() const { return mFree; }
 
 /*!
+ *  Returns @c true if all indices are reserved; otherwise, returns @c false.
+ */
+bool FreeIndexTracker::isBooked() const { return mFree == 0;}
+
+/*!
  *  Returns the lowest index that is currently reserved, or @c std::nullopt if all are free.
  */
 std::optional<quint64> FreeIndexTracker::firstReserved() const

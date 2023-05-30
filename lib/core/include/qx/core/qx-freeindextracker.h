@@ -40,6 +40,7 @@ public:
     quint64 maximum() const;
     quint64 range() const;
     quint64 free() const;
+    bool isBooked() const;
 
     std::optional<quint64> firstReserved() const;
     std::optional<quint64> lastReserved() const;
