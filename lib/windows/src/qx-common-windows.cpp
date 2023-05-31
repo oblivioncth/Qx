@@ -422,7 +422,7 @@ GenericError translateNtstatus(NTSTATUS stat)
     BitArray statBits = BitArray::fromInteger(stat);
 
     // Get severity
-    BitArray severityBits = statBits.extract(30, 2);
+    BitArray severityBits = statBits.subArray(30, 2);
     quint8 severity = severityBits.toInteger<quint8>();
 
     // Check for success
