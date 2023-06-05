@@ -28,4 +28,25 @@ QString Integrity::generateChecksum(QByteArray& data, QCryptographicHash::Algori
     return checksumHash.result().toHex();
 }
 
+/*!
+ *  Returns the ISO 3309/ITU-T V.42 compliant CRC-32 checksum of @a data.
+ */
+quint32 Integrity::crc32(QByteArrayView data)
+{
+    // LSB-first implementation
+    static constexpr quint32 lsbPolynomial = 0xEDB88320;
+
+    uint32_t crc = 0xFFFFFFFF;
+
+    for(quint8 byte : data)
+    {
+        crc ^= byte;
+        for(size_t bit = 8; bit > 0; bit--)
+            crc = crc & 1 ? (crc >> 1) ^ lsbPolynomial : crc >> 1;
+    }
+
+    // Return compliment
+    return ~crc;
+}
+
 }
