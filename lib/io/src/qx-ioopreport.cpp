@@ -399,10 +399,7 @@ bool IoOpReport::isNull() const { return mNull; }
  */
 GenericError IoOpReport::toGenericError() const
 {
-    if(isFailure())
-        return GenericError();
-    else
-        return GenericError(GenericError::Error, outcome(), outcomeInfo());
+    return isFailure() ? GenericError(GenericError::Error, outcome(), outcomeInfo()) : GenericError();
 }
 
 }
