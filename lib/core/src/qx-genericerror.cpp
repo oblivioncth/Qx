@@ -242,7 +242,7 @@ QTextStream& operator<<(QTextStream& ts, const GenericError& ge)
         ts << Qt::endl << GenericError::DETAILED_INFO_HEADING << Qt::endl << ge.mDetailedInfo << Qt::endl;
 
     // Pad
-    ts << Qt::endl;
+    //ts << Qt::endl;
 
     // Forward stream
     return ts;
