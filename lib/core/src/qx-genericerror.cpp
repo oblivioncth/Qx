@@ -225,7 +225,7 @@ GenericError& GenericError::setDetailedInfo(QString detailedInfo) { mDetailedInf
 QTextStream& operator<<(QTextStream& ts, const GenericError& ge)
 {
     // Primary heading
-    ts << ge.errorLevelString() << ": ";
+    ts << "( " << ge.errorLevelString() << " ) ";
     if(!ge.mCaption.isEmpty())
         ts << ge.mCaption;
     ts << Qt::endl;
