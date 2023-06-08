@@ -30,9 +30,14 @@ QString Integrity::generateChecksum(QByteArray& data, QCryptographicHash::Algori
 
 /*!
  *  Returns the ISO 3309/ITU-T V.42 compliant CRC-32 checksum of @a data.
+ *
+ *  @note This function will return @c 0 if @a data is empty.
  */
 quint32 Integrity::crc32(QByteArrayView data)
 {
+    if(data.isEmpty())
+        return 0;
+
     // LSB-first implementation
     static constexpr quint32 lsbPolynomial = 0xEDB88320;
 
