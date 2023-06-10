@@ -33,6 +33,7 @@ private slots:
     void maximum();
     void range();
     void free();
+    void reserved();
     void isBooked();
     void firstReserved();
     void lastReserved();
@@ -90,6 +91,8 @@ void tst_qx_freeindextracker::maximum() { QCOMPARE(CMN_TRACKER.maximum(), 50); }
 void tst_qx_freeindextracker::range() { QCOMPARE(CMN_TRACKER.range(), 46); }
 
 void tst_qx_freeindextracker::free() { QCOMPARE(CMN_TRACKER.free(), 36); }
+
+void tst_qx_freeindextracker::reserved() { QCOMPARE(CMN_TRACKER.reserved(), 10); }
 
 void tst_qx_freeindextracker::isBooked()
 {

@@ -134,6 +134,11 @@ quint64 FreeIndexTracker::range() const { return length(mMin, mMax); }
 quint64 FreeIndexTracker::free() const { return mFree; }
 
 /*!
+ *  Returns the number of occupied indices.
+ */
+quint64 FreeIndexTracker::reserved() const { return mReserved.size() - mFree; }
+
+/*!
  *  Returns @c true if all indices are reserved; otherwise, returns @c false.
  */
 bool FreeIndexTracker::isBooked() const { return mFree == 0;}
