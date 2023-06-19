@@ -7,187 +7,11 @@
 #include <QTimer>
 
 // Extra-component Includes
+#include "qx/core/__private/qx-internalerror.h"
 #include "qx/core/qx-string.h"
 
 namespace Qx
 {
-//===============================================================================================================
-// DownloadManagerReport
-//===============================================================================================================
-
-/*!
- *  @class DownloadManagerReport qx/network/qx-downloadmanager.h
- *
- *  @brief The DownloadManagerReport class details the outcome of processing an AsyncDownloadManager or
- *  SyncDownloadManager queue.
- */
-
-//-Class Enums-----------------------------------------------------------------------------------------------
-//Public:
-/*!
- *  @enum DownloadManagerReport::Outcome
- *
- *  This enum represents the outcome of a processed download manager queue.
- */
-
-/*!
- *  @var DownloadManagerReport::Outcome DownloadManagerReport::Fail
- *  A queue that failed to process completely.
- */
-
-/*!
- *  @var DownloadManagerReport::Outcome DownloadManagerReport::Abort
- *  A queue that was aborted in-progress.
- */
-
-/*!
- *  @var DownloadManagerReport::Outcome DownloadManagerReport::Success
- *  A queue that finished processing successfully.
- */
-
-//-Constructor-------------------------------------------------------------------------------------------------------
-//Public:
-/*!
- *  Constructs a null download manager report
- */
-DownloadManagerReport::DownloadManagerReport() :
-    mNull(true),
-    mOutcome(Outcome::Success),
-    mErrorInfo(),
-    mTaskReports()
-{}
-
-//-Instance Functions------------------------------------------------------------------------------------------------
-//Public:
-/*!
- *  Returns the overall processing outcome of the download manager the report was generated from.
- */
-DownloadManagerReport::Outcome DownloadManagerReport::outcome() const { return mOutcome; }
-
-/*!
- *  Returns error information regarding queue processing, which is only valid
- *  if the report's @ref outcome isn't Outcome::Success.
- */
-GenericError DownloadManagerReport::errorInfo() const { return mErrorInfo; }
-
-/*!
- *  Returns @c true if the download manager that generated this report processed its queue successfully;
- *  otherwise returns @c false.
- */
-bool DownloadManagerReport::wasSuccessful() const { return mOutcome == Outcome::Success; }
-
-/*!
- *  Returns reports detailing the result of each individual download task that was part of the
- *  generating manager's queue.
- */
-QList<DownloadOpReport> DownloadManagerReport::taskReports() const { return mTaskReports; }
-
-/*!
- *  Returns @c true if the report is null; otherwise, returns @c false.
- */
-bool DownloadManagerReport::isNull() const { return mNull; }
-
-//===============================================================================================================
-// DownloadManagerReport::Builder
-//===============================================================================================================
-
-//-Constructor-------------------------------------------------------------------------------------------------------
-//Public:
-DownloadManagerReport::Builder::Builder()
-{
-    // Have to start with raw pointer because of private constructor
-    DownloadManagerReport* dmr = new DownloadManagerReport();
-    mWorkingReport = std::unique_ptr<DownloadManagerReport>(dmr);
-}
-
-//-Instance Functions------------------------------------------------------------------------------------------------
-// Private:
-void DownloadManagerReport::Builder::updateOutcome(const DownloadOpReport& dop)
-{
-    Outcome newOutcome = Outcome::Success;
-
-    switch(dop.result())
-    {
-        case DownloadOpReport::Completed:
-            return;
-        case DownloadOpReport::Failed:
-        case DownloadOpReport::Skipped:
-            newOutcome = Outcome::Fail;
-            break;
-        case DownloadOpReport::Aborted:
-            newOutcome = Outcome::Abort;
-            break;
-    }
-
-    if(newOutcome > mWorkingReport->mOutcome)
-        mWorkingReport->mOutcome = newOutcome;
-}
-
-//Public:
-void DownloadManagerReport::Builder::wDownload(DownloadOpReport downloadReport)
-{
-    updateOutcome(downloadReport);
-    mWorkingReport->mTaskReports.append(downloadReport);
-}
-
-DownloadManagerReport DownloadManagerReport::Builder::build()
-{
-    // Build error info
-    if(mWorkingReport->mOutcome != Outcome::Success)
-    {
-        uint skipped = 0;
-        uint aborted = 0;
-        QStringList errorList;
-
-        // Enumerate individual errors
-        for(const DownloadOpReport& dop : qAsConst(mWorkingReport->mTaskReports))
-        {
-            switch(dop.result())
-            {
-                case DownloadOpReport::Failed:
-                    errorList.append(ERR_D_LIST_ITEM.arg(dop.task().target.toDisplayString(), dop.errorInfo().secondaryInfo()));
-                    break;
-                case DownloadOpReport::Skipped:
-                    skipped++;
-                    break;
-                case DownloadOpReport::Aborted:
-                    aborted++;
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        // Create error details
-        QString errorDetails;
-
-        if(!errorList.isEmpty())
-        {
-            errorDetails += ERR_D_SPECIFIC + "\n";
-            errorDetails += "- " + errorList.join("\n- ");
-        }
-        if(skipped || aborted)
-        {
-            if(!errorDetails.isEmpty())
-                errorDetails += "\n\n";
-
-            errorDetails += ERR_D_GENERAL + "\n";
-
-            QStringList generalList;
-            if(skipped)
-                generalList << ERR_D_SKIP.arg(skipped);
-            if(aborted)
-                generalList << ERR_D_ABORT.arg(aborted);
-
-            errorDetails += "- " + generalList.join("\n- ");
-        }
-
-        mWorkingReport->mErrorInfo = GenericError(GenericError::Error, ERR_P_QUEUE_INCOMPL, ERR_S_OUTCOME_FAIL, errorDetails);
-    }
-
-    mWorkingReport->mNull = false;
-    return *mWorkingReport;
-}
 
 //===============================================================================================================
 // AsyncDownloadManager
@@ -619,18 +443,19 @@ void AsyncDownloadManager::clearTasks()
 void AsyncDownloadManager::sslErrorHandler(QNetworkReply* reply, const QList<QSslError>& errors)
 {
     // Create error message
-    GenericError errMsg(GenericError::Warning, SSL_ERR.arg(reply->url().toString()), CONTINUE_QUES,
-                        String::join(errors, [](const QSslError& err){ return err.errorString(); }, ENDL, LIST_ITEM_PREFIX));
+    quint16 errValue = QxPrivate::InternalError::VAL_SSL_ERR;
+    QString errDetails = String::join(errors, [](const QSslError& err){ return err.errorString(); }, ENDL, LIST_ITEM_PREFIX);
+    QxPrivate::InternalError errMsg(Warning, errValue, SSL_ERR.arg(reply->url().toString()), CONTINUE_QUES, errDetails);
 
     // Signal result
     bool ignoreErrors = false;
 
     // Emit signal for answer
-    emit sslErrors(errMsg, &ignoreErrors);
+    emit sslErrors(Error(errMsg), &ignoreErrors);
 
     if(ignoreErrors)
         reply->ignoreSslErrors();
-    //else -> Reply will end with error, which will be handled by the finished() handler
+    //else -> reply will end with error, which will be handled by the finished() handler
 }
 
 void AsyncDownloadManager::authHandler(QNetworkReply* reply, QAuthenticator* authenticator)
@@ -901,7 +726,7 @@ void AsyncDownloadManager::abort()
 
 //-Signals------------------------------------------------------------------------------------------------
 /*!
- *  @fn void AsyncDownloadManager::sslErrors(Qx::GenericError errorMsg, bool* ignore)
+ *  @fn void AsyncDownloadManager::sslErrors(Qx::Error errorMsg, bool* ignore)
  *
  *  This signal is emitted if the SSL/TLS session encountered errors during the set up, including certificate
  *  verification errors. The @a errorMsg parameter details the errors.
@@ -1204,9 +1029,9 @@ void SyncDownloadManager::abort() { mAsyncDm->abort(); }
 
 //-Signals---------------------------------------------------------------------------------------------------
 /*!
- *  @fn void SyncDownloadManager::sslErrors(Qx::GenericError errorMsg, bool* ignore)
+ *  @fn void SyncDownloadManager::sslErrors(Qx::Error errorMsg, bool* ignore)
  *
- *  @copydoc AsyncDownloadManager::sslErrors(Qx::GenericError errorMsg, bool* ignore)
+ *  @copydoc AsyncDownloadManager::sslErrors(Qx::Error errorMsg, bool* ignore)
  */
 
 /*!

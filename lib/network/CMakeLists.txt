@@ -1,13 +1,17 @@
 #================= Add Component ==========================
 qx_add_component("Network"
     HEADERS_API
-        qx-common-network.h
         qx-networkreplyerror.h
         qx-downloadmanager.h
+        qx-downloadmanagerreport.h
+        qx-downloadopreport.h
+        qx-downloadtask.h
     IMPLEMENTATION
-        qx-common-network.cpp
         qx-networkreplyerror.cpp
         qx-downloadmanager.cpp
+        qx-downloadmanagerreport.cpp
+        qx-downloadopreport.cpp
+        qx-downloadtask.cpp
     LINKS
         PUBLIC
             Qt6::Core

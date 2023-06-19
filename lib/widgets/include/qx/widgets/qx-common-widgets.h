@@ -8,14 +8,13 @@
 #include <QMessageBox>
 
 // Extra-component Includes
-#include "qx/core/qx-genericerror.h"
-
+#include "qx/core/qx-error.h"
 
 namespace Qx
 {
 //-Namespace Functions-------------------------------------------------------------------------------------------------
-QX_WIDGETS_EXPORT void postError(GenericError error);
-QX_WIDGETS_EXPORT int postBlockingError(GenericError error,
+QX_WIDGETS_EXPORT void postError(const Error& error);
+QX_WIDGETS_EXPORT int postBlockingError(const Error& error,
                                         QMessageBox::StandardButtons choices = QMessageBox::Ok,
                                         QMessageBox::StandardButton defChoice = QMessageBox::NoButton);
 

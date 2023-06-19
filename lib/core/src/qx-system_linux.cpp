@@ -159,35 +159,18 @@ namespace  // Anonymous namespace for local only definitions
         return QString();
     }
 
+    SystemError errnoError(const QString& aError) { return SystemError::fromErrno(errno, aError); }
 
-    // TODO: Consider adding this and errnoGen as public functions in qx-linux
-    GenericError translateErrno(int err)
-    {
-        /* TODO: Once moving to Ubuntu 22.04 LTS as a reference (and therefore using a higher version of
-         * glibc, use strerrorname_np() to get the text name of the error number
-         */
-        QString name = "0x" + QString::number(err, 16);
-
-        //NOTE: If ever used in other UNIX systems, the POSIX version of this needs to differ as noted here:
-        // http://www.club.cc.cmu.edu/~cmccabe/blog_strerror.html
-        char buffer[128]; // No need to initialize, GNU strerror_r() guarantees result is null terminated
-        QString desc = QString::fromLatin1(strerror_r(err, buffer, sizeof(buffer)), -1);
-
-        return GenericError(GenericError::Error, "System Error: " + desc + " (" + name + ").");
-    }
-
-    GenericError errnoGen() { return translateErrno(errno); }
-
-    GenericError sendKillSignal(quint32 pid, int sig)
+    SystemError sendKillSignal(quint32 pid, int sig, const QString& action)
     {
         if(pid == 0 || pid > std::numeric_limits<pid_t>::max())
-            return translateErrno(EINVAL);
+            return SystemError::fromErrno(EINVAL, action);
         else
         {
             if(::kill(static_cast<pid_t>(pid), sig) == 0)
-                return Qx::GenericError();
+                return SystemError();
             else
-                return errnoGen();
+                return errnoError(action);
         }
     }
 }
@@ -252,9 +235,17 @@ QList<quint32> processChildren(quint32 processId, bool recursive)
     return cPids;
 }
 
-GenericError cleanKillProcess(quint32 processId)  { return sendKillSignal(processId, SIGTERM); }
+SystemError cleanKillProcess(quint32 processId)
+{
+    static const QString ACTION = QSL("Failed to cleanly kill process %1");
+    return sendKillSignal(processId, SIGTERM, ACTION.arg(processId));
+}
 
-GenericError forceKillProcess(quint32 processId) { return sendKillSignal(processId, SIGKILL); }
+SystemError forceKillProcess(quint32 processId)
+{
+    static const QString ACTION = QSL("Failed to forcefully kill process %1");
+    return sendKillSignal(processId, SIGKILL, ACTION.arg(processId));
+}
 
 bool enforceSingleInstance(QString uniqueAppId)
 {

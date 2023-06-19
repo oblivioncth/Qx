@@ -5,12 +5,12 @@
 #include <QMessageBox>
 
 // Extra-component Includes
-#include "qx/core/qx-genericerror.h"
+#include "qx/core/qx-error.h"
 
 namespace Qx
 {
 /*! @cond */
-void prepareErrorPostBox(const GenericError& error, QMessageBox& msgBox);
+void prepareErrorPostBox(const Error& error, QMessageBox& msgBox);
 /*! @endcond */
 }
 

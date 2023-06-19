@@ -138,25 +138,6 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
 {
     // Alternate function to internal RtlNtStatusToDosError (which requires address linkage),
     // Thanks to https://gist.github.com/ian-abbott/732c5b88182a1941a603
-    DWORD ConvertNtStatusToWin32Error(NTSTATUS ntstatus)
-    {
-            DWORD oldError;
-            DWORD result;
-            DWORD br;
-            OVERLAPPED o;
-
-            o.Internal = ntstatus;
-            o.InternalHigh = 0;
-            o.Offset = 0;
-            o.OffsetHigh = 0;
-            o.hEvent = 0;
-            oldError = GetLastError();
-            GetOverlappedResult(NULL, &o, &br, FALSE);
-            result = GetLastError();
-            SetLastError(oldError);
-            return result;
-    }
-
     int nativeShowMode(ShortcutProperties::ShowMode showMode)
     {
         switch(showMode)
@@ -286,7 +267,7 @@ bool processIsRunning(HANDLE processHandle)
  *  elevated by an administrator (i.e. "Run as administrator"), or if UAC is disabled
  *  and the process was started by a user who is a member of the 'Administrators' group.
  */
-GenericError processIsElevated(bool& elevated)
+SystemError processIsElevated(bool& elevated)
 {
     HANDLE hThisProcess = GetCurrentProcess(); // Self handle doesn't need to be closed
     return processIsElevated(elevated, hThisProcess);
@@ -301,14 +282,14 @@ GenericError processIsElevated(bool& elevated)
  *  @note The handle must be valid and have been opened with the `PROCESS_QUERY_LIMITED_INFORMATION`
  *  access permission.
  */
-GenericError processIsElevated(bool& elevated, HANDLE processHandle)
+SystemError processIsElevated(bool& elevated, HANDLE processHandle)
 {
     // Default to false
     elevated = false;
 
     // Ensure handle isn't null (doesn't assure validity)
     if(!processHandle)
-        return translateHresult(E_HANDLE);
+        return SystemError::fromHresult(E_HANDLE);
 
     // Get access token for process
     HANDLE hToken;
@@ -329,7 +310,7 @@ GenericError processIsElevated(bool& elevated, HANDLE processHandle)
     elevated = elevationInfo.TokenIsElevated;
 
     // Return success
-    return GenericError();
+    return SystemError();
 }
 
 /*!
@@ -338,7 +319,7 @@ GenericError processIsElevated(bool& elevated, HANDLE processHandle)
  *  Sets @a elevated to true if the process specified by @a processId is running with elevated
  *  privileges; otherwise, sets it to false.
  */
-GenericError processIsElevated(bool& elevated, DWORD processId)
+SystemError processIsElevated(bool& elevated, DWORD processId)
 {
     // Default to false
     elevated = false;
@@ -349,7 +330,7 @@ GenericError processIsElevated(bool& elevated, DWORD processId)
         return getLastError();
 
     // Check elevation
-    GenericError res = processIsElevated(elevated, hProcess);
+    SystemError res = processIsElevated(elevated, hProcess);
 
     // Cleanup handle
     CloseHandle(hProcess);
@@ -366,11 +347,11 @@ GenericError processIsElevated(bool& elevated, DWORD processId)
  *
  *  @sa cleanKillProcess(quint32), forceKillProcess().
  */
-GenericError cleanKillProcess(HANDLE processHandle)
+SystemError cleanKillProcess(HANDLE processHandle)
 {
     // Ensure handle isn't null (doesn't assure validity)
     if(!processHandle)
-        return translateHresult(E_HANDLE);
+        return SystemError::fromHresult(E_HANDLE);
 
     return cleanKillProcess(GetProcessId(processHandle));
 }
@@ -380,99 +361,34 @@ GenericError cleanKillProcess(HANDLE processHandle)
  *
  *  @sa forceKillProcess(quint32), cleanKillProcess();
  */
-GenericError forceKillProcess(HANDLE processHandle)
+SystemError forceKillProcess(HANDLE processHandle)
 {
     if(!TerminateProcess(processHandle, 0xFFFF))
         return getLastError();
 
-    return GenericError();
+    return SystemError();
 }
 
 /*!
- *  Returns the HRESULT value @a res as a generic error.
- *
- *  Only the primary info portion of the error is filled.
- */
-GenericError translateHresult(HRESULT res)
-{
-    BitArray resBits = BitArray::fromInteger(res);
-
-    // Check if result is actually an ntstatus code
-    if(resBits.testBit(28))
-        return translateNtstatus(res);
-
-    // Check for success
-    if(!resBits.testBit(31))
-        return GenericError();
-
-    // Create com error instance from result
-    _com_error comError(res);
-
-    // Return translated error
-    return GenericError(GenericError::Error, QString::fromWCharArray(comError.ErrorMessage()));
-}
-
-/*!
- *  Returns the NTSTATUS value @a stat as a generic error.
- *
- *  Only the primary info portion of the error is filled.
- */
-GenericError translateNtstatus(NTSTATUS stat)
-{
-    BitArray statBits = BitArray::fromInteger(stat);
-
-    // Get severity
-    BitArray severityBits = statBits.subArray(30, 2);
-    quint8 severity = severityBits.toInteger<quint8>();
-
-    // Check for success
-    if(severity == 0x00)
-        return GenericError();
-
-    // Get handle to ntdll.dll.
-    HMODULE hNtDll = LoadLibrary(L"NTDLL.DLL");
-
-    // Return unknown error if library fails to load
-    if (hNtDll == NULL)
-        return GenericError::UNKNOWN_ERROR;
-
-    // Use format message to create error string
-    TCHAR* formatedBuffer = nullptr;
-    DWORD formatResult = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_FROM_HMODULE,
-                                       hNtDll, ConvertNtStatusToWin32Error(stat), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                                       (LPTSTR)&formatedBuffer, 0, NULL);
-
-    // Free loaded dll
-    FreeLibrary(hNtDll);
-
-    // Return unknown error if message fails to format
-    if(!formatResult)
-        return GenericError::UNKNOWN_ERROR;
-
-    // Return translated error
-    return GenericError(severity == 0x03 ? GenericError::Error : GenericError::Warning, QString::fromWCharArray(formatedBuffer));
-}
-
-/*!
- *  Returns the calling threads last error code value as a generic error.
+ *  Returns the calling threads last error code value as a system error.
  *
  *  @sa <a href="https://docs.microsoft.com/en-us/windows/win32/api/errhandlingapi/nf-errhandlingapi-getlasterror">GetLastError</a>
  */
-GenericError getLastError()
+SystemError getLastError()
 {
     DWORD error = GetLastError();
-    return translateHresult(HRESULT_FROM_WIN32(error));
+    return SystemError::fromHresult(HRESULT_FROM_WIN32(error));
 }
 
 /*!
  *  Creates a shortcut on the user's filesystem at the path @a shortcutPath, with the given
  *  shortcut properties @a sp.
  */
-GenericError createShortcut(QString shortcutPath, ShortcutProperties sp)
+SystemError createShortcut(QString shortcutPath, ShortcutProperties sp)
 {
     // Check for basic argument validity
     if(sp.target.isEmpty() || shortcutPath.isEmpty() || sp.iconIndex < 0)
-        return translateHresult(E_INVALIDARG);
+        return SystemError::fromHresult(E_INVALIDARG);
 
     // Working vars
     HRESULT hRes;
@@ -513,45 +429,45 @@ GenericError createShortcut(QString shortcutPath, ShortcutProperties sp)
         // Set shortcut properties
         hRes = ipShellLink->SetPath((const wchar_t*)fullTargetPath.utf16());
         if(FAILED(hRes))
-            return translateHresult(hRes);
+            return SystemError::fromHresult(hRes);
 
         if(!sp.targetArgs.isEmpty())
         {
             hRes = ipShellLink->SetArguments((const wchar_t*)sp.targetArgs.utf16());
             if (FAILED(hRes))
-                return translateHresult(hRes);
+                return SystemError::fromHresult(hRes);
         }
 
         if(!sp.startIn.isEmpty())
         {
             hRes = ipShellLink->SetWorkingDirectory((const wchar_t*)sp.startIn.utf16());
             if (FAILED(hRes))
-                return translateHresult(hRes);
+                return SystemError::fromHresult(hRes);
         }
 
         if(!sp.comment.isEmpty())
         {
             hRes = ipShellLink->SetDescription((const wchar_t*)sp.comment.utf16());
             if (FAILED(hRes))
-                return translateHresult(hRes);
+                return SystemError::fromHresult(hRes);
         }
 
         if(!sp.iconFilePath.isEmpty())
         {
             hRes = ipShellLink->SetIconLocation((const wchar_t*)sp.iconFilePath.utf16(), sp.iconIndex);
             if (FAILED(hRes))
-                return translateHresult(hRes);
+                return SystemError::fromHresult(hRes);
         }
 
         hRes = ipShellLink->SetShowCmd(nativeShowMode(sp.showMode));
         if(FAILED(hRes))
-            return translateHresult(hRes);
+            return SystemError::fromHresult(hRes);
 
         // Write the shortcut to disk
         hRes = ipPersistFile->Save((const wchar_t*)shortcutPath.utf16(), TRUE);
     }
 
-    return translateHresult(hRes);
+    return SystemError::fromHresult(hRes);
 }
 
 }
