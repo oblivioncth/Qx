@@ -31,6 +31,55 @@ namespace Qx
  */
 
 //===============================================================================================================
+// Json::Error
+//===============================================================================================================
+
+// Enum
+/*!
+ *  @class Json::Error qx/core/qx-json.h
+ *
+ *  @brief The Json::Error class is used to report errors related to JSON manipulation.
+ */
+
+/*!
+ *  @enum Json::Error::Form
+ *
+ *  This enum represents form of JSON error.
+ */
+
+/*!
+ *  @var Json::Error::Form Json::Error::NoError
+ *  No error occurred.
+ */
+
+/*!
+ *  @var Json::Error::Form Json::Error::MissingKey
+ *  An expected key was missing.
+ */
+
+// Ctor
+Json::Error::Error(const QString& a, Form f) :
+    mAction(a),
+    mForm(f)
+{}
+
+// Functions
+/*!
+ *  A message noting the attempted action that failed.
+ */
+QString Json::Error::action() const { return mAction; }
+
+/*!
+ *  The form of error that occurred.
+ */
+Json::Error::Form Json::Error::form() const { return mForm; }
+
+// Functions
+quint32 Json::Error::deriveValue() const { return mForm; };
+QString Json::Error::derivePrimary() const { return mAction; };
+QString Json::Error::deriveSecondary() const { return ERR_STRINGS.value(mForm); };
+
+//===============================================================================================================
 // Json
 //===============================================================================================================
 
@@ -45,7 +94,7 @@ namespace Qx
 //Public:
 
 /*!
- *  @fn GenericError Json::checkedKeyRetrieval(T& valueBuffer, QJsonObject jObject, const QString& key)
+ *  @fn Json::Error Json::checkedKeyRetrieval(T& valueBuffer, QJsonObject jObject, const QString& key)
  *
  *  Safely retrieves the value associated with the specified key from the given JSON Object.
  *
@@ -64,7 +113,7 @@ namespace Qx
  */
 
 /*!
- *  @fn GenericError Json::checkedArrayConversion(QList<T>& valueBuffer, QJsonArray jArray)
+ *  @fn Json::Error Json::checkedArrayConversion(QList<T>& valueBuffer, QJsonArray jArray)
  *
  *  Safely transforms the provided JSON array into a list of values of its underlying type.
  *
@@ -80,7 +129,7 @@ namespace Qx
  */
 
 /*!
- * @fn GenericError Json::checkedArrayConversion(QSet<T>& valueBuffer, QJsonArray jArray)
+ * @fn Json::Error Json::checkedArrayConversion(QSet<T>& valueBuffer, QJsonArray jArray)
  *
  * @overload
  *

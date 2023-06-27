@@ -8,7 +8,7 @@
 #include <QString>
 
 // Inner-component Includes
-#include "qx/core/qx-genericerror.h"
+#include "qx/core/qx-systemerror.h"
 
 namespace Qx
 {
@@ -21,11 +21,8 @@ QX_CORE_EXPORT QList<quint32> processChildren(quint32 processId, bool recursive 
 QX_CORE_EXPORT bool processIsRunning(QString processName);
 QX_CORE_EXPORT bool processIsRunning(quint32 processId);
 
-/* TODO: Consider setting the primary details of the errors returned here to an appropriate message like
- * "Failed to close process *processId*." and set the secondary details to the system error info.
- */
-QX_CORE_EXPORT GenericError cleanKillProcess(quint32 processId);
-QX_CORE_EXPORT GenericError forceKillProcess(quint32 processId);
+QX_CORE_EXPORT SystemError cleanKillProcess(quint32 processId);
+QX_CORE_EXPORT SystemError forceKillProcess(quint32 processId);
 
 QX_CORE_EXPORT bool enforceSingleInstance(QString uniqueAppId);
 }

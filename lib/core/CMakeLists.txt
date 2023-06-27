@@ -3,6 +3,7 @@ qx_add_component("Core"
     HEADERS_PRIVATE
         qx-json_p.h
     HEADERS_API
+        qx-abstracterror.h
         qx-algorithm.h
         qx-array.h
         qx-base85.h
@@ -12,8 +13,10 @@ qx_add_component("Core"
         qx-cumulation.h
         qx-datetime.h
         qx-dsvtable.h
+        qx-error.h
         qx-freeindextracker.h
         qx-genericerror.h
+        qx-global.h
         qx-groupedprogressmanager.h
         qx-index.h
         qx-integrity.h
@@ -27,16 +30,21 @@ qx_add_component("Core"
         qx-setonce.h
         qx-string.h
         qx-system.h
+        qx-systemerror.h
         qx-traverser.h
+        __private/qx-internalerror.h
     IMPLEMENTATION
+        qx-abstracterror.cpp
         qx-algorithm.cpp
         qx-base85.cpp
         qx-bitarray.cpp
         qx-char.cpp
         qx-datetime.cpp
         qx-dsvtable.cpp
+        qx-error.cpp
         qx-freeindextracker.cpp
         qx-genericerror.cpp
+        qx-global.cpp
         qx-groupedprogressmanager.cpp
         qx-integrity.cpp
         qx-iostream_linux.cpp
@@ -49,6 +57,10 @@ qx_add_component("Core"
         qx-system.cpp
         qx-system_linux.cpp
         qx-system_win.cpp
+        qx-systemerror.cpp
+        qx-systemerror_linux.cpp
+        qx-systemerror_win.cpp
+        __private/qx-internalerror.cpp
     DOC_ONLY
         qx-regularexpression.dox
         qx-bytearray.dox

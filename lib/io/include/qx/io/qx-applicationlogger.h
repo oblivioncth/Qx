@@ -10,7 +10,7 @@
 #include <QRegularExpression>
 
 // Qx Includes
-#include <qx/core/qx-genericerror.h>
+#include <qx/core/qx-error.h>
 #include <qx/io/qx-textstreamwriter.h>
 
 class QCoreApplication;
@@ -28,17 +28,12 @@ private:
                                                                                QRegularExpression::MultilineOption);
     static inline const QString NO_PARAMS = "*None*";
     static inline const QString EVENT_TEMPLATE = " - <%1> [%2] %3";
+    static inline const QString ERR_TEMPLATE = " - <%1> [%2] %3) %4 - %5";
     static inline const QString COMMANDLINE_LABEL = "Arguments:";
     static inline const QString EVENTS_LABEL = "Events:";
     static inline const QString FINISH_TEMPLATE = "---------- Execution finished %1 (Code %2) ----------";
     static inline const QString FINISH_SUCCESS = "successfully";
     static inline const QString FINISH_ERR = "prematurely";
-
-    static inline const QHash<GenericError::ErrorLevel, QString> ERROR_LEVEL_STR_MAP = {
-        {GenericError::Warning, "WARNING"},
-        {GenericError::Error, "ERROR"},
-        {GenericError::Critical, "CRITICAL"}
-    };
 
 //-Instance Variables-------------------------------------------------------------------------------------------------
 private:
@@ -79,7 +74,7 @@ public:
     // Operate
     IoOpReport openLog();
     IoOpReport recordVerbatim(QString text);
-    IoOpReport recordErrorEvent(QString src, GenericError error);
+    IoOpReport recordErrorEvent(QString src, Error error);
     IoOpReport recordGeneralEvent(QString src, QString event);
     IoOpReport finish(int returnCode);
 

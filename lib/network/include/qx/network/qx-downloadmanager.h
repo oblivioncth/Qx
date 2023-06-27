@@ -10,10 +10,12 @@
 #include <QAuthenticator>
 
 // Intra-component Includes
-#include "qx/network/qx-common-network.h"
+#include "qx/network/qx-downloadtask.h"
+#include "qx/network/qx-downloadopreport.h"
+#include "qx/network/qx-downloadmanagerreport.h"
 
 // Extra-component Includes
-#include "qx/core/qx-genericerror.h"
+#include "qx/core/qx-error.h"
 #include "qx/core/qx-cumulation.h"
 #include "qx/io/qx-filestreamwriter.h"
 
@@ -38,75 +40,6 @@
  */
 namespace Qx
 {
-
-//-Forward Declarations-------------------------------------------------------------------------------------------
-class AsyncDownloadManager;
-class SyncDownloadManager;
-
-class QX_NETWORK_EXPORT DownloadManagerReport
-{
-
-friend AsyncDownloadManager;
-friend SyncDownloadManager;
-
-//-Class Enums----------------------------------------------------------------------------------------------------
-public:
-   enum class Outcome{
-       Success = 0x0,
-       Fail = 0x1,
-       Abort = 0x2
-   };
-
-//-Instance Variables---------------------------------------------------------------------------------------------
-private:
-    bool mNull;
-    Outcome mOutcome;
-    GenericError mErrorInfo;
-    QList<DownloadOpReport> mTaskReports;
-
-//-Constructor-------------------------------------------------------------------------------------------------------
-public:
-    DownloadManagerReport();
-
-//-Instance Functions----------------------------------------------------------------------------------------------
-public:
-    Outcome outcome() const;
-    GenericError errorInfo() const;
-    bool wasSuccessful() const;
-    QList<DownloadOpReport> taskReports() const;
-    bool isNull() const;
-
-//-Inner Classes--------------------------------------------------------------------------------------------------
-private:
-    class Builder
-    {
-    //-Class Variables-----------------------------------------------------------------------------------------------
-    private:
-        static inline const QString ERR_P_QUEUE_INCOMPL = "The download(s) failed to complete successfully.";
-        static inline const QString ERR_S_OUTCOME_FAIL = "One or more downloads failed due to the following reasons.";
-        static inline const QString ERR_D_SKIP = "%1 remaining download(s) were skipped due to previous errors aborted.";
-        static inline const QString ERR_D_ABORT = "%1 remaining download(s) were aborted.";
-        static inline const QString ERR_D_SPECIFIC = "Specific:";
-        static inline const QString ERR_D_GENERAL = "General:";
-        static inline const QString ERR_D_LIST_ITEM = "[%1] %2";
-
-    //-Instance Variables---------------------------------------------------------------------------------------------
-    private:
-        std::unique_ptr<DownloadManagerReport> mWorkingReport;
-
-    //-Constructor---------------------------------------------------------------------------------------------------
-    public:
-        Builder();
-
-    //-Instance Functions----------------------------------------------------------------------------------------------
-    private:
-        void updateOutcome(const DownloadOpReport& dop);
-
-    public:
-        void wDownload(DownloadOpReport downloadReport);
-        DownloadManagerReport build();
-    };
-};
 
 class QX_NETWORK_EXPORT AsyncDownloadManager: public QObject
 {
@@ -236,7 +169,7 @@ public slots:
 //-Signals------------------------------------------------------------------------------------------------------------
 signals:
     // In-progress signals
-    void sslErrors(Qx::GenericError errorMsg, bool* ignore);
+    void sslErrors(Qx::Error errorMsg, bool* ignore);
     void authenticationRequired(QString prompt, QAuthenticator* authenticator);
     void preSharedKeyAuthenticationRequired(QString prompt, QSslPreSharedKeyAuthenticator* authenticator);
     void proxyAuthenticationRequired(QString prompt, QAuthenticator* authenticator);
@@ -294,7 +227,7 @@ public:
 
 //-Slots------------------------------------------------------------------------------------------------------------
 private slots:
-    void finishHandler(const DownloadManagerReport& dmr);
+    void finishHandler(const Qx::DownloadManagerReport& dmr);
 
 public slots:
     void abort();
@@ -302,7 +235,7 @@ public slots:
 //-Signals------------------------------------------------------------------------------------------------------------
 signals:
     // In-progress signals
-    void sslErrors(Qx::GenericError errorMsg, bool* ignore);
+    void sslErrors(Qx::Error errorMsg, bool* ignore);
     void authenticationRequired(QString prompt, QAuthenticator* authenticator);
     void preSharedKeyAuthenticationRequired(QString prompt, QSslPreSharedKeyAuthenticator* authenticator);
     void proxyAuthenticationRequired(QString prompt, QAuthenticator* authenticator);
@@ -313,5 +246,5 @@ signals:
 
 }
 
-Q_DECLARE_METATYPE(Qx::DownloadManagerReport);
+
 #endif // QX_DOWNLOADMANAGER_H

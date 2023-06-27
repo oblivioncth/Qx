@@ -11,11 +11,11 @@
 #include <QJsonArray>
 
 // Intra-component Includes
-#include "qx/core/qx-genericerror.h"
+#include "qx/core/qx-abstracterror.h"
 
 // Extra-component Includes
-#include <qx/utility/qx-macros.h>
-#include <qx/utility/qx-concepts.h>
+#include "qx/utility/qx-macros.h"
+#include "qx/utility/qx-concepts.h"
 
 namespace Qx
 {
@@ -25,15 +25,45 @@ concept qjson_type = Qx::any_of<T, bool, double, QString, QJsonArray, QJsonObjec
 
 class QX_CORE_EXPORT Json
 {
+//-Inner Classes-------------------------------------------------------------------------------------------------
+    class QX_CORE_EXPORT Error final : public AbstractError<"Qx::Json::Error", 5>
+    {
+    public:
+        enum Form
+        {
+            NoError = 0,
+            MissingKey = 1,
+            TypeMismatch = 2
+        };
+
+    private:
+        static inline const QHash<Form, QString> ERR_STRINGS{
+            {NoError, QSL("")},
+            {MissingKey, QSL("The key does not exist.")},
+            {TypeMismatch, QSL("Value type mismatch.")}
+        };
+
+        QString mAction;
+        Form mForm;
+
+    public:
+        Error(const QString& a = {}, Form f = NoError);
+
+        QString action() const;
+        Form form() const;
+
+    private:
+        quint32 deriveValue() const override;
+        QString derivePrimary() const override;
+        QString deriveSecondary() const override;
+    };
+
 //-Class Members-------------------------------------------------------------------------------------------------
 private:
     // Errors
     static inline const QString ERR_RETRIEVING_VALUE = QSL("JSON Error: Could not retrieve the %1 value from key '%2'.");
-    static inline const QString ERR_KEY_DOESNT_EXIST = QSL("The key '%1' does not exist.");
-    static inline const QString ERR_KEY_TYPE_MISMATCH = QSL("The key '%1' holds a value of a different type than '%2'.");
     static inline const QString ERR_CONVERTING_ARRAY_LIST = QSL("JSON Error: Could not convert JSON array to a list of %1.");
     static inline const QString ERR_CONVERTING_ARRAY_SET = QSL("JSON Error: Could not convert JSON array to a set of %1.");
-    static inline const QString ERR_VALUE_TYPE_MISMATCH = QSL("The array contained a value of a different type than '%2'.");
 
 //-Class Functions-----------------------------------------------------------------------------------------------
 private:
@@ -44,7 +74,7 @@ private:
 public:
     template<typename T>
         requires qjson_type<T>
-    static GenericError checkedKeyRetrieval(T& valueBuffer, QJsonObject jObject, const QString& key)
+    static Error checkedKeyRetrieval(T& valueBuffer, QJsonObject jObject, const QString& key)
     {
         // Reset buffer
         valueBuffer = T();
@@ -52,22 +82,22 @@ public:
         QJsonValue jv;
 
         if((jv = jObject.value(key)).isUndefined())
-            return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(typeString<T>(), key), ERR_KEY_DOESNT_EXIST.arg(key));
+            return Error{.action = ERR_RETRIEVING_VALUE.arg(typeString<T>(), key), .form = Error::MissingKey};
 
         if(!isType<T>(jv))
         {
             QString ts = typeString<T>();
-            return GenericError(GenericError::Error, ERR_RETRIEVING_VALUE.arg(ts, key), ERR_KEY_TYPE_MISMATCH.arg(key, ts));
+            return Error(ERR_RETRIEVING_VALUE.arg(ts, key), Error::TypeMismatch);
         }
         else
             valueBuffer = toType<T>(jv);
 
-        return GenericError();
+        return Error();
     }
 
     template<typename T>
         requires qjson_type<T>
-    static GenericError checkedArrayConversion(QList<T>& valueBuffer, QJsonArray jArray)
+    static Error checkedArrayConversion(QList<T>& valueBuffer, QJsonArray jArray)
     {
         // Reset buffer
         valueBuffer.clear();
@@ -80,16 +110,16 @@ public:
             {
                 valueBuffer.clear();
                 QString ts = typeString<T>();
-                return GenericError(GenericError::Error, ERR_CONVERTING_ARRAY_LIST.arg(ts), ERR_VALUE_TYPE_MISMATCH.arg(ts));
+                return Error(ERR_CONVERTING_ARRAY_LIST.arg(ts), Error::TypeMismatch);
             }
         }
 
-        return GenericError();
+        return Error();
     }
 
     template<typename T>
         requires qjson_type<T>
-    static GenericError checkedArrayConversion(QSet<T>& valueBuffer, QJsonArray jArray)
+    static Error checkedArrayConversion(QSet<T>& valueBuffer, QJsonArray jArray)
     {
         // Reset buffer
         valueBuffer.clear();
@@ -102,17 +132,17 @@ public:
             {
                 valueBuffer.clear();
                 QString ts = typeString<T>();
-                return GenericError(GenericError::Error, ERR_CONVERTING_ARRAY_SET.arg(ts), ERR_VALUE_TYPE_MISMATCH.arg(ts));
+                return Error(ERR_CONVERTING_ARRAY_SET.arg(ts), Error::TypeMismatch);
             }
         }
 
-        return GenericError();
+        return Error();
     }
 
     static QList<QJsonValue> findAllValues(const QJsonValue& rootValue, const QString& key);
 
     static QString asString(const QJsonValue& value);
-};	
+};
 
 /* Template specializations
  *
