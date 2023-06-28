@@ -33,7 +33,7 @@ private:
 //! [1]
 
 //! [2]
-QX_DECLARE_ERROR_TYPE(MyError, "MyError", 1020)
+class QX_ERROR_TYPE(MyError, "MyError", 1020)
 {
     //..
 }

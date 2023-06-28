@@ -158,7 +158,7 @@ QString IError::deriveDetails() const { return QString(); }
  *  To create a concrete error type, inherit from AbstractError, instantiate it with the new error types name
  *  and type code, and then override the `derive...()` methods defined by the IError interface as required.
  *  Generally you should at least override deriveValue() and derivePrimary(). Or, for the most common case
- *  one can use QX_DECLARE_ERROR_TYPE().
+ *  one can use QX_ERROR_TYPE().
  *
  *  @note Type codes 0-999 are reserved by Qx.
  *

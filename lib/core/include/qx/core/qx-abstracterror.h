@@ -147,7 +147,7 @@ concept error_adaptation = error_adapter<Ater> && std::constructible_from<Ater, 
 }
 
 //-Macros----------------------------------------------------------------------------------------------------------
-#define QX_DECLARE_ERROR_TYPE(Type, Name, Code) \
-    class Type final : public Qx::AbstractError<Name, Code>
+#define QX_ERROR_TYPE(Type, Name, Code) \
+    Type final : public Qx::AbstractError<Name, Code>
 
 #endif // QX_ABSTRACTERROR_H
