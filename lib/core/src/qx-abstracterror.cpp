@@ -232,7 +232,7 @@ QString IError::deriveDetails() const { return QString(); }
 
 //-Macros----------------------------------------------------------------------------------------------------------
 /*!
- *  @def QX_DECLARE_ERROR_TYPE(Type, Name, Code)
+ *  @def QX_ERROR_TYPE(Type, Name, Code)
  *
  *  This macro declares a new Qx Error Type for the most common use-case.
  *
