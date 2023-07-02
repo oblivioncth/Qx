@@ -145,7 +145,7 @@ QString Json::Error::deriveSecondary() const { return ERR_STRINGS.value(mForm); 
  *  If @a rootValue is of any type other than QJsonValue::Array or QJsonValue::Object
  *  then returned list will always be empty.
  */
-QList<QJsonValue> Json::findAllValues(const QJsonValue& rootValue, const QString& key)
+QList<QJsonValue> Json::findAllValues(const QJsonValue& rootValue, QStringView key)
 {
     QList<QJsonValue> hits;
     recursiveValueFinder(hits, rootValue, key);

@@ -74,7 +74,7 @@ private:
 public:
     template<typename T>
         requires qjson_type<T>
-    static Error checkedKeyRetrieval(T& valueBuffer, QJsonObject jObject, const QString& key)
+    static Error checkedKeyRetrieval(T& valueBuffer, QJsonObject jObject, QStringView key)
     {
         // Reset buffer
         valueBuffer = T();
@@ -139,7 +139,7 @@ public:
         return Error();
     }
 
-    static QList<QJsonValue> findAllValues(const QJsonValue& rootValue, const QString& key);
+    static QList<QJsonValue> findAllValues(const QJsonValue& rootValue, QStringView key);
 
     static QString asString(const QJsonValue& value);
 };
