@@ -94,7 +94,7 @@ QString Json::Error::deriveSecondary() const { return ERR_STRINGS.value(mForm); 
 //Public:
 
 /*!
- *  @fn Json::Error Json::checkedKeyRetrieval(T& valueBuffer, QJsonObject jObject, const QString& key)
+ *  @fn Json::Error Json::checkedKeyRetrieval(T& valueBuffer, const QJsonObject& jObject, const QString& key)
  *
  *  Safely retrieves the value associated with the specified key from the given JSON Object.
  *
@@ -113,7 +113,7 @@ QString Json::Error::deriveSecondary() const { return ERR_STRINGS.value(mForm); 
  */
 
 /*!
- *  @fn Json::Error Json::checkedArrayConversion(QList<T>& valueBuffer, QJsonArray jArray)
+ *  @fn Json::Error Json::checkedArrayConversion(QList<T>& valueBuffer, const QJsonArray& jArray)
  *
  *  Safely transforms the provided JSON array into a list of values of its underlying type.
  *
@@ -129,7 +129,7 @@ QString Json::Error::deriveSecondary() const { return ERR_STRINGS.value(mForm); 
  */
 
 /*!
- * @fn Json::Error Json::checkedArrayConversion(QSet<T>& valueBuffer, QJsonArray jArray)
+ * @fn Json::Error Json::checkedArrayConversion(QSet<T>& valueBuffer, const QJsonArray& jArray)
  *
  * @overload
  *

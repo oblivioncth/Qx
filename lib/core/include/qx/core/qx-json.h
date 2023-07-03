@@ -74,7 +74,7 @@ private:
 public:
     template<typename T>
         requires qjson_type<T>
-    static Error checkedKeyRetrieval(T& valueBuffer, QJsonObject jObject, QStringView key)
+    static Error checkedKeyRetrieval(T& valueBuffer, const QJsonObject& jObject, QStringView key)
     {
         // Reset buffer
         valueBuffer = T();
@@ -97,7 +97,7 @@ public:
 
     template<typename T>
         requires qjson_type<T>
-    static Error checkedArrayConversion(QList<T>& valueBuffer, QJsonArray jArray)
+    static Error checkedArrayConversion(QList<T>& valueBuffer, const QJsonArray& jArray)
     {
         // Reset buffer
         valueBuffer.clear();
@@ -119,7 +119,7 @@ public:
 
     template<typename T>
         requires qjson_type<T>
-    static Error checkedArrayConversion(QSet<T>& valueBuffer, QJsonArray jArray)
+    static Error checkedArrayConversion(QSet<T>& valueBuffer, const QJsonArray& jArray)
     {
         // Reset buffer
         valueBuffer.clear();
