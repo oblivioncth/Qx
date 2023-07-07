@@ -1108,4 +1108,20 @@ namespace Qx
  *
  *  Satisfied if @c K can be converted to @c T using static_cast<>().
  */
+
+// Grouping
+/*!
+ *  @concept any_of
+ *  @brief Specifies that a type is one of several types.
+ *
+ *  Satisfied if @c K is the same as at least one of @c L.
+ */
+
+// Template
+/*!
+ *  @concept specializes
+ *  @brief Specifies that a type is a specialization of a template.
+ *
+ *  Satisfied if @c K is a specialization of @c L with any parameters.
+ */
 }
