@@ -26,6 +26,7 @@ concept qjson_type = Qx::any_of<T, bool, double, QString, QJsonArray, QJsonObjec
 class QX_CORE_EXPORT Json
 {
 //-Inner Classes-------------------------------------------------------------------------------------------------
+public:
     class QX_CORE_EXPORT Error final : public AbstractError<"Qx::Json::Error", 5>
     {
     public:
