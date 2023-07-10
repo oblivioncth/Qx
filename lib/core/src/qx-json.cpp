@@ -13,131 +13,124 @@
  *  @ingroup qx-core
  *
  *  @brief The qx-json header file provides various utilities for JSON data manipulation.
+ *
+ *  The mechanisms of this file introduce a highly flexible, simple to use, declarative
+ *  mechanism for parsing JSON data into user structs and other types.
+ *
+ *  For example, the following JSON data:
+ *  @snippet qx-json.cpp 0
+ *
+ *  can easily be parsed into a corresponding set of C++ data structures like so:
+ *  @snippet qx-json.cpp 1
+ *
+ *  @sa QX_JSON_STRUCT(), and QxJson.
+ */
+
+/*!
+ *  @def QX_JSON_STRUCT()
+ *
+ *  Specifies that a struct is a JSON-tied struct, which enables support for automatic
+ *  parsing of a corresponding JSON object.
+ *
+ *  The name of each included member must match the name their corresponding JSON key.
+ *
+ *  @snippet qx-json.cpp 2
+ */
+
+/*!
+ *  @def QX_JSON_DECLARE_MEMBER_OVERRIDES()
+ *
+ *  Declares that a JSON-tried struct has member/key specific value parsing overrides.
+ *
+ *  This macro must be used before any member specific overrides can be defined.
+ *
+ *  @sa QX_JSON_MEMBER_OVERRIDE()
+ */
+
+/*!
+ *  @def QX_JSON_MEMBER_OVERRIDE()
+ *
+ *  Used to define a member/key specific value parsing override for a JSON-tried struct.
+ *  The specified member will be parsed using the provided function instead of a
+ *  potentially available generic one for that type.
+ *
+ *  @snippet qx-json.cpp 3
  */
 
 namespace Qx
 {
 
-/*!
- *  @concept qjson_type
- *  @brief Specifies that a type is one of the set used for within JSON related Qt classes.
- *
- *  Satisfied if @a T is one of:
- *  - bool
- *  - double
- *  - QString
- *  - QJsonArray
- *  - QJsonObject
- */
-
 //===============================================================================================================
-// Json::Error
+// JsonError
 //===============================================================================================================
 
 // Enum
 /*!
- *  @class Json::Error qx/core/qx-json.h
+ *  @class JsonError qx/core/qx-json.h
  *
- *  @brief The Json::Error class is used to report errors related to JSON manipulation.
+ *  @brief The JsonError class is used to report errors related to JSON manipulation.
  */
 
 /*!
- *  @enum Json::Error::Form
+ *  @enum JsonError::Form
  *
  *  This enum represents form of JSON error.
  */
 
 /*!
- *  @var Json::Error::Form Json::Error::NoError
+ *  @var JsonError::Form JsonError::NoError
  *  No error occurred.
  */
 
 /*!
- *  @var Json::Error::Form Json::Error::MissingKey
+ *  @var JsonError::Form JsonError::MissingKey
  *  An expected key was missing.
  */
 
 // Ctor
-Json::Error::Error(const QString& a, Form f) :
+/*!
+ *  Creates an invalid JsonError.
+ */
+JsonError::JsonError() :
+    mAction(),
+    mForm(Form::NoError)
+{}
+
+/*!
+ *  Creates a JSON error with the action @a and error form @a f.
+ */
+JsonError::JsonError(const QString& a, Form f) :
     mAction(a),
     mForm(f)
 {}
 
 // Functions
 /*!
+ *  Returns @c true if an error occurred; otherwise, returns @c false.
+ */
+bool JsonError::isValid() const { return mForm != NoError; }
+
+/*!
  *  A message noting the attempted action that failed.
  */
-QString Json::Error::action() const { return mAction; }
+QString JsonError::action() const { return mAction; }
 
 /*!
  *  The form of error that occurred.
  */
-Json::Error::Form Json::Error::form() const { return mForm; }
+JsonError::Form JsonError::form() const { return mForm; }
 
 // Functions
-quint32 Json::Error::deriveValue() const { return mForm; };
-QString Json::Error::derivePrimary() const { return mAction; };
-QString Json::Error::deriveSecondary() const { return ERR_STRINGS.value(mForm); };
+quint32 JsonError::deriveValue() const { return mForm; };
+QString JsonError::derivePrimary() const { return mAction; };
+QString JsonError::deriveSecondary() const { return ERR_STRINGS.value(mForm); };
 
 //===============================================================================================================
-// Json
+// <namepace>
 //===============================================================================================================
 
-/*!
- *  @class Json qx/core/qx-json.h
- *  @ingroup qx-core
- *
- *  @brief The Json class is a collection of static functions pertaining to parsing JSON data
- */
-
-//-Class Functions---------------------------------------------------------------------------------------------
+//-Functions---------------------------------------------------------------------------------------------
 //Public:
-
-/*!
- *  @fn Json::Error Json::checkedKeyRetrieval(T& valueBuffer, const QJsonObject& jObject, const QString& key)
- *
- *  Safely retrieves the value associated with the specified key from the given JSON Object.
- *
- *  Before the value data is accessed a check is performed to ensure that the key actually exists and that the
- *  type of the value matches the expected type @a T. This precludes the need to perform these two steps independently
- *  for every key/value pair parsed from a JSON Object.
- *
- *  @param[out] valueBuffer The return buffer for the retrieved value.
- *  @param[in] jObject The JSON Object to retrieve a value from.
- *  @param[in] key The key associated with the desired value.
- *
- *  If the key doesn't exist, or the type of that key's value is not the same as the return value buffer's type,
- *  the returned error object will specify such; otherwise, an invalid error is returned.
- *
- *  @a valueBuffer is set to a default constructed value in the event of an error.
- */
-
-/*!
- *  @fn Json::Error Json::checkedArrayConversion(QList<T>& valueBuffer, const QJsonArray& jArray)
- *
- *  Safely transforms the provided JSON array into a list of values of its underlying type.
- *
- *  This assumes that the array is homogeneous.
- *
- *  @param[out] valueBuffer The return buffer for the retrieved value.
- *  @param[in] jArray The JSON Object to retrieve a value from.
- *
- *  If array contains a value that does not match the return value buffer's type,
- *  the returned error object will specify such; otherwise, an invalid error is returned.
- *
- *  @a valueBuffer is set to an empty list in the event of an error.
- */
-
-/*!
- * @fn Json::Error Json::checkedArrayConversion(QSet<T>& valueBuffer, const QJsonArray& jArray)
- *
- * @overload
- *
- * Safely transforms the provided JSON array into a set of values of its underlying type.
- *
- * @a valueBuffer is set to an empty set in the event of an error.
- */
-
 /*!
  *  Recursively searches @a rootValue for @a key and returns the associated value for
  *  all matches as a list, or an empty list if the key was not found.
@@ -145,7 +138,7 @@ QString Json::Error::deriveSecondary() const { return ERR_STRINGS.value(mForm); 
  *  If @a rootValue is of any type other than QJsonValue::Array or QJsonValue::Object
  *  then returned list will always be empty.
  */
-QList<QJsonValue> Json::findAllValues(const QJsonValue& rootValue, QStringView key)
+QList<QJsonValue> findAllValues(const QJsonValue& rootValue, QStringView key)
 {
     QList<QJsonValue> hits;
     recursiveValueFinder(hits, rootValue, key);
@@ -157,7 +150,7 @@ QList<QJsonValue> Json::findAllValues(const QJsonValue& rootValue, QStringView k
  *
  *  If @a value is an object or array, the returned string will be in the compact format.
  */
-QString Json::asString(const QJsonValue& value)
+QString asString(const QJsonValue& value)
 {
     QJsonValue::Type valueType = value.type();
     if(valueType == QJsonValue::Type::Array)
@@ -178,6 +171,64 @@ QString Json::asString(const QJsonValue& value)
         return value.toString();
     else // Covers Null & Undefined
         return QString();
+} // namespace Qx
+
+namespace QxJson
+{
+//===============================================================================================================
+// <namepace>
+//===============================================================================================================
+
+/*!
+ *  @namespace QxJson
+ *
+ *  @brief The @c QxJson namespace encapsulates the user-extensible implementation of Qx's JSON parsing facilities.
+ */
+
+/*!
+ *  @struct Converter
+ *
+ *  @brief The Converter template struct acts as an interface that carries details on how to parse JSON to various types.
+ *
+ *  JSON data can be converted to an object of any type as Converter provides a specialization for that type that
+ *  contains a corresponding fromJson() function.
+ *
+ *  By default, conversions are provided for:
+ *  - bool
+ *  - double
+ *  - Integer Types
+ *  - QString
+ *  - QJsonArray
+ *  - QJsonObject
+ *  - QList<T>
+ *  - QSet<T>
+ *  - QHash<K, T> (when a keygen() specialization exists for K)
+ *  - QMap<K, T> (when a keygen() specialization exists for K)
+ *
+ *  Support for additional, non-structural types can be added like so:
+ *  @snippet qx-json.cpp 4
+ *
+ *  If a structural type needs to be registered, the QX_JSON_STRUCT and QX_JSON_MEMBER macros should be used
+ *  instead.
+ *
+ *  @sa qx-json.h and keygen().
+ */
+
+/*!
+ *  @fn template<typename Key, class Value> Key keygen(const Value& value)
+ *
+ *  @brief The keygen template function acts as an interface through which the derivation of a key
+ *  for a given type when used in associative containers is defined.
+ *
+ *  Any otherwise convertible JSON type can be parsed into a map as long as a specialization of keygen() exists
+ *  for that type.
+ *
+ *  Support for additional types can be added like so:
+ *  @snippet qx-json.cpp 5
+ *
+ *  @sa qx-json.h and Converter.
+ */
+
 }
 
 }
