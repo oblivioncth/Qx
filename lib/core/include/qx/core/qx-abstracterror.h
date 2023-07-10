@@ -39,7 +39,7 @@ private:
         u"Qx::SystemError",
         u"Qx::DownloadManagerReport",
         u"Qx::DownloadOpReport",
-        u"Qx::Json::Error"
+        u"Qx::JsonError"
     };
     // TODO: If this becomes sufficiently large, move to a constexpr set (hopefully available in std by that time)
 

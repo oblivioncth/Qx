@@ -23,3 +23,30 @@
  *
  *  This convenience macro is an alias for QByteArrayLiteral.
  */
+
+/*!
+ *  @def QX_FOR_EACH(macro, ...)
+ *
+ *  This function-like macro acts like a fold expression for its variadic arguments.
+ *  It produces the result of calling the macro @a macro once for each argument that
+ *  follows.
+ *
+ *  For example:
+ *  @code{.cpp}
+ *  #define F(x) //...
+ *  QX_FOR_EACH(F, 1, 4, 10) // -> F(1) F(4) F(10)
+ *  @endcode
+ *
+ *  @sa QX_FOR_EACH_DELIM()
+ */
+
+/*!
+ *  @def QX_FOR_EACH_DELIM(macro, ...)
+ *
+ *  Same as QX_FOR_EACH(), but a comma in placed between each resultant element.
+ *
+ *  @code{.cpp}
+ *  #define F(x) //...
+ *  QX_FOR_EACH_DELIM(F, 1, 4, 10) // -> F(1), F(4), F(10)
+ *  @endcode
+ */
