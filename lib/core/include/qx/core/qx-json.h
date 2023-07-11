@@ -77,6 +77,8 @@ private:
         {InvalidValue, QSL("Invalid value for type.")}
     };
 
+//-Instance Variables-------------------------------------------------------------
+private:
     QString mAction;
     Form mForm;
 
