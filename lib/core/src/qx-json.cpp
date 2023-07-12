@@ -126,6 +126,36 @@ QString JsonError::derivePrimary() const { return mAction; };
 QString JsonError::deriveSecondary() const { return ERR_STRINGS.value(mForm); };
 
 //===============================================================================================================
+// QJsonParseErrorAdapter
+//===============================================================================================================
+
+/*!
+ *  @class QJsonParseErrorAdapter
+ *  @ingroup qx-core
+ *
+ *  @brief Allows QJsonParseError to be used via the Qx::Error interface.
+ *
+ *  All errors are assigned the severity of Severity::Error.
+ *
+ *  @note This class exists in order to provide an implicit conversion between QJsonParseError
+ *  and Error, and generally should not be used directly.
+ */
+
+//-Constructor---------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  Constructs an Error adapter for the type QJsonParseError by observing the reference @a e.
+ */
+QJsonParseErrorAdapter::QJsonParseErrorAdapter(const QJsonParseError& e) :
+    mErrorRef(e)
+{}
+
+//Private:
+quint32 QJsonParseErrorAdapter::deriveValue() const { return mErrorRef.error; }
+QString QJsonParseErrorAdapter::derivePrimary() const { return mErrorRef.errorString(); }
+QString QJsonParseErrorAdapter::deriveSecondary() const { return OFFSET_STR.arg(mErrorRef.offset); }
+
+//===============================================================================================================
 // <namepace>
 //===============================================================================================================
 
@@ -191,6 +221,8 @@ QString asString(const QJsonValue& value)
         return value.toString();
     else // Covers Null & Undefined
         return QString();
+}
+
 } // namespace Qx
 
 namespace QxJson
@@ -248,7 +280,5 @@ namespace QxJson
  *
  *  @sa qx-json.h and Converter.
  */
-
-}
 
 }

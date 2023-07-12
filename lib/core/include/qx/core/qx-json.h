@@ -13,6 +13,7 @@
 
 // Intra-component Includes
 #include "qx/core/qx-abstracterror.h"
+#include "qx/core/qx-error.h"
 
 // Extra-component Includes
 #include "qx/utility/qx-macros.h"
@@ -369,6 +370,30 @@ template<typename T>
 concept json_root = QxJson::json_containing<T> ||
                     QxJson::json_struct<T>;
 
+//-Classes---------------------------------------------------------------------------------------------------------
+class QX_CORE_EXPORT QJsonParseErrorAdapter: public Qx::AbstractError<"QJsonParseError", 500>
+{
+//-Class Variables-------------------------------------------------------------------------------------
+private:
+    static inline const QString OFFSET_STR = QSL("Position: %1.");
+
+//-Instance Variables-------------------------------------------------------------------------------------
+private:
+    const QJsonParseError& mErrorRef;
+
+//-Constructor---------------------------------------------------------------------------------------------
+public:
+    QJsonParseErrorAdapter(const QJsonParseError& e);
+    QJsonParseErrorAdapter(QJsonParseErrorAdapter&&) = delete;
+    QJsonParseErrorAdapter(const QJsonParseErrorAdapter&) = delete;
+
+//-Instance Functions-------------------------------------------------------------------------------------
+private:
+    quint32 deriveValue() const override;
+    QString derivePrimary() const override;
+    QString deriveSecondary() const override;
+};
+
 //-Functions-------------------------------------------------------------------------------------------------------
 template<typename T>
     requires json_root<T>
@@ -406,6 +431,6 @@ QX_CORE_EXPORT QList<QJsonValue> findAllValues(const QJsonValue& rootValue, QStr
 QX_CORE_EXPORT QString asString(const QJsonValue& value);
 
 } // namespace Qx
-
+QX_DECLARE_ERROR_ADAPTATION(QJsonParseError, Qx::QJsonParseErrorAdapter);
 
 #endif // QX_JSON_H

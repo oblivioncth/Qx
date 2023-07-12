@@ -32,14 +32,15 @@ private:
     static inline const QString T_NAME_DUPE = QSL("Error type name %1 is already claimed!");
     static inline const QString T_CODE_RESERVED = QSL("Error type code %1 is reserved!");
     static inline constinit QHash<quint16, const QString*> codeRegistry;
-    static constexpr std::array<QStringView, 7> RESERVED_NAMES{
+    static constexpr std::array<QStringView, 8> RESERVED_NAMES{
         u"Qx::InternalError",
         u"Qx::GenericError",
         u"Qx::IoOpReport",
         u"Qx::SystemError",
         u"Qx::DownloadManagerReport",
         u"Qx::DownloadOpReport",
-        u"Qx::JsonError"
+        u"Qx::JsonError",
+        u"QJsonParseError"
     };
     // TODO: If this becomes sufficiently large, move to a constexpr set (hopefully available in std by that time)
 
