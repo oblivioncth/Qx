@@ -244,7 +244,7 @@ struct Converter<T>
             ([&]{
                 // Meta
                 constexpr auto mName = memberMeta.M_NAME;
-                QLatin1StringView mKey(mName.value);
+                constexpr QLatin1StringView mKey(mName.value);
                 using mType = typename std::remove_reference<decltype(memberMeta)>::type::M_TYPE;
                 auto mPtr = memberMeta.mPtr;
 
