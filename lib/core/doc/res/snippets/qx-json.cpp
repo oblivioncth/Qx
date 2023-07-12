@@ -22,7 +22,7 @@ struct Info
     bool cool;
     
     QX_JSON_STRUCT(rating, cool);
-}
+};
 
 struct MyJson
 {
@@ -33,7 +33,7 @@ struct MyJson
     QX_JSON_STRUCT(title, info, reviews);
 };
 
-void main()
+int main()
 {
     // Get JSON data
     QFile jsonFile("data.json");
