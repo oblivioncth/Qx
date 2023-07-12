@@ -331,14 +331,14 @@ struct Converter<T>
         // Convert all
         for(const QJsonValue& aValue : jArray)
         {
-            K converted;
+            V converted;
             if(cnvError = Converter<V>::fromJson(converted, aValue); cnvError.isValid())
             {
                 value.clear();
                 return cnvError;
             }
 
-            value.insert(keygen(converted), converted);
+            value.insert(keygen<K, V>(converted), converted);
         }
 
         return Qx::JsonError();
