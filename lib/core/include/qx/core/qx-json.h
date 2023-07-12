@@ -190,7 +190,7 @@ concept containing = Qx::specializes<T, QList> ||
 
 template<typename T>
 concept json_containing = containing<T> &&
-                          json_convertible<typename T::parameter_type>;
+                          json_convertible<typename T::value_type>;
 
 template<typename T>
 concept associative = Qx::specializes<T, QHash> ||
@@ -274,7 +274,7 @@ template<typename T>
     requires json_containing<T>
 struct Converter<T>
 {
-    using E = typename T::parameter_type;
+    using E = typename T::value_type;
 
     static Qx::JsonError fromJson(T& value, const QJsonValue& jValue)
     {
