@@ -135,7 +135,7 @@ QString JsonError::deriveSecondary() const { return ERR_STRINGS.value(mForm); };
  *
  *  @brief Allows QJsonParseError to be used via the Qx::Error interface.
  *
- *  All errors are assigned the severity of Severity::Error.
+ *  All errors are assigned the severity of Severity::Err.
  *
  *  @note This class exists in order to provide an implicit conversion between QJsonParseError
  *  and Error, and generally should not be used directly.
