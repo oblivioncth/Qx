@@ -129,8 +129,28 @@ QString JsonError::deriveSecondary() const { return ERR_STRINGS.value(mForm); };
 // <namepace>
 //===============================================================================================================
 
+//-Concepts---------------------------------------------------------------------------------------------
+/*!
+ *  @concept json_root
+ *  @brief Specifies that a type is a valid analogue for a JSON document root element.
+ *
+ *  Satisfied if @a T is a JSON-tied struct (an analogue for a root object), or a container class
+ *  with a value type for which there is a QxJson::Converter specialization (an analogue for a root
+ *  array).
+ */
+
 //-Functions---------------------------------------------------------------------------------------------
 //Public:
+/*!
+ *  @fn JsonError parseJson(T& parsed, const QJsonDocument& doc)
+ *
+ *  Parse the entire JSON document @a doc and stores the result in @a parsed.
+ *  @a T must satisfy the @ref json_root concept.
+ *
+ *  If parsing fails, a valid JsonError is returned that describes the cause; otherwise, an invalid
+ *  error is returned.
+ */
+
 /*!
  *  Recursively searches @a rootValue for @a key and returns the associated value for
  *  all matches as a list, or an empty list if the key was not found.

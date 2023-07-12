@@ -99,9 +99,6 @@ private:
     QString deriveSecondary() const override;
 };
 
-QX_CORE_EXPORT QList<QJsonValue> findAllValues(const QJsonValue& rootValue, QStringView key);
-QX_CORE_EXPORT QString asString(const QJsonValue& value);
-
 } // namespace Qx
 
 /*! @cond */
@@ -360,6 +357,7 @@ struct Converter<T>
         return Qx::JsonError();
     }
 };
+/*! @endcond */
 
 } // namespace QxJson
 
@@ -403,7 +401,9 @@ JsonError parseJson(T& parsed, const QJsonDocument& doc)
 
     return QxJson::Converter<T>::fromJson(parsed, rootAsValue);
 }
-/*! @endcond */
+
+QX_CORE_EXPORT QList<QJsonValue> findAllValues(const QJsonValue& rootValue, QStringView key);
+QX_CORE_EXPORT QString asString(const QJsonValue& value);
 
 } // namespace Qx
 
