@@ -200,7 +200,41 @@ template<typename T>
 concept json_associative = associative<T> &&
                            json_convertible<typename T::mapped_type> &&
                            json_keyable<typename T::key_type, typename T::mapped_type>;
+} // namespace QxJson
 
+namespace QxJsonPrivate
+{
+//-Functions-------------------------------------------------------------
+/* This helper is required as a form on indirection within
+ *
+ * template<typename T>
+ *     requires json_struct<T>
+ * struct Converter<T> {...}
+ *
+ * That functions makes/made use of an 'if constexpr' statement which contains
+ * a reference to a type in the true branch that doesn't exist if the
+ * false branch is taken. Different compilers seem to discard the untaken
+ * branch of the value dependent statement at different stages as it compiled
+ * fine with MSVC and a newer version of GCC, but not clang or older GCC versions.
+ * To clarify, compliation would fail due to the type in the not-yet-discarded
+ * branch not being declared.
+ *
+ * Putting the reference of the potentially undeclared type behind this function
+ * that always exists solves the issue.
+ */
+template<class K, typename T, Qx::StringLiteral N>
+    requires QxJson::json_override_convertible<K, T, N>
+Qx::JsonError performOverrideConversion(T& value, const QJsonValue& jv)
+{
+    return K::template QxJsonConversionOverride<N>::fromJson(value, jv);
+}
+
+
+} // namespace QxJsonPrivate
+
+
+namespace QxJson
+{
 //-Default Converter Specializations-------------------------------------
 /*! @cond */
 template<typename T>
@@ -258,7 +292,7 @@ struct Converter<T>
 
                 // Convert value
                 if constexpr(json_override_convertible<T, mType, mName>)
-                    cnvError = T::template QxJsonConversionOverride<mName>::fromJson(value.*mPtr, mValue);
+                    cnvError = QxJsonPrivate::performOverrideConversion<T, mType, mName>(value.*mPtr, mValue);
                 else
                     cnvError = Converter<mType>::fromJson(value.*mPtr, mValue);
 
