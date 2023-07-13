@@ -277,7 +277,7 @@ struct Converter<T>
             // Fold expression
             ([&]{
                 // Meta
-                constexpr auto mName = std::remove_reference<decltype(memberMeta)>::type::M_NAME;
+                static constexpr auto mName = std::remove_reference<decltype(memberMeta)>::type::M_NAME;
                 constexpr QLatin1StringView mKey(mName.value);
                 using mType = typename std::remove_reference<decltype(memberMeta)>::type::M_TYPE;
                 auto mPtr = memberMeta.mPtr;
