@@ -126,9 +126,9 @@ constexpr MemberMetadata<N, T, S> makeMemberMetadata(T S::*memberPtr)
     return {memberPtr};
 }
 
-template<typename T> static inline QString typeString() = delete;
-template<typename T> static inline bool isType(const QJsonValue& v) = delete;
-template<typename T> static inline T toType(const QJsonValue& v) = delete;
+template<typename T> [[maybe_unused]] static inline QString typeString() = delete;
+template<typename T> [[maybe_unused]] static inline bool isType(const QJsonValue& v) = delete;
+template<typename T> [[maybe_unused]] static inline T toType(const QJsonValue& v) = delete;
 
 template<> inline QString typeString<bool>() { return QSL("bool"); };
 template<> inline QString typeString<double>() { return QSL("double"); };
