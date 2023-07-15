@@ -8,7 +8,7 @@ namespace Qx
 {
 
 template<typename T>
-    requires std::is_trivially_assignable_v<T&, T>
+    requires std::is_assignable_v<T&, T>
 class SetOnce
 {
 //-Instance Members----------------------------------------------------------------------------------------------------
