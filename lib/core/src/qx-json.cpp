@@ -35,6 +35,17 @@
  *  The name of each included member must match the name their corresponding JSON key.
  *
  *  @snippet qx-json.cpp 2
+ *
+ *  @sa QX_JSON_STRUCT_OUTSIDE()
+ */
+
+/*!
+ *  @def QX_JSON_STRUCT_OUTSIDE()
+ *
+ *  Same as QX_JSON_STRUCT(), but is used outside of a struct instead of inside.
+ *
+ *  This is useful for hiding the JSON parsing implementation details of a public
+ *  struct within a different source file.
  */
 
 /*!

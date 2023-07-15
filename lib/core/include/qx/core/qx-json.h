@@ -24,32 +24,46 @@
 
 //-Macros------------------------------------------------------------------
 /*! @cond */
-#define __QX_JSON_META_STRUCT(meta_tuple) \
-template <typename StructT> \
-struct QxJsonMetaStruct \
-{ \
-    static inline constexpr auto memberMetadata() \
+#define __QX_JSON_META_STRUCT_INSIDE(meta_tuple) \
+    template <typename StructT> \
+    struct QxJsonMetaStructInside \
     { \
-        return meta_tuple; \
-    } \
+        static inline constexpr auto memberMetadata() \
+        { \
+            return meta_tuple; \
+        } \
+    }
+
+#define __QX_JSON_META_STRUCT_OUTSIDE(self_type, meta_tuple) \
+namespace QxJson \
+{ \
+    template <typename StructT> \
+    struct QxJsonMetaStructOutside<self_type, StructT> \
+    { \
+        static inline constexpr auto memberMetadata() \
+        { \
+            return meta_tuple; \
+        } \
+    }; \
 }
 
 #define __QX_JSON_MEMBER(member) QxJsonPrivate::makeMemberMetadata<#member>(&StructT::member)
 
 /*! @endcond */
 
-#define QX_JSON_STRUCT(...) __QX_JSON_META_STRUCT(std::make_tuple(QX_FOR_EACH_DELIM(__QX_JSON_MEMBER, __VA_ARGS__)))
+#define QX_JSON_STRUCT(...) __QX_JSON_META_STRUCT_INSIDE(std::make_tuple(QX_FOR_EACH_DELIM(__QX_JSON_MEMBER, __VA_ARGS__)))
+#define QX_JSON_STRUCT_OUTSIDE(Struct, ...) __QX_JSON_META_STRUCT_OUTSIDE(Struct, std::make_tuple(QX_FOR_EACH_DELIM(__QX_JSON_MEMBER, __VA_ARGS__)))
 
 #define QX_JSON_DECLARE_MEMBER_OVERRIDES() \
-template<Qx::StringLiteral MemberN> \
-struct QxJsonConversionOverride
+    template<Qx::StringLiteral MemberN> \
+    struct QxJsonConversionOverride
 
 #define QX_JSON_MEMBER_OVERRIDE(member, ...) \
-template<> \
-struct QxJsonConversionOverride<#member> \
-{ \
-    __VA_ARGS__\
-};
+    template<> \
+    struct QxJsonConversionOverride<#member> \
+    { \
+        __VA_ARGS__\
+    };
 
 namespace Qx
 {
@@ -156,14 +170,26 @@ namespace QxJson
 template<typename T>
 struct Converter;
 
+template<typename SelfType, typename DelayedSelfType>
+struct QxJsonMetaStructOutside;
+
 //-Concepts--------------------------------------------------------------
 template<typename T>
 concept qjson_type = Qx::any_of<T, bool, double, QString, QJsonArray, QJsonObject>;
 
 template<typename T>
-concept json_struct = requires {
-    T::template QxJsonMetaStruct<T>::memberMetadata();
+concept json_struct_inside = requires {
+    T::template QxJsonMetaStructInside<T>::memberMetadata();
 };
+
+template<typename T>
+concept json_struct_outside = requires {
+    QxJsonMetaStructOutside<T, T>::memberMetadata();
+};
+
+template<typename T>
+concept json_struct = json_struct_inside<T> ||
+                      json_struct_outside<T>;
 
 template<typename T>
 concept json_convertible = requires(T& tValue) {
@@ -209,23 +235,38 @@ concept json_containing = json_collective<T> ||
 namespace QxJsonPrivate
 {
 //-Functions-------------------------------------------------------------
-/* This helper is required as a form on indirection within
+/* These helpers are required as a form on indirection within
  *
  * template<typename T>
  *     requires json_struct<T>
  * struct Converter<T> {...}
  *
- * That functions makes/made use of an 'if constexpr' statement which contains
- * a reference to a type in the true branch that doesn't exist if the
- * false branch is taken. Different compilers seem to discard the untaken
+ * That functions makes/made use of 'if constexpr' statements that contain
+ * references to a type in their true branches that doesn't exist if the
+ * false branches are taken. Different compilers seem to discard the untaken
  * branch of the value dependent statement at different stages as it compiled
  * fine with MSVC and a newer version of GCC, but not clang or older GCC versions.
- * To clarify, compliation would fail due to the type in the not-yet-discarded
+ * To clarify, compi
+ * lation would fail due to the type in the not-yet-discarded
  * branch not being declared.
  *
- * Putting the reference of the potentially undeclared type behind this function
- * that always exists solves the issue.
+ * Putting the reference of the potentially undeclared types behind these functions
+ * that always exist solves the issue.
  */
+template<class K>
+    requires QxJson::json_struct_inside<K>
+constexpr auto getMemberMeta()
+{
+    return K::template QxJsonMetaStructInside<K>::memberMetadata();
+}
+
+template<class K>
+    requires QxJson::json_struct_outside<K>
+constexpr auto getMemberMeta()
+{
+    return QxJson::QxJsonMetaStructOutside<K, K>::memberMetadata();
+}
+
 template<class K, typename T, Qx::StringLiteral N>
     requires QxJson::json_override_convertible<K, T, N>
 Qx::JsonError performOverrideConversion(T& value, const QJsonValue& jv)
@@ -271,7 +312,7 @@ struct Converter<T>
         Qx::JsonError cnvError;
 
         // Get member metadata tuple
-        constexpr auto memberMetas = T::template QxJsonMetaStruct<T>::memberMetadata();
+        constexpr auto memberMetas = QxJsonPrivate::getMemberMeta<T>();
 
         // "Iterate" over each tuple element via std::apply, with a fold expression
         // utilizing && which short-circuits. This allows us to "break" the loop
