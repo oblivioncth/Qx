@@ -174,11 +174,29 @@ QString QJsonParseErrorAdapter::deriveSecondary() const { return OFFSET_STR.arg(
 /*!
  *  @fn JsonError parseJson(T& parsed, const QJsonDocument& doc)
  *
- *  Parse the entire JSON document @a doc and stores the result in @a parsed.
+ *  Parses the entire JSON document @a doc and stores the result in @a parsed.
  *  @a T must satisfy the @ref json_root concept.
  *
  *  If parsing fails, a valid JsonError is returned that describes the cause; otherwise, an invalid
  *  error is returned.
+ */
+
+/*!
+ *  @fn JsonError parseJson(T& parsed, const QJsonObject& obj)
+ *
+ *  @overload
+ *
+ *  Parses the JSON object @a obj and stores the result in @a parsed.
+ *  @a T must satisfy the @ref QxJson::json_struct concept.
+ */
+
+/*!
+ *  @fn JsonError parseJson(T& parsed, const QJsonArray& array)
+ *
+ *  @overload
+ *
+ *  Parses the JSON array @a array and stores the result in @a parsed.
+ *  @a T must satisfy the @ref QxJson::json_containing concept.
  */
 
 /*!

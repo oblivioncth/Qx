@@ -54,7 +54,6 @@ struct QxJsonConversionOverride<#member> \
 namespace Qx
 {
 
-//-Concepts------------------------------------------------------------------------------------------------------
 class QX_CORE_EXPORT JsonError final : public AbstractError<"Qx::JsonError", 5>
 {
 //-Class Enums-------------------------------------------------------------
@@ -185,11 +184,11 @@ concept json_keyable = requires(const Value& v) {
 };
 
 template<typename T>
-concept containing = Qx::specializes<T, QList> ||
+concept collective = Qx::specializes<T, QList> ||
                      Qx::specializes<T, QSet>;
 
 template<typename T>
-concept json_containing = containing<T> &&
+concept json_collective = collective<T> &&
                           json_convertible<typename T::value_type>;
 
 template<typename T>
@@ -200,8 +199,13 @@ template<typename T>
 concept json_associative = associative<T> &&
                            json_convertible<typename T::mapped_type> &&
                            json_keyable<typename T::key_type, typename T::mapped_type>;
+
+template<typename T>
+concept json_containing = json_collective<T> ||
+                          json_associative<T>;
 } // namespace QxJson
 
+/*! @cond */
 namespace QxJsonPrivate
 {
 //-Functions-------------------------------------------------------------
@@ -228,7 +232,7 @@ Qx::JsonError performOverrideConversion(T& value, const QJsonValue& jv)
 {
     return K::template QxJsonConversionOverride<N>::fromJson(value, jv);
 }
-
+/*! @endcond */
 
 } // namespace QxJsonPrivate
 
@@ -305,7 +309,7 @@ struct Converter<T>
 };
 
 template<typename T>
-    requires json_containing<T>
+    requires json_collective<T>
 struct Converter<T>
 {
     using E = typename T::value_type;
@@ -459,6 +463,26 @@ JsonError parseJson(T& parsed, const QJsonDocument& doc)
     QJsonValue rootAsValue = std::move(root);
 
     return QxJson::Converter<T>::fromJson(parsed, rootAsValue);
+}
+
+template<typename T>
+    requires QxJson::json_struct<T>
+JsonError parseJson(T& parsed, const QJsonObject& obj)
+{
+    // Use QJsonValue for semi-type erasure
+    QJsonValue objAsValue(obj);
+
+    return QxJson::Converter<T>::fromJson(parsed, objAsValue);
+}
+
+template<typename T>
+    requires QxJson::json_containing<T>
+JsonError parseJson(T& parsed, const QJsonArray& array)
+{
+    // Use QJsonValue for semi-type erasure
+    QJsonValue arrayAsValue(array);
+
+    return QxJson::Converter<T>::fromJson(parsed, array);
 }
 
 QX_CORE_EXPORT QList<QJsonValue> findAllValues(const QJsonValue& rootValue, QStringView key);
