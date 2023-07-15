@@ -65,6 +65,30 @@ struct MyStruct
 //! [2]
 
 //! [3]
+struct MyStruct
+{
+    int number;
+    QString name;
+    
+    QX_JSON_STRUCT_X(
+        QX_JSON_MEMBER(number),
+        QX_JSON_MEMBER_ALIASED(name, "aliasName")
+    );
+}
+//! [3]
+
+//! [4]
+struct MyStruct
+{
+    int number;
+    QString name;
+}
+
+// At global scope
+QX_JSON_STRUCT_OUTSIDE(number, name);
+//! [4]
+
+//! [5]
 struct MySpecialStruct
 {
     int number;
@@ -82,9 +106,9 @@ struct MySpecialStruct
         }
     )
 }
-//! [3]
+//! [5]
 
-//! [4]
+//! [6]
 class MyType
 {
     ...
@@ -105,9 +129,9 @@ namespace QxJson
         }
     };
 }
-//! [4]
+//! [6]
 
-//! [5]
+//! [7]
 struct MyStruct
 {
     int number;
@@ -136,4 +160,4 @@ struct OtherStruct
     
     QX_JSON_STRUCT(enabled, myStructs);
 };
-//! [5]
+//! [7]

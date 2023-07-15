@@ -27,6 +27,25 @@
  */
 
 /*!
+ *  @def QX_JSON_MEMBER()
+ *
+ *  Used to denote a JSON struct member whose name matches its key when using QX_JSON_STRUCT_X().
+ *
+ *  @sa QX_JSON_STRUCT_X()
+ */
+
+/*!
+ *  @def QX_JSON_MEMBER_ALIASED(member, key)
+ *
+ *  Used to denote a JSON struct member with a key that is different from its name when
+ *  using QX_JSON_STRUCT_X().
+ *
+ *  @a key is to be a string literal.
+ *
+ *  @sa QX_JSON_STRUCT_X()
+ */
+
+/*!
  *  @def QX_JSON_STRUCT()
  *
  *  Specifies that a struct is a JSON-tied struct, which enables support for automatic
@@ -36,7 +55,17 @@
  *
  *  @snippet qx-json.cpp 2
  *
- *  @sa QX_JSON_STRUCT_OUTSIDE()
+ *  @sa QX_JSON_STRUCT_OUTSIDE() and QX_JSON_STRUCT_X()
+ */
+
+/*!
+ *  @def QX_JSON_STRUCT_X()
+ *
+ *  Same as QX_JSON_STRUCT(), but allows for customization of member keys.
+ *
+ *  Each member must be wrapped in QX_JSON_MEMBER() or QX_JSON_MEMBER_ALIASED().
+ *
+ *  @snippet qx-json.cpp 3
  */
 
 /*!
@@ -44,8 +73,20 @@
  *
  *  Same as QX_JSON_STRUCT(), but is used outside of a struct instead of inside.
  *
+ *  @snippet qx-json.cpp 4
+ *
  *  This is useful for hiding the JSON parsing implementation details of a public
  *  struct within a different source file.
+ *
+ *  @sa QX_JSON_STRUCT()
+ */
+
+/*!
+ *  @def QX_JSON_STRUCT_OUTSIDE_X()
+ *
+ *  Same as QX_JSON_STRUCT_X(), but is used outside of a struct instead of inside.
+
+ *  @sa QX_JSON_STRUCT_OUTSIDE()
  */
 
 /*!
@@ -65,7 +106,7 @@
  *  The specified member will be parsed using the provided function instead of a
  *  potentially available generic one for that type.
  *
- *  @snippet qx-json.cpp 3
+ *  @snippet qx-json.cpp 5
  */
 
 namespace Qx
@@ -287,7 +328,7 @@ namespace QxJson
  *  - QMap<K, T> (when a keygen() specialization exists for K)
  *
  *  Support for additional, non-structural types can be added like so:
- *  @snippet qx-json.cpp 4
+ *  @snippet qx-json.cpp 6
  *
  *  If a structural type needs to be registered, the QX_JSON_STRUCT and QX_JSON_MEMBER macros should be used
  *  instead.
@@ -305,7 +346,7 @@ namespace QxJson
  *  for that type.
  *
  *  Support for additional types can be added like so:
- *  @snippet qx-json.cpp 5
+ *  @snippet qx-json.cpp 7
  *
  *  @sa qx-json.h and Converter.
  */

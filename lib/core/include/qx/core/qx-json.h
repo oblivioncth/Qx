@@ -47,12 +47,16 @@ namespace QxJson \
     }; \
 }
 
-#define __QX_JSON_MEMBER(member) QxJsonPrivate::makeMemberMetadata<#member>(&StructT::member)
-
 /*! @endcond */
 
-#define QX_JSON_STRUCT(...) __QX_JSON_META_STRUCT_INSIDE(std::make_tuple(QX_FOR_EACH_DELIM(__QX_JSON_MEMBER, __VA_ARGS__)))
-#define QX_JSON_STRUCT_OUTSIDE(Struct, ...) __QX_JSON_META_STRUCT_OUTSIDE(Struct, std::make_tuple(QX_FOR_EACH_DELIM(__QX_JSON_MEMBER, __VA_ARGS__)))
+#define QX_JSON_MEMBER(member) QxJsonPrivate::makeMemberMetadata<#member>(&StructT::member)
+#define QX_JSON_MEMBER_ALIASED(member, key) QxJsonPrivate::makeMemberMetadata<key>(&StructT::member)
+
+#define QX_JSON_STRUCT(...) __QX_JSON_META_STRUCT_INSIDE(std::make_tuple(QX_FOR_EACH_DELIM(QX_JSON_MEMBER, __VA_ARGS__)))
+#define QX_JSON_STRUCT_X(...) __QX_JSON_META_STRUCT_INSIDE(std::make_tuple(__VA_ARGS__))
+
+#define QX_JSON_STRUCT_OUTSIDE(Struct, ...) __QX_JSON_META_STRUCT_OUTSIDE(Struct, std::make_tuple(QX_FOR_EACH_DELIM(QX_JSON_MEMBER, __VA_ARGS__)))
+#define QX_JSON_STRUCT_OUTSIDE_X(Struct, ...) __QX_JSON_META_STRUCT_OUTSIDE(Struct, std::make_tuple(__VA_ARGS__))
 
 #define QX_JSON_DECLARE_MEMBER_OVERRIDES() \
     template<Qx::StringLiteral MemberN> \
