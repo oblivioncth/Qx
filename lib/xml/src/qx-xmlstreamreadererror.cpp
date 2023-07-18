@@ -46,6 +46,14 @@ XmlStreamReaderError::XmlStreamReaderError(QString customError) :
     mErrorText(customError)
 {}
 
+/*!
+ *  Constructs a custom XML stream reader error from the current error state of stream @a streamReader.
+ */
+XmlStreamReaderError::XmlStreamReaderError(const QXmlStreamReader& streamReader) :
+    mErrorType(streamReader.error()),
+    mErrorText(mErrorType == QXmlStreamReader::CustomError ? streamReader.errorString() : STD_ERR_TXT.value(mErrorType))
+{}
+
 //-Instance Functions--------------------------------------------------------------------------------------------
 //Public:
 /*!

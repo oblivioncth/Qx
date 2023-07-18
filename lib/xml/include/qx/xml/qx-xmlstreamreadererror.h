@@ -35,6 +35,7 @@ public:
     XmlStreamReaderError();
     XmlStreamReaderError(QXmlStreamReader::Error standardError);
     XmlStreamReaderError(QString customError);
+    XmlStreamReaderError(const QXmlStreamReader& streamReader);
 
 //-Instance Functions--------------------------------------------------------------------------------------------
 public:
