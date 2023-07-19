@@ -1124,4 +1124,19 @@ namespace Qx
  *
  *  Satisfied if @c K is a specialization of @c L with any parameters.
  */
+
+// Similiar interface types
+/*!
+ *  @concept qassociative
+ *  @brief Specifies that a type is a Qt-based associative container type.
+ *
+ *  Satisfied if @c T is a specialization of QHash or QMap.
+ */
+
+/*!
+ *  @concept qcollective
+ *  @brief Specifies that a type is a Qt-based collection type.
+ *
+ *  Satisfied if @c T is a specialization of QList or QSet.
+ */
 }

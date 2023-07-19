@@ -214,19 +214,11 @@ concept json_keyable = requires(const Value& v) {
 };
 
 template<typename T>
-concept collective = Qx::specializes<T, QList> ||
-                     Qx::specializes<T, QSet>;
-
-template<typename T>
-concept json_collective = collective<T> &&
+concept json_collective = Qx::qcollective<T> &&
                           json_convertible<typename T::value_type>;
 
 template<typename T>
-concept associative = Qx::specializes<T, QHash> ||
-                      Qx::specializes<T, QMap>;
-
-template<typename T>
-concept json_associative = associative<T> &&
+concept json_associative = Qx::qassociative<T> &&
                            json_convertible<typename T::mapped_type> &&
                            json_keyable<typename T::key_type, typename T::mapped_type>;
 

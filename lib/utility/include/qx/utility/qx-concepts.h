@@ -6,6 +6,10 @@
 #include <iterator>
 #include <type_traits>
 
+// Qt Includes
+#include <QHash>
+#include <QMap>
+
 /*! @cond */
 namespace QxConceptsPrivate
 {
@@ -511,6 +515,15 @@ concept any_of = (std::same_as<K, L> || ...);
 // Template
 template<typename K, template <typename...> class L>
 concept specializes = QxConceptsPrivate::is_specialization_of_v<K, L>;
+
+// Similiar interface types
+template<typename T>
+concept qassociative = specializes<T, QHash> ||
+                       specializes<T, QMap>;
+
+template<typename T>
+concept qcollective = Qx::specializes<T, QList> ||
+                      Qx::specializes<T, QSet>;
 
 }
 
