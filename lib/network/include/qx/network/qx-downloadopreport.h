@@ -14,7 +14,7 @@
 namespace Qx
 {
 
-class QX_NETWORK_EXPORT DownloadOpReport final : AbstractError<"Qx::DownloadOpReport", 4>
+class QX_NETWORK_EXPORT DownloadOpReport final : public AbstractError<"Qx::DownloadOpReport", 4>
 {
 //-Class Enums------------------------------------------------------------------------------------------------------
 public:

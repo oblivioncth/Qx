@@ -19,7 +19,7 @@ namespace Qx
 //-Forward Declarations-------------------------------------------------------------------------------------------
 class AsyncDownloadManager;
 
-class QX_NETWORK_EXPORT DownloadManagerReport final : AbstractError<"Qx::DownloadManagerReport", 3>
+class QX_NETWORK_EXPORT DownloadManagerReport final : public AbstractError<"Qx::DownloadManagerReport", 3>
 {
 friend AsyncDownloadManager;
 
