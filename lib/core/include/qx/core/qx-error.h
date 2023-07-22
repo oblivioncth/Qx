@@ -46,12 +46,12 @@ private:
 
 public:
     static constexpr quint16 TYPE_CODE = 0;
-    static inline const QString TYPE_NAME = u"Error"_s;
+    static constexpr QLatin1StringView TYPE_NAME{"Error"};
 
 //-Instance Variables----------------------------------------------------------------------------------------------------------
 private:
     quint16 mTypeCode;
-    QString mTypeName;
+    QLatin1StringView mTypeName;
     quint32 mValue;
     Severity mSeverity;
     QString mCaption;
@@ -90,7 +90,7 @@ public:
 //-Instance Functions------------------------------------------------------------------------------------------------------
 public:
     quint16 typeCode() const;
-    QString typeName() const;
+    QLatin1StringView typeName() const;
 
     quint32 value() const;
     Severity severity() const;

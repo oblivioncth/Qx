@@ -140,7 +140,7 @@ quint16 Error::typeCode() const { return mTypeCode; }
  *
  *  @sa AbstractError::TYPE_NAME
  */
-QString Error::typeName() const { return mTypeName; }
+QLatin1StringView Error::typeName() const { return mTypeName; }
 
 /*!
  *  Returns the value (i.e. type specific code) of the error.

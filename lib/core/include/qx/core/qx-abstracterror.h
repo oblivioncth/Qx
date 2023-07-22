@@ -88,7 +88,7 @@ friend class Error;
 //-Class Variables----------------------------------------------------------------------------------------------------------
 public:
     static constexpr quint16 TYPE_CODE = ECode;
-    static inline const QString TYPE_NAME{EName.value};
+    static constexpr QLatin1StringView TYPE_NAME{EName.value};
 
 private:
     static inline const bool REGISTER = registerType(TYPE_CODE, TYPE_NAME);
