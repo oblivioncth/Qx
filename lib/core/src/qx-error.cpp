@@ -273,7 +273,7 @@ quint64 Error::code() const { return (quint64(mSeverity) << 48) | (quint64(mType
 QString Error::hexCode() const
 {
     static constexpr QStringView hx = u"0x";
-    static const QString ph = QSL("%1");
+    static const QString ph = u"%1"_s;
 
     return hx % ph.arg(code(), 14, 16, QChar('0')).toUpper();
 }
@@ -286,7 +286,7 @@ QString Error::hexCode() const
  */
 QString Error::toString() const
 {
-    QString str = '[' + severityString() + "] (" + hexCode() + ')';
+    QString str = '[' + severityString() + u"] ("_s + hexCode() + ')';
 
     if(!mPrimary.isEmpty())
     {

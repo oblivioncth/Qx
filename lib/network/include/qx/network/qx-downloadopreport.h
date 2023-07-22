@@ -9,7 +9,6 @@
 
 // Extra-component Includes
 #include "qx/core/qx-abstracterror.h"
-#include "qx/utility/qx-macros.h"
 
 namespace Qx
 {
@@ -27,11 +26,11 @@ public:
 
 //-Class Members----------------------------------------------------------------------------------------------------
 private:
-    static inline const QString COMPLETE = QSL("The download [%1] -> [%2] did completed succesfully");
-    static inline const QString INCOMPLETE = QSL("The download [%1] -> [%2] did not complete");
-    static inline const QString FAILED = QSL("Error: %1");
-    static inline const QString ABORTED = QSL("Task was aborted.");
-    static inline const QString SKIPPED = QSL("Task was skipped due to previous errors.");
+    static inline const QString COMPLETE = u"The download [%1] -> [%2] did completed succesfully"_s;
+    static inline const QString INCOMPLETE = u"The download [%1] -> [%2] did not complete"_s;
+    static inline const QString FAILED = u"Error: %1"_s;
+    static inline const QString ABORTED = u"Task was aborted."_s;
+    static inline const QString SKIPPED = u"Task was skipped due to previous errors."_s;
 
 //-Instance Members---------------------------------------------------------------------------------------------------
 private:

@@ -4,8 +4,7 @@
 // Qt Includes
 #include <QHash>
 
-// Extra-component Includes
-#include "qx/utility/qx-macros.h"
+using namespace Qt::Literals::StringLiterals;
 
 namespace Qx
 {
@@ -40,9 +39,9 @@ namespace Qx
 QString severityString(Severity sv, bool uc)
 {
     static const QHash<Severity, QString> SEVERITY_STRING_MAP{
-        {Severity::Warning, QSL("Warning")},
-        {Severity::Err, QSL("Error")},
-        {Severity::Critical, QSL("Critical")},
+        {Severity::Warning, u"Warning"_s},
+        {Severity::Err, u"Error"_s},
+        {Severity::Critical, u"Critical"_s},
     };
 
     const QString str = SEVERITY_STRING_MAP.value(sv);

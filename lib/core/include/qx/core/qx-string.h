@@ -25,7 +25,7 @@ public:
 
     template<typename T, typename F>
         requires defines_call_for_s<F, QString, const T&>
-    static QString join(QList<T> list, F&& toStringFunc, QString separator = "", QString prefix = "")
+    static QString join(QList<T> list, F&& toStringFunc, QString separator = {}, QString prefix = {})
     {
         QString conjuction;
 
@@ -40,11 +40,11 @@ public:
         return conjuction;
     }
 
-    static QString join(QList<QString> list, QString separator = "", QString prefix = ""); // Overload for T = QString
+    static QString join(QList<QString> list, QString separator = {}, QString prefix = {}); // Overload for T = QString
 
     template<typename T, typename F>
         requires defines_call_for_s<F, QString, const T&>
-    static QString join(QSet<T> set, F&& toStringFunc, QString separator = "", QString prefix = "")
+    static QString join(QSet<T> set, F&& toStringFunc, QString separator = {}, QString prefix = {})
     {
         QString conjuction;
 
@@ -60,7 +60,7 @@ public:
         return conjuction;
     }
 
-    static QString join(QSet<QString> set, QString separator = "", QString prefix = ""); // Overload for T = QString
+    static QString join(QSet<QString> set, QString separator = {}, QString prefix = {}); // Overload for T = QString
 
     static QString trimLeading(const QStringView string);
     static QString trimTrailing(const QStringView string);

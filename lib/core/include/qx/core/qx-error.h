@@ -12,9 +12,6 @@
 // Intra-component Includes
 #include "qx/core/qx-abstracterror.h"
 
-// Extra-component Includes
-#include "qx/utility/qx-macros.h"
-
 // Private namespace for storing registered error adapters
 namespace QxErrorPrivate
 {
@@ -41,7 +38,7 @@ class QX_CORE_EXPORT Error
 {
 //-Class Variables----------------------------------------------------------------------------------------------------------
 private:
-    static inline const QString DETAILED_INFO_HEADING = QSL("Details:\n--------");
+    static inline const QString DETAILED_INFO_HEADING = u"Details:\n--------"_s;
 
     // Adapter Registry Alias
     template <class K>
@@ -49,7 +46,7 @@ private:
 
 public:
     static constexpr quint16 TYPE_CODE = 0;
-    static inline const QString TYPE_NAME = QSL("Error");
+    static inline const QString TYPE_NAME = u"Error"_s;
 
 //-Instance Variables----------------------------------------------------------------------------------------------------------
 private:

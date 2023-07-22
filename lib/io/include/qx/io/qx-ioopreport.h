@@ -53,53 +53,53 @@ class QX_IO_EXPORT IoOpReport final : public AbstractError<"Qx::IoOpReport", 1>
 {
 //-Class Members----------------------------------------------------------------------------------------------------
 private:
-    static const inline QString NULL_TARGET = QSL("<NULL>");
-    static const inline QString TYPE_MACRO = QSL("<target>");
+    static const inline QString NULL_TARGET = u"<NULL>"_s;
+    static const inline QString TYPE_MACRO = u"<target>"_s;
     static const inline QHash<IoOpTargetType, QString> TARGET_TYPE_STRINGS  = {
-        {IO_FILE, QSL("file")},
-        {IO_DIR, QSL("directory")}
+        {IO_FILE, u"file"_s},
+        {IO_DIR, u"directory"_s}
     };
-    static const inline QString SUCCESS_TEMPLATE = QSL(R"(Successfully %1 %2 "%3")");
-    static const inline QString ERROR_TEMPLATE = QSL(R"(Error while %1 %2 "%3")");
+    static const inline QString SUCCESS_TEMPLATE = uR"(Successfully %1 %2 "%3")"_s;
+    static const inline QString ERROR_TEMPLATE = uR"(Error while %1 %2 "%3")"_s;
     static const inline QHash<IoOpType, QString> SUCCESS_VERBS = {
-        {IO_OP_READ, QSL("read")},
-        {IO_OP_WRITE, QSL("wrote")},
-        {IO_OP_ENUMERATE, QSL("enumerated")},
-        {IO_OP_INSPECT, QSL("inspected")},
-        {IO_OP_MANIPULATE, QSL("manipulated")}
+        {IO_OP_READ, u"read"_s},
+        {IO_OP_WRITE, u"wrote"_s},
+        {IO_OP_ENUMERATE, u"enumerated"_s},
+        {IO_OP_INSPECT, u"inspected"_s},
+        {IO_OP_MANIPULATE, u"manipulated"_s}
     };
     static const inline QHash<IoOpType, QString> ERROR_VERBS = {
-        {IO_OP_READ, QSL("reading")},
-        {IO_OP_WRITE, QSL("writing")},
-        {IO_OP_ENUMERATE, QSL("enumerating")},
-        {IO_OP_INSPECT, QSL("inspecting")},
-        {IO_OP_MANIPULATE, QSL("manipulating")}
+        {IO_OP_READ, u"reading"_s},
+        {IO_OP_WRITE, u"writing"_s},
+        {IO_OP_ENUMERATE, u"enumerating"_s},
+        {IO_OP_INSPECT, u"inspecting"_s},
+        {IO_OP_MANIPULATE, u"manipulating"_s}
     };
     static const inline QHash<IoOpResultType, QString> ERROR_INFO = {
-        {IO_ERR_UNKNOWN, QSL("An unknown error has occurred.")},
-        {IO_ERR_ACCESS_DENIED, QSL("Access denied.")},
-        {IO_ERR_WRONG_TYPE, QSL("Target is not a ") + TYPE_MACRO + QSL(".")},
-        {IO_ERR_OUT_OF_RES, QSL("Out of resources.")},
-        {IO_ERR_READ, QSL("General read error.")},
-        {IO_ERR_WRITE, QSL("General write error.")},
-        {IO_ERR_FATAL, QSL("A fatal error has occurred.")},
-        {IO_ERR_OPEN, QSL("Could not open ") + TYPE_MACRO + QSL(".")},
-        {IO_ERR_ABORT, QSL("The operation was aborted.")},
-        {IO_ERR_TIMEOUT, QSL("Request timed out.")},
-        {IO_ERR_REMOVE, QSL("The ") + TYPE_MACRO + QSL(" could not be removed.")},
-        {IO_ERR_RENAME, QSL("The ") + TYPE_MACRO + QSL(" could not be renamed.")},
-        {IO_ERR_REPOSITION, QSL("The ") + TYPE_MACRO + QSL(" could not be moved.")},
-        {IO_ERR_RESIZE, QSL("The ") + TYPE_MACRO + QSL(" could not be resized.")},
-        {IO_ERR_COPY, QSL("The ") + TYPE_MACRO + QSL(" could not be copied.")},
-        {IO_ERR_DNE, QSL("The ") + TYPE_MACRO + QSL(" does not exist.")},
-        {IO_ERR_PATH_DNE, QSL("The containing path of the ") + TYPE_MACRO + QSL(" does not exist.")},
-        {IO_ERR_NULL, QSL("The target is null")},
-        {IO_ERR_EXISTS, QSL("The ") + TYPE_MACRO + QSL(" already exists.")},
-        {IO_ERR_CANT_CREATE, QSL("The ") + TYPE_MACRO + QSL(" could not be created.")},
-        {IO_ERR_CANT_CREATE_PATH, QSL("The path to the ") + TYPE_MACRO + QSL(" could not be created.")},
-        {IO_ERR_FILE_SIZE_MISMATCH, QSL("File size mismatch.")},
-        {IO_ERR_CURSOR_OOB, QSL("File data cursor has gone out of bounds.")},
-        {IO_ERR_FILE_NOT_OPEN, QSL("The file is not open.")}
+        {IO_ERR_UNKNOWN, u"An unknown error has occurred."_s},
+        {IO_ERR_ACCESS_DENIED, u"Access denied."_s},
+        {IO_ERR_WRONG_TYPE, u"Target is not a "_s + TYPE_MACRO + u"."_s},
+        {IO_ERR_OUT_OF_RES, u"Out of resources."_s},
+        {IO_ERR_READ, u"General read error."_s},
+        {IO_ERR_WRITE, u"General write error."_s},
+        {IO_ERR_FATAL, u"A fatal error has occurred."_s},
+        {IO_ERR_OPEN, u"Could not open "_s + TYPE_MACRO + u"."_s},
+        {IO_ERR_ABORT, u"The operation was aborted."_s},
+        {IO_ERR_TIMEOUT, u"Request timed out."_s},
+        {IO_ERR_REMOVE, u"The "_s + TYPE_MACRO + u" could not be removed."_s},
+        {IO_ERR_RENAME, u"The "_s + TYPE_MACRO + u" could not be renamed."_s},
+        {IO_ERR_REPOSITION, u"The "_s + TYPE_MACRO + u" could not be moved."_s},
+        {IO_ERR_RESIZE, u"The "_s + TYPE_MACRO + u" could not be resized."_s},
+        {IO_ERR_COPY, u"The "_s + TYPE_MACRO + u" could not be copied."_s},
+        {IO_ERR_DNE, u"The "_s + TYPE_MACRO + u" does not exist."_s},
+        {IO_ERR_PATH_DNE, u"The containing path of the "_s + TYPE_MACRO + u" does not exist."_s},
+        {IO_ERR_NULL, u"The target is null"_s},
+        {IO_ERR_EXISTS, u"The "_s + TYPE_MACRO + u" already exists."_s},
+        {IO_ERR_CANT_CREATE, u"The "_s + TYPE_MACRO + u" could not be created."_s},
+        {IO_ERR_CANT_CREATE_PATH, u"The path to the "_s + TYPE_MACRO + u" could not be created."_s},
+        {IO_ERR_FILE_SIZE_MISMATCH, u"File size mismatch."_s},
+        {IO_ERR_CURSOR_OOB, u"File data cursor has gone out of bounds."_s},
+        {IO_ERR_FILE_NOT_OPEN, u"The file is not open."_s}
     };
     /* TODO: In the many const QHashs like this throughout the lib, figure out how to also
      * make the values const (for since they aren't to be modified), because as is they don't
