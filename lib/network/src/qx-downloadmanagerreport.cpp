@@ -69,7 +69,7 @@ QString DownloadManagerReport::deriveDetails() const
     details.reserve(mDetailsSpecific.size() && mDetailsGeneral.size() + 2);
     details.append(mDetailsGeneral);
     if(!details.isEmpty())
-        details.append("\n\n"); // +2
+        details.append(u"\n\n"_s); // +2
     details.append(mDetailsSpecific);
 
     return details;
@@ -198,13 +198,13 @@ DownloadManagerReport DownloadManagerReport::Builder::build()
 
         if(!errorList.isEmpty())
         {
-            sDetails += ERR_D_SPECIFIC + "\n";
-            sDetails += "- " + errorList.join("\n- ");
+            sDetails += ERR_D_SPECIFIC + '\n';
+            sDetails += u"- "_s + errorList.join(u"\n- "_s);
         }
 
         if(skipped || aborted)
         {
-            gDetails += ERR_D_GENERAL + "\n";
+            gDetails += ERR_D_GENERAL + '\n';
 
             QStringList generalList;
             if(skipped)
@@ -212,7 +212,7 @@ DownloadManagerReport DownloadManagerReport::Builder::build()
             if(aborted)
                 generalList << ERR_D_ABORT.arg(aborted);
 
-            gDetails += "- " + generalList.join("\n- ");
+            gDetails += u"- "_s + generalList.join(u"\n- "_s);
         }
 
         mWorkingReport.mOutcomeString = ERR_P_QUEUE_INCOMPL;

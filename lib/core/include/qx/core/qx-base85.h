@@ -18,6 +18,8 @@
 #include <QHash>
 #include <QSet>
 
+using namespace Qt::Literals::StringLiterals;
+
 namespace Qx
 {
 
@@ -147,12 +149,12 @@ public:
 //-Class Variables------------------------------------------------------------------------------------------------------
 private:
     static inline const QHash<ParseError, QString> ERROR_STR_MAP{
-        {NoError, QStringLiteral("No error occurred.")},
-        {InvalidEncoding, QStringLiteral("The provided encoding is invalid.")},
-        {PaddingRequired, QStringLiteral("The string makes use of padding, but the specified encoding does not support padding.")},
-        {NonANSI, QStringLiteral("The string contains characters that are wider than a single byte.")},
-        {CharacterSetMismatch, QStringLiteral("The string contains characters that are not present in the specified encoding's character set.")},
-        {ShortcutMidFrame, QStringLiteral("A shortcut character appears in the middle of one of the string's 5-character ASCII frames.")},
+        {NoError, u"No error occurred."_s},
+        {InvalidEncoding, u"The provided encoding is invalid."_s},
+        {PaddingRequired, u"The string makes use of padding, but the specified encoding does not support padding."_s},
+        {NonANSI, u"The string contains characters that are wider than a single byte."_s},
+        {CharacterSetMismatch, u"The string contains characters that are not present in the specified encoding's character set."_s},
+        {ShortcutMidFrame, u"A shortcut character appears in the middle of one of the string's 5-character ASCII frames."_s},
     };
 
 //-Instance Variables------------------------------------------------------------------------------------------------------------
@@ -180,8 +182,8 @@ private:
     static constexpr char ENCODE_PAD_CHAR = '\0';
 
     // Shortcut Frames
-    static inline const QByteArray ZERO_GROUP_FRAME = QByteArrayLiteral("\x00\x00\x00\x00");
-    static inline const QByteArray SPACE_GROUP_FRAME = QByteArrayLiteral("\x20\x20\x20\x20");
+    static inline const QByteArray ZERO_GROUP_FRAME = "\x00\x00\x00\x00"_ba;
+    static inline const QByteArray SPACE_GROUP_FRAME = "\x20\x20\x20\x20"_ba;
 
     // Decode
     static constexpr quint32 POWERS_OF_85[] = {

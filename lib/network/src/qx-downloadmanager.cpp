@@ -154,7 +154,7 @@ void AsyncDownloadManager::startDownload(DownloadTask task)
     if(streamOpen.isFailure())
     {
         forceFinishProgress(task);
-        recordFinishedDownload(DownloadOpReport::failedDownload(task, streamOpen.outcome() + ": " + streamOpen.outcomeInfo()));
+        recordFinishedDownload(DownloadOpReport::failedDownload(task, streamOpen.outcome() + u": "_s + streamOpen.outcomeInfo()));
         if(mStopOnError)
             stopOnError();
         return;

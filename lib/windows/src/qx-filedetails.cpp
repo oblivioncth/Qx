@@ -10,6 +10,8 @@
 // Extra-component Includes
 #include <qx/core/qx-datetime.h>
 
+using namespace Qt::Literals::StringLiterals;
+
 namespace Qx
 {
 
@@ -306,8 +308,8 @@ FileDetails FileDetails::readFileDetails(QString filePath)
                 for (ULONGLONG i = 0; i < (viQuerryResultSizeBuffer / sizeof(struct LANGANDCODEPAGE)); i++)
                 {
                     // Get current sub block base
-                    QString langID = QString("%1").arg(langCodePage[i].wLanguage, 4, 16, QChar('0'));
-                    QString codePageID = QString("%1").arg(langCodePage[i].wCodePage, 4, 16, QChar('0'));
+                    QString langID = QString(u"%1"_s).arg(langCodePage[i].wLanguage, 4, 16, QChar('0'));
+                    QString codePageID = QString(u"%1"_s).arg(langCodePage[i].wCodePage, 4, 16, QChar('0'));
                     QString currentSubBlockBase = FileDetails::SUB_BLOCK_BASE_TEMPLATE.arg(langID, codePageID);
 
                     // String table to populate

@@ -47,7 +47,7 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(ReadOptions)
 //-Namespace Variables-------------------------------------------------------------------------------------------------
 //TODO: Ensure these work in shared build. Don't think they need to be exported since they are defined here
 const QChar ENDL = '\n'; //Auto cross platform thanks to QIODevice::OpenMode Text
-const QString LIST_ITEM_PREFIX = "- ";
+const QString LIST_ITEM_PREFIX = u"- "_s;
 
 //-Namespace Functions-------------------------------------------------------------------------------------------------
 QX_IO_EXPORT bool fileIsEmpty(const QFile& file);

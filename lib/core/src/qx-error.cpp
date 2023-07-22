@@ -361,7 +361,7 @@ Error Error::withSeverity(Severity sv)
 QTextStream& operator<<(QTextStream& ts, const Qx::Error& e)
 {
     // Primary heading
-    ts << "( " << e.severityString() << " ) " << e.hexCode() << " ";
+    ts << "( " << e.severityString() << " ) " << e.hexCode() << ' ';
     if(!e.mCaption.isEmpty())
         ts << e.mCaption;
     ts << '\n';

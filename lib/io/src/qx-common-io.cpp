@@ -902,7 +902,7 @@ IoOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, Index32 
 
                  // If end was reached and there was a trailing line break that isn't to be ignored, there is one more blank line
                  if(fileTextStream.atEnd() && !readOptions.testFlag(IgnoreTrailingBreak) && fileTextStream.precedingBreak())
-                     returnBuffer.append("");
+                     returnBuffer.append(u""_s);
              }
          }
 
@@ -985,7 +985,7 @@ namespace
                 for(int i = 0; i < *startPos.line(); ++i)
                     textStream << ENDL;
                 for(int i = 0; i < *startPos.character(); ++i)
-                    textStream << " ";
+                    textStream << ' ';
             }
 
             // Write main text
@@ -1020,7 +1020,7 @@ namespace
                 {
                     int lastLineCharCount = beforeNew.count() - (beforeNew.lastIndexOf(ENDL) + 1);
                     int charNeeded = std::max(*startPos.character() - lastLineCharCount, 0);
-                    beforeNew += QString(" ").repeated(charNeeded);
+                    beforeNew += QString(' ').repeated(charNeeded);
 
                     if(charNeeded > 0)
                         padded = true;

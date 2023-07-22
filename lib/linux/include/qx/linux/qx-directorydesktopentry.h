@@ -14,8 +14,8 @@ class QX_LINUX_EXPORT DirectoryDesktopEntry : public DesktopEntry
 {
 //-Class Members-------------------------------------------------------------------------------------------------
 private:
-    static inline const QString TYPE = QStringLiteral("Directory");
-    static inline const QString EXTENSION = QStringLiteral("directory");
+    static inline const QString TYPE = u"Directory"_s;
+    static inline const QString EXTENSION = u"directory"_s;
 
 //-Constructor-----------------------------------------------------------------------------------------------------
 public:

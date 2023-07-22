@@ -22,18 +22,18 @@ class QX_IO_EXPORT ApplicationLogger
 {
 //-Class Variables----------------------------------------------------------------------------------------------------
 private:
-    static inline const QString HEADER_TEMPLATE = "[ %1 Execution Log ] (%2) : %3";
+    static inline const QString HEADER_TEMPLATE = u"[ %1 Execution Log ] (%2) : %3"_s;
     // NOTE: Changes to the members of this class might require changes to this pattern
-    static inline const QRegularExpression HEADER_PATTERN = QRegularExpression(R"(^\[ .* Execution Log \] \(.*\) : .+)",
+    static inline const QRegularExpression HEADER_PATTERN = QRegularExpression(uR"(^\[ .* Execution Log \] \(.*\) : .+)"_s,
                                                                                QRegularExpression::MultilineOption);
-    static inline const QString NO_PARAMS = "*None*";
-    static inline const QString EVENT_TEMPLATE = " - <%1> [%2] %3";
-    static inline const QString ERR_TEMPLATE = " - <%1> [%2] %3) %4 - %5";
-    static inline const QString COMMANDLINE_LABEL = "Arguments:";
-    static inline const QString EVENTS_LABEL = "Events:";
-    static inline const QString FINISH_TEMPLATE = "---------- Execution finished %1 (Code %2) ----------";
-    static inline const QString FINISH_SUCCESS = "successfully";
-    static inline const QString FINISH_ERR = "prematurely";
+    static inline const QString NO_PARAMS = u"*None*"_s;
+    static inline const QString EVENT_TEMPLATE = u" - <%1> [%2] %3"_s;
+    static inline const QString ERR_TEMPLATE = u" - <%1> [%2] %3) %4 - %5"_s;
+    static inline const QString COMMANDLINE_LABEL = u"Arguments:"_s;
+    static inline const QString EVENTS_LABEL = u"Events:"_s;
+    static inline const QString FINISH_TEMPLATE = u"---------- Execution finished %1 (Code %2) ----------"_s;
+    static inline const QString FINISH_SUCCESS = u"successfully"_s;
+    static inline const QString FINISH_ERR = u"prematurely"_s;
 
 //-Instance Variables-------------------------------------------------------------------------------------------------
 private:

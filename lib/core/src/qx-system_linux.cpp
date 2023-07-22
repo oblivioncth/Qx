@@ -32,7 +32,7 @@ namespace  // Anonymous namespace for local only definitions
 
     public:
         ProcTraverser() :
-            mItr("/proc", QDir::Dirs | QDir::NoDotAndDotDot),
+            mItr(u"/proc"_s, QDir::Dirs | QDir::NoDotAndDotDot),
             mAtEnd(false)
         {
             // Go to first entry
@@ -59,7 +59,7 @@ namespace  // Anonymous namespace for local only definitions
 
     QString readProcString(quint32 pid, QString subFilePath)
     {
-        QFile procFile("/proc/" + QString::number(pid) + subFilePath);
+        QFile procFile(u"/proc/"_s + QString::number(pid) + subFilePath);
         if(procFile.exists())
         {
             if(procFile.open(QIODevice::ReadOnly))
@@ -77,7 +77,7 @@ namespace  // Anonymous namespace for local only definitions
     {
         QStringList stats;
 
-        QString stat = readProcString(pid, "/stat");
+        QString stat = readProcString(pid, u"/stat"_s);
         if(!stat.isEmpty())
         {
             // Single out name (can contain all kinds of problematic characters)
@@ -119,7 +119,7 @@ namespace  // Anonymous namespace for local only definitions
 
     QString procNameFromCmdline(quint32 pid)
     {
-        QString cmdline = readProcString(pid, "/cmdline");
+        QString cmdline = readProcString(pid, u"/cmdline"_s);
         if(!cmdline.isEmpty())
         {
             if(cmdline.front() == '-') // Account for login shells

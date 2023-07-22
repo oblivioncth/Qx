@@ -235,7 +235,7 @@ IoOpReport ApplicationLogger::openLog()
 
     //-Construct entry start---------------------
     // Header
-    entryStart += HEADER_TEMPLATE.arg(mAppName, mAppVersion, QDateTime::currentDateTime().toString()) + "\n";
+    entryStart += HEADER_TEMPLATE.arg(mAppName, mAppVersion, QDateTime::currentDateTime().toString()) + '\n';
 
     // Start parameters
     entryStart += COMMANDLINE_LABEL + ' ' + (mAppArguments.isEmpty() ? NO_PARAMS : mAppArguments) + '\n';
@@ -276,9 +276,9 @@ IoOpReport ApplicationLogger::recordErrorEvent(QString src, Error error)
         QString timeString = QTime::currentTime().toString();;
         QString errorString = ERR_TEMPLATE.arg(timeString, src, error.severityString(), error.hexCode(), error.primary());
         if(!error.secondary().isEmpty())
-            errorString += " " + error.secondary();
+            errorString += ' ' + error.secondary();
         if(!error.details().isEmpty())
-            errorString += "\n\t" + error.details().replace("\n", "\n\t");
+            errorString += u"\n\t"_s + error.details().replace('\n', u"\n\t"_s);
 
         mErrorStatus = mTextStreamWriter.writeLine(errorString);
     }
