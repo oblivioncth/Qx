@@ -18,7 +18,8 @@
 
 // Extra-component Includes
 #include "qx/utility/qx-stringliteral.h"
-#include "qx/utility/qx-macros.h"
+
+using namespace Qt::Literals::StringLiterals;
 
 namespace Qx
 {
@@ -28,9 +29,9 @@ class QX_CORE_EXPORT IError
     friend class Error;
 //-Class Variables----------------------------------------------------------------------------------------------------------
 private:
-    static inline const QString T_CODE_DUPE = QSL("Error type code %1 is already claimed by %2!");
-    static inline const QString T_NAME_DUPE = QSL("Error type name %1 is already claimed!");
-    static inline const QString T_CODE_RESERVED = QSL("Error type code %1 is reserved!");
+    static inline const QString T_CODE_DUPE = u"Error type code %1 is already claimed by %2!"_s;
+    static inline const QString T_NAME_DUPE = u"Error type name %1 is already claimed!"_s;
+    static inline const QString T_CODE_RESERVED = u"Error type code %1 is reserved!"_s;
     static inline constinit QHash<quint16, const QString*> codeRegistry;
     static constexpr std::array<QStringView, 8> RESERVED_NAMES{
         u"Qx::InternalError",
@@ -87,7 +88,7 @@ friend class Error;
 //-Class Variables----------------------------------------------------------------------------------------------------------
 public:
     static constexpr quint16 TYPE_CODE = ECode;
-    static inline const QString TYPE_NAME = EName.value;
+    static constexpr QLatin1StringView TYPE_NAME{EName.value};
 
 private:
     static inline const bool REGISTER = registerType(TYPE_CODE, TYPE_NAME);

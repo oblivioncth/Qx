@@ -217,16 +217,15 @@ private:
 
     // External parse
     template<typename D>
-        requires any_of<D, QString, QByteArrayView>
+        requires any_of<D, QLatin1StringView, QUtf8StringView, QStringView>
     static Base85 fromExternal(D base85, const Base85Encoding* enc, Base85ParseError* error);
 
-    template<typename D, typename C = typename std::iterator_traits<typename D::const_iterator>::value_type>
-        requires any_of<D, QString, QByteArrayView>
+    template<typename D>
+        requires any_of<D, QLatin1StringView, QUtf8StringView, QStringView>
     static Base85ParseError parseExternal(D base85, Base85& externallyEncoded);
 
 public:
-    static Base85 fromString(const QString& base85, const Base85Encoding* enc, Base85ParseError* error = nullptr);
-    static Base85 fromData(QByteArrayView base85, const Base85Encoding* enc, Base85ParseError* error = nullptr);
+    static Base85 fromEncoded(QAnyStringView base85, const Base85Encoding* enc, Base85ParseError* error = nullptr);
     static Base85 encode(const QByteArray& data, const Base85Encoding* enc);
 
 //-Instance Functions---------------------------------------------------------------------------------------------------------
@@ -238,7 +237,8 @@ public:
 
     QByteArray decode();
     QString toString();
-    const QByteArray& encodedData() const;
+    QByteArrayView data() const;
+    qsizetype size() const;
 
     bool operator==(const Base85& other) const;
     bool operator!=(const Base85& other) const;

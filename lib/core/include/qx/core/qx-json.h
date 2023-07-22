@@ -88,11 +88,11 @@ public:
 //-Class Variables-------------------------------------------------------------
 private:
     static inline const QHash<Form, QString> ERR_STRINGS{
-        {NoError, QSL("")},
-        {MissingKey, QSL("The key does not exist.")},
-        {TypeMismatch, QSL("Value type mismatch.")},
-        {EmptyDoc, QSL("The document is empty.")},
-        {InvalidValue, QSL("Invalid value for type.")}
+        {NoError, u""_s},
+        {MissingKey, u"The key does not exist."_s},
+        {TypeMismatch, u"Value type mismatch."_s},
+        {EmptyDoc, u"The document is empty."_s},
+        {InvalidValue, u"Invalid value for type."_s}
     };
 
 //-Instance Variables-------------------------------------------------------------
@@ -123,9 +123,9 @@ private:
 namespace QxJsonPrivate
 {
 //-Namespace Variables---------------------------------------------------
-static inline const QString ERR_CONV_TYPE = QSL("JSON Error: Converting value to %1");
-static inline const QString ERR_NO_KEY = QSL("JSON Error: Could not retrieve key '%1'.");
-static inline const QString ERR_PARSE_DOC = QSL("JSON Error: Could not parse JSON document.");
+static inline const QString ERR_CONV_TYPE = u"JSON Error: Converting value to %1"_s;
+static inline const QString ERR_NO_KEY = u"JSON Error: Could not retrieve key '%1'."_s;
+static inline const QString ERR_PARSE_DOC = u"JSON Error: Could not parse JSON document."_s;
 
 //-Structs---------------------------------------------------------------
 template<Qx::StringLiteral MemberN, typename MemberT, class Struct>
@@ -147,11 +147,11 @@ template<typename T> [[maybe_unused]] static inline QString typeString() = delet
 template<typename T> [[maybe_unused]] static inline bool isType(const QJsonValue& v) = delete;
 template<typename T> [[maybe_unused]] static inline T toType(const QJsonValue& v) = delete;
 
-template<> inline QString typeString<bool>() { return QSL("bool"); };
-template<> inline QString typeString<double>() { return QSL("double"); };
-template<> inline QString typeString<QString>() { return QSL("string"); };
-template<> inline QString typeString<QJsonArray>() { return QSL("array"); };
-template<> inline QString typeString<QJsonObject>() { return QSL("object"); };
+template<> inline QString typeString<bool>() { return u"bool"_s; };
+template<> inline QString typeString<double>() { return u"double"_s; };
+template<> inline QString typeString<QString>() { return u"string"_s; };
+template<> inline QString typeString<QJsonArray>() { return u"array"_s; };
+template<> inline QString typeString<QJsonObject>() { return u"object"_s; };
 
 template<> inline bool isType<bool>(const QJsonValue& v) { return v.isBool(); };
 template<> inline bool isType<double>(const QJsonValue& v) { return v.isDouble(); };
@@ -450,7 +450,7 @@ class QX_CORE_EXPORT QJsonParseErrorAdapter: public Qx::AbstractError<"QJsonPars
 {
 //-Class Variables-------------------------------------------------------------------------------------
 private:
-    static inline const QString OFFSET_STR = QSL("Position: %1.");
+    static inline const QString OFFSET_STR = u"Position: %1."_s;
 
 //-Instance Variables-------------------------------------------------------------------------------------
 private:

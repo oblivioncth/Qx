@@ -32,7 +32,7 @@ public:
 
 //-Class Variables------------------------------------------------------------------------------------------------
 private:
-    static inline const QString UKNOWN_CAUSE = QSL("An unknown error occured");
+    static inline const QString UKNOWN_CAUSE = u"An unknown error occured"_s;
 
 //-Instance Variables------------------------------------------------------------------------------------------------
 private:
@@ -49,8 +49,8 @@ public:
 //-Class Functions--------------------------------------------------------------------------------------------
 public:
 #ifdef _WIN32
-    static SystemError fromHresult(HRESULT res, QString aError = "System Error");
-    static SystemError fromNtStatus(NTSTATUS res, QString aError = "System Error");
+    static SystemError fromHresult(HRESULT res, QString aError = u"System Error"_s);
+    static SystemError fromNtStatus(NTSTATUS res, QString aError = u"System Error"_s);
 #endif
 
 #ifdef __linux__

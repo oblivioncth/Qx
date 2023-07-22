@@ -276,15 +276,15 @@ QString asString(const QJsonValue& value)
     if(valueType == QJsonValue::Type::Array)
     {
         QJsonDocument formatter(value.toArray());
-        return formatter.toJson(QJsonDocument::Compact);
+        return QString::fromLatin1(formatter.toJson(QJsonDocument::Compact));
     }
     else if(valueType == QJsonValue::Type::Object)
     {
         QJsonDocument formatter(value.toObject());
-        return formatter.toJson(QJsonDocument::Compact);
+        return QString::fromLatin1(formatter.toJson(QJsonDocument::Compact));
     }
     else if(valueType == QJsonValue::Type::Bool)
-        return value.toBool() ? "true" : "false";
+        return value.toBool() ? u"true"_s : u"false"_s;
     else if(valueType == QJsonValue::Type::Double)
         return QString::number(value.toDouble());
     else if(valueType == QJsonValue::Type::String)

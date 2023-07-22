@@ -25,7 +25,7 @@ QString Integrity::generateChecksum(QByteArray& data, QCryptographicHash::Algori
 {
     QCryptographicHash checksumHash(hashAlgorithm);
     checksumHash.addData(data);
-    return checksumHash.result().toHex();
+    return QString::fromLatin1(checksumHash.result().toHex());
 }
 
 /*!

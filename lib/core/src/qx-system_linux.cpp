@@ -237,13 +237,13 @@ QList<quint32> processChildren(quint32 processId, bool recursive)
 
 SystemError cleanKillProcess(quint32 processId)
 {
-    static const QString ACTION = QSL("Failed to cleanly kill process %1");
+    static const QString ACTION = u"Failed to cleanly kill process %1"_s;
     return sendKillSignal(processId, SIGTERM, ACTION.arg(processId));
 }
 
 SystemError forceKillProcess(quint32 processId)
 {
-    static const QString ACTION = QSL("Failed to forcefully kill process %1");
+    static const QString ACTION = u"Failed to forcefully kill process %1"_s;
     return sendKillSignal(processId, SIGKILL, ACTION.arg(processId));
 }
 

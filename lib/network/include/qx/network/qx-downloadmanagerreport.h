@@ -78,18 +78,18 @@ class DownloadManagerReport::Builder
 //-Class Variables-----------------------------------------------------------------------------------------------
 private:
     // Success
-    static inline const QString SUCCESS = QSL("All download tasks completed successfully.");
+    static inline const QString SUCCESS = u"All download tasks completed successfully."_s;
 
     // Error overall
-    static inline const QString ERR_P_QUEUE_INCOMPL = QSL("The download(s) failed to complete successfully.");
-    static inline const QString ERR_S_OUTCOME_FAIL = QSL("One or more downloads failed due to the following reasons.");
+    static inline const QString ERR_P_QUEUE_INCOMPL = u"The download(s) failed to complete successfully."_s;
+    static inline const QString ERR_S_OUTCOME_FAIL = u"One or more downloads failed due to the following reasons."_s;
 
     // Error details
-    static inline const QString ERR_D_SKIP = QSL("%1 remaining download(s) were skipped due to previous errors aborted.");
-    static inline const QString ERR_D_ABORT = QSL("%1 remaining download(s) were aborted.");
-    static inline const QString ERR_D_SPECIFIC = QSL("Specific:");
-    static inline const QString ERR_D_GENERAL = QSL("General:");
-    static inline const QString ERR_D_LIST_ITEM = QSL("[%1] %2");
+    static inline const QString ERR_D_SKIP = u"%1 remaining download(s) were skipped due to previous errors aborted."_s;
+    static inline const QString ERR_D_ABORT = u"%1 remaining download(s) were aborted."_s;
+    static inline const QString ERR_D_SPECIFIC = u"Specific:"_s;
+    static inline const QString ERR_D_GENERAL = u"General:"_s;
+    static inline const QString ERR_D_LIST_ITEM = u"[%1] %2"_s;
 
 //-Instance Variables---------------------------------------------------------------------------------------------
 private:

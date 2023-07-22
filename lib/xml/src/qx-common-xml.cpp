@@ -26,6 +26,6 @@ namespace  // Anonymous namespace for effectively private (to this cpp)
 /*!
  *  Returns a copy of @a string with all non-legal XML characters removed
  */
-QString xmlSanitized(QString string) { return string.replace(illegalXmlChar, ""); }	
+QString xmlSanitized(QString string) { return string.remove(illegalXmlChar); }
 
 }
