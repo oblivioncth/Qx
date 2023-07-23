@@ -57,18 +57,18 @@ private:
     static const qint64 SIZE_QUERY_TIMEOUT_MS = 500;
 
     // Errors - Finish
-    static inline const QString ERR_TIMEOUT = "The data transfer failed to start before the timeout was reached.";
+    static inline const QString ERR_TIMEOUT = u"The data transfer failed to start before the timeout was reached."_s;
 
     // Errors - Messages
-    static inline const QString SSL_ERR = "The following SSL issues occurred while attempting to download %1";
-    static inline const QString CONTINUE_QUES = "Continue downloading?";
-    static inline const QString AUTH_REQUIRED = "Authentication is required to connect to %1";
-    static inline const QString PROXY_AUTH_REQUIRED = "Authentication is required to connect to the proxy %1";
+    static inline const QString SSL_ERR = u"The following SSL issues occurred while attempting to download %1"_s;
+    static inline const QString CONTINUE_QUES = u"Continue downloading?"_s;
+    static inline const QString AUTH_REQUIRED = u"Authentication is required to connect to %1"_s;
+    static inline const QString PROXY_AUTH_REQUIRED = u"Authentication is required to connect to the proxy %1"_s;
 
     // Prompts
-    static inline const QString PROMPT_AUTH = "Authentication is required for %1";
-    static inline const QString PROMPT_PRESHARED_AUTH = "Pre-shared key authentication is required for %1";
-    static inline const QString PROMPT_PROXY_AUTH = "Proxy authentication is required for %1";
+    static inline const QString PROMPT_AUTH = u"Authentication is required for %1"_s;
+    static inline const QString PROMPT_PRESHARED_AUTH = u"Pre-shared key authentication is required for %1"_s;
+    static inline const QString PROMPT_PROXY_AUTH = u"Proxy authentication is required for %1"_s;
 
 //-Instance Members---------------------------------------------------------------------------------------------------
 private:

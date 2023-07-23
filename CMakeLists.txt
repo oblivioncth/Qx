@@ -121,7 +121,7 @@ if(QX_DOCS)
     add_subdirectory(doc)
 endif()
 
-#================ Build Documentation ======================
+#================ Build Tests ======================
 if(QX_TESTS)
     enable_testing()
     set(TESTS_TARGET_PREFIX ${PROJECT_NAMESPACE_LC})
