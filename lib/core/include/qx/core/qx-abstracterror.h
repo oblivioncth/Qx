@@ -91,7 +91,7 @@ public:
     static constexpr QLatin1StringView TYPE_NAME{EName.value};
 
 private:
-    static inline const bool REGISTER = registerType(TYPE_CODE, TYPE_NAME);
+    static const bool REGISTER;
 
 //-Constructor-------------------------------------------------------------------------------------------------------------
 protected:
@@ -125,6 +125,15 @@ public:
 //    // IIFE that ensures E is a specialization of AbstractError
 //    []<StringLiteral Y, quint16 Z>(AbstractError<Y, Z>&){}(type);
 //};
+
+/* Define error type registrar variable. This must be done out of line to ensure that only
+ * one instance of the variable exists per-error-type across an entire program. If the variable
+ * is defined inline, multiple versiosn of it can exist in parallel when linking via shared-libraries,
+ * if those libraries are used by multiple targets in the same project. This would cause an error type
+ * to call registerType() multiple times.
+ */
+template<StringLiteral EName, quint16 ECode>
+const bool AbstractError<EName, ECode>::REGISTER = registerType(TYPE_CODE, TYPE_NAME);
 
 namespace AbstractErrorPrivate
 {
