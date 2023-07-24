@@ -24,7 +24,7 @@ namespace Qx
 /*!
  *  @fn QString processName(quint32 processId)
  *
- *  Returns the process name of a running process with the PID @a processID,
+ *  Returns the process name of a running process with the PID @a processId,
  *  or a null string if the process could not be found.
  *
  *  @sa processId().
@@ -58,7 +58,7 @@ bool processIsRunning(QString processName) { return processId(processName); }
 bool processIsRunning(quint32 processId) { return processName(processId).isNull(); }
 
 /*!
- *  @fn GenericError cleanKillProcess(quint32 processId)
+ *  @fn SystemError cleanKillProcess(quint32 processId)
  *
  *  Attempts to close the process referenced by @a processId in a manner that allows it to
  *  shutdown gracefully.
@@ -88,7 +88,7 @@ bool processIsRunning(quint32 processId) { return processName(processId).isNull(
  */
 
 /*!
- *  @fn GenericError forceKillProcess(quint32 processId)
+ *  @fn SystemError forceKillProcess(quint32 processId)
  *
  *  Forcefully closes the process referenced by @a processId such that it exists immediately.
  *

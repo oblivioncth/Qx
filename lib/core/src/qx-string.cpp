@@ -47,7 +47,7 @@ bool String::isValidChecksum(QString checksum, QCryptographicHash::Algorithm has
 /*!
  *  Returns a copy of @a string with all non-hexadecimal characters removed.
  */
-QString String::stripToHexOnly(QString string) { return string.replace(RegularExpression::ANY_NON_HEX, ""); }
+QString String::stripToHexOnly(QString string) { return string.remove(RegularExpression::ANY_NON_HEX); }
 
 /*!
  *  @fn QString String::join(QList<T> list, F&& toStringFunc, QString separator = "", QString prefix = "")

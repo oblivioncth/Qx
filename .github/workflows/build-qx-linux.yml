@@ -58,7 +58,7 @@ jobs:
     - name: Install Qt (custom build)
       uses: oblivioncth/actions/general/install-and-cache-qt-from-ffynnon@dev
       with:
-        version: 6.4.2
+        version: 6.5.1
         os: linux
         compiler: ${{ matrix.qt_comp }}
         linkage: ${{ matrix.lib_linkage }}
@@ -71,7 +71,7 @@ jobs:
     - name: Install Doxygen
       uses: oblivioncth/actions/ubuntu/install-doxygen-from-sourceforge@dev
       with:
-        version: 1.9.4
+        version: 1.9.7
     - name: Install Graphviz
       run: sudo apt-get install graphviz
     - name: Install Ninja

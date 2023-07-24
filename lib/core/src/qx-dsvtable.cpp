@@ -103,10 +103,10 @@ qsizetype DsvParseError::offset() const { return mOffset; }
  *
  *  DSV is human readable, flexible, and widely supported.
  *
- *  The most common form of DSV, CSV, uses the comma character @c , as the delimiter.
+ *  The most common form of DSV, CSV, uses the comma character `,` as the delimiter.
  *
  *  DsvTable provides a variety of methods for data manipulation, as well as
- *  <a href="<a href="https://en.wikipedia.org/wiki/Delimiter-separated_values">RFC4180</a>
+ *  <a href="https://en.wikipedia.org/wiki/Delimiter-separated_values">RFC4180</a>
  *  compliant parsing and serialization of DSV data via fromDsv() and toDsv().
  *
  *  It's data is stored and accessed as instances of QVariant for convenient conversion of each

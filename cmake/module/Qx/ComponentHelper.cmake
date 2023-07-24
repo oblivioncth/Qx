@@ -69,6 +69,7 @@ function(qx_add_component COMPONENT_NAME)
 
     # Function inputs
     set(oneValueArgs
+        TARGET_VAR
     )
 
     set(multiValueArgs
@@ -97,6 +98,9 @@ function(qx_add_component COMPONENT_NAME)
     else()
         set(COMPONENT_TYPE "INTERFACE")
     endif()
+    
+    # Determine target name
+    set(component_target "${PROJECT_NAMESPACE_LC}_${COMPONENT_NAME_LC}")
 
     # ---------- Generate Primary Include Header ------------
     # Get Date/Time
@@ -126,7 +130,7 @@ function(qx_add_component COMPONENT_NAME)
 
     # --------------------- Add Library -----------------------
     include(OB/Library)
-    ob_add_standard_library("${PROJECT_NAMESPACE_LC}_${COMPONENT_NAME_LC}"
+    ob_add_standard_library("${component_target}"
         NAMESPACE "${PROJECT_NAMESPACE}"
         ALIAS "${COMPONENT_NAME}"
         TYPE "${COMPONENT_TYPE}"
@@ -147,4 +151,9 @@ function(qx_add_component COMPONENT_NAME)
             ${COMPONENT_LINKS}
         CONFIG CUSTOM "${PROJECT_FILE_TEMPLATES}/${PROJECT_NAMESPACE}ComponentConfig.cmake.in"
     )
+    
+    # Return target name if requested
+    if(COMPONENT_TARGET_VAR)
+        set(${COMPONENT_TARGET_VAR} "${component_target}" PARENT_SCOPE)
+    endif()
 endfunction()

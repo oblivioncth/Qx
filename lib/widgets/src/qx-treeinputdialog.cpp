@@ -5,6 +5,8 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 
+using namespace Qt::Literals::StringLiterals;
+
 namespace Qx
 {
 
@@ -56,8 +58,8 @@ TreeInputDialog::TreeInputDialog(QWidget* parent) : QDialog(parent)
 
     // Setup ButtonBox
     mButtonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    QPushButton* selectAllButton = mButtonBox->addButton("Select All", QDialogButtonBox::ResetRole);
-    QPushButton* selectNoneButton = mButtonBox->addButton("Select None", QDialogButtonBox::ResetRole);
+    QPushButton* selectAllButton = mButtonBox->addButton(u"Select All"_s, QDialogButtonBox::ResetRole);
+    QPushButton* selectNoneButton = mButtonBox->addButton(u"Select None"_s, QDialogButtonBox::ResetRole);
     connect(mButtonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
     connect(mButtonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
     connect(selectAllButton, &QPushButton::clicked, this, &TreeInputDialog::selectAllClicked);

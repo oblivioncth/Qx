@@ -11,7 +11,7 @@ namespace Qx
 {
 
 //-Namespace Functions-------------------------------------------------------------------------------------------------------------
-QX_XML_EXPORT QString xmlSanitized(QString string);
+QX_XML_EXPORT QString xmlSanitized(const QString& string);
 
 }
 

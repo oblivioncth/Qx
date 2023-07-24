@@ -23,7 +23,7 @@ class QX_LINUX_EXPORT DesktopEntry
 {
 //-Class Members----------------------------------------------------------------------------------------------------
 private:
-    static inline const QString MAIN_GROUP = QStringLiteral("[Desktop Entry]");
+    static inline const QString MAIN_GROUP = u"[Desktop Entry]"_s;
 
 //-Instance Members-------------------------------------------------------------------------------------------------
 private:

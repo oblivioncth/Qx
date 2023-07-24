@@ -14,8 +14,8 @@ class QX_LINUX_EXPORT LinkDesktopEntry : public DesktopEntry
 {
 //-Class Members-------------------------------------------------------------------------------------------------
 private:
-    static inline const QString TYPE = QStringLiteral("Link");
-    static inline const QString EXTENSION = QStringLiteral("desktop");
+    static inline const QString TYPE = u"Link"_s;
+    static inline const QString EXTENSION = u"desktop"_s;
 
 //-Instance Members-------------------------------------------------------------------------------------------------
 private:

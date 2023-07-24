@@ -27,9 +27,9 @@ namespace Qx
  *  @note This function does not block and returns immediately. The QMessageBox object is automatically deleted
  *  after it is closed.
  *
- *  @sa postBlockingError().
+ *  @sa postBlockingError(), QTextStream& operator<<(QTextStream& ts, const Qx::Error& e).
  */
-void postError(GenericError error)
+void postError(const Error& error)
 {
     // Prepare dialog
     QMessageBox* genericErrorMessage = new QMessageBox();
@@ -54,7 +54,7 @@ void postError(GenericError error)
  *
  *  @sa postError().
  */
-int postBlockingError(GenericError error, QMessageBox::StandardButtons choices, QMessageBox::StandardButton defChoice)
+int postBlockingError(const Error& error, QMessageBox::StandardButtons choices, QMessageBox::StandardButton defChoice)
 {
     // Prepare dialog
     QMessageBox genericErrorMessage;

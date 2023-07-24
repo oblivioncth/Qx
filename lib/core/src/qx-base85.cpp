@@ -80,7 +80,7 @@ namespace Qx
  *
  *  @par Custom Encodings:
  *  @parblock
- *  Custom encodings can be created from scratch by constructing a blank encoding via Base85() and then setting its
+ *  Custom encodings can be created from scratch by constructing a blank encoding via Base85Encoding() and then setting its
  *  parameters, or by modifying standard encodings via @ref Base85Encoding(StandardEncoding).
  *  @endparblock
  */
@@ -848,7 +848,7 @@ char Base85::charToLatin1(QChar ch) { return ch.toLatin1(); }
  * definitions are obviously available here, the above holds true.
  */
 template<typename D>
-    requires any_of<D, QString, QByteArrayView>
+    requires any_of<D, QLatin1StringView, QUtf8StringView, QStringView>
 Base85 Base85::fromExternal(D base85, const Base85Encoding* enc, Base85ParseError* error)
 {
     // Ensure encoding is valid
@@ -876,22 +876,24 @@ Base85 Base85::fromExternal(D base85, const Base85Encoding* enc, Base85ParseErro
     return externallyEncoded;
 }
 
-template<typename D, typename C>
-    requires any_of<D, QString, QByteArrayView>
+template<typename D>
+    requires any_of<D, QLatin1StringView, QUtf8StringView, QStringView>
 Base85ParseError Base85::parseExternal(D base85, Base85& externallyEncoded)
 {
+    using CharType = typename D::value_type;
+
     const Base85Encoding* encooding = externallyEncoded.encoding();
 
     //-Check for Padding---------------------------------------------------------------
     // Determine shortcut characters vs regular characters (assume encoding is correct at this point)
-    QSet<C> shortcutChars;
+    QSet<CharType> shortcutChars;
     if(encooding->usesZeroGroupShortcut())
         shortcutChars.insert(encooding->zeroGroupCharacter().value());
     if(encooding->usesSpaceGroupShortcut())
         shortcutChars.insert(encooding->spaceGroupCharacter().value());
 
     int shortcutCount = shortcutChars.isEmpty() ? 0 :
-        std::count_if(base85.cbegin(), base85.cend(), [&shortcutChars](const C& c){ return shortcutChars.contains(c); });
+        std::count_if(base85.cbegin(), base85.cend(), [&shortcutChars](const auto& c){ return shortcutChars.contains(c); });
     int nonShortcutCount = base85.size() - shortcutCount;
 
     // Determine if string relies on padding
@@ -908,31 +910,31 @@ Base85ParseError Base85::parseExternal(D base85, Base85& externallyEncoded)
 
     // Validate each character one-by-one and append to internal data
     int frameIdx = 0;
-    for(qsizetype i = 0; i < base85.size(); i++)
+    for(qsizetype chIdx = -1; const auto& ch : base85)
     {
-        const C& ch = base85[i];
+        ++chIdx;
 
         // White space is to be ignored, if char is whitespace, skip it
         if(Char::isSpace(ch))
             continue;
 
         // Only matters for input type that contains QChar
-        if constexpr(std::is_same_v<C, QChar>)
+        if constexpr(std::is_same_v<CharType, QStringView>)
         {
             // Ensure character can fit in one byte (ASCII/extended-ASCII)
-            if(ch.unicode() > 255)
-                return Base85ParseError(Base85ParseError::NonANSI, i);
+            if(ch > 255)
+                return Base85ParseError(Base85ParseError::NonANSI, chIdx);
         }
 
         // Ensure character belongs to encoding
         char asciiChar = charToLatin1(ch); // Ensures char is Latin1, covers QChar
         if(!encooding->containsCharacter(asciiChar))
-            return Base85ParseError(Base85ParseError::CharacterSetMismatch, i);
+            return Base85ParseError(Base85ParseError::CharacterSetMismatch, chIdx);
 
         // Check if character is a shortcut char, and if so is appropriately used
         bool isShortcut = shortcutChars.contains(ch);
         if(isShortcut && frameIdx != 0) // Can only be used at start of frame
-            return Base85ParseError(Base85ParseError::ShortcutMidFrame, i);
+            return Base85ParseError(Base85ParseError::ShortcutMidFrame, chIdx);
 
         // Add validated character
         encodedData->append(asciiChar);
@@ -950,27 +952,8 @@ Base85ParseError Base85::parseExternal(D base85, Base85& externallyEncoded)
 
 //Public:
 /*!
- *  Parses @a base85 as a Base85 string that was encoded with @a enc and creates a Base85
- *  object from it. Any whitespace within the original string will not be present in the
- *  resultant object.
- *
- *  Returns a valid (non-null) Base85 string if the parsing succeeds. If it fails, the
- *  returned string will be null, and the optional @a error variable will contain further
- *  details about the error.
- *
- *  @warning The caller must be able to guarantee that @a enc will not be deleted as long as
- *  the Base85 exists and may have its methods used.
- *
- *  @sa toString(), fromData(), Base85ParseError, and isNull().
- */
-Base85 Base85::fromString(const QString& base85, const Base85Encoding* enc, Base85ParseError* error)
-{
-    return fromExternal(base85, enc, error);
-}
-
-/*!
- *  Parses the binary data @a base85 as a Base85 string that was encoded with @a enc and creates
- *  a Base85 object from it. Any whitespace within the original string will not be present in the
+ *  Parses @a base85 as a Base85 string that was encoded with @a enc and creates
+ *  a Base85 object from it. Any whitespace within the original data will not be present in the
  *  resultant object.
  *
  *  Returns a valid (non-null) Base85 string if the parsing succeeds. If it fails, the
@@ -982,9 +965,9 @@ Base85 Base85::fromString(const QString& base85, const Base85Encoding* enc, Base
  *
  *  @sa fromString(), Base85ParseError, isNull(), and @a encodedData().
  */
-Base85 Base85::fromData(QByteArrayView base85, const Base85Encoding* enc, Base85ParseError* error)
+Base85 Base85::fromEncoded(QAnyStringView base85, const Base85Encoding* enc, Base85ParseError* error)
 {
-    return fromExternal(base85, enc, error);
+    return base85.visit([&](auto str){ return fromExternal(str, enc, error); });
 }
 
 /*!
@@ -1065,11 +1048,16 @@ QByteArray Base85::decode()
 QString Base85::toString() { return QString::fromLatin1(mEncoded); }
 
 /*!
- *  Returns a reference to the encoded data.
+ *  Returns a view of the encoded data.
  *
  *  @sa toString().
  */
-const QByteArray& Base85::encodedData() const { return mEncoded; }
+QByteArrayView Base85::data() const { return mEncoded; }
+
+/*!
+ *  Returns the size of the encoded data.
+ */
+qsizetype Base85::size() const { return mEncoded.size(); }
 
 
 /*!

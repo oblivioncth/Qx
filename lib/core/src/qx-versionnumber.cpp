@@ -80,7 +80,7 @@ VersionNumber::VersionNumber() : QVersionNumber() {}
  *
  *  @sa commonPrefix().
  */
-VersionNumber VersionNumber::first(qsizetype n)
+VersionNumber VersionNumber::first(qsizetype n) const
 {
     if(n < 0)
         n = 0;
@@ -98,7 +98,7 @@ VersionNumber VersionNumber::first(qsizetype n)
  *
  *  @sa isNull(), segmentAt().
  */
-int VersionNumber::nanoVersion() { return segmentAt(3); }
+int VersionNumber::nanoVersion() const { return segmentAt(3); }
 
 
 /*!
@@ -109,7 +109,7 @@ int VersionNumber::nanoVersion() { return segmentAt(3); }
  *
  *  @snippet qx-versionnumber.cpp 0
  */
-VersionNumber VersionNumber::normalized(qsizetype min)
+VersionNumber VersionNumber::normalized(qsizetype min) const
 {
     if(min < 0)
         min = 0;

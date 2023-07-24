@@ -36,8 +36,8 @@ namespace Qx
  *  Creates an application logger with no file path or details set.
  */
 ApplicationLogger::ApplicationLogger() :
-    mMaxEntries(100),
     mConstructionTimeStamp(QDateTime::currentDateTime()),
+    mMaxEntries(100),
     mTextStreamWriter(WriteMode::Append,  WriteOption::CreatePath | WriteOption::Unbuffered),
     mErrorStatus()
 {}
@@ -235,7 +235,7 @@ IoOpReport ApplicationLogger::openLog()
 
     //-Construct entry start---------------------
     // Header
-    entryStart += HEADER_TEMPLATE.arg(mAppName, mAppVersion, QDateTime::currentDateTime().toString()) + "\n";
+    entryStart += HEADER_TEMPLATE.arg(mAppName, mAppVersion, QDateTime::currentDateTime().toString()) + '\n';
 
     // Start parameters
     entryStart += COMMANDLINE_LABEL + ' ' + (mAppArguments.isEmpty() ? NO_PARAMS : mAppArguments) + '\n';
@@ -269,15 +269,16 @@ IoOpReport ApplicationLogger::recordVerbatim(QString text)
  *
  *  @sa recordGeneralEvent().
  */
-IoOpReport ApplicationLogger::recordErrorEvent(QString src, GenericError error)
+IoOpReport ApplicationLogger::recordErrorEvent(QString src, Error error)
 {
     if(!mErrorStatus.isFailure())
     {
-        QString errorString = EVENT_TEMPLATE.arg(QTime::currentTime().toString(), src, ERROR_LEVEL_STR_MAP.value(error.errorLevel()) + ") " + error.primaryInfo());
-        if(!error.secondaryInfo().isNull())
-            errorString += " " + error.secondaryInfo();
-        if(!error.detailedInfo().isNull())
-            errorString += "\n\t" + error.detailedInfo().replace("\n", "\n\t");
+        QString timeString = QTime::currentTime().toString();;
+        QString errorString = ERR_TEMPLATE.arg(timeString, src, error.severityString(), error.hexCode(), error.primary());
+        if(!error.secondary().isEmpty())
+            errorString += ' ' + error.secondary();
+        if(!error.details().isEmpty())
+            errorString += u"\n\t"_s + error.details().replace('\n', u"\n\t"_s);
 
         mErrorStatus = mTextStreamWriter.writeLine(errorString);
     }

@@ -11,6 +11,8 @@
 // Intra-component Includes
 #include "qx/core/qx-table.h"
 
+using namespace Qt::Literals::StringLiterals;
+
 namespace Qx
 {
 
@@ -29,11 +31,11 @@ public:
 //-Class Variables------------------------------------------------------------------------------------------------------
 private:
     static inline const QHash<ParseError, QString> ERROR_STR_MAP{
-        {NoError, QStringLiteral("No error occurred.")},
-        {IllegalEscape, QStringLiteral("Illegal use of an escape character.")},
-        {UnterminatedField, QStringLiteral("An escaped field was not properly terminated.")},
-        {UnevenColumns, QStringLiteral("A row contained a different number of fields than the header row.")},
-        {InternalError, QStringLiteral("An internal parser error occurred.")}
+        {NoError, u"No error occurred."_s},
+        {IllegalEscape, u"Illegal use of an escape character."_s},
+        {UnterminatedField, u"An escaped field was not properly terminated."_s},
+        {UnevenColumns, u"A row contained a different number of fields than the header row."_s},
+        {InternalError, u"An internal parser error occurred."_s}
     };
 
 //-Instance Variables------------------------------------------------------------------------------------------------------------

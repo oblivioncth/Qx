@@ -81,14 +81,14 @@ The CMake project is designed to be used with multi-configuration generators suc
 
 If you only need a subset of Qx's components, the **QX_COMPONENTS** cache variable can be set to a semicolon or whitespace separated list of components. Only these components and their required dependencies will be configured, which can save on build time.
 
-#### CMake Options:
+### CMake Options:
 
  - `QX_DOCS` - Set to `ON` in order to generate the documentation target (OFF)
  - `QX_COMPONENTS` - Set to a semicolon/whitespace delimited list of components to limit configuration to those components only ([all-components])
  - `QX_TESTS` = Set to `ON` in order to generate the test targets (OFF)
  - `BUILD_SHARED_LIBS` - Build Qx as a shared libraries instead of a static ones (OFF)
 
-#### CMake Targets:
+### CMake Targets:
 
  - `all` - Builds all Qx components (the entire library) and documentation if enabled
  - `install` - Installs the build output into `CMAKE_INSTALL_PREFIX`
@@ -96,14 +96,14 @@ If you only need a subset of Qx's components, the **QX_COMPONENTS** cache variab
  - `qx_<lowercase_component_name>` - Builds a specific Qx component
  - `qx_tst_...` - Builds the various test targets. To actually run tests, just build the general CMake tests target `test`.
 
-#### CMake Install Components:
+### CMake Install Components:
 - `qx` - Installs top-level files (README.md, CMake package configuration files, etc.)
 - `qx_docs` - Installs the Qx documentation
 - `qx_<lowercase_component_name>` - Installs a specific Qx component
 
 If Qx is configured as a sub-project, its install components are automatically removed from the `all` component, as to not pollute the install directory of the top-level project.
 
-#### Documentation:
+### Documentation:
 In order for the `qx_docs` target to be generated the CMake cache variable **QX_DOCS** must be set to *ON* when CMake is invoked:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 cmake.exe (...) -D QX_DOCS=ON
@@ -150,10 +150,10 @@ The path for this documentation varies depending on how you obtained Qt, but is 
     # By default on Windows <QT_SOFTWARE> is C:\Program Files\Qt
     # On Linux it is often /usr/local/Qt
 
-#### Tests:
+### Tests:
 The project contains a suite of tests to ensure that the library functions as intended. They will be expanded upon as the library matures.
 
-#### Package
+### Package
 By default, the CMakeLists project configures CPack to create an artifact ZIP containing the binaries for Debug and Release configurations, as well as documentation.
 
 The following is the general build process required to successfully generate this package via a shadow build on Windows:

@@ -626,7 +626,7 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
 
             // If there was a trailing line break that isn't to be ignored, last line is actually blank
             if(!readOptions.testFlag(IgnoreTrailingBreak) && fileTextStream.precedingBreak())
-                returnBuffer = "";
+                returnBuffer = u""_s;
             else if(startPos.character().isLast()) // Last char is desired
                 returnBuffer = lastLine.right(1);
             else // Some range of last line is desired
@@ -755,7 +755,7 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
 
             // If there was a trailing line break that isn't to be ignored, last line is actually blank
             if(!readOptions.testFlag(IgnoreTrailingBreak) && fileTextStream.precedingBreak())
-                returnBuffer = "";
+                returnBuffer = u""_s;
             else if(startPos.character().isLast()) // Last char is desired
                 returnBuffer = lastLine.right(1);
             else // Some range of last line is desired
@@ -882,7 +882,7 @@ IoOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, Index32 
 
              // If there was a trailing line break that isn't to be ignored, last line is actually blank
              if(!readOptions.testFlag(IgnoreTrailingBreak) && fileTextStream.precedingBreak())
-                 lastLine = "";
+                 lastLine = u""_s;
 
              // Add last line to list
              returnBuffer.append(lastLine);
@@ -902,7 +902,7 @@ IoOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, Index32 
 
                  // If end was reached and there was a trailing line break that isn't to be ignored, there is one more blank line
                  if(fileTextStream.atEnd() && !readOptions.testFlag(IgnoreTrailingBreak) && fileTextStream.precedingBreak())
-                     returnBuffer.append("");
+                     returnBuffer.append(u""_s);
              }
          }
 
@@ -985,7 +985,7 @@ namespace
                 for(int i = 0; i < *startPos.line(); ++i)
                     textStream << ENDL;
                 for(int i = 0; i < *startPos.character(); ++i)
-                    textStream << " ";
+                    textStream << ' ';
             }
 
             // Write main text
@@ -1020,7 +1020,7 @@ namespace
                 {
                     int lastLineCharCount = beforeNew.count() - (beforeNew.lastIndexOf(ENDL) + 1);
                     int charNeeded = std::max(*startPos.character() - lastLineCharCount, 0);
-                    beforeNew += QString(" ").repeated(charNeeded);
+                    beforeNew += QString(' ').repeated(charNeeded);
 
                     if(charNeeded > 0)
                         padded = true;
@@ -1179,7 +1179,7 @@ IoOpReport deleteTextFromFile(QFile& textFile, TextPos startPos, TextPos endPos)
 
     // Determine beforeDeletion
     if(startPos == TextPos::START) // (0,0)
-        beforeDeletion = "";
+        beforeDeletion = u""_s;
     else if(startPos.character().isLast())
     {
         transientReport = readTextFromFile(beforeDeletion, textFile, TextPos::START, startPos);
@@ -1194,7 +1194,7 @@ IoOpReport deleteTextFromFile(QFile& textFile, TextPos startPos, TextPos endPos)
 
     // Determine afterDeletion
     if(endPos == TextPos::END)
-        afterDeletion = "";
+        afterDeletion = u""_s;
     else if(endPos.character().isLast())
         transientReport = readTextFromFile(afterDeletion, textFile, TextPos(endPos.line() + 1, 0), TextPos::END);
     else

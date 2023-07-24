@@ -102,7 +102,7 @@ IoOpReport handlePathCreation(const QFileInfo& fileInfo, bool createPaths)
     {
         if(!createPaths)
             return IoOpReport(IO_OP_WRITE, IO_ERR_PATH_DNE, fileInfo);
-        else if(!fileDir.mkpath("."))
+        else if(!fileDir.mkpath(u"."_s))
             return IoOpReport(IO_OP_WRITE, IO_ERR_CANT_CREATE_PATH, fileInfo);
     }
 

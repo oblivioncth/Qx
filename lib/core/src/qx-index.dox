@@ -108,54 +108,26 @@ namespace Qx
  *  This is equivalent to <tt>*this == Index<T>::LAST</tt>.
  */
 
+//-Operators-------------------------------------------------------------------------------------------------------
+//Public:
 /*!
- * @fn bool Index<T>::operator==(const Index<T>& other)
+ * @fn bool Index<T>::operator==(const Index<T>& other) const noexcept
  *
  *  Returns @c true if this index and @a other are both null, 'last', or have the same underlying value; otherwise
  *  returns @c false.
  */
 
 /*!
- * @fn bool Index<T>::operator!=(const Index<T>& other)
+ * @fn auto Index<T>::operator<=>(const Index& other) const noexcept
  *
- *  Returns @c true if this index and @a other are not equivalent; otherwise returns @c false.
+ *  Performs a three-way comparison between this index and @a other.
+ *
+ *  Returns:
+ *  - @c <0 if this index is less than @a other
+ *  - @c 0 if this index is equal to @a other
+ *  - @c >0 if this index is greater than @a other
  */
 
-/*!
- * @fn bool Index<T>::operator<(const Index<T>& other)
- *
- *  Returns @c true if one of the following is true:
- *
- *  1) This index is null and @a other is not.
- *  2) This index is not 'last' and @a other is.
- *  3) This index's underlying value is less than @a other's underlying value.
- *
- *  Otherwise returns @c false.
- */
-
-/*!
- * @fn bool Index<T>::operator<=(const Index<T>& other)
- *
- *  See operator<(const Index<T>& other) and operator==(const Index<T>& other)
- */
-
-/*!
- * @fn bool Index<T>::operator>(const Index<T>& other)
- *
- *  Returns @c true if one of the following is true:
- *
- *  1) @a other is null and this index is not.
- *  2) @a other is not 'last' and this index is.
- *  3) This index's underlying value is greater than @a other's underlying value.
- *
- *  Otherwise returns @c false.
- */
-
-/*!
- * @fn bool Index<T>::operator>=(const Index<T>& other)
- *
- *  See operator>(const Index<T>& other) and operator==(const Index<T>& other)
- */
 
 /*!
  * @fn Index<T> Index<T>::operator-(const Index<T>& other)

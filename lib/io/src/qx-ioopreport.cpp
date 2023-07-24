@@ -3,10 +3,10 @@
 
 namespace Qx
 {
-
+//-Namespace Enums---------------------------------------------------------------------------------------------
+// TODO: Needs to have @ingroup qx-io, but Doxygen 1.9.7 has a bug preventing this
 /*!
  *  @enum IoOpType
- *  @ingroup qx-io
  *
  *  This defines the type of an IO operation.
  */
@@ -31,9 +31,9 @@ namespace Qx
  *  Describes an inspection operation (e.g. querying file permissions)
  */
 
+// TODO: Needs to have @ingroup qx-io, but Doxygen 1.9.7 has a bug preventing this
 /*!
  *  @enum IoOpResultType
- *  @ingroup qx-io
  *
  *  This defines type of an IO operation result.
  */
@@ -153,9 +153,9 @@ namespace Qx
  *  The operation could not be performed because the target file is not open.
  */
 
+// TODO: Needs to have @ingroup qx-io, but Doxygen 1.9.7 has a bug preventing this
 /*!
  *  @enum IoOpTargetType
- *  @ingroup qx-io
  *
  *  This defines the type of an IO operation target.
  */
@@ -347,6 +347,10 @@ void IoOpReport::parseOutcome()
     }
 }
 
+quint32 IoOpReport::deriveValue() const { return mResult; }
+QString IoOpReport::derivePrimary() const { return isFailure() ? outcome() : QString(); }
+QString IoOpReport::deriveSecondary() const { return isFailure() ? outcomeInfo() : QString(); };
+
 //Public:
 /*!
  *  Returns the type of operation.
@@ -389,20 +393,5 @@ bool IoOpReport::isFailure() const { return mResult != IO_SUCCESS; }
  *  Returns @c true if the report is null; otherwise returns @c false.
  */
 bool IoOpReport::isNull() const { return mNull; }
-
-/*!
- *  Returns a GenericError that describes the outcome of the IO operation.
- *
- *  An invalid (non-error) GenericError is returned if the report describes a successful operation.
- *
- *  @sa outcome(), and outcomeInfo().
- */
-GenericError IoOpReport::toGenericError() const
-{
-    if(isFailure())
-        return GenericError();
-    else
-        return GenericError(GenericError::Error, outcome(), outcomeInfo());
-}
 
 }

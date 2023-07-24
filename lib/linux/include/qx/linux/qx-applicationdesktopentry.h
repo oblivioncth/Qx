@@ -40,9 +40,9 @@ class QX_LINUX_EXPORT ApplicationDesktopEntry : public DesktopEntry
 {
 //-Class Members-------------------------------------------------------------------------------------------------
 private:
-    static inline const QString TYPE = QStringLiteral("Application");
-    static inline const QString EXTENSION = QStringLiteral("desktop");
-    static inline const QString ACTION_HEADER = QStringLiteral("[Desktop Actions %1]");
+    static inline const QString TYPE = u"Application"_s;
+    static inline const QString EXTENSION = u"desktop"_s;
+    static inline const QString ACTION_HEADER = u"[Desktop Actions %1]"_s;
 
 //-Instance Members-------------------------------------------------------------------------------------------------
 private:

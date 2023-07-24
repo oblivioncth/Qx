@@ -10,10 +10,12 @@
 #include <QAuthenticator>
 
 // Intra-component Includes
-#include "qx/network/qx-common-network.h"
+#include "qx/network/qx-downloadtask.h"
+#include "qx/network/qx-downloadopreport.h"
+#include "qx/network/qx-downloadmanagerreport.h"
 
 // Extra-component Includes
-#include "qx/core/qx-genericerror.h"
+#include "qx/core/qx-error.h"
 #include "qx/core/qx-cumulation.h"
 #include "qx/io/qx-filestreamwriter.h"
 
@@ -39,75 +41,6 @@
 namespace Qx
 {
 
-//-Forward Declarations-------------------------------------------------------------------------------------------
-class AsyncDownloadManager;
-class SyncDownloadManager;
-
-class QX_NETWORK_EXPORT DownloadManagerReport
-{
-
-friend AsyncDownloadManager;
-friend SyncDownloadManager;
-
-//-Class Enums----------------------------------------------------------------------------------------------------
-public:
-   enum class Outcome{
-       Success = 0x0,
-       Fail = 0x1,
-       Abort = 0x2
-   };
-
-//-Instance Variables---------------------------------------------------------------------------------------------
-private:
-    bool mNull;
-    Outcome mOutcome;
-    GenericError mErrorInfo;
-    QList<DownloadOpReport> mTaskReports;
-
-//-Constructor-------------------------------------------------------------------------------------------------------
-public:
-    DownloadManagerReport();
-
-//-Instance Functions----------------------------------------------------------------------------------------------
-public:
-    Outcome outcome() const;
-    GenericError errorInfo() const;
-    bool wasSuccessful() const;
-    QList<DownloadOpReport> taskReports() const;
-    bool isNull() const;
-
-//-Inner Classes--------------------------------------------------------------------------------------------------
-private:
-    class Builder
-    {
-    //-Class Variables-----------------------------------------------------------------------------------------------
-    private:
-        static inline const QString ERR_P_QUEUE_INCOMPL = "The download(s) failed to complete successfully.";
-        static inline const QString ERR_S_OUTCOME_FAIL = "One or more downloads failed due to the following reasons.";
-        static inline const QString ERR_D_SKIP = "%1 remaining download(s) were skipped due to previous errors aborted.";
-        static inline const QString ERR_D_ABORT = "%1 remaining download(s) were aborted.";
-        static inline const QString ERR_D_SPECIFIC = "Specific:";
-        static inline const QString ERR_D_GENERAL = "General:";
-        static inline const QString ERR_D_LIST_ITEM = "[%1] %2";
-
-    //-Instance Variables---------------------------------------------------------------------------------------------
-    private:
-        std::unique_ptr<DownloadManagerReport> mWorkingReport;
-
-    //-Constructor---------------------------------------------------------------------------------------------------
-    public:
-        Builder();
-
-    //-Instance Functions----------------------------------------------------------------------------------------------
-    private:
-        void updateOutcome(const DownloadOpReport& dop);
-
-    public:
-        void wDownload(DownloadOpReport downloadReport);
-        DownloadManagerReport build();
-    };
-};
-
 class QX_NETWORK_EXPORT AsyncDownloadManager: public QObject
 {
 //-QObject Macro (Required for all QObject Derived Classes)-----------------------------------------------------------
@@ -124,18 +57,18 @@ private:
     static const qint64 SIZE_QUERY_TIMEOUT_MS = 500;
 
     // Errors - Finish
-    static inline const QString ERR_TIMEOUT = "The data transfer failed to start before the timeout was reached.";
+    static inline const QString ERR_TIMEOUT = u"The data transfer failed to start before the timeout was reached."_s;
 
     // Errors - Messages
-    static inline const QString SSL_ERR = "The following SSL issues occurred while attempting to download %1";
-    static inline const QString CONTINUE_QUES = "Continue downloading?";
-    static inline const QString AUTH_REQUIRED = "Authentication is required to connect to %1";
-    static inline const QString PROXY_AUTH_REQUIRED = "Authentication is required to connect to the proxy %1";
+    static inline const QString SSL_ERR = u"The following SSL issues occurred while attempting to download %1"_s;
+    static inline const QString CONTINUE_QUES = u"Continue downloading?"_s;
+    static inline const QString AUTH_REQUIRED = u"Authentication is required to connect to %1"_s;
+    static inline const QString PROXY_AUTH_REQUIRED = u"Authentication is required to connect to the proxy %1"_s;
 
     // Prompts
-    static inline const QString PROMPT_AUTH = "Authentication is required for %1";
-    static inline const QString PROMPT_PRESHARED_AUTH = "Pre-shared key authentication is required for %1";
-    static inline const QString PROMPT_PROXY_AUTH = "Proxy authentication is required for %1";
+    static inline const QString PROMPT_AUTH = u"Authentication is required for %1"_s;
+    static inline const QString PROMPT_PRESHARED_AUTH = u"Pre-shared key authentication is required for %1"_s;
+    static inline const QString PROMPT_PROXY_AUTH = u"Proxy authentication is required for %1"_s;
 
 //-Instance Members---------------------------------------------------------------------------------------------------
 private:
@@ -236,7 +169,7 @@ public slots:
 //-Signals------------------------------------------------------------------------------------------------------------
 signals:
     // In-progress signals
-    void sslErrors(Qx::GenericError errorMsg, bool* ignore);
+    void sslErrors(Qx::Error errorMsg, bool* ignore);
     void authenticationRequired(QString prompt, QAuthenticator* authenticator);
     void preSharedKeyAuthenticationRequired(QString prompt, QSslPreSharedKeyAuthenticator* authenticator);
     void proxyAuthenticationRequired(QString prompt, QAuthenticator* authenticator);
@@ -294,7 +227,7 @@ public:
 
 //-Slots------------------------------------------------------------------------------------------------------------
 private slots:
-    void finishHandler(const DownloadManagerReport& dmr);
+    void finishHandler(const Qx::DownloadManagerReport& dmr);
 
 public slots:
     void abort();
@@ -302,7 +235,7 @@ public slots:
 //-Signals------------------------------------------------------------------------------------------------------------
 signals:
     // In-progress signals
-    void sslErrors(Qx::GenericError errorMsg, bool* ignore);
+    void sslErrors(Qx::Error errorMsg, bool* ignore);
     void authenticationRequired(QString prompt, QAuthenticator* authenticator);
     void preSharedKeyAuthenticationRequired(QString prompt, QSslPreSharedKeyAuthenticator* authenticator);
     void proxyAuthenticationRequired(QString prompt, QAuthenticator* authenticator);
@@ -313,5 +246,5 @@ signals:
 
 }
 
-Q_DECLARE_METATYPE(Qx::DownloadManagerReport);
+
 #endif // QX_DOWNLOADMANAGER_H
