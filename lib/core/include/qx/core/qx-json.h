@@ -58,16 +58,23 @@ namespace QxJson \
 #define QX_JSON_STRUCT_OUTSIDE(Struct, ...) __QX_JSON_META_STRUCT_OUTSIDE(Struct, std::make_tuple(QX_FOR_EACH_DELIM(QX_JSON_MEMBER, __VA_ARGS__)))
 #define QX_JSON_STRUCT_OUTSIDE_X(Struct, ...) __QX_JSON_META_STRUCT_OUTSIDE(Struct, std::make_tuple(__VA_ARGS__))
 
-#define QX_JSON_DECLARE_MEMBER_OVERRIDES() \
-    template<Qx::StringLiteral MemberN> \
-    struct QxJsonConversionOverride
-
-#define QX_JSON_MEMBER_OVERRIDE(member, ...) \
+/*
+ * TODO: Create an "inside" version of this macro and its underlying functions, though it's tricky
+ * given clang/GCCs issues with non-namespace explicit template specializations so either a dummy
+ * template parameter will need to be used (to make it technically a partial specialization) or
+ * the specializations themselves will still need to be outside the struct (second macro), while
+ * the declaration of the inner override struct (first macro, e.g. QX_JSON_DECLARE_MEMBER_OVERRIDES(); )
+ * is inside
+ */
+#define QX_JSON_MEMBER_OVERRIDE(Struct, member, ...) \
+namespace QxJson \
+{ \
     template<> \
-    struct QxJsonConversionOverride<#member> \
+    struct MemberOverrideCoverter<Struct, #member> \
     { \
         __VA_ARGS__\
-    };
+    }; \
+}
 
 namespace Qx
 {
@@ -174,6 +181,9 @@ namespace QxJson
 template<typename T>
 struct Converter;
 
+template<class Struct, Qx::StringLiteral member>
+struct MemberOverrideCoverter;
+
 template<typename SelfType, typename DelayedSelfType>
 struct QxJsonMetaStructOutside;
 
@@ -202,7 +212,7 @@ concept json_convertible = requires(T& tValue) {
 
 template<class K, typename T, Qx::StringLiteral N>
 concept json_override_convertible = requires(T& tValue) {
-    { K::template QxJsonConversionOverride<N>::fromJson(tValue, QJsonValue()) } -> std::same_as<Qx::JsonError>;
+    { MemberOverrideCoverter<K, N>::fromJson(tValue, QJsonValue()) } -> std::same_as<Qx::JsonError>;
 };
 
 template<typename Key, class Value>
@@ -242,8 +252,7 @@ namespace QxJsonPrivate
  * false branches are taken. Different compilers seem to discard the untaken
  * branch of the value dependent statement at different stages as it compiled
  * fine with MSVC and a newer version of GCC, but not clang or older GCC versions.
- * To clarify, compi
- * lation would fail due to the type in the not-yet-discarded
+ * To clarify, compilation would fail due to the type in the not-yet-discarded
  * branch not being declared.
  *
  * Putting the reference of the potentially undeclared types behind these functions
@@ -267,7 +276,14 @@ template<class K, typename T, Qx::StringLiteral N>
     requires QxJson::json_override_convertible<K, T, N>
 Qx::JsonError performOverrideConversion(T& value, const QJsonValue& jv)
 {
-    return K::template QxJsonConversionOverride<N>::fromJson(value, jv);
+    return QxJson::MemberOverrideCoverter<K, N>::fromJson(value, jv);
+}
+
+template<typename T>
+    requires QxJson::json_convertible<T>
+Qx::JsonError performRegularConversion(T& value, const QJsonValue& jv)
+{
+    return QxJson::Converter<T>::fromJson(value, jv);
 }
 /*! @endcond */
 
@@ -335,7 +351,7 @@ struct Converter<T>
                 if constexpr(json_override_convertible<T, mType, mName>)
                     cnvError = QxJsonPrivate::performOverrideConversion<T, mType, mName>(value.*mPtr, mValue);
                 else
-                    cnvError = Converter<mType>::fromJson(value.*mPtr, mValue);
+                    cnvError = QxJsonPrivate::performRegularConversion<mType>(value.*mPtr, mValue);
 
                 return !cnvError.isValid();
             }() && ...);

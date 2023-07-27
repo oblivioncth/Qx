@@ -94,18 +94,16 @@ struct MySpecialStruct
     int number;
     QString name;
     
-    QX_JSON_STRUCT(number, name);
-    
-    QX_JSON_DECLARE_MEMBER_OVERRIDES();
-    
-    QX_JSON_MEMBER_OVERRIDE(name,
-        static Qx::JsonError fromJson(QString& member, const QJsonValue& jv)
-        {
-            member = "OverridenName";
-            return Qx::JsonError();
-        }
-    )
+    QX_JSON_STRUCT(number, name);     
 }
+
+QX_JSON_MEMBER_OVERRIDE(MySpecialStruct, name,
+    static Qx::JsonError fromJson(QString& member, const QJsonValue& jv)
+    {
+        member = "OverridenName";
+        return Qx::JsonError();
+    }
+)
 //! [5]
 
 //! [6]
