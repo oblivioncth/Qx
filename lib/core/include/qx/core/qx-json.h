@@ -242,8 +242,7 @@ namespace QxJsonPrivate
  * false branches are taken. Different compilers seem to discard the untaken
  * branch of the value dependent statement at different stages as it compiled
  * fine with MSVC and a newer version of GCC, but not clang or older GCC versions.
- * To clarify, compi
- * lation would fail due to the type in the not-yet-discarded
+ * To clarify, compilation would fail due to the type in the not-yet-discarded
  * branch not being declared.
  *
  * Putting the reference of the potentially undeclared types behind these functions
@@ -268,6 +267,13 @@ template<class K, typename T, Qx::StringLiteral N>
 Qx::JsonError performOverrideConversion(T& value, const QJsonValue& jv)
 {
     return K::template QxJsonConversionOverride<N>::fromJson(value, jv);
+}
+
+template<typename T>
+    requires QxJson::json_convertible<T>
+Qx::JsonError performRegularConversion(T& value, const QJsonValue& jv)
+{
+    return QxJson::Converter<T>::fromJson(value, jv);
 }
 /*! @endcond */
 
@@ -335,7 +341,7 @@ struct Converter<T>
                 if constexpr(json_override_convertible<T, mType, mName>)
                     cnvError = QxJsonPrivate::performOverrideConversion<T, mType, mName>(value.*mPtr, mValue);
                 else
-                    cnvError = Converter<mType>::fromJson(value.*mPtr, mValue);
+                    cnvError = QxJsonPrivate::performRegularConversion<mType>(value.*mPtr, mValue);
 
                 return !cnvError.isValid();
             }() && ...);
