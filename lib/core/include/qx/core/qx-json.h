@@ -58,6 +58,14 @@ namespace QxJson \
 #define QX_JSON_STRUCT_OUTSIDE(Struct, ...) __QX_JSON_META_STRUCT_OUTSIDE(Struct, std::make_tuple(QX_FOR_EACH_DELIM(QX_JSON_MEMBER, __VA_ARGS__)))
 #define QX_JSON_STRUCT_OUTSIDE_X(Struct, ...) __QX_JSON_META_STRUCT_OUTSIDE(Struct, std::make_tuple(__VA_ARGS__))
 
+/*
+ * TODO: Create an "inside" version of this macro and its underlying functions, though it's tricky
+ * given clang/GCCs issues with non-namespace explicit template specializations so either a dummy
+ * template parameter will need to be used (to make it technically a partial specialization) or
+ * the specializations themselves will still need to be outside the struct (second macro), while
+ * the declaration of the inner override struct (first macro, e.g. QX_JSON_DECLARE_MEMBER_OVERRIDES(); )
+ * is inside
+ */
 #define QX_JSON_MEMBER_OVERRIDE(Struct, member, ...) \
 namespace QxJson \
 { \
