@@ -58,16 +58,15 @@ namespace QxJson \
 #define QX_JSON_STRUCT_OUTSIDE(Struct, ...) __QX_JSON_META_STRUCT_OUTSIDE(Struct, std::make_tuple(QX_FOR_EACH_DELIM(QX_JSON_MEMBER, __VA_ARGS__)))
 #define QX_JSON_STRUCT_OUTSIDE_X(Struct, ...) __QX_JSON_META_STRUCT_OUTSIDE(Struct, std::make_tuple(__VA_ARGS__))
 
-#define QX_JSON_DECLARE_MEMBER_OVERRIDES() \
-    template<Qx::StringLiteral MemberN> \
-    struct QxJsonConversionOverride
-
-#define QX_JSON_MEMBER_OVERRIDE(member, ...) \
+#define QX_JSON_MEMBER_OVERRIDE(Struct, member, ...) \
+namespace QxJson \
+{ \
     template<> \
-    struct QxJsonConversionOverride<#member> \
+    struct MemberOverrideCoverter<Struct, #member> \
     { \
         __VA_ARGS__\
-    };
+    }; \
+}
 
 namespace Qx
 {
@@ -174,6 +173,9 @@ namespace QxJson
 template<typename T>
 struct Converter;
 
+template<class Struct, Qx::StringLiteral member>
+struct MemberOverrideCoverter;
+
 template<typename SelfType, typename DelayedSelfType>
 struct QxJsonMetaStructOutside;
 
@@ -202,7 +204,7 @@ concept json_convertible = requires(T& tValue) {
 
 template<class K, typename T, Qx::StringLiteral N>
 concept json_override_convertible = requires(T& tValue) {
-    { K::template QxJsonConversionOverride<N>::fromJson(tValue, QJsonValue()) } -> std::same_as<Qx::JsonError>;
+    { MemberOverrideCoverter<K, N>::fromJson(tValue, QJsonValue()) } -> std::same_as<Qx::JsonError>;
 };
 
 template<typename Key, class Value>
@@ -266,7 +268,7 @@ template<class K, typename T, Qx::StringLiteral N>
     requires QxJson::json_override_convertible<K, T, N>
 Qx::JsonError performOverrideConversion(T& value, const QJsonValue& jv)
 {
-    return K::template QxJsonConversionOverride<N>::fromJson(value, jv);
+    return QxJson::MemberOverrideCoverter<K, N>::fromJson(value, jv);
 }
 
 template<typename T>

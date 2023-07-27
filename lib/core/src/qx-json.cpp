@@ -89,15 +89,6 @@
  *  @sa QX_JSON_STRUCT_OUTSIDE()
  */
 
-/*!
- *  @def QX_JSON_DECLARE_MEMBER_OVERRIDES()
- *
- *  Declares that a JSON-tried struct has member/key specific value parsing overrides.
- *
- *  This macro must be used before any member specific overrides can be defined.
- *
- *  @sa QX_JSON_MEMBER_OVERRIDE()
- */
 
 /*!
  *  @def QX_JSON_MEMBER_OVERRIDE()
@@ -105,6 +96,8 @@
  *  Used to define a member/key specific value parsing override for a JSON-tried struct.
  *  The specified member will be parsed using the provided function instead of a
  *  potentially available generic one for that type.
+ *
+ *  Must be used in namespace scope, outside of the struct definition.
  *
  *  @snippet qx-json.cpp 5
  */
