@@ -378,9 +378,9 @@ IoOpReport textFileLineCount(int& returnBuffer, QFile& textFile, bool ignoreTrai
 
 /*!
  *  Converts any relative component of @a textPos to an absolute one. I.e. determines the actual line
- *  and or/character that Index32::LAST references for the given @a textFile, if present.
+ *  and or/character that Index32(Index32::Last) references for the given @a textFile, if present.
  *
- *  If neither the line or character component of @a textPos contain the value Index32::LAST,
+ *  If neither the line or character component of @a textPos contain the value Index32(Index32::Last),
  *  @a textPos is left unchanged.
  *
  *  @param[in,out] textPos The text position to translate into an absolute position.
@@ -459,7 +459,7 @@ IoOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const
 
     // Query tracking
     TextPos trueStartPos = query.startPosition();
-    TextPos currentPos = TextPos::START;
+    TextPos currentPos = TextPos(TextPos::Start);
     TextPos possibleMatch = TextPos();
     int hitsSkipped = 0;
     QString::const_iterator queryIt = query.string().constBegin();
@@ -469,7 +469,7 @@ IoOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const
     QTextStream fileTextStream(&textFile);
 
     // Translate start position to absolute position
-    if(trueStartPos != TextPos::START)
+    if(trueStartPos != TextPos(TextPos::Start))
     {
         IoOpReport translate = textFileAbsolutePosition(trueStartPos, textFile, readOptions.testFlag(IgnoreTrailingBreak));
         if(translate.isFailure())
@@ -489,7 +489,7 @@ IoOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const
     QScopeGuard fileGuard([&textFile](){ textFile.close(); });
 
     // Skip to start pos
-    if(trueStartPos != TextPos::START)
+    if(trueStartPos != TextPos(TextPos::Start))
     {
         int line;
         // Skip to start line
@@ -739,7 +739,7 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
         TextStream fileTextStream(&textFile);
 
         // Cover each possible range type
-        if(startPos == TextPos::START && endPos == TextPos::END) // Whole file is desired
+        if(startPos == TextPos(TextPos::Start) && endPos == TextPos(TextPos::End)) // Whole file is desired
         {
             returnBuffer = fileTextStream.readAll();
 
@@ -999,7 +999,7 @@ namespace
 
             // Fill beforeNew
             TextPos beforeEnd = TextPos(startPos.line(), startPos.character() - 1);
-            IoOpReport readBefore = readTextFromFile(beforeNew, auxFile, TextPos::START, beforeEnd);
+            IoOpReport readBefore = readTextFromFile(beforeNew, auxFile, TextPos(TextPos::Start), beforeEnd);
             if(readBefore.isFailure())
                 return readBefore;
 
@@ -1178,27 +1178,27 @@ IoOpReport deleteTextFromFile(QFile& textFile, TextPos startPos, TextPos endPos)
     IoOpReport transientReport;
 
     // Determine beforeDeletion
-    if(startPos == TextPos::START) // (0,0)
+    if(startPos == TextPos(TextPos::Start)) // (0,0)
         beforeDeletion = u""_s;
     else if(startPos.character().isLast())
     {
-        transientReport = readTextFromFile(beforeDeletion, textFile, TextPos::START, startPos);
+        transientReport = readTextFromFile(beforeDeletion, textFile, TextPos(TextPos::Start), startPos);
         beforeDeletion.chop(1);
     }
     else
-        transientReport = readTextFromFile(beforeDeletion, textFile, TextPos::START, TextPos(startPos.line(), startPos.character() - 1));
+        transientReport = readTextFromFile(beforeDeletion, textFile, TextPos(TextPos::Start), TextPos(startPos.line(), startPos.character() - 1));
 
     // Check for transient errors
     if(!transientReport.isNull() && transientReport.result() != IO_SUCCESS)
         return IoOpReport(IO_OP_WRITE, transientReport.result(), textFile);
 
     // Determine afterDeletion
-    if(endPos == TextPos::END)
+    if(endPos == TextPos(TextPos::End))
         afterDeletion = u""_s;
     else if(endPos.character().isLast())
-        transientReport = readTextFromFile(afterDeletion, textFile, TextPos(endPos.line() + 1, 0), TextPos::END);
+        transientReport = readTextFromFile(afterDeletion, textFile, TextPos(endPos.line() + 1, 0), TextPos(TextPos::End));
     else
-        transientReport = readTextFromFile(afterDeletion, textFile, TextPos(endPos.line(), endPos.character() + 1), TextPos::END);
+        transientReport = readTextFromFile(afterDeletion, textFile, TextPos(endPos.line(), endPos.character() + 1), TextPos(TextPos::End));
 
     // Check for transient errors
     if(transientReport.result() != IO_SUCCESS)

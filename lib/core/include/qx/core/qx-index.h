@@ -22,12 +22,13 @@ class Index
 //-Class Types----------------------------------------------------------------------------------------------------
 private:
     enum class Type {Null, End, Value};
-    struct LastKey {};
 
-//-Class Members----------------------------------------------------------------------------------------------------
 public:
-    static const Index<T> FIRST;
-    static const Index<T> LAST;
+    enum Extent
+    {
+        First,
+        Last
+    };
 
 //-Instance Members----------------------------------------------------------------------------------------------------
 private:
@@ -35,19 +36,32 @@ private:
     T mValue;
 
 //-Constructor----------------------------------------------------------------------------------------------
-private:
-    Index(LastKey) :
-        mType(Type::End),
-        mValue(std::numeric_limits<T>::max())
-    {}
-
 public:
-    Index() :
+    constexpr Index() :
         mType(Type::Null),
         mValue(0)
     {}
 
-    Index(T value) :
+    constexpr Index(Extent e)
+    {
+        switch(e)
+        {
+            case First:
+                mType = Type::Value;
+                mValue = 0;
+                break;
+
+            case Last:
+                mType = Type::End;
+                mValue = std::numeric_limits<T>::max();
+                break;
+
+            default:
+                qCritical("Invalid extent");
+        }
+    }
+
+    constexpr Index(T value) :
         mType(Type::Value),
         mValue(value)
     {
@@ -93,7 +107,7 @@ public:
         if(other.mType == Type::End)
             return 0;
         else if(mType == Type::End)
-            return LAST;
+            return Index(Last);
         else
             return constrainedSub(mValue, other.mValue, 0);
     }
@@ -103,7 +117,7 @@ public:
     Index operator+(const Index& other)
     {
         return (mType == Type::End || other.mType == Type::End) ?
-                    LAST : constrainedAdd(mValue, other.mValue, 0);
+                    Index(Last) : constrainedAdd(mValue, other.mValue, 0);
     }
 
 
@@ -117,7 +131,7 @@ public:
         if(other.mType == Type::End)
             return mType == Type::End ? 1 : 0;
         else if(mType == Type::End)
-            return LAST;
+            return Index(Last);
         else
             return constrainedDiv(mValue, other.mValue, 0);
     }
@@ -129,7 +143,7 @@ public:
         if(mValue == 0 || other.mValue == 0)
             return 0;
         else if(mType == Type::End || other.mType == Type::End)
-            return LAST;
+            return Index(Last);
         else
             return constrainedMult(mValue, other.mValue, 0);
 
@@ -288,14 +302,6 @@ public:
 //    template<typename N> requires std::integral<N>
 //    friend T& operator*=(N& integer, const Index<T>& index) { integer *= static_cast<N>(index.mValue); return integer; }
 };
-
-//-Outer Class Definitions----------------------------------------------------------------------------------
-template<typename T>
-    requires std::signed_integral<T>
-const Index<T> Index<T>::FIRST = Index<T>(0);
-template<typename T>
-    requires std::signed_integral<T>
-const Index<T> Index<T>::LAST = Index<T>(LastKey{});
 
 //-Outer Class Types----------------------------------------------------------------------------------------
 typedef Index<qint8> Index8;
