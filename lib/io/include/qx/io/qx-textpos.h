@@ -43,12 +43,8 @@ public:
     void setCharacter(Index32 character);
     bool isNull() const;
 
-    bool operator== (const TextPos& otherTextPos);
-    bool operator!= (const TextPos& otherTextPos);
-    bool operator> (const TextPos& otherTextPos);
-    bool operator>= (const TextPos& otherTextPos);
-    bool operator< (const TextPos& otherTextPos);
-    bool operator<= (const TextPos& otherTextPos);
+    bool operator==(const TextPos& other) const noexcept = default;
+    auto operator<=>(const TextPos& other) const noexcept;
 };
 
 }

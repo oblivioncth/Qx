@@ -81,46 +81,27 @@ TextPos::TextPos(Index32 line, Index32 character) :
 //Public:
 
 /*!
+ *  @fn bool TextPos::operator==(const TextPos& otherTextPos) const
+ *
  *  Returns @c true if the line and character of this text position are the same as in @a otherTextPos;
  *  otherwise returns @c false.
  */
-bool TextPos::operator==(const TextPos& otherTextPos) { return mLine == otherTextPos.mLine && mCharacter == otherTextPos.mCharacter; }
 
 /*!
- *  Returns @c true if either the line or character of this text position is different than in @a otherTextPos;
- *  otherwise returns @c false.
+ *  Performs a three-way comparison between this text position and @a other.
+ *
+ *  Returns:
+ *  - @c <0 if this text position is less than @a other
+ *  - @c 0 if this text position is equal to @a other
+ *  - @c >0 if this text position is greater than @a other
  */
-bool TextPos::operator!= (const TextPos& otherTextPos) { return !(*this == otherTextPos); }
-
-/*!
- *  Returns @c true if this text position points to a further location than @a otherTextPos;
- *  otherwise returns @c false.
- */
-bool TextPos::operator> (const TextPos& otherTextPos)
+auto TextPos::operator<=>(const TextPos& other) const noexcept
 {
-    if(mLine == otherTextPos.mLine)
-        return mCharacter > otherTextPos.mCharacter;
-    else
-        return mLine > otherTextPos.mLine;
+    if (auto c = mLine <=> other.mLine; c != 0)
+            return c;
+
+    return mCharacter <=> other.mCharacter;
 }
-
-/*!
- *  Returns @c true if this text position points to at least the same location as @a otherTextPos;
- *  otherwise returns @c false.
- */
-bool TextPos::operator>= (const TextPos& otherTextPos) { return *this == otherTextPos || *this > otherTextPos; }
-
-/*!
- *  Returns @c true if this text position points to a closer location than @a otherTextPos;
- *  otherwise returns @c false.
- */
-bool TextPos::operator< (const TextPos& otherTextPos) { return !(*this >= otherTextPos); }
-
-/*!
- *  Returns @c true if this text position points to at most the same location as @a otherTextPos;
- *  otherwise returns @c false.
- */
-bool TextPos::operator<= (const TextPos& otherTextPos) { return !(*this > otherTextPos); }
 
 /*!
  *  Returns the line that the text position is pointing to.
