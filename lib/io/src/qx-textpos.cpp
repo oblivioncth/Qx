@@ -95,7 +95,7 @@ TextPos::TextPos(Index32 line, Index32 character) :
  *  - @c 0 if this text position is equal to @a other
  *  - @c >0 if this text position is greater than @a other
  */
-auto TextPos::operator<=>(const TextPos& other) const noexcept
+std::strong_ordering TextPos::operator<=>(const TextPos& other) const noexcept
 {
     if (auto c = mLine <=> other.mLine; c != 0)
             return c;

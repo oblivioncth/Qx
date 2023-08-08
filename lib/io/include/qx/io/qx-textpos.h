@@ -44,7 +44,7 @@ public:
     bool isNull() const;
 
     bool operator==(const TextPos& other) const noexcept = default;
-    auto operator<=>(const TextPos& other) const noexcept;
+    std::strong_ordering operator<=>(const TextPos& other) const noexcept;
 };
 
 }

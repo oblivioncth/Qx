@@ -84,7 +84,7 @@ public:
 //    template<typename N> requires std::integral<N>
 //    bool operator==(const N& integer) const { return mType == Type::Value && static_cast<N>(mValue) == integer; }
 
-    auto operator<=>(const Index& other) const noexcept {
+    std::strong_ordering operator<=>(const Index& other) const noexcept {
         switch(mType)
         {
             case Type::Null:

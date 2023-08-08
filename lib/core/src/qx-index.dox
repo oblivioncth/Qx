@@ -115,7 +115,7 @@ namespace Qx
  */
 
 /*!
- * @fn auto Index<T>::operator<=>(const Index& other) const noexcept
+ * @fn std::strong_ordering Index<T>::operator<=>(const Index& other) const noexcept
  *
  *  Performs a three-way comparison between this index and @a other.
  *
