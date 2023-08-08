@@ -54,8 +54,9 @@ namespace Qx
 
 //-Class Types----------------------------------------------------------------------------------------------------
 //Public:
+// TODO: Report this as a Doxygen bug, likely should need to be Index<T>::Extent
 /*!
- *  @enum Index<T>::Extent
+ *  @enum Index::Extent
  *
  *  Used to refer to indicies of special significance.
  *

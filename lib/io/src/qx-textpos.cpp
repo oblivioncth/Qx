@@ -19,7 +19,7 @@ namespace Qx
 //Public:
 
 /*!
- *  @enum Index<T>::Extent
+ *  @enum TextPos::Extent
  *
  *  Used to refer to text positions of special significance.
  *
