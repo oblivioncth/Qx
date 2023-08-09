@@ -15,22 +15,24 @@ namespace Qx
  *  @brief The TextPos class is used to represent an offset within a text file in terms of lines and characters.
  */
 
-//-Class Variables-----------------------------------------------------------------------------------------------
+//-Class Types-----------------------------------------------------------------------------------------------
 //Public:
 
 /*!
+ *  @enum TextPos::Extent
+ *
+ *  Used to refer to text positions of special significance.
+ *
+ *  @var Index<T>::Extent Index<T>::First
  *  A text position representing the start of a file.
  *
  *  Equivalent to @c TextPos(0,0).
- */
-const TextPos TextPos::START = TextPos(0,0); // Initialization of constant reference TextPos
-
-/*!
+ *
+ *  @var Index<T>::Extent Index<T>::Last
  *  A text position representing the end file.
  *
- *  Equivalent to @c TextPos(Index32::LAST,Index32::LAST).
+ *  Equivalent to @c TextPos(Index32(Index32::Last), Index32(Index32::Last)).
  */
-const TextPos TextPos::END = TextPos(Index32::LAST, Index32::LAST); // Initialization of constant reference TextPos
 
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
@@ -42,6 +44,30 @@ TextPos::TextPos() :
     mLine(Index32()),
     mCharacter(Index32())
 {}
+
+//TODO: Consider creating Qx::Extent (with Start/End) in qx-global and just use
+// that for Index and TextPos.
+/*!
+ *  Creates a text position at the given extent @a e.
+ */
+TextPos::TextPos(Extent e)
+{
+    switch(e)
+    {
+        case Start:
+            mLine = 0;
+            mCharacter = 0;
+            break;
+
+        case End:
+            mLine = Index32(Index32::Last);
+            mCharacter = Index32(Index32::Last);
+            break;
+
+        default:
+            qCritical("Invalid extent");
+    }
+}
 
 /*!
  *  Creates a text position that points to @a line and @a character.
@@ -55,46 +81,27 @@ TextPos::TextPos(Index32 line, Index32 character) :
 //Public:
 
 /*!
+ *  @fn bool TextPos::operator==(const TextPos& otherTextPos) const
+ *
  *  Returns @c true if the line and character of this text position are the same as in @a otherTextPos;
  *  otherwise returns @c false.
  */
-bool TextPos::operator==(const TextPos& otherTextPos) { return mLine == otherTextPos.mLine && mCharacter == otherTextPos.mCharacter; }
 
 /*!
- *  Returns @c true if either the line or character of this text position is different than in @a otherTextPos;
- *  otherwise returns @c false.
+ *  Performs a three-way comparison between this text position and @a other.
+ *
+ *  Returns:
+ *  - @c <0 if this text position is less than @a other
+ *  - @c 0 if this text position is equal to @a other
+ *  - @c >0 if this text position is greater than @a other
  */
-bool TextPos::operator!= (const TextPos& otherTextPos) { return !(*this == otherTextPos); }
-
-/*!
- *  Returns @c true if this text position points to a further location than @a otherTextPos;
- *  otherwise returns @c false.
- */
-bool TextPos::operator> (const TextPos& otherTextPos)
+std::strong_ordering TextPos::operator<=>(const TextPos& other) const noexcept
 {
-    if(mLine == otherTextPos.mLine)
-        return mCharacter > otherTextPos.mCharacter;
-    else
-        return mLine > otherTextPos.mLine;
+    if (auto c = mLine <=> other.mLine; c != 0)
+            return c;
+
+    return mCharacter <=> other.mCharacter;
 }
-
-/*!
- *  Returns @c true if this text position points to at least the same location as @a otherTextPos;
- *  otherwise returns @c false.
- */
-bool TextPos::operator>= (const TextPos& otherTextPos) { return *this == otherTextPos || *this > otherTextPos; }
-
-/*!
- *  Returns @c true if this text position points to a closer location than @a otherTextPos;
- *  otherwise returns @c false.
- */
-bool TextPos::operator< (const TextPos& otherTextPos) { return !(*this >= otherTextPos); }
-
-/*!
- *  Returns @c true if this text position points to at most the same location as @a otherTextPos;
- *  otherwise returns @c false.
- */
-bool TextPos::operator<= (const TextPos& otherTextPos) { return !(*this > otherTextPos); }
 
 /*!
  *  Returns the line that the text position is pointing to.

@@ -17,7 +17,7 @@ namespace Qx
  *  use -1 to mean 'none' in the context of searches.
  *
  *  The Index type is designed to remedy this issue by providing a more distinct representation of a set's final index
- *  via the member variable Index<T>::LAST, which for completeness is paired with Index<T>::FIRST. The type also
+ *  via the constructor Index(Extent), which can also be used to more explicitly reference the first index. The type also
  *  can be null, providing further clarity for the 'none' case.
  *
  *  To minimize unintentional interactions, Index<T> only has comparison and arithmetic operators defined for when
@@ -52,20 +52,19 @@ namespace Qx
  *  @li 2) 'last' indices are greater than everything except other 'last' indices (highest possible value)
  */
 
-//-Class Members----------------------------------------------------------------------------------------------------
+//-Class Types----------------------------------------------------------------------------------------------------
 //Public:
+// TODO: Report this as a Doxygen bug, likely should need to be Index<T>::Extent
 /*!
- *  @var Index<T> Index<T>::FIRST
+ *  @enum Index::Extent
  *
- *  Used to refer to the first index of a dataset.
+ *  Used to refer to indicies of special significance.
  *
- *  This is equivalent to @c Index<T>(0).
- */
-
-/*!
- *  @var Index<T> Index<T>::LAST
+ *  @var Index<T>::Extent Index<T>::First
+ *  The first index, equivalent to @c Index<T>(0).
  *
- *  Used to refer to the last index of a dataset.
+ *  @var Index<T>::Extent Index<T>::Last
+ *  The last index.
  */
 
 //-Constructor----------------------------------------------------------------------------------------------
@@ -74,6 +73,12 @@ namespace Qx
  * @fn Index<T>::Index()
  *
  *  Creates an null index.
+ */
+
+/*!
+ * @fn Index<T>::Index(Extent e)
+ *
+ *  Creates an index at the given extent @a e.
  */
 
 /*!
@@ -97,15 +102,7 @@ namespace Qx
  *
  *  Returns @c true if the index represents the last index of an arbitrary dataset; otherwise returns @c false.
  *
- *  This is equivalent to <tt>*this == Index<T>::LAST</tt>.
- */
-
-/*!
- * @fn bool Index<T>::isLast() const
- *
- *  Returns @c true if the index represents the last index of an arbitrary dataset; otherwise returns @c false.
- *
- *  This is equivalent to <tt>*this == Index<T>::LAST</tt>.
+ *  This is equivalent to <tt>*this == Index<T>(Last)</tt>.
  */
 
 //-Operators-------------------------------------------------------------------------------------------------------
@@ -118,7 +115,7 @@ namespace Qx
  */
 
 /*!
- * @fn auto Index<T>::operator<=>(const Index& other) const noexcept
+ * @fn std::strong_ordering Index<T>::operator<=>(const Index& other) const noexcept
  *
  *  Performs a three-way comparison between this index and @a other.
  *
