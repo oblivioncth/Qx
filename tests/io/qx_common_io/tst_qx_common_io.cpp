@@ -48,7 +48,8 @@ void tst_qx_common_io::writeStringToFile_data()
     // Overwrite
     QString overwritePath = mWriteDir.filePath("overwrite_file.txt");
     QVERIFY(QFile::copy(u":/data/writeStringToFile/overwrite_original.txt"_s, overwritePath));
-    QFile::setPermissions(overwritePath, QFile::WriteOwner); // Required since copying from a file marked read-only
+    auto p = QFile::WriteOwner | QFile::ReadOwner | QFile::WriteUser | QFile::ReadUser;
+    QFile::setPermissions(overwritePath, p); // Required since copying from a file marked read-only
 
     QFile inputFile(u":/data/writeStringToFile/overwrite_input.txt"_s);
     QVERIFY(inputFile.open(QIODevice::ReadOnly | QIODevice::Text));
@@ -73,7 +74,7 @@ void tst_qx_common_io::writeStringToFile()
     // Write to file
     // TODO: Handle different arguments for writeStringToFile in _data
     Qx::IoOpReport rp = Qx::writeStringToFile(*file, input, Qx::Overwrite, Qx::TextPos(1,2));
-    QVERIFY(!rp.isFailure());
+    QVERIFY2(!rp.isFailure(), qPrintable(rp.outcomeInfo()));
 
     // Get file's new contents and compare
     QVERIFY(file->open(QIODevice::ReadOnly | QIODevice::Text));
