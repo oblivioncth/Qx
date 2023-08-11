@@ -109,7 +109,7 @@ namespace Qx
 // JsonError
 //===============================================================================================================
 
-// Enum
+//-Class Enums-------------------------------------------------------------
 /*!
  *  @class JsonError qx/core/qx-json.h
  *
@@ -120,19 +120,15 @@ namespace Qx
  *  @enum JsonError::Form
  *
  *  This enum represents form of JSON error.
- */
-
-/*!
+ *
  *  @var JsonError::Form JsonError::NoError
  *  No error occurred.
- */
-
-/*!
+ *
  *  @var JsonError::Form JsonError::MissingKey
  *  An expected key was missing.
  */
 
-// Ctor
+//-Constructor-----------------------------------------------------------------
 /*!
  *  Creates an invalid JsonError.
  */
@@ -149,7 +145,23 @@ JsonError::JsonError(const QString& a, Form f) :
     mForm(f)
 {}
 
-// Functions
+//-Instance Functions-------------------------------------------------------------
+//Private:
+quint32 JsonError::deriveValue() const { return mForm; };
+QString JsonError::derivePrimary() const { return mAction; };
+QString JsonError::deriveSecondary() const { return ERR_STRINGS.value(mForm); };
+
+QString JsonError::deriveDetails() const
+{
+    QString details = u"JSON Node Stack:\n"_s;
+    for(const auto& node : mContext)
+        details += u"- "_s + std::visit([](auto&& n){ return n.string(); }, node) + u"\n"_s;
+    details += u"\nAction: "_s + derivePrimary() + u"\n\n"_s + u"Error: "_s + deriveSecondary();
+
+    return details;
+}
+
+//Public:
 /*!
  *  Returns @c true if an error occurred; otherwise, returns @c false.
  */
@@ -165,10 +177,32 @@ QString JsonError::action() const { return mAction; }
  */
 JsonError::Form JsonError::form() const { return mForm; }
 
-// Functions
-quint32 JsonError::deriveValue() const { return mForm; };
-QString JsonError::derivePrimary() const { return mAction; };
-QString JsonError::deriveSecondary() const { return ERR_STRINGS.value(mForm); };
+/*!
+ *  Provides the full context in which the error occurred.
+ */
+QList<QxJson::ContextNode> JsonError::context() const { return mContext; }
+
+/*!
+ *  Prepends the context node @a node to the error's context and returns a reference
+ *  to the updated error object. This function is a no-op if the error is not valid.
+ *
+ *  Generally this function is of no use in user code, but can be utilized when
+ *  providing complex custom parsing for user types via QX_JSON_MEMBER_OVERRIDE
+ *  or Converter specializations.
+ *
+ *  Typically, this function is used in a chain of return calls in order to pass
+ *  the context of where an error occurred up the call stack. For example, one might
+ *  return information about a JSON array related error like so:
+ *
+ *  @snippet qx-json.cpp 6
+ */
+JsonError& JsonError::withContext(const QxJson::ContextNode& node)
+{
+    if(!isValid())
+        return *this;
+
+    mContext.prepend(node); return *this;
+}
 
 //===============================================================================================================
 // QJsonParseErrorAdapter
@@ -290,15 +324,155 @@ QString asString(const QJsonValue& value)
 
 namespace QxJson
 {
-//===============================================================================================================
-// <namepace>
-//===============================================================================================================
 
 /*!
  *  @namespace QxJson
  *
  *  @brief The @c QxJson namespace encapsulates the user-extensible implementation of Qx's JSON parsing facilities.
  */
+
+//===============================================================================================================
+// Nodes
+//===============================================================================================================
+
+/*!
+ *  @class File
+ *  @brief The file class represents a JSON file node for use in error contexts.
+ *
+ *  @note This class is irrelevant in user code except for some instances of complex
+ *  custom JSON parsing
+ *
+ *  @sa Qx::JsonError::withContext().
+ */
+
+/*!
+ *  Constructs a file node with the identifier of @a filename.
+ */
+File::File(const QString& filename) : mIdentifier(filename) {}
+
+/*!
+ *  Constructs a file node with the identifier set to the filename of @a docFile.
+ */
+File::File(const QFile& docFile) : mIdentifier(docFile.fileName()) {}
+
+/*!
+ *  Constructs a file node with the identifier set to the absolute path of @a docFile.
+ */
+File::File(const QFileInfo& docFile) : mIdentifier(docFile.absoluteFilePath()) {}
+
+/*!
+ *  Returns the string representation of the node.
+ */
+QString File::string() const { return u"File: "_s + mIdentifier; }
+
+/*!
+ *  @class Document
+ *  @brief The document class represents a JSON document node for use in error contexts.
+ *
+ *  @note This class is irrelevant in user code except for some instances of complex
+ *  custom JSON parsing
+ *
+ *  @sa Qx::JsonError::withContext().
+ */
+
+/*!
+ *  Constructs a document element node with the name @a name, which defaults to no name.
+ */
+Document::Document(const QString& name) : mName(name) {}
+
+/*!
+ *  Returns the string representation of the node.
+ */
+QString Document::string() const { return u"Document"_s + (!mName.isNull() ? u": "_s + mName : QString()); }
+
+/*!
+ *  @class Object
+ *  @brief The object class represents a JSON object node for use in error contexts.
+ *
+ *  @note This class is irrelevant in user code except for some instances of complex
+ *  custom JSON parsing
+ *
+ *  @sa Qx::JsonError::withContext().
+ */
+
+/*!
+ *  Constructs an object element node.
+ */
+Object::Object() {}
+
+/*!
+ *  Returns the string representation of the node.
+ */
+QString Object::string() const { return u"Object"_s; }
+
+/*!
+ *  @class ObjectKey
+ *  @brief The object key class represents a JSON Object key node for use in error contexts.
+ *
+ *  @note This class is irrelevant in user code except for some instances of complex
+ *  custom JSON parsing
+ *
+ *  @sa Qx::JsonError::withContext().
+ */
+
+/*!
+ *  Constructs an object key node with the key name @a name.
+ */
+ObjectKey::ObjectKey(const QString& name) : mName(name) {}
+
+/*!
+ *  Returns the string representation of the node.
+ */
+QString ObjectKey::string() const { return u"Key: "_s + mName; }
+
+/*!
+ *  @class Array
+ *  @brief The array class represents a JSON array node for use in error contexts.
+ *
+ *  @note This class is irrelevant in user code except for some instances of complex
+ *  custom JSON parsing
+ *
+ *  @sa Qx::JsonError::withContext().
+ */
+
+/*!
+ *  Constructs an array element node.
+ */
+Array::Array() {}
+
+/*!
+ *  Returns the string representation of the node.
+ */
+QString Array::string() const { return u"Array"_s; }
+
+/*!
+ *  @class ArrayElement
+ *  @brief The array element key class represents a JSON Array element node for use in error contexts.
+ *
+ *  @note This class is irrelevant in user code except for some instances of complex
+ *  custom JSON parsing
+ *
+ *  @sa Qx::JsonError::withContext().
+ */
+
+/*!
+ *  Constructs an array element node with the element number @a element.
+ */
+ArrayElement::ArrayElement(uint element) : mElement(element) {}
+
+/*!
+ *  Returns the string representation of the node.
+ */
+QString ArrayElement::string() const { return (u"Element: %1"_s).arg(mElement); }
+
+/*!
+ *  @typedef ContextNode
+ *  Any JSON context node type.
+ */
+
+//===============================================================================================================
+// <namepace>
+//===============================================================================================================
 
 /*!
  *  @struct Converter
@@ -321,7 +495,7 @@ namespace QxJson
  *  - QMap<K, T> (when a keygen() specialization exists for K)
  *
  *  Support for additional, non-structural types can be added like so:
- *  @snippet qx-json.cpp 6
+ *  @snippet qx-json.cpp 7
  *
  *  If a structural type needs to be registered, the QX_JSON_STRUCT and QX_JSON_MEMBER macros should be used
  *  instead.
@@ -339,7 +513,7 @@ namespace QxJson
  *  for that type.
  *
  *  Support for additional types can be added like so:
- *  @snippet qx-json.cpp 7
+ *  @snippet qx-json.cpp 8
  *
  *  @sa qx-json.h and Converter.
  */
