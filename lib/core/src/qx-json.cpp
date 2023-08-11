@@ -156,7 +156,7 @@ QString JsonError::deriveDetails() const
     QString details = u"JSON Node Stack:\n"_s;
     for(const auto& node : mContext)
         details += u"- "_s + std::visit([](auto&& n){ return n.string(); }, node) + u"\n"_s;
-    details += u"\nAction: "_s + derivePrimary() + u"\n\n"_s + u"Error: "_s + deriveSecondary();
+    details += u"\n"_s + derivePrimary() + u"\n\n"_s + deriveSecondary();
 
     return details;
 }
