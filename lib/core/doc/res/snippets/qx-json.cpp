@@ -107,6 +107,18 @@ QX_JSON_MEMBER_OVERRIDE(MySpecialStruct, name,
 //! [5]
 
 //! [6]
+QJsonArray ja;
+// Somehow populate array...
+
+for(int i = 0; i < ja.size(); ++i)
+{
+    // Parse element
+    if(Qx::JsonError je = parseMyElement(ja[i]); je.isValid())
+        return je.withContext(QxJson::Array()).withContext(QxJson::ArrayElement(i));
+}
+//! [6]
+
+//! [7]
 class MyType
 {
     ...
@@ -127,9 +139,9 @@ namespace QxJson
         }
     };
 }
-//! [6]
-
 //! [7]
+
+//! [8]
 struct MyStruct
 {
     int number;
@@ -158,4 +170,4 @@ struct OtherStruct
     
     QX_JSON_STRUCT(enabled, myStructs);
 };
-//! [7]
+//! [8]
