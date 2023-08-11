@@ -578,12 +578,46 @@ private:
 
 //-Functions-------------------------------------------------------------------------------------------------------
 template<typename T>
-    requires json_root<T>
-JsonError parseJson(T& parsed, const QString& filePath)
+    requires QxJson::json_struct<T>
+JsonError parseJson(T& parsed, const QJsonObject& obj)
 {
-    QFile file(filePath);
+    // Use QJsonValue for semi-type erasure
+    QJsonValue objAsValue(obj);
 
-    return parseJson(parsed, file);
+    return QxJson::Converter<T>::fromJson(parsed, objAsValue);
+}
+
+template<typename T>
+    requires QxJson::json_containing<T>
+JsonError parseJson(T& parsed, const QJsonArray& array)
+{
+    // Use QJsonValue for semi-type erasure
+    QJsonValue arrayAsValue(array);
+
+    return QxJson::Converter<T>::fromJson(parsed, array);
+}
+
+template<typename T>
+    requires json_root<T>
+JsonError parseJson(T& parsed, const QJsonDocument& doc)
+{
+    if(doc.isEmpty())
+        return JsonError(QxJsonPrivate::ERR_PARSE_DOC, JsonError::EmptyDoc).withContext(QxJson::Document());
+
+    if constexpr(QxJson::json_containing<T>)
+    {
+        if(!doc.isArray())
+            return JsonError(QxJsonPrivate::ERR_PARSE_DOC, JsonError::TypeMismatch).withContext(QxJson::Document());
+
+        return parseJson(parsed, doc.array()).withContext(QxJson::Document());
+    }
+    else
+    {
+        if(!doc.isObject())
+            return JsonError(QxJsonPrivate::ERR_PARSE_DOC, JsonError::TypeMismatch).withContext(QxJson::Document());
+
+        return parseJson(parsed, doc.object()).withContext(QxJson::Document());
+    }
 }
 
 template<typename T>
@@ -629,45 +663,11 @@ JsonError parseJson(T& parsed, QFile& file)
 
 template<typename T>
     requires json_root<T>
-JsonError parseJson(T& parsed, const QJsonDocument& doc)
+JsonError parseJson(T& parsed, const QString& filePath)
 {
-    if(doc.isEmpty())
-        return JsonError(QxJsonPrivate::ERR_PARSE_DOC, JsonError::EmptyDoc).withContext(QxJson::Document());
+    QFile file(filePath);
 
-    if constexpr(QxJson::json_containing<T>)
-    {
-        if(!doc.isArray())
-            return JsonError(QxJsonPrivate::ERR_PARSE_DOC, JsonError::TypeMismatch).withContext(QxJson::Document());
-
-        return parseJson(parsed, doc.array()).withContext(QxJson::Document());
-    }
-    else
-    {
-        if(!doc.isObject())
-            return JsonError(QxJsonPrivate::ERR_PARSE_DOC, JsonError::TypeMismatch).withContext(QxJson::Document());
-
-        return parseJson(parsed, doc.object()).withContext(QxJson::Document());
-    }
-}
-
-template<typename T>
-    requires QxJson::json_struct<T>
-JsonError parseJson(T& parsed, const QJsonObject& obj)
-{
-    // Use QJsonValue for semi-type erasure
-    QJsonValue objAsValue(obj);
-
-    return QxJson::Converter<T>::fromJson(parsed, objAsValue);
-}
-
-template<typename T>
-    requires QxJson::json_containing<T>
-JsonError parseJson(T& parsed, const QJsonArray& array)
-{
-    // Use QJsonValue for semi-type erasure
-    QJsonValue arrayAsValue(array);
-
-    return QxJson::Converter<T>::fromJson(parsed, array);
+    return parseJson(parsed, file);
 }
 
 QX_CORE_EXPORT QList<QJsonValue> findAllValues(const QJsonValue& rootValue, QStringView key);
