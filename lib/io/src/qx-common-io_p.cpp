@@ -132,10 +132,10 @@ IoOpReport writePrep(const QFileInfo& fileInfo, WriteOptions writeOptions)
 void matchAppendConditionParams(WriteMode& writeMode, TextPos& startPos)
 {
 	// Match append condition parameters
-	if(startPos == TextPos(TextPos::End))
+	if(startPos == TextPos(End))
 		writeMode = Append;
 	else if(writeMode == Append)
-		startPos = TextPos(TextPos::End);
+		startPos = TextPos(End);
 }
 
 /*! @endcond */

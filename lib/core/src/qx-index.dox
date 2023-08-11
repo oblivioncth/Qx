@@ -52,21 +52,6 @@ namespace Qx
  *  @li 2) 'last' indices are greater than everything except other 'last' indices (highest possible value)
  */
 
-//-Class Types----------------------------------------------------------------------------------------------------
-//Public:
-// TODO: Report this as a Doxygen bug, likely should need to be Index<T>::Extent
-/*!
- *  @enum Index::Extent
- *
- *  Used to refer to indicies of special significance.
- *
- *  @var Index<T>::Extent Index<T>::First
- *  The first index, equivalent to @c Index<T>(0).
- *
- *  @var Index<T>::Extent Index<T>::Last
- *  The last index.
- */
-
 //-Constructor----------------------------------------------------------------------------------------------
 //Public:
 /*!
@@ -102,7 +87,7 @@ namespace Qx
  *
  *  Returns @c true if the index represents the last index of an arbitrary dataset; otherwise returns @c false.
  *
- *  This is equivalent to <tt>*this == Index<T>(Last)</tt>.
+ *  This is equivalent to <tt>*this == Index<T>(Qx::Last)</tt>.
  */
 
 //-Operators-------------------------------------------------------------------------------------------------------

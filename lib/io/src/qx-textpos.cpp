@@ -15,25 +15,6 @@ namespace Qx
  *  @brief The TextPos class is used to represent an offset within a text file in terms of lines and characters.
  */
 
-//-Class Types-----------------------------------------------------------------------------------------------
-//Public:
-
-/*!
- *  @enum TextPos::Extent
- *
- *  Used to refer to text positions of special significance.
- *
- *  @var Index<T>::Extent Index<T>::First
- *  A text position representing the start of a file.
- *
- *  Equivalent to @c TextPos(0,0).
- *
- *  @var Index<T>::Extent Index<T>::Last
- *  A text position representing the end file.
- *
- *  Equivalent to @c TextPos(Index32(Index32::Last), Index32(Index32::Last)).
- */
-
 //-Constructor---------------------------------------------------------------------------------------------------
 //Public:
 
@@ -45,10 +26,11 @@ TextPos::TextPos() :
     mCharacter(Index32())
 {}
 
-//TODO: Consider creating Qx::Extent (with Start/End) in qx-global and just use
-// that for Index and TextPos.
 /*!
  *  Creates a text position at the given extent @a e.
+ *
+ *  Start creates a text position equivalent to @c TextPos(0,0), while End creates
+ *  a text position equivalent to @c TextPos(Index32(Qx::Last), Index32(Qx::Last)).
  */
 TextPos::TextPos(Extent e)
 {
@@ -60,8 +42,8 @@ TextPos::TextPos(Extent e)
             break;
 
         case End:
-            mLine = Index32(Index32::Last);
-            mCharacter = Index32(Index32::Last);
+            mLine = Index32(Last);
+            mCharacter = Index32(Last);
             break;
 
         default:

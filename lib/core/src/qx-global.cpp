@@ -13,21 +13,33 @@ namespace Qx
  *  @enum Severity
  *
  *  This enum represents the the severity of an error/outcome.
- */
-
-/*!
+ *
  *  @var Severity Warning
  *  A warning.
- */
-
-/*!
+ *
  *  @var Severity Err
  *  An error.
+ *
+ *  @var Severity Critical
+ *  A critical/fatal error.
  */
 
 /*!
- *  @var Severity Critical
- *  A critical/fatal error.
+ *  @enum Extent
+ *
+ *  Used to refer the extents of a range.
+ *
+ *  @var Extent First
+ *  The beginning of a range, or its first unit.
+ *
+ *  @var Extent Start
+ *  Equivalent to First.
+ *
+ *  @var Extent Last
+ *  The end of a range, or its last unit.
+ *
+ *  @var Extent End
+ *  Equivalent to Last.
  */
 
 //-Namespace Functions-----------------------------------------------------------------------------------------------------------
