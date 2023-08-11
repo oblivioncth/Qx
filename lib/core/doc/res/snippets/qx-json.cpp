@@ -35,21 +35,11 @@ struct MyJson
 
 int main()
 {
-    // Get JSON data
     QFile jsonFile("data.json");
-    Q_ASSERT(jsonFile.open(QIODevice::ReadOnly));
-
-    QByteArray jsonData = jsonFile.readAll();
-    jsonFile.close();
-
     MyJson myJsonDoc;
 
-    // Parse raw JSON data
-    QJsonDocument jd = QJsonDocument::fromJson(jsonData);
-    Q_ASSERT(!jd.isEmpty());
-
     // Parse into custom structures
-    Qx::JsonError je = Qx::parseJson(myJsonDoc, jd);
+    Qx::JsonError je = Qx::parseJson(myJsonDoc, jsonFile);
     Q_ASSERT(!je.isValid());
 }
 //! [1]
