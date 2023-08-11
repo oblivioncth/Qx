@@ -85,11 +85,12 @@ class File
 {
 private:
     QString mIdentifier;
+    QString mFileError;
 
 public:
-    File(const QString& filename);
-    File(const QFile& docFile);
-    File(const QFileInfo& docFile);
+    File(const QString& filename, const QString& fileError = {});
+    File(const QFile& docFile, const QString& fileError = {});
+    File(const QFileInfo& docFile, const QString& fileError = {});
 
     QString string() const;
 };
@@ -157,10 +158,13 @@ public:
     enum Form
     {
         NoError = 0,
-        MissingKey = 1,
-        TypeMismatch = 2,
-        EmptyDoc = 3,
-        InvalidValue = 4
+        MissingKey,
+        TypeMismatch,
+        EmptyDoc,
+        InvalidValue,
+        MissingFile,
+        InaccessibleFile,
+        FileReadError
     };
 
 //-Class Variables-------------------------------------------------------------
@@ -170,7 +174,10 @@ private:
         {MissingKey, u"The key does not exist."_s},
         {TypeMismatch, u"Value type mismatch."_s},
         {EmptyDoc, u"The document is empty."_s},
-        {InvalidValue, u"Invalid value for type."_s}
+        {InvalidValue, u"Invalid value for type."_s},
+        {MissingFile, u"File does not exist."_s},
+        {InaccessibleFile, u"Cannot open the file."_s},
+        {FileReadError, u"File read error."_s}
     };
 
 //-Instance Variables-------------------------------------------------------------
@@ -208,6 +215,7 @@ namespace QxJsonPrivate
 static inline const QString ERR_CONV_TYPE = u"JSON Error: Converting value to %1"_s;
 static inline const QString ERR_NO_KEY = u"JSON Error: Could not retrieve key '%1'."_s;
 static inline const QString ERR_PARSE_DOC = u"JSON Error: Could not parse JSON document."_s;
+static inline const QString ERR_READ_FILE = u"JSON Error: Could not read JSON file."_s;
 
 //-Structs---------------------------------------------------------------
 template<Qx::StringLiteral MemberN, typename MemberT, class Struct>
@@ -569,6 +577,56 @@ private:
 };
 
 //-Functions-------------------------------------------------------------------------------------------------------
+template<typename T>
+    requires json_root<T>
+JsonError parseJson(T& parsed, const QString& filePath)
+{
+    QFile file(filePath);
+
+    return parseJson(parsed, file);
+}
+
+template<typename T>
+    requires json_root<T>
+JsonError parseJson(T& parsed, QFile& file)
+{
+    if(!file.exists())
+        return JsonError(QxJsonPrivate::ERR_READ_FILE, JsonError::MissingFile).withContext(QxJson::File(file.fileName()));
+
+    // Close and re-open file if missing required mode
+    if(!file.isReadable())
+    {
+        if(file.isOpen())
+            file.close();
+
+        if(!file.open(QIODevice::ReadOnly))
+            return JsonError(QxJsonPrivate::ERR_READ_FILE, JsonError::InaccessibleFile).withContext(QxJson::File(file.fileName(), file.errorString()));
+    }
+
+    // Close file when finished
+    QScopeGuard fileGuard([&file]{ file.close(); });
+
+    // Read data
+    QByteArray jsonData = file.readAll();
+    if(jsonData.isEmpty())
+    {
+        if(file.error() != QFileDevice::NoError)
+            return JsonError(QxJsonPrivate::ERR_READ_FILE, JsonError::FileReadError).withContext(QxJson::File(file.fileName(), file.errorString()));
+        else
+            return JsonError(QxJsonPrivate::ERR_READ_FILE, JsonError::EmptyDoc).withContext(QxJson::File(file.fileName()));
+    }
+
+    // Basic parse
+    QJsonParseError jpe;
+    QJsonDocument jd = QJsonDocument::fromJson(jsonData, &jpe);
+
+    if(jpe.error != jpe.NoError)
+        return JsonError(QxJsonPrivate::ERR_READ_FILE, JsonError::FileReadError).withContext(QxJson::File(file.fileName(), jpe.errorString()));
+
+    // True parse
+    return parseJson(parsed, jd).withContext(QxJson::File(file.fileName()));
+}
+
 template<typename T>
     requires json_root<T>
 JsonError parseJson(T& parsed, const QJsonDocument& doc)

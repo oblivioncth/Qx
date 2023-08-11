@@ -251,6 +251,26 @@ QString QJsonParseErrorAdapter::deriveSecondary() const { return OFFSET_STR.arg(
 //-Functions---------------------------------------------------------------------------------------------
 //Public:
 /*!
+ *  @fn JsonError parseJson(T& parsed, const QString& filePath)
+ *
+ *  Parses the entire JSON document file at path @a filePath and stores the result in @a parsed.
+ *  @a T must satisfy the @ref json_root concept.
+ *
+ *  If parsing fails, a valid JsonError is returned that describes the cause; otherwise, an invalid
+ *  error is returned.
+ */
+
+/*!
+ *  @fn JsonError parseJson(T& parsed, QFile& file)
+ *
+ *  Parses the entire JSON document file @a file and stores the result in @a parsed.
+ *  @a T must satisfy the @ref json_root concept.
+ *
+ *  If parsing fails, a valid JsonError is returned that describes the cause; otherwise, an invalid
+ *  error is returned.
+ */
+
+/*!
  *  @fn JsonError parseJson(T& parsed, const QJsonDocument& doc)
  *
  *  Parses the entire JSON document @a doc and stores the result in @a parsed.
@@ -346,24 +366,43 @@ namespace QxJson
  */
 
 /*!
- *  Constructs a file node with the identifier of @a filename.
+ *  Constructs a file node with the identifier of @a filename and file specific error
+ *  information @a fileError, if any.
  */
-File::File(const QString& filename) : mIdentifier(filename) {}
+File::File(const QString& filename, const QString& fileError) :
+    mIdentifier(filename),
+    mFileError(fileError)
+{}
 
 /*!
- *  Constructs a file node with the identifier set to the filename of @a docFile.
+ *  Constructs a file node with the identifier set to the filename of @a docFile and
+ *  file specific error information @a fileError, if any.
  */
-File::File(const QFile& docFile) : mIdentifier(docFile.fileName()) {}
+File::File(const QFile& docFile, const QString& fileError) :
+    mIdentifier(docFile.fileName()),
+    mFileError(fileError)
+{}
 
 /*!
- *  Constructs a file node with the identifier set to the absolute path of @a docFile.
+ *  Constructs a file node with the identifier set to the absolute path of @a docFile
+ *  and file specific error information @a fileError, if any.
  */
-File::File(const QFileInfo& docFile) : mIdentifier(docFile.absoluteFilePath()) {}
+File::File(const QFileInfo& docFile, const QString& fileError) :
+    mIdentifier(docFile.absoluteFilePath()),
+    mFileError(fileError)
+{}
 
 /*!
  *  Returns the string representation of the node.
  */
-QString File::string() const { return u"File: "_s + mIdentifier; }
+QString File::string() const
+{
+    QString str = u"File: "_s + mIdentifier;
+    if(!mFileError.isEmpty())
+        str += (u"\n  [%1]"_s).arg(mFileError);
+
+    return str;
+}
 
 /*!
  *  @class Document
