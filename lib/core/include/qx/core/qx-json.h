@@ -271,6 +271,8 @@ template<typename SelfType, typename DelayedSelfType>
 struct QxJsonMetaStructOutside;
 
 //-Concepts--------------------------------------------------------------
+
+// TODO: Document these concepts
 template<typename T>
 concept qjson_type = Qx::any_of<T, bool, double, QString, QJsonArray, QJsonObject>;
 
@@ -318,6 +320,11 @@ concept json_associative = Qx::qassociative<T> &&
 template<typename T>
 concept json_containing = json_collective<T> ||
                           json_associative<T>;
+
+template<typename T>
+concept json_optional = Qx::specializes<T, std::optional> &&
+                        QxJson::json_convertible<typename T::value_type>;
+
 } // namespace QxJson
 
 /*! @cond */
@@ -426,9 +433,17 @@ struct Converter<T>
                 // Get value from key
                 if(!jObject.contains(mKey))
                 {
-                    cnvError = Qx::JsonError(QxJsonPrivate::ERR_NO_KEY.arg(mKey), Qx::JsonError::MissingKey)
-                               .withContext(QxJson::Object());
-                    return false;
+                    if constexpr(json_optional<mType>)
+                    {
+                        value.*mPtr = std::nullopt;
+                        return true;
+                    }
+                    else
+                    {
+                        cnvError = Qx::JsonError(QxJsonPrivate::ERR_NO_KEY.arg(mKey), Qx::JsonError::MissingKey)
+                                       .withContext(QxJson::Object());
+                        return false;
+                    }
                 }
                 QJsonValue mValue = jObject.value(mKey);
 
@@ -524,6 +539,24 @@ struct Converter<T>
         }
 
         return Qx::JsonError();
+    }
+};
+
+template<typename T>
+    requires json_optional<T>
+struct Converter<T>
+{
+    using O = typename T::value_type;
+
+    static Qx::JsonError fromJson(T& value, const QJsonValue& jValue)
+    {
+        O opt;
+        Qx::JsonError je = Converter<O>::fromJson(opt, jValue);
+
+        if(!je.isValid())
+            value = std::move(opt);
+
+        return je;
     }
 };
 
