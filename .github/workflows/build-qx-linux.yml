@@ -64,6 +64,8 @@ jobs:
         linkage: ${{ matrix.lib_linkage }}
         path: ${{ env.qt_install_dir }}
         credentials: ${{ secrets.qt_ffynnon_cred }}
+    - name: Update package index
+      run: sudo apt-get update
     - name: Install OpenGL lib
       run: sudo apt-get install libglu1-mesa-dev
     - name: Install XCB Related libs

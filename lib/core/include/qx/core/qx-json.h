@@ -10,6 +10,8 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QFile>
+#include <QFileInfo>
 
 // Intra-component Includes
 #include "qx/core/qx-abstracterror.h"
@@ -76,6 +78,76 @@ namespace QxJson \
     }; \
 }
 
+namespace QxJson
+{
+
+class QX_CORE_EXPORT File
+{
+private:
+    QString mIdentifier;
+    QString mFileError;
+
+public:
+    File(const QString& filename, const QString& fileError = {});
+    File(const QFile& docFile, const QString& fileError = {});
+    File(const QFileInfo& docFile, const QString& fileError = {});
+
+    QString string() const;
+};
+
+class QX_CORE_EXPORT Document
+{
+private:
+    QString mName;
+
+public:
+    Document(const QString& name = {});
+
+    QString string() const;
+};
+
+class QX_CORE_EXPORT Object
+{
+public:
+    Object();
+
+    QString string() const;
+};
+
+class QX_CORE_EXPORT ObjectKey
+{
+private:
+    QString mName;
+
+public:
+    ObjectKey(const QString& name);
+
+    QString string() const;
+};
+
+class QX_CORE_EXPORT Array
+{
+public:
+    Array();
+
+    QString string() const;
+};
+
+class QX_CORE_EXPORT ArrayElement
+{
+private:
+    uint mElement;
+
+public:
+    ArrayElement(uint element);
+
+    QString string() const;
+};
+
+using ContextNode = std::variant<File, Document, Object, ObjectKey, Array, ArrayElement>;
+
+} // namespace QxJson
+
 namespace Qx
 {
 
@@ -86,10 +158,13 @@ public:
     enum Form
     {
         NoError = 0,
-        MissingKey = 1,
-        TypeMismatch = 2,
-        EmptyDoc = 3,
-        InvalidValue = 4
+        MissingKey,
+        TypeMismatch,
+        EmptyDoc,
+        InvalidValue,
+        MissingFile,
+        InaccessibleFile,
+        FileReadError
     };
 
 //-Class Variables-------------------------------------------------------------
@@ -99,29 +174,36 @@ private:
         {MissingKey, u"The key does not exist."_s},
         {TypeMismatch, u"Value type mismatch."_s},
         {EmptyDoc, u"The document is empty."_s},
-        {InvalidValue, u"Invalid value for type."_s}
+        {InvalidValue, u"Invalid value for type."_s},
+        {MissingFile, u"File does not exist."_s},
+        {InaccessibleFile, u"Cannot open the file."_s},
+        {FileReadError, u"File read error."_s}
     };
 
 //-Instance Variables-------------------------------------------------------------
 private:
     QString mAction;
     Form mForm;
+    QList<QxJson::ContextNode> mContext;
 
-//-Class Constructor-------------------------------------------------------------
+//-Constructor-----------------------------------------------------------------
 public:
     JsonError();
     JsonError(const QString& a, Form f);
 
-//-Class Functions-------------------------------------------------------------
-public:
-    bool isValid() const;
-    QString action() const;
-    Form form() const;
-
+//-Instance Functions-------------------------------------------------------------
 private:
     quint32 deriveValue() const override;
     QString derivePrimary() const override;
     QString deriveSecondary() const override;
+    QString deriveDetails() const override;
+
+public:
+    bool isValid() const;
+    QString action() const;
+    Form form() const;
+    QList<QxJson::ContextNode> context() const;
+    JsonError& withContext(const QxJson::ContextNode& node);
 };
 
 } // namespace Qx
@@ -133,6 +215,7 @@ namespace QxJsonPrivate
 static inline const QString ERR_CONV_TYPE = u"JSON Error: Converting value to %1"_s;
 static inline const QString ERR_NO_KEY = u"JSON Error: Could not retrieve key '%1'."_s;
 static inline const QString ERR_PARSE_DOC = u"JSON Error: Could not parse JSON document."_s;
+static inline const QString ERR_READ_FILE = u"JSON Error: Could not read JSON file."_s;
 
 //-Structs---------------------------------------------------------------
 template<Qx::StringLiteral MemberN, typename MemberT, class Struct>
@@ -188,6 +271,8 @@ template<typename SelfType, typename DelayedSelfType>
 struct QxJsonMetaStructOutside;
 
 //-Concepts--------------------------------------------------------------
+
+// TODO: Document these concepts
 template<typename T>
 concept qjson_type = Qx::any_of<T, bool, double, QString, QJsonArray, QJsonObject>;
 
@@ -235,6 +320,11 @@ concept json_associative = Qx::qassociative<T> &&
 template<typename T>
 concept json_containing = json_collective<T> ||
                           json_associative<T>;
+
+template<typename T>
+concept json_optional = Qx::specializes<T, std::optional> &&
+                        QxJson::json_convertible<typename T::value_type>;
+
 } // namespace QxJson
 
 /*! @cond */
@@ -315,7 +405,8 @@ struct Converter<T>
     static Qx::JsonError fromJson(T& value, const QJsonValue& jValue)
     {
         if(!jValue.isObject())
-            return Qx::JsonError(QxJsonPrivate::ERR_CONV_TYPE.arg(QxJsonPrivate::typeString<QJsonObject>()), Qx::JsonError::TypeMismatch);
+            return Qx::JsonError(QxJsonPrivate::ERR_CONV_TYPE.arg(QxJsonPrivate::typeString<QJsonObject>()), Qx::JsonError::TypeMismatch)
+                   .withContext(QxJson::Object());
 
         // Underlying object
         QJsonObject jObject = jValue.toObject();
@@ -342,8 +433,17 @@ struct Converter<T>
                 // Get value from key
                 if(!jObject.contains(mKey))
                 {
-                    cnvError = Qx::JsonError(QxJsonPrivate::ERR_NO_KEY.arg(mKey), Qx::JsonError::MissingKey);
-                    return false;
+                    if constexpr(json_optional<mType>)
+                    {
+                        value.*mPtr = std::nullopt;
+                        return true;
+                    }
+                    else
+                    {
+                        cnvError = Qx::JsonError(QxJsonPrivate::ERR_NO_KEY.arg(mKey), Qx::JsonError::MissingKey)
+                                       .withContext(QxJson::Object());
+                        return false;
+                    }
                 }
                 QJsonValue mValue = jObject.value(mKey);
 
@@ -353,6 +453,7 @@ struct Converter<T>
                 else
                     cnvError = QxJsonPrivate::performRegularConversion<mType>(value.*mPtr, mValue);
 
+                cnvError.withContext(QxJson::ObjectKey(mKey)).withContext(QxJson::Object());
                 return !cnvError.isValid();
             }() && ...);
         }, memberMetas);
@@ -373,7 +474,10 @@ struct Converter<T>
         value.clear();
 
         if(!jValue.isArray())
-            return Qx::JsonError(QxJsonPrivate::ERR_CONV_TYPE.arg(QxJsonPrivate::typeString<QJsonArray>()), Qx::JsonError::TypeMismatch);
+        {
+            return Qx::JsonError(QxJsonPrivate::ERR_CONV_TYPE.arg(QxJsonPrivate::typeString<QJsonArray>()), Qx::JsonError::TypeMismatch)
+                   .withContext(QxJson::Array());
+        }
 
         // Underlying Array
         QJsonArray jArray = jValue.toArray();
@@ -382,13 +486,13 @@ struct Converter<T>
         Qx::JsonError cnvError;
 
         // Convert all
-        for(const QJsonValue& aValue : jArray)
+        for(auto i = 0; i < jArray.count(); ++i)
         {
             E converted;
-            if(cnvError = Converter<E>::fromJson(converted, aValue); cnvError.isValid())
+            if(cnvError = Converter<E>::fromJson(converted, jArray[i]); cnvError.isValid())
             {
                 value.clear();
-                return cnvError;
+                return cnvError.withContext(QxJson::ArrayElement(i)).withContext(QxJson::Array());
             }
 
             value << converted;
@@ -411,8 +515,10 @@ struct Converter<T>
         value.clear();
 
         if(!jValue.isArray())
-            return Qx::JsonError(QxJsonPrivate::ERR_CONV_TYPE.arg(QxJsonPrivate::typeString<QJsonArray>()), Qx::JsonError::TypeMismatch);
-
+        {
+            return Qx::JsonError(QxJsonPrivate::ERR_CONV_TYPE.arg(QxJsonPrivate::typeString<QJsonArray>()), Qx::JsonError::TypeMismatch)
+                   .withContext(QxJson::Array());
+        }
         // Underlying Array
         QJsonArray jArray = jValue.toArray();
 
@@ -420,19 +526,37 @@ struct Converter<T>
         Qx::JsonError cnvError;
 
         // Convert all
-        for(const QJsonValue& aValue : jArray)
+        for(auto i = 0; i < jArray.count(); ++i)
         {
             V converted;
-            if(cnvError = Converter<V>::fromJson(converted, aValue); cnvError.isValid())
+            if(cnvError = Converter<V>::fromJson(converted, jArray[i]); cnvError.isValid())
             {
                 value.clear();
-                return cnvError;
+                return cnvError.withContext(QxJson::ArrayElement(i)).withContext(QxJson::Array());
             }
 
             value.insert(keygen<K, V>(converted), converted);
         }
 
         return Qx::JsonError();
+    }
+};
+
+template<typename T>
+    requires json_optional<T>
+struct Converter<T>
+{
+    using O = typename T::value_type;
+
+    static Qx::JsonError fromJson(T& value, const QJsonValue& jValue)
+    {
+        O opt;
+        Qx::JsonError je = Converter<O>::fromJson(opt, jValue);
+
+        if(!je.isValid())
+            value = std::move(opt);
+
+        return je;
     }
 };
 
@@ -487,38 +611,6 @@ private:
 
 //-Functions-------------------------------------------------------------------------------------------------------
 template<typename T>
-    requires json_root<T>
-JsonError parseJson(T& parsed, const QJsonDocument& doc)
-{
-    if(doc.isEmpty())
-        return JsonError(QxJsonPrivate::ERR_PARSE_DOC, JsonError::EmptyDoc);
-
-    using RootType = std::conditional_t<
-        (QxJson::json_containing<T>), QJsonArray, QJsonObject>;
-
-    RootType root;
-    if constexpr(QxJson::json_containing<T>)
-    {
-        if(!doc.isArray())
-            return JsonError(QxJsonPrivate::ERR_PARSE_DOC, JsonError::TypeMismatch);
-
-        root = doc.array();
-    }
-    else
-    {
-        if(!doc.isObject())
-            return JsonError(QxJsonPrivate::ERR_PARSE_DOC, JsonError::TypeMismatch);
-
-        root = doc.object();
-    }
-
-    // Use QJsonValue move constructor for semi-type erasure
-    QJsonValue rootAsValue = std::move(root);
-
-    return QxJson::Converter<T>::fromJson(parsed, rootAsValue);
-}
-
-template<typename T>
     requires QxJson::json_struct<T>
 JsonError parseJson(T& parsed, const QJsonObject& obj)
 {
@@ -536,6 +628,79 @@ JsonError parseJson(T& parsed, const QJsonArray& array)
     QJsonValue arrayAsValue(array);
 
     return QxJson::Converter<T>::fromJson(parsed, array);
+}
+
+template<typename T>
+    requires json_root<T>
+JsonError parseJson(T& parsed, const QJsonDocument& doc)
+{
+    if(doc.isEmpty())
+        return JsonError(QxJsonPrivate::ERR_PARSE_DOC, JsonError::EmptyDoc).withContext(QxJson::Document());
+
+    if constexpr(QxJson::json_containing<T>)
+    {
+        if(!doc.isArray())
+            return JsonError(QxJsonPrivate::ERR_PARSE_DOC, JsonError::TypeMismatch).withContext(QxJson::Document());
+
+        return parseJson(parsed, doc.array()).withContext(QxJson::Document());
+    }
+    else
+    {
+        if(!doc.isObject())
+            return JsonError(QxJsonPrivate::ERR_PARSE_DOC, JsonError::TypeMismatch).withContext(QxJson::Document());
+
+        return parseJson(parsed, doc.object()).withContext(QxJson::Document());
+    }
+}
+
+template<typename T>
+    requires json_root<T>
+JsonError parseJson(T& parsed, QFile& file)
+{
+    if(!file.exists())
+        return JsonError(QxJsonPrivate::ERR_READ_FILE, JsonError::MissingFile).withContext(QxJson::File(file.fileName()));
+
+    // Close and re-open file if missing required mode
+    if(!file.isReadable())
+    {
+        if(file.isOpen())
+            file.close();
+
+        if(!file.open(QIODevice::ReadOnly))
+            return JsonError(QxJsonPrivate::ERR_READ_FILE, JsonError::InaccessibleFile).withContext(QxJson::File(file.fileName(), file.errorString()));
+    }
+
+    // Close file when finished
+    QScopeGuard fileGuard([&file]{ file.close(); });
+
+    // Read data
+    QByteArray jsonData = file.readAll();
+    if(jsonData.isEmpty())
+    {
+        if(file.error() != QFileDevice::NoError)
+            return JsonError(QxJsonPrivate::ERR_READ_FILE, JsonError::FileReadError).withContext(QxJson::File(file.fileName(), file.errorString()));
+        else
+            return JsonError(QxJsonPrivate::ERR_READ_FILE, JsonError::EmptyDoc).withContext(QxJson::File(file.fileName()));
+    }
+
+    // Basic parse
+    QJsonParseError jpe;
+    QJsonDocument jd = QJsonDocument::fromJson(jsonData, &jpe);
+
+    if(jpe.error != jpe.NoError)
+        return JsonError(QxJsonPrivate::ERR_READ_FILE, JsonError::FileReadError).withContext(QxJson::File(file.fileName(), jpe.errorString()));
+
+    // True parse
+    return parseJson(parsed, jd).withContext(QxJson::File(file.fileName()));
+}
+
+template<typename T>
+    requires json_root<T>
+JsonError parseJson(T& parsed, const QString& filePath)
+{
+    QFile file(filePath);
+
+    return parseJson(parsed, file);
 }
 
 QX_CORE_EXPORT QList<QJsonValue> findAllValues(const QJsonValue& rootValue, QStringView key);

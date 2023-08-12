@@ -10,6 +10,7 @@
 #include <QtGlobal>
 
 // Intra-component Includes
+#include "qx/core/qx-global.h"
 #include "qx/core/qx-algorithm.h"
 
 namespace Qx
@@ -22,13 +23,6 @@ class Index
 //-Class Types----------------------------------------------------------------------------------------------------
 private:
     enum class Type {Null, End, Value};
-
-public:
-    enum Extent
-    {
-        First,
-        Last
-    };
 
 //-Instance Members----------------------------------------------------------------------------------------------------
 private:

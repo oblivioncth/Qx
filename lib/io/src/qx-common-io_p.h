@@ -37,7 +37,7 @@ void matchAppendConditionParams(WriteMode& writeMode, Index<T>& startPos)
     if(startPos.isLast())
         writeMode = Append;
     else if(writeMode == Append)
-        startPos = Index<T>(Index<T>::Last);
+        startPos = Index<T>(Last);
 }
 /*! @endcond */
 }

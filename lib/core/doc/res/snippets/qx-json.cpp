@@ -35,21 +35,11 @@ struct MyJson
 
 int main()
 {
-    // Get JSON data
     QFile jsonFile("data.json");
-    Q_ASSERT(jsonFile.open(QIODevice::ReadOnly));
-
-    QByteArray jsonData = jsonFile.readAll();
-    jsonFile.close();
-
     MyJson myJsonDoc;
 
-    // Parse raw JSON data
-    QJsonDocument jd = QJsonDocument::fromJson(jsonData);
-    Q_ASSERT(!jd.isEmpty());
-
     // Parse into custom structures
-    Qx::JsonError je = Qx::parseJson(myJsonDoc, jd);
+    Qx::JsonError je = Qx::parseJson(myJsonDoc, jsonFile);
     Q_ASSERT(!je.isValid());
 }
 //! [1]
@@ -107,6 +97,18 @@ QX_JSON_MEMBER_OVERRIDE(MySpecialStruct, name,
 //! [5]
 
 //! [6]
+QJsonArray ja;
+// Somehow populate array...
+
+for(int i = 0; i < ja.size(); ++i)
+{
+    // Parse element
+    if(Qx::JsonError je = parseMyElement(ja[i]); je.isValid())
+        return je.withContext(QxJson::Array()).withContext(QxJson::ArrayElement(i));
+}
+//! [6]
+
+//! [7]
 class MyType
 {
     ...
@@ -127,9 +129,9 @@ namespace QxJson
         }
     };
 }
-//! [6]
-
 //! [7]
+
+//! [8]
 struct MyStruct
 {
     int number;
@@ -158,4 +160,4 @@ struct OtherStruct
     
     QX_JSON_STRUCT(enabled, myStructs);
 };
-//! [7]
+//! [8]

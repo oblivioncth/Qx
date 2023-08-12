@@ -62,10 +62,10 @@ QX_IO_EXPORT IoOpReport textFileAbsolutePosition(TextPos& textPos, QFile& textFi
 QX_IO_EXPORT IoOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const TextQuery& query, ReadOptions readOptions = NoReadOptions);
 QX_IO_EXPORT IoOpReport fileContainsString(bool& returnBuffer, QFile& textFile, const QString& query, Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive, bool allowSplit = false);
 QX_IO_EXPORT IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos, int count, ReadOptions readOptions = NoReadOptions);
-QX_IO_EXPORT IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos = TextPos(TextPos::Start), TextPos endPos = TextPos(TextPos::End), ReadOptions readOptions = NoReadOptions);
-QX_IO_EXPORT IoOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, Index32 startLine = 0, Index32 endLine = Index32(Index32::Last), ReadOptions readOptions = NoReadOptions);
-QX_IO_EXPORT IoOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode writeMode = Truncate, TextPos startPos = TextPos(TextPos::Start), WriteOptions writeOptions = NoWriteOptions);
-QX_IO_EXPORT IoOpReport writeStringToFile(QSaveFile& textFile, const QString& text, WriteMode writeMode = Truncate, TextPos startPos = TextPos(TextPos::Start), WriteOptions writeOptions = NoWriteOptions);
+QX_IO_EXPORT IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos startPos = TextPos(Start), TextPos endPos = TextPos(End), ReadOptions readOptions = NoReadOptions);
+QX_IO_EXPORT IoOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, Index32 startLine = 0, Index32 endLine = Index32(Last), ReadOptions readOptions = NoReadOptions);
+QX_IO_EXPORT IoOpReport writeStringToFile(QFile& textFile, const QString& text, WriteMode writeMode = Truncate, TextPos startPos = TextPos(Start), WriteOptions writeOptions = NoWriteOptions);
+QX_IO_EXPORT IoOpReport writeStringToFile(QSaveFile& textFile, const QString& text, WriteMode writeMode = Truncate, TextPos startPos = TextPos(Start), WriteOptions writeOptions = NoWriteOptions);
 QX_IO_EXPORT IoOpReport deleteTextFromFile(QFile& textFile, TextPos startPos, TextPos endPos);
 
 // Directory:
@@ -81,7 +81,7 @@ QX_IO_EXPORT IoOpReport calculateFileChecksum(QString& returnBuffer, QFile& file
 QX_IO_EXPORT IoOpReport fileMatchesChecksum(bool& returnBuffer, QFile& file, QString checksum, QCryptographicHash::Algorithm hashAlgorithm);
 
 // Binary Based
-QX_IO_EXPORT IoOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, Index64 startPos = 0, Index64 endPos = Index64(Index64::Last));
+QX_IO_EXPORT IoOpReport readBytesFromFile(QByteArray& returnBuffer, QFile& file, Index64 startPos = 0, Index64 endPos = Index64(Last));
 QX_IO_EXPORT IoOpReport writeBytesToFile(QFile& file, const QByteArray& bytes, WriteMode writeMode = Truncate, Index64 startPos = 0, WriteOptions writeOptions = NoWriteOptions);
 QX_IO_EXPORT IoOpReport writeBytesToFile(QSaveFile& file, const QByteArray& bytes, WriteMode writeMode = Truncate, Index64 startPos = 0, WriteOptions writeOptions = NoWriteOptions);
 }

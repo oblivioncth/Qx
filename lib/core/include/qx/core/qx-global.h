@@ -14,6 +14,14 @@ enum Severity
     Critical = 3
 };
 
+enum Extent
+{
+    First,
+    Start = First,
+    Last,
+    End = Last
+};
+
 //-Namespace Functions-----------------------------------------------------------------------------------------------------------
 QString severityString(Severity sv, bool uc = true);
 
