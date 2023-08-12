@@ -5,10 +5,6 @@ on:
       qt_ffynnon_cred:
         description: 'Credentials for getting Qt from Ffynnon'
         required: true
-    outputs:
-      doc_artifact_name:
-        description: "Name of artifact used to update docs"
-        value: ${{ jobs.build-qx.outputs.doc_artifact_name }}
 env:
   qt_install_dir: ${{ github.workspace }}/Qt/Install
   qx_src_suffix: Qx/Source
@@ -31,8 +27,6 @@ jobs:
     env:
       vs_dir: C:/Program Files/Microsoft Visual Studio/2022/Enterprise
       cmake_gen: Ninja Multi-Config
-    outputs:
-      doc_artifact_name: ${{ steps.set_doc_artifact_name.outputs.doc_artifact_name }}
     steps:
     - name: Set derived variables with shell because GitHub Actions env context sucks
       run: |
@@ -56,9 +50,8 @@ jobs:
         os: windows
         credentials: ${{ secrets.qt_ffynnon_cred }}
     - name: Install Graphviz
-      run: |
-        choco install graphviz
-    - name: Checkout Qx
+      run: choco install graphviz
+    - name: Checkout PxCrypt
       uses: actions/checkout@v3
       with:
         path: ${{ env.qx_src_suffix }}
@@ -86,10 +79,6 @@ jobs:
       run: |
         $artifact_name=$((Get-ChildItem -Path "${{ env.qx_package_path }}" -Filter *.zip)[0].BaseName)
         echo "current_artifact_name=$artifact_name" >> $Env:GITHUB_ENV
-    - name: Set doc artifact name
-      id: set_doc_artifact_name
-      if: matrix.lib_linkage == 'static'
-      run: echo "doc_artifact_name=${{ env.current_artifact_name }}" >> $Env:GITHUB_OUTPUT
     - name: Upload Qx build artifact
       uses: actions/upload-artifact@v3
       with:

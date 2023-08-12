@@ -5,6 +5,10 @@ on:
       qt_ffynnon_cred:
         description: 'Credentials for getting Qt from Ffynnon'
         required: true
+    outputs:
+      doc_artifact_name:
+        description: "Name of artifact used to update docs"
+        value: ${{ jobs.build-qx.outputs.doc_artifact_name }}
 env:
   qt_install_dir: ${{ github.workspace }}/Qt/Install
   qx_src_suffix: Qx/Source
@@ -48,6 +52,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       cmake_gen: Ninja Multi-Config
+    outputs:
+      doc_artifact_name: ${{ steps.set_doc_artifact_name.outputs.doc_artifact_name }}
     steps:
     - name: Set derived variables with shell because GitHub Actions env context sucks
       run: |
@@ -110,6 +116,10 @@ jobs:
         cpack_name=$(find "${{ env.qx_package_path }}" -type f -name "*.zip")
         artifact_name="$(basename "$cpack_name" .zip) [${{ matrix.cxx_comp }}]"
         echo "current_artifact_name=$artifact_name" >> $GITHUB_ENV
+    - name: Set doc artifact name
+      id: set_doc_artifact_name
+      if: matrix.lib_linkage == 'static' && matrix.cxx_comp == 'clang++-14' 
+      run: echo "doc_artifact_name=${{ env.current_artifact_name }}" >> $GITHUB_OUTPUT
     - name: Upload Qx build artifact
       uses: actions/upload-artifact@v3
       with:
