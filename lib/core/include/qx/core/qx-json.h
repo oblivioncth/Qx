@@ -438,7 +438,7 @@ struct Converter<T>
                 else
                     cnvError = QxJsonPrivate::performRegularConversion<mType>(value.*mPtr, mValue);
 
-                cnvError.withContext(QxJson::Object()).withContext(QxJson::ObjectKey(mKey));
+                cnvError.withContext(QxJson::ObjectKey(mKey)).withContext(QxJson::Object());
                 return !cnvError.isValid();
             }() && ...);
         }, memberMetas);
@@ -477,7 +477,7 @@ struct Converter<T>
             if(cnvError = Converter<E>::fromJson(converted, jArray[i]); cnvError.isValid())
             {
                 value.clear();
-                return cnvError.withContext(QxJson::Array()).withContext(QxJson::ArrayElement(i));
+                return cnvError.withContext(QxJson::ArrayElement(i)).withContext(QxJson::Array());
             }
 
             value << converted;
@@ -517,7 +517,7 @@ struct Converter<T>
             if(cnvError = Converter<V>::fromJson(converted, jArray[i]); cnvError.isValid())
             {
                 value.clear();
-                return cnvError.withContext(QxJson::Array()).withContext(QxJson::ArrayElement(i));
+                return cnvError.withContext(QxJson::ArrayElement(i)).withContext(QxJson::Array());
             }
 
             value.insert(keygen<K, V>(converted), converted);
