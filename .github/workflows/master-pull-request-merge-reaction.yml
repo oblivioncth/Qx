@@ -58,7 +58,7 @@ jobs:
 
   update-docs:
     name: Update gh-pages
-    needs: [build_qx_release_windows]
+    needs: [build_qx_release_linux]
     if: github.event.pull_request.merged == true
     permissions:
       contents: read
@@ -69,10 +69,10 @@ jobs:
       url: ${{ steps.page-deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-    - name: Download built shared Qx artifact
+    - name: Download built doc Qx artifact
       uses: actions/download-artifact@v3
       with:
-        name: ${{ needs.build_qx_release_windows.outputs.doc_artifact_name }}
+        name: ${{ needs.build_qx_release_linux.outputs.doc_artifact_name }}
         path: ${{ env.doc_artifact_path }}
     - name: Setup pages
       uses: actions/configure-pages@v3
