@@ -81,7 +81,7 @@ namespace QxJson \
 namespace QxJson
 {
 
-class File
+class QX_CORE_EXPORT File
 {
 private:
     QString mIdentifier;
@@ -95,7 +95,7 @@ public:
     QString string() const;
 };
 
-class Document
+class QX_CORE_EXPORT Document
 {
 private:
     QString mName;
@@ -106,7 +106,7 @@ public:
     QString string() const;
 };
 
-class Object
+class QX_CORE_EXPORT Object
 {
 public:
     Object();
@@ -114,7 +114,7 @@ public:
     QString string() const;
 };
 
-class ObjectKey
+class QX_CORE_EXPORT ObjectKey
 {
 private:
     QString mName;
@@ -125,7 +125,7 @@ public:
     QString string() const;
 };
 
-class Array
+class QX_CORE_EXPORT Array
 {
 public:
     Array();
@@ -133,7 +133,7 @@ public:
     QString string() const;
 };
 
-class ArrayElement
+class QX_CORE_EXPORT ArrayElement
 {
 private:
     uint mElement;
