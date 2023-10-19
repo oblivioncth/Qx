@@ -304,7 +304,8 @@ IoOpReport ApplicationLogger::recordGeneralEvent(QString src, QString event)
 
 /*!
  *  Writes a footer to the current log entry that notes the application's return code and whether or
- *  not execution finished successfully, then closes the log.
+ *  not execution finished successfully, then closes the log. The return code is reinterpreted as an
+ *  unsigned integer before it's printed.
  *
  *  If @a returnCode equals @c 0, execution is considered to have been successful; otherwise, it will
  *  be considered to have ended prematurely.
@@ -314,7 +315,8 @@ IoOpReport ApplicationLogger::recordGeneralEvent(QString src, QString event)
 IoOpReport ApplicationLogger::finish(int returnCode)
 {
     if(!mErrorStatus.isFailure())
-        mErrorStatus = mTextStreamWriter.writeLine(FINISH_TEMPLATE.arg(returnCode == 0 ? FINISH_SUCCESS : FINISH_ERR).arg(returnCode));
+        mErrorStatus = mTextStreamWriter.writeLine(FINISH_TEMPLATE.arg(returnCode == 0 ? FINISH_SUCCESS : FINISH_ERR)
+                                                                  .arg(static_cast<unsigned int>(returnCode)));
 
     // Close log
     mTextStreamWriter.closeFile();
