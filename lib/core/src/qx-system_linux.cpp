@@ -183,13 +183,15 @@ namespace  // Anonymous namespace for local only definitions
     private:
         static inline const QString DESKTOP_MAIN_GROUP = u"Desktop Entry"_s;
         static inline const QRegularExpression GROUP_VALIDATOR{uR"(^[^\x00-\x1F\x7F-\xFF\[\]]+$)"_s};
-        static inline const QRegularExpression KEY_VALIDATOR{uR"(^[a-zA-Z0-9-\/]+$)"_s};
+        static inline const QRegularExpression KEY_VALIDATOR{uR"(^[^\x00-\x1F\x7F-\xFF]+$)"_s};
+        static inline const QRegularExpression KEY_VALIDATOR_DESKTOP{uR"(^[a-zA-Z0-9-\/]+$)"_s};
 
     //-Instance Variables-------------------------------------------------------------
     private:
         QIODevice& mDevice;
         QSettings::SettingsMap& mSettings;
         bool mDesktopFile;
+        const QRegularExpression& mKeyValidator;
 
         QString mGroup;
 
@@ -198,16 +200,17 @@ namespace  // Anonymous namespace for local only definitions
         XdgParser(QIODevice& device, QSettings::SettingsMap& map, bool desktop) :
             mDevice(device),
             mSettings(map),
-            mDesktopFile(desktop)
+            mDesktopFile(desktop),
+            mKeyValidator(desktop ? KEY_VALIDATOR_DESKTOP : KEY_VALIDATOR)
         {}
 
     //-Class Functions---------------------------------------------------------------
     private:
         static bool validGroup(QStringView group) { return GROUP_VALIDATOR.match(group).hasMatch(); };
-        static bool validKey(QStringView key) { return KEY_VALIDATOR.match(key).hasMatch(); };
 
     //-Instance Functions------------------------------------------------------------
     private:
+        bool validKey(QStringView key) { return mKeyValidator.match(key).hasMatch(); };
         bool parseGroup(QStringView groupStr)
         {
             if(groupStr.front() != '[' && groupStr.back() != ']')
@@ -271,13 +274,15 @@ namespace  // Anonymous namespace for local only definitions
     private:
         static inline const QString DESKTOP_MAIN_GROUP = u"Desktop Entry"_s;
         static inline const QRegularExpression GROUP_VALIDATOR{uR"(^[^\x00-\x1F\x7F-\xFF\[\]]+$)"_s};
-        static inline const QRegularExpression KEY_VALIDATOR{uR"(^[a-zA-Z0-9-\/]+$)"_s};
+        static inline const QRegularExpression KEY_VALIDATOR{uR"(^[^\x00-\x1F\x7F-\xFF]+$)"_s};
+        static inline const QRegularExpression KEY_VALIDATOR_DESKTOP{uR"(^[a-zA-Z0-9-\/]+$)"_s};
 
     //-Instance Variables-------------------------------------------------------------
     private:
         QIODevice& mDevice;
         const QSettings::SettingsMap& mSettings;
         bool mDesktopFile;
+        const QRegularExpression& mKeyValidator;
 
         QString mGroup;
 
@@ -286,16 +291,17 @@ namespace  // Anonymous namespace for local only definitions
         XdgWritter(QIODevice& device, const QSettings::SettingsMap& map, bool desktop) :
             mDevice(device),
             mSettings(map),
-            mDesktopFile(desktop)
+            mDesktopFile(desktop),
+            mKeyValidator(desktop ? KEY_VALIDATOR_DESKTOP : KEY_VALIDATOR)
         {}
 
     //-Class Functions---------------------------------------------------------------
     private:
         static bool validGroup(QStringView group) { return GROUP_VALIDATOR.match(group).hasMatch(); };
-        static bool validKey(QStringView key) { return KEY_VALIDATOR.match(key).hasMatch(); };
 
     //-Instance Functions------------------------------------------------------------
     private:
+        bool validKey(QStringView key) { return mKeyValidator.match(key).hasMatch(); };
         bool writeLine(QStringView line)
         {
             QByteArray data = line.toUtf8() + '\n';
