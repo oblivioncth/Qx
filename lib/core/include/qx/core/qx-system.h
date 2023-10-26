@@ -6,6 +6,9 @@
 
 // Qt Includes
 #include <QString>
+#ifdef __linux
+#include <QSettings>
+#endif
 
 // Inner-component Includes
 #include "qx/core/qx-systemerror.h"
@@ -25,6 +28,16 @@ QX_CORE_EXPORT SystemError cleanKillProcess(quint32 processId);
 QX_CORE_EXPORT SystemError forceKillProcess(quint32 processId);
 
 QX_CORE_EXPORT bool enforceSingleInstance(QString uniqueAppId);
+
+QX_CORE_EXPORT bool setDefaultProtocolHandler(const QString& scheme, const QString& name, const QString& path = {}, const QStringList& args = {});
+QX_CORE_EXPORT bool isDefaultProtocolHandler(const QString& scheme, const QString& path = {});
+QX_CORE_EXPORT bool removeDefaultProtocolHandler(const QString& scheme, const QString& path = {});
+
+#ifdef __linux__
+// Temporary means to and end, will replace with full parser eventually
+QX_CORE_EXPORT QSettings::Format xdgSettingsFormat();
+QX_CORE_EXPORT QSettings::Format xdgDesktopSettingsFormat();
+#endif
 }
 
 #endif // QX_SYSTEM_H

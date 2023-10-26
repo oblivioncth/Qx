@@ -13,6 +13,9 @@
 #include <QFile>
 #include <QDir>
 #include <QDirIterator>
+#include <QSettings>
+#include <QProcess>
+#include <QStandardPaths>
 
 // Inner-component Includes
 #include <qx/core/qx-regularexpression.h>
@@ -173,6 +176,239 @@ namespace  // Anonymous namespace for local only definitions
                 return errnoError(action);
         }
     }
+
+    class XdgParser
+    {
+    //-Class Variables----------------------------------------------------------------
+    private:
+        static inline const QString DESKTOP_MAIN_GROUP = u"Desktop Entry"_s;
+        static inline const QRegularExpression GROUP_VALIDATOR{uR"(^[^\x00-\x1F\x7F-\xFF\[\]]+$)"_s};
+        static inline const QRegularExpression KEY_VALIDATOR{uR"(^[^\x00-\x1F\x7F-\xFF]+$)"_s};
+        static inline const QRegularExpression KEY_VALIDATOR_DESKTOP{uR"(^[a-zA-Z0-9-\/]+$)"_s};
+
+    //-Instance Variables-------------------------------------------------------------
+    private:
+        QIODevice& mDevice;
+        QSettings::SettingsMap& mSettings;
+        bool mDesktopFile;
+        const QRegularExpression& mKeyValidator;
+
+        QString mGroup;
+
+    //-Constructor-------------------------------------------------------------------
+    public:
+        XdgParser(QIODevice& device, QSettings::SettingsMap& map, bool desktop) :
+            mDevice(device),
+            mSettings(map),
+            mDesktopFile(desktop),
+            mKeyValidator(desktop ? KEY_VALIDATOR_DESKTOP : KEY_VALIDATOR)
+        {}
+
+    //-Class Functions---------------------------------------------------------------
+    private:
+        static bool validGroup(QStringView group) { return GROUP_VALIDATOR.match(group).hasMatch(); };
+
+    //-Instance Functions------------------------------------------------------------
+    private:
+        bool validKey(QStringView key) { return mKeyValidator.match(key).hasMatch(); };
+        bool parseGroup(QStringView groupStr)
+        {
+            if(groupStr.front() != '[' && groupStr.back() != ']')
+                return false;
+
+            bool haveGroup = !mGroup.isEmpty();
+            mGroup = groupStr.sliced(1, groupStr.size() - 2).trimmed().toString();
+            return validGroup(mGroup) && (!mDesktopFile || (haveGroup || mGroup == DESKTOP_MAIN_GROUP));
+        }
+
+        bool parseKeyValue(QStringView keyValueStr)
+        {
+            if(mGroup.isEmpty())
+                return false;
+
+            auto eqItr = std::find(keyValueStr.cbegin(), keyValueStr.cend(), '=');
+            if(eqItr == keyValueStr.cend())
+                return false;
+
+            QString key = QStringView(keyValueStr.cbegin(), eqItr).trimmed().toString();
+            if(!validKey(key))
+                return false;
+
+            QString value = QStringView(eqItr + 1, keyValueStr.cend()).trimmed().toString();
+
+            mSettings[mGroup + '/' + key] = value;
+
+            return true;
+        }
+
+    public:
+        bool parse()
+        {
+            // Parse line-by-line
+            while(!mDevice.atEnd())
+            {
+                QString line = QString::fromUtf8(mDevice.readLine()).trimmed();
+
+                // Ignore comments and blanks
+                if(line.isEmpty() || line.front() == '#')
+                    continue;
+
+                // Parse by type
+                if(line.front() == '[')
+                {
+                    if(!parseGroup(line))
+                        return false;
+                }
+                else if(!parseKeyValue(line))
+                    return false;
+            }
+
+            // Return success
+            return true;
+        }
+    };
+
+    class XdgWritter
+    {
+    //-Class Variables----------------------------------------------------------------
+    private:
+        static inline const QString DESKTOP_MAIN_GROUP = u"Desktop Entry"_s;
+        static inline const QRegularExpression GROUP_VALIDATOR{uR"(^[^\x00-\x1F\x7F-\xFF\[\]]+$)"_s};
+        static inline const QRegularExpression KEY_VALIDATOR{uR"(^[^\x00-\x1F\x7F-\xFF]+$)"_s};
+        static inline const QRegularExpression KEY_VALIDATOR_DESKTOP{uR"(^[a-zA-Z0-9-\/]+$)"_s};
+
+    //-Instance Variables-------------------------------------------------------------
+    private:
+        QIODevice& mDevice;
+        const QSettings::SettingsMap& mSettings;
+        bool mDesktopFile;
+        const QRegularExpression& mKeyValidator;
+
+        QString mGroup;
+
+    //-Constructor-------------------------------------------------------------------
+    public:
+        XdgWritter(QIODevice& device, const QSettings::SettingsMap& map, bool desktop) :
+            mDevice(device),
+            mSettings(map),
+            mDesktopFile(desktop),
+            mKeyValidator(desktop ? KEY_VALIDATOR_DESKTOP : KEY_VALIDATOR)
+        {}
+
+    //-Class Functions---------------------------------------------------------------
+    private:
+        static bool validGroup(QStringView group) { return GROUP_VALIDATOR.match(group).hasMatch(); };
+
+    //-Instance Functions------------------------------------------------------------
+    private:
+        bool validKey(QStringView key) { return mKeyValidator.match(key).hasMatch(); };
+        bool writeLine(QStringView line)
+        {
+            QByteArray data = line.toUtf8() + '\n';
+            qint64 w = 0;
+
+            while((w = mDevice.write(data) != data.size()))
+            {
+                if(w == -1)
+                    return false;
+
+                data.chop(w);
+            }
+
+            return true;
+        }
+
+        bool writeGroup(const QString& groupStr)
+        {
+            if(!validGroup(groupStr))
+                return false;
+
+            return writeLine('[' + groupStr + ']');
+        }
+
+        bool writeKeyValue(const QString& key, const QString& value)
+        {
+            if(!validKey(key))
+                return false;
+
+            return writeLine(key + '=' + value);
+        }
+
+        void updateGroup(const QString& group)
+        {
+            if(mGroup == group)
+                return;
+
+            if(!mGroup.isEmpty())
+                writeLine(u""_s); // linebreak after end of previous group
+
+            mGroup = group;
+            writeGroup(mGroup);
+        }
+
+        bool processKeyValue(const QString& key, const QVariant& value)
+        {
+            // Relies on the fact that mSettings are sorted alphabetically
+            if(!value.canConvert<QString>())
+                return false;
+
+            // Strip group from key
+            auto sp = key.indexOf('/');
+            if(sp == -1)
+                return false;
+            QString group = key.chopped(key.length() - sp);
+            QString trueKey = key.sliced(sp + 1);
+
+            // Update group if required
+            updateGroup(group);
+
+            // Write key and value
+            return writeKeyValue(trueKey, value.toString());
+        }
+
+    public:
+        bool write()
+        {
+            // Write main entry first if desktop file
+            if(mDesktopFile)
+            {
+                bool hasMain = false;
+                for (auto [key, value] : mSettings.asKeyValueRange())
+                {
+                    if(key.startsWith(DESKTOP_MAIN_GROUP))
+                    {
+                        if(!processKeyValue(key, value))
+                            return false;
+                        hasMain = true;
+                    }
+                    else if(hasMain)
+                        break;
+                }
+
+                if(!hasMain)
+                    return false;
+            }
+
+
+            // Write remaining key/values alphabetically
+            for (auto [key, value] : mSettings.asKeyValueRange())
+            {
+                if(!mDesktopFile || !key.startsWith(DESKTOP_MAIN_GROUP))
+                {
+                    if(!processKeyValue(key, value))
+                        return false;
+                }
+            }
+
+            // Return success
+            return true;
+        }
+    };
+
+    bool readXdgDesktopFile(QIODevice& device, QSettings::SettingsMap& map) { return XdgParser(device, map, true).parse(); }
+    bool writeXdgDesktopFile(QIODevice& device, const QSettings::SettingsMap& map) { return XdgWritter(device, map, true).write(); }
+    bool readXdgGeneralFile(QIODevice& device, QSettings::SettingsMap& map) { return XdgParser(device, map, false).parse(); }
+    bool writeXdgGeneralFile(QIODevice& device, const QSettings::SettingsMap& map) { return XdgWritter(device, map, false).write(); }
 }
 
 //-Namespace Functions-------------------------------------------------------------------------------------------------------------
@@ -296,5 +532,86 @@ bool enforceSingleInstance(QString uniqueAppId)
     // This is the first instance
     return true;
 }
+
+/* TODO: After figuring out the conundrum that is how to best have class/functions be
+ * private for Core, but part of the public interface for Linux/Windows, create a better
+ * parser that's independent of QSettings which follows the specification more closely
+ * (i.e. preserving whitespace and comments). Also, one that better handles parsing
+ * escaped characters and splitting multi-entry values into a list, as well as
+ * erroring on unrecognized groups/keys or if required keys are missing.
+ *
+ * A decent option is to do something that's somewhat like the PIMPL pattern (which this
+ * library should use in time anyway). Have non-component libs for system specific
+ * implementations that doesn't rely on core (e.g. QxSystemFundamentalsWindows, QxSystemLinux,
+ * QxSystemImplLinux, or so on) that core links to. Then, in the system specific user facing
+ * libs (i.e. QxLinux/ QxWindows), have a public API header that basically copies the public
+ * interface of the non-API parser/writer with a forward declaration and member pointer of
+ * that parser. Its implementation file can then include the header to the non-API variant
+ * and just forward the public interface calls through. Both Core and Linux can link to these
+ * files using CMake's PRIVATE specifier.
+ *
+ * Alternatively, the same setup library wise can be used, but the parser/writer in the
+ * baseline system libraries can itself be documented and "user facing", but linked as
+ * PRIVATE for Core and PUBLIC for Linux, so that only linking to Linux will give users
+ * access to the underlying library. The downside with this option is that then that
+ * library will need to be documented almost as if its a true component so the above
+ * option is probably best, as it can keep the underlying system libs as true implementation
+ * details, even if that does mean there's some redundancy with the public API needing
+ * to be more or less copied verbatim.
+ */
+
+/*!
+ *  Returns a QSettings::Format type that can be used to construct a QSettings object
+ *  capable of handling several XDG file formats.
+ *
+ *  This format is utilized similarly to QSettings::Format::Ini, noteably in that the
+ *  first section of a key before a separator @c '/' corresponds to the group within
+ *  the XDG file and the rest of the key is the actual key within the file. It also
+ *  allows for group names with spaces and avoids other behavior imposed by the built-in
+ *  INI format that breaks XDG file formats.
+ *
+ *  @note This function is only available on Linux, and part of the Core component
+ *  instead of the Linux component for technical reasons.
+ *
+ *  @warning
+ *  @parblock
+ *  This format handler is fairly primitive, only being slightly more competant
+ *  that straight bodge and should be used with caution. Basic checking of key/group
+ *  name validity is performed and file output is largely conformant by default; however,
+ *  any escaping and unescaping of parameters must be handled manually, multi-element values
+ *  are not automatically seperated into a list, comment and blank lines in the original file
+ *  are not preserved, nor is key order. Generally any value that cannot be converted to
+ *  another type 'as is' (e.g. @c true and @c false clearly are booleans) are parsed as plain
+ *  strings.
+ *
+ *  Eventually a dedicated and fully conformant parser will be added.
+ *  @endparblock
+ */
+QSettings::Format xdgSettingsFormat()
+{
+    static const QSettings::Format xdgFormat =
+        QSettings::registerFormat("", readXdgGeneralFile, writeXdgGeneralFile);
+
+    return xdgFormat;
+}
+
+/*!
+ *  Same as xdgSettingsFormat() but the returned format is better suited for manipulating
+ *  XDG Desktop Entries specifically. It ensures that the "Desktop Entry" section is always
+ *  written first and ensures that a given file contains such an entry since it's required.
+ *
+ *  @note This function is only available on Linux, and part of the Core component
+ *  instead of the Linux component for technical reasons.
+ *
+ *  @warning See the warning for xdgSettingsFormat().
+ */
+QSettings::Format xdgDesktopSettingsFormat()
+{
+    static const QSettings::Format xdgDesktopFormat =
+        QSettings::registerFormat("desktop", readXdgDesktopFile, writeXdgDesktopFile);
+
+    return xdgDesktopFormat;
+}
+
 
 }
