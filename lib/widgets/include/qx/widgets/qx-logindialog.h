@@ -10,6 +10,8 @@
 #include <QLineEdit>
 #include <QDialogButtonBox>
 
+using namespace Qt::Literals::StringLiterals;
+
 namespace Qx
 {
 
@@ -20,9 +22,9 @@ class QX_WIDGETS_EXPORT LoginDialog : public QDialog
 
 //-Class Members-------------------------------------------------------------------------------------------------------
 private:
-    static inline const QString LABEL_DEF_PRMT= "Login Required";
-    static inline const QString LABEL_USRNAME = "&Username";
-    static inline const QString LABEL_PSSWD = "&Password";
+    static inline const QString LABEL_DEF_PRMT= u"Login Required"_s;
+    static inline const QString LABEL_USRNAME = u"&Username"_s;
+    static inline const QString LABEL_PSSWD = u"&Password"_s;
 
 //-Instance Members---------------------------------------------------------------------------------------------------
 private:

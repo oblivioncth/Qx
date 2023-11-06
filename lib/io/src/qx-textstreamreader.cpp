@@ -185,7 +185,7 @@ QString	TextStreamReader::readAll()
  *
  *  If @a maxlen is 0, the lines can be of any length.
  *
- *  The returned line has no trailing end-of-line characters ("\n" or "\r\n"), so calling
+ *  The returned line has no trailing end-of-line characters ('\n' or "\r\n"), so calling
  *  QString::trimmed() can be unnecessary.
  *
  *  If the stream has read to the end of the file, readLine() will return a null QString. For strings,
@@ -214,7 +214,7 @@ QString	TextStreamReader::readLine(qint64 maxlen)
  *
  *  If @a maxlen is 0, the lines can be of any length.
  *
- *  The resulting line has no trailing end-of-line characters ("\n" or "\r\n"), so calling
+ *  The resulting line has no trailing end-of-line characters ('\n' or "\r\n"), so calling
  *  QString::trimmed() can be unnecessary.
  *
  *  If @a line has sufficient capacity for the data that is about to be read, this function may not

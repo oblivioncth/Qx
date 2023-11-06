@@ -8,9 +8,6 @@
 #include "qx/windows-gui/qx-winguievent.h"
 #include "qx-winguieventfilter_p.h"
 
-// Extra-component Includes
-#include "qx/windows/qx-common-windows.h"
-
 namespace Qx
 {
 
@@ -205,26 +202,18 @@ TaskbarButton::TaskbarButton(QObject *parent) :
 
     // Acquire Taskbar Interface
     HRESULT hresult = CoCreateInstance(CLSID_TaskbarList, nullptr, CLSCTX_INPROC_SERVER, IID_ITaskbarList4, reinterpret_cast<void **>(&mTaskbarInterface));
-    if (FAILED(hresult))
+    if (FAILED(hresult)) [[unlikely]]
     {
         mTaskbarInterface = nullptr;
-
-        const GenericError err = translateHresult(hresult);
-        QString errStr;
-        QTextStream es(&errStr);
-        es << err;
-        qWarning("TaskbarButton: ITaskbarList4 interface was not created.\n%s.", qPrintable(errStr));
+        qWarning("TaskbarButton: ITaskbarList4 interface was not created. HRESULT: 0x%x.", hresult);
     }
-    else if (FAILED(mTaskbarInterface->HrInit()))
+
+    hresult = mTaskbarInterface->HrInit();
+    if (FAILED(hresult)) [[unlikely]]
     {
         mTaskbarInterface->Release();
         mTaskbarInterface = nullptr;
-
-        const GenericError err = translateHresult(hresult);
-        QString errStr;
-        QTextStream es(&errStr);
-        es << err;
-        qWarning("TaskbarButton: ITaskbarList4 interface was not initialized.\n%s", unsigned(hresult), qPrintable(errStr));
+        qWarning("TaskbarButton: ITaskbarList4 interface was not initialized. HRESULT: 0x%x.", hresult);
     }
 }
 

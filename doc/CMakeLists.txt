@@ -13,6 +13,12 @@ set(DOXYGEN_HTML_COLORSTYLE_HUE 0)
 set(DOXYGEN_HTML_COLORSTYLE_SAT 255)
 set(DOXYGEN_HTML_COLORSTYLE_GAMMA 80)
 
+set(DOXYGEN_PREDEFINED
+    "QX_ERROR_TYPE(Type,Name,Code)=Type final : public Qx::AbstractError<Name, Code>"
+    "__QX_JSON_META_STRUCT="
+    "QX_DECLARE_ERROR_ADAPTATION(Adaptable, Adapter)="
+)
+
 # Setup documentation
 ob_standard_documentation(${DOC_TARGET_NAME}
     DOXY_VER 1.9.4

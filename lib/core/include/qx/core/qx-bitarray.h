@@ -62,7 +62,9 @@ public:
         replace(converted, start, length);
     }
 
-    BitArray extract(int start, int length = -1);
+    BitArray subArray(int start, int length = -1);
+    BitArray takeFromStart(int length = -1);
+    BitArray takeFromEnd(int length = -1);
 
     BitArray operator<<(int n);
     void operator<<=(int n);

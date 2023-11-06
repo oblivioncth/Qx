@@ -1,8 +1,5 @@
 namespace Qx
 {
-/*! @addtogroup qx-core
- *  @{
- */
 
 //-Namespace Members--------------------------------------------------------------------------------------------
 /*!
@@ -36,5 +33,4 @@ namespace Qx
  *  @note On Linux this function is only available on systems that utilize the 'termios' terminal interface.
  */
 
-/*! @}*/
 }

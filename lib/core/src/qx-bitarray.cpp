@@ -130,11 +130,11 @@ void BitArray::replace(const BitArray& bits, int start, int length)
  */
 
 /*!
- *  Returns a new bit array that contains @a length bits from the original, begging at @a start.
+ *  Returns a new bit array that contains @a length bits from the original, beggining at @a start.
  *
  *  A value of -1 for @a length will result all bits from @a start to the end of the array being included.
  */
-BitArray BitArray::extract(int start, int length)
+BitArray BitArray::subArray(int start, int length)
 {
     if(start < 0 || start >= count())
         qFatal("Least significant bit index was outside BitArray contents");
@@ -143,12 +143,54 @@ BitArray BitArray::extract(int start, int length)
     int maxLength = count() - start;
     length = (length == -1) ? maxLength : std::min(length, maxLength);
 
-    BitArray extracted(length);
+    BitArray sub(length);
 
     for(int i = 0; i < length; i++)
-        extracted.setBit(i, at(start + i));
+        sub.setBit(i, at(start + i));
 
-    return extracted;
+    return sub;
+}
+
+
+/*!
+ *  Removes @a length bits from the start of the array and returns them
+ *
+ *  A value of -1 for @a length will result in all bits being included.
+ */
+BitArray BitArray::takeFromStart(int length)
+{
+    // Constrain length to bounds
+    length = (length == -1) ? size() : std::min((qsizetype)length, size());
+
+    BitArray taken(length);
+
+    for(int i = 0; i < length; i++)
+        taken.setBit(i, at(i));
+
+    *this >>= length;
+    resize(size() - length);
+
+    return taken;
+}
+
+/*!
+ *  Removes @a length bits from the end of the array and returns them
+ *
+ *  A value of -1 for @a length will result in all bits being included.
+ */
+BitArray BitArray::takeFromEnd(int length)
+{
+    // Constrain length to bounds
+    length = (length == -1) ? size() : std::min((qsizetype)length, size());
+
+    BitArray taken(length);
+
+    for(int i = 0; i < length; i++)
+        taken.setBit(i, at(size() - 1 - i));
+
+    resize(size() - length);
+
+    return taken;
 }
 
 /*!

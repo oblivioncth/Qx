@@ -16,6 +16,7 @@ class QX_CORE_EXPORT Integrity
 //-Class Functions---------------------------------------------------------------------------------------------
 public:
     static QString generateChecksum(QByteArray& data, QCryptographicHash::Algorithm hashAlgorithm);
+    static quint32 crc32(QByteArrayView data);
 };	
 
 }

@@ -1,0 +1,31 @@
+namespace Qx
+{
+//===============================================================================================================
+// StringLiteral
+//===============================================================================================================
+
+/*!
+ *  @struct StringLiteral qx/utility/qx-stringliteral.h
+ *  @ingroup qx-utility
+ *
+ *  @brief The StringLiteral template struct acts as a literal class type wrapper around a C-style string
+ *  that effectively allows the string to be used as a non-type template parameter.
+ *
+ *  @snippet qx-stringliteral.cpp 0
+ */
+
+//-Instance Fields---------------------------------------------------------------------------------------------
+/*!
+ *  @var StringLiteral::value
+ *
+ *  The wrapped C-Style string.
+ */
+
+//-Constructor-------------------------------------------------------------------------------------------------
+//Public:
+/*!
+ * @fn StringLiteral<N>::StringLiteral(const char (&str)[N])
+ *
+ *  Wraps the C-Style string @a str of length @a N.
+ */
+}

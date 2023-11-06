@@ -137,6 +137,18 @@ namespace Qx
  *  @qflag{ReadOptions, ReadOption}
  */
 
+/*!
+ *  @enum PathType
+ *
+ *  This denotes the type of a path in terms of relativity.
+ *
+ *  @var PathType Absolute
+ *  An absolute path.
+ *
+ *  @var PathType Relative
+ *  A relative path.
+ */
+
 //-Namespace Variables-------------------------------------------------------------------------------------------------
 /*!
  * @var QChar ENDL
@@ -378,9 +390,9 @@ IoOpReport textFileLineCount(int& returnBuffer, QFile& textFile, bool ignoreTrai
 
 /*!
  *  Converts any relative component of @a textPos to an absolute one. I.e. determines the actual line
- *  and or/character that Index32::LAST references for the given @a textFile, if present.
+ *  and or/character that Index32(Index32::Last) references for the given @a textFile, if present.
  *
- *  If neither the line or character component of @a textPos contain the value Index32::LAST,
+ *  If neither the line or character component of @a textPos contain the value Index32(Index32::Last),
  *  @a textPos is left unchanged.
  *
  *  @param[in,out] textPos The text position to translate into an absolute position.
@@ -459,7 +471,7 @@ IoOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const
 
     // Query tracking
     TextPos trueStartPos = query.startPosition();
-    TextPos currentPos = TextPos::START;
+    TextPos currentPos = TextPos(Start);
     TextPos possibleMatch = TextPos();
     int hitsSkipped = 0;
     QString::const_iterator queryIt = query.string().constBegin();
@@ -469,7 +481,7 @@ IoOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const
     QTextStream fileTextStream(&textFile);
 
     // Translate start position to absolute position
-    if(trueStartPos != TextPos::START)
+    if(trueStartPos != TextPos(Start))
     {
         IoOpReport translate = textFileAbsolutePosition(trueStartPos, textFile, readOptions.testFlag(IgnoreTrailingBreak));
         if(translate.isFailure())
@@ -489,7 +501,7 @@ IoOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const
     QScopeGuard fileGuard([&textFile](){ textFile.close(); });
 
     // Skip to start pos
-    if(trueStartPos != TextPos::START)
+    if(trueStartPos != TextPos(Start))
     {
         int line;
         // Skip to start line
@@ -626,7 +638,7 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
 
             // If there was a trailing line break that isn't to be ignored, last line is actually blank
             if(!readOptions.testFlag(IgnoreTrailingBreak) && fileTextStream.precedingBreak())
-                returnBuffer = "";
+                returnBuffer = u""_s;
             else if(startPos.character().isLast()) // Last char is desired
                 returnBuffer = lastLine.right(1);
             else // Some range of last line is desired
@@ -739,7 +751,7 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
         TextStream fileTextStream(&textFile);
 
         // Cover each possible range type
-        if(startPos == TextPos::START && endPos == TextPos::END) // Whole file is desired
+        if(startPos == TextPos(Start) && endPos == TextPos(End)) // Whole file is desired
         {
             returnBuffer = fileTextStream.readAll();
 
@@ -755,7 +767,7 @@ IoOpReport readTextFromFile(QString& returnBuffer, QFile& textFile, TextPos star
 
             // If there was a trailing line break that isn't to be ignored, last line is actually blank
             if(!readOptions.testFlag(IgnoreTrailingBreak) && fileTextStream.precedingBreak())
-                returnBuffer = "";
+                returnBuffer = u""_s;
             else if(startPos.character().isLast()) // Last char is desired
                 returnBuffer = lastLine.right(1);
             else // Some range of last line is desired
@@ -882,7 +894,7 @@ IoOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, Index32 
 
              // If there was a trailing line break that isn't to be ignored, last line is actually blank
              if(!readOptions.testFlag(IgnoreTrailingBreak) && fileTextStream.precedingBreak())
-                 lastLine = "";
+                 lastLine = u""_s;
 
              // Add last line to list
              returnBuffer.append(lastLine);
@@ -902,7 +914,7 @@ IoOpReport readTextFromFile(QStringList& returnBuffer, QFile& textFile, Index32 
 
                  // If end was reached and there was a trailing line break that isn't to be ignored, there is one more blank line
                  if(fileTextStream.atEnd() && !readOptions.testFlag(IgnoreTrailingBreak) && fileTextStream.precedingBreak())
-                     returnBuffer.append("");
+                     returnBuffer.append(u""_s);
              }
          }
 
@@ -985,7 +997,7 @@ namespace
                 for(int i = 0; i < *startPos.line(); ++i)
                     textStream << ENDL;
                 for(int i = 0; i < *startPos.character(); ++i)
-                    textStream << " ";
+                    textStream << ' ';
             }
 
             // Write main text
@@ -999,7 +1011,7 @@ namespace
 
             // Fill beforeNew
             TextPos beforeEnd = TextPos(startPos.line(), startPos.character() - 1);
-            IoOpReport readBefore = readTextFromFile(beforeNew, auxFile, TextPos::START, beforeEnd);
+            IoOpReport readBefore = readTextFromFile(beforeNew, auxFile, TextPos(Start), beforeEnd);
             if(readBefore.isFailure())
                 return readBefore;
 
@@ -1020,7 +1032,7 @@ namespace
                 {
                     int lastLineCharCount = beforeNew.count() - (beforeNew.lastIndexOf(ENDL) + 1);
                     int charNeeded = std::max(*startPos.character() - lastLineCharCount, 0);
-                    beforeNew += QString(" ").repeated(charNeeded);
+                    beforeNew += QString(' ').repeated(charNeeded);
 
                     if(charNeeded > 0)
                         padded = true;
@@ -1178,27 +1190,27 @@ IoOpReport deleteTextFromFile(QFile& textFile, TextPos startPos, TextPos endPos)
     IoOpReport transientReport;
 
     // Determine beforeDeletion
-    if(startPos == TextPos::START) // (0,0)
-        beforeDeletion = "";
+    if(startPos == TextPos(Start)) // (0,0)
+        beforeDeletion = u""_s;
     else if(startPos.character().isLast())
     {
-        transientReport = readTextFromFile(beforeDeletion, textFile, TextPos::START, startPos);
+        transientReport = readTextFromFile(beforeDeletion, textFile, TextPos(Start), startPos);
         beforeDeletion.chop(1);
     }
     else
-        transientReport = readTextFromFile(beforeDeletion, textFile, TextPos::START, TextPos(startPos.line(), startPos.character() - 1));
+        transientReport = readTextFromFile(beforeDeletion, textFile, TextPos(Start), TextPos(startPos.line(), startPos.character() - 1));
 
     // Check for transient errors
     if(!transientReport.isNull() && transientReport.result() != IO_SUCCESS)
         return IoOpReport(IO_OP_WRITE, transientReport.result(), textFile);
 
     // Determine afterDeletion
-    if(endPos == TextPos::END)
-        afterDeletion = "";
+    if(endPos == TextPos(End))
+        afterDeletion = u""_s;
     else if(endPos.character().isLast())
-        transientReport = readTextFromFile(afterDeletion, textFile, TextPos(endPos.line() + 1, 0), TextPos::END);
+        transientReport = readTextFromFile(afterDeletion, textFile, TextPos(endPos.line() + 1, 0), TextPos(End));
     else
-        transientReport = readTextFromFile(afterDeletion, textFile, TextPos(endPos.line(), endPos.character() + 1), TextPos::END);
+        transientReport = readTextFromFile(afterDeletion, textFile, TextPos(endPos.line(), endPos.character() + 1), TextPos(End));
 
     // Check for transient errors
     if(transientReport.result() != IO_SUCCESS)
@@ -1312,6 +1324,7 @@ IoOpReport dirContentInfoList(QFileInfoList& returnBuffer, QDir directory, QStri
 /*!
  *  Fills @a returnBuffer with a list of names for all the files and directories in @a directory, limited according
  *  to the name and attribute filters previously set with QDir::setNameFilters() and QDir::setFilter(), while sort flags are ignored.
+ *  The paths will be relative to @a directory if @a pathType is @c PathType::Relative.
  *
  *  The name filter and file attribute filter can be overridden using the @a nameFilters and @a filters arguments respectively.
  *
@@ -1322,7 +1335,7 @@ IoOpReport dirContentInfoList(QFileInfoList& returnBuffer, QDir directory, QStri
  *  @sa QDir::entryList
  */
 IoOpReport dirContentList(QStringList& returnBuffer, QDir directory, QStringList nameFilters,
-                              QDir::Filters filters, QDirIterator::IteratorFlags flags)
+                          QDir::Filters filters, QDirIterator::IteratorFlags flags, PathType pathType)
 {
     // Empty buffer
     returnBuffer = QStringList();
@@ -1344,7 +1357,10 @@ IoOpReport dirContentList(QStringList& returnBuffer, QDir directory, QStringList
     QDirIterator listIterator(directory.path(), nameFilters, filters, flags);
 
     while(listIterator.hasNext())
-        returnBuffer.append(listIterator.next());
+    {
+        QString absPath = listIterator.next();
+        returnBuffer.append(pathType == PathType::Absolute ? absPath : directory.relativeFilePath(absPath));
+    }
 
     return IoOpReport(IO_OP_ENUMERATE, IO_SUCCESS, directory);
 }

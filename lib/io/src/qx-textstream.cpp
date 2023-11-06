@@ -148,9 +148,9 @@ QString TextStream::readLineWithBreak(qint64 maxlen)
         QString buffer = QTextStream::readLine(maxlen);
 
         if(atEnd() || maxlen > 0)
-            return precedingBreak() ? buffer + "\n" : buffer;
+            return precedingBreak() ? buffer + '\n' : buffer;
         else
-            return buffer + "\n";
+            return buffer + '\n';
     }
 }
 

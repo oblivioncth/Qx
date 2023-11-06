@@ -25,9 +25,9 @@ public:
 
 //-Member Functions--------------------------------------------------------------------------------------------
 public:
-    VersionNumber first(qsizetype n);
-    int nanoVersion();
-    VersionNumber normalized(qsizetype min = 0);
+    VersionNumber first(qsizetype n) const;
+    int nanoVersion() const;
+    VersionNumber normalized(qsizetype min = 0) const;
 
 //-Class Functions---------------------------------------------------------------------------------------------
 public:

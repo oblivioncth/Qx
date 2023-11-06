@@ -1,5 +1,10 @@
 // Unit Includes
 #include "qx/core/qx-system.h"
+#include "qx-system_p.h"
+
+// Qt Includes
+#include <QDir>
+#include <QCoreApplication>
 
 /*!
  *  @file qx-system.h
@@ -10,6 +15,13 @@
 
 namespace Qx
 {
+
+namespace  // Anonymous namespace for effectively private (to this cpp) functions
+{
+
+bool isValidScheme(QStringView scheme) { return !scheme.isEmpty() && !scheme.contains(QChar::Space); };
+
+}
 
 //-Namespace Functions-------------------------------------------------------------------------------------------------------------
 /*!
@@ -24,7 +36,7 @@ namespace Qx
 /*!
  *  @fn QString processName(quint32 processId)
  *
- *  Returns the process name of a running process with the PID @a processID,
+ *  Returns the process name of a running process with the PID @a processId,
  *  or a null string if the process could not be found.
  *
  *  @sa processId().
@@ -58,7 +70,7 @@ bool processIsRunning(QString processName) { return processId(processName); }
 bool processIsRunning(quint32 processId) { return processName(processId).isNull(); }
 
 /*!
- *  @fn GenericError cleanKillProcess(quint32 processId)
+ *  @fn SystemError cleanKillProcess(quint32 processId)
  *
  *  Attempts to close the process referenced by @a processId in a manner that allows it to
  *  shutdown gracefully.
@@ -88,7 +100,7 @@ bool processIsRunning(quint32 processId) { return processName(processId).isNull(
  */
 
 /*!
- *  @fn GenericError forceKillProcess(quint32 processId)
+ *  @fn SystemError forceKillProcess(quint32 processId)
  *
  *  Forcefully closes the process referenced by @a processId such that it exists immediately.
  *
@@ -122,5 +134,95 @@ bool processIsRunning(quint32 processId) { return processName(processId).isNull(
  *  versions and builds, and therefore should be a reasonably unique string that typically is never
  *  changed in future revisions once set.
  */
+
+/*!
+ *  Sets the application at @a path as the default handler for URI requests of @a scheme for the
+ *  current user. The registration is configured so that when a URL that uses the protocol is followed,
+ *  the program at the given path will be executed with the scheme URL as the last argument. Generally,
+ *  the user is shown a prompt with the friendly name of the application @a name
+ *  when the protocol is used.
+ *
+ *  @a scheme cannot contain whitespace. If @a path is left empty, it defaults to
+ *  QCoreApplication::applicationFilePath().
+ *
+ *  Returns @c true if the operation was successful; otherwise, returns @c false.
+ *
+ *  Commonly, applications are designed to handle scheme URLs as a singular argument:
+ *
+ *  @code
+ *  myapp myscheme://some-data-here
+ *  @endcode
+ *
+ *  as most operating system facilities that allow a user to select a default protocol handler do not
+ *  for adding additional arguments; however, additional arguments can be provided via @a args, which
+ *  are placed before the scheme URL.
+ *
+ *  @note On Linux this function relies on FreeDesktop conformance.
+ *
+ *  @warning The provided arguments are automatically quoted, but not escaped. If the provided arguments
+ *  contain reserved characters, they will need to be escaped manually.
+ *
+ *  @sa isDefaultProtocolHandler() and removeDefaultProtocolHandler().
+ */
+bool setDefaultProtocolHandler(const QString& scheme, const QString& name, const QString& path, const QStringList& args)
+{
+    if(!isValidScheme(scheme))
+        return false;
+
+    QString command = '"' + QDir::toNativeSeparators(!path.isEmpty() ? path : QCoreApplication::applicationFilePath()) + '"';
+    if(!args.isEmpty())
+        command += uR"( ")"_s + args.join(uR"(" ")"_s) + '"';
+
+    return registerUriSchemeHandler(scheme, name, command);
+}
+
+/*!
+ *  Returns @c true if the application at @a path is set as the default handler for URI requests of
+ *  @a scheme for the current user; otherwise, returns @c false.
+ *
+ *  If @a path is left empty, it defaults to
+ *  QCoreApplication::applicationFilePath().
+ *
+ *  @note On Linux this function relies on FreeDesktop conformance.
+ *
+ *  @sa setDefaultProtocolHandler() and removeDefaultProtocolHandler().
+ */
+bool isDefaultProtocolHandler(const QString& scheme, const QString& path)
+{
+    if(!isValidScheme(scheme))
+        return false;
+
+    QString p = QDir::toNativeSeparators(!path.isEmpty() ? path : QCoreApplication::applicationFilePath());
+    return checkUriSchemeHandler(scheme, p);
+}
+
+/*!
+ *  Removes the application at @a path as the default handler for UR requests of @a scheme if it is
+ *  currently set as such for the current user. This function can only remove the default on a per-user
+ *  basis, so it can fail if the default is set system-wide on platforms where users cannot
+ *  override defaults with an unset value.
+ *
+ *  If @a path is left empty, it defaults to
+ *  QCoreApplication::applicationFilePath().
+ *
+ *  Returns @c true if the operation was successful, or the application is not the default;
+ *  otherwise, returns @c false.
+ *
+ *  @note On Linux this function relies on FreeDesktop conformance and may require a restart
+ *  of the user's desktop session to take effect.
+ *
+ *  @warning On Linux this function causes mimeapps.list to be reordered, which can affect
+ *  MIME handler priorities! It is recommended to avoid this function in its current state.
+ *
+ *  @sa isDefaultProtocolHandler() and setDefaultProtocolHandler().
+ */
+bool removeDefaultProtocolHandler(const QString& scheme, const QString& path)
+{
+    if(!isValidScheme(scheme))
+        return false;
+
+    QString p = QDir::toNativeSeparators(!path.isEmpty() ? path : QCoreApplication::applicationFilePath());
+    return removeUriSchemeHandler(scheme, p);
+}
 
 }

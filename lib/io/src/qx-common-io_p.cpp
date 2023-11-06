@@ -102,7 +102,7 @@ IoOpReport handlePathCreation(const QFileInfo& fileInfo, bool createPaths)
     {
         if(!createPaths)
             return IoOpReport(IO_OP_WRITE, IO_ERR_PATH_DNE, fileInfo);
-        else if(!fileDir.mkpath("."))
+        else if(!fileDir.mkpath(u"."_s))
             return IoOpReport(IO_OP_WRITE, IO_ERR_CANT_CREATE_PATH, fileInfo);
     }
 
@@ -132,10 +132,10 @@ IoOpReport writePrep(const QFileInfo& fileInfo, WriteOptions writeOptions)
 void matchAppendConditionParams(WriteMode& writeMode, TextPos& startPos)
 {
 	// Match append condition parameters
-	if(startPos == TextPos::END)
+	if(startPos == TextPos(End))
 		writeMode = Append;
 	else if(writeMode == Append)
-		startPos = TextPos::END;
+		startPos = TextPos(End);
 }
 
 /*! @endcond */

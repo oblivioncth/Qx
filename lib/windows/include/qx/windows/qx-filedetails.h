@@ -15,6 +15,8 @@
 // Extra-component Includes
 #include "qx/core/qx-versionnumber.h"
 
+using namespace Qt::Literals::StringLiterals;
+
 namespace Qx
 {
 
@@ -51,20 +53,20 @@ public:
 
 //-Class Members----------------------------------------------------------------------------------------------------
 private:
-    static inline const QString LANG_CODE_PAGE_QUERY = "\\VarFileInfo\\Translation";
-    static inline const QString SUB_BLOCK_BASE_TEMPLATE = "\\StringFileInfo\\%1%2\\";
-    static inline const QString ST_COMMENTS_QUERY = "Comments";
-    static inline const QString ST_COMPANY_NAME_QUERY = "CompanyName";
-    static inline const QString ST_FILE_DESCRIPTION_QUERY = "FileDescription";
-    static inline const QString ST_FILE_VERSION_QUERY = "FileVersion";
-    static inline const QString ST_INTERNAL_NAME_QUERY = "InternalName";
-    static inline const QString ST_LEGAL_COPYRIGHT_QUERY = "LegalCopyright";
-    static inline const QString ST_LEGAL_TRADEMARKS_QUERY = "LegalTrademarks";
-    static inline const QString ST_ORIGINAL_FILENAME_QUERY = "OriginalFilename";
-    static inline const QString ST_PRODUCT_NAME_QUERY = "ProductName";
-    static inline const QString ST_PRODUCT_VERSION_QUERY = "ProductVersion";
-    static inline const QString ST_PRIVATE_BUILD_QUERY = "PrivateBuild";
-    static inline const QString ST_SPECIAL_BUILD_QUERY = "SpecialBuild";
+    static inline const QString LANG_CODE_PAGE_QUERY = u"\\VarFileInfo\\Translation"_s;
+    static inline const QString SUB_BLOCK_BASE_TEMPLATE = u"\\StringFileInfo\\%1%2\\"_s;
+    static inline const QString ST_COMMENTS_QUERY = u"Comments"_s;
+    static inline const QString ST_COMPANY_NAME_QUERY = u"CompanyName"_s;
+    static inline const QString ST_FILE_DESCRIPTION_QUERY = u"FileDescription"_s;
+    static inline const QString ST_FILE_VERSION_QUERY = u"FileVersion"_s;
+    static inline const QString ST_INTERNAL_NAME_QUERY = u"InternalName"_s;
+    static inline const QString ST_LEGAL_COPYRIGHT_QUERY = u"LegalCopyright"_s;
+    static inline const QString ST_LEGAL_TRADEMARKS_QUERY = u"LegalTrademarks"_s;
+    static inline const QString ST_ORIGINAL_FILENAME_QUERY = u"OriginalFilename"_s;
+    static inline const QString ST_PRODUCT_NAME_QUERY = u"ProductName"_s;
+    static inline const QString ST_PRODUCT_VERSION_QUERY = u"ProductVersion"_s;
+    static inline const QString ST_PRIVATE_BUILD_QUERY = u"PrivateBuild"_s;
+    static inline const QString ST_SPECIAL_BUILD_QUERY = u"SpecialBuild"_s;
 
 //-Instance Members-------------------------------------------------------------------------------------------------
 private:

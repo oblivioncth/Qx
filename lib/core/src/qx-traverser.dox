@@ -75,7 +75,6 @@ namespace Qx
 //-Outer Class Types----------------------------------------------------------------------------------------
 /*!
  * @typedef StringTraverser
- * @ingroup qx-core
  *
  * A convenience synonym for @ref Qx::Traverser<QString>
  */

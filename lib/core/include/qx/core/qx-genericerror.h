@@ -4,75 +4,61 @@
 // Shared Lib Support
 #include "qx/core/qx_core_export.h"
 
-// Qt Includes
-#include <QHash>
-#include <QString>
-#include <QMetaType>
-#include <QTextStream>
+// Intra-component Includes
+#include "qx/core/qx-abstracterror.h"
 
 namespace Qx
 {
 
-class QX_CORE_EXPORT GenericError
+class QX_CORE_EXPORT GenericError final : public AbstractError<"Qx::GenericError", 999>
 {
-//-Class Enums-----------------------------------------------------------------------------------------------
-public:
-    enum ErrorLevel { Warning, Error, Critical };
-
-//-Class Members---------------------------------------------------------------------------------------------
+//-Instance Variables------------------------------------------------------------------------------------------
 private:
-    static inline const QHash<ErrorLevel, QString> ERR_LVL_STRING_MAP = {
-        {ErrorLevel::Warning, "Warning"},
-        {ErrorLevel::Error, "Error"},
-        {ErrorLevel::Critical, "Critical"},
-    };
-
-    static inline const QString DETAILED_INFO_HEADING = "Details:\n--------";
-
-public:
-    static const GenericError UNKNOWN_ERROR;
-
-//-Instance Members------------------------------------------------------------------------------------------
-private:
-    ErrorLevel mErrorLevel;
+    quint32 mValue;
+    Severity mSeverity;
     QString mCaption;
-    QString mPrimaryInfo;
-    QString mSecondaryInfo;
-    QString mDetailedInfo;
+    QString mPrimary;
+    QString mSecondary;
+    QString mDetails;
 
 //-Constructor----------------------------------------------------------------------------------------------
 public:
     GenericError();
-    GenericError(ErrorLevel errorLevel, QString primaryInfo,
-                 QString secondaryInfo = QString(), QString detailedInfo = QString(), QString caption = QString());
+    GenericError(Severity severity, quint32 value, const QString& primary,
+                 const QString& secondary = {}, const QString& details = {}, const QString& caption = {});
 
 //-Instance Functions----------------------------------------------------------------------------------------------
+private:
+    quint32 deriveValue() const override;
+    Severity deriveSeverity() const override;
+    QString deriveCaption() const override;
+    QString derivePrimary() const override;
+    QString deriveSecondary() const override;
+    QString deriveDetails() const override;
+
 public:
     bool isValid() const;
-    ErrorLevel errorLevel() const;
-    QString errorLevelString(bool caps = true) const;
+    quint32 value() const;
+    Severity severity() const;
     QString caption() const;
-    QString primaryInfo() const;
-    QString secondaryInfo() const;
-    QString detailedInfo() const;
-    QString toString() const;
+    QString primary() const;
+    QString secondary() const;
+    QString details() const;
 
-    GenericError& setErrorLevel(ErrorLevel errorLevel);
-    GenericError& setCaption(QString caption);
-    GenericError& setPrimaryInfo(QString primaryInfo);
-    GenericError& setSecondaryInfo(QString secondaryInfo);
-    GenericError& setDetailedInfo(QString detailedInfo);
+    GenericError& setSeverity(Severity sv);
+    GenericError withSeverity(Severity sv);
+    GenericError& setCaption(const QString& caption);
+    GenericError& setPrimary(const QString& primary);
+    GenericError& setSecondary(const QString& secondary);
+    GenericError& setDetails(const QString& details);
 
-//-Friend Functions------------------------------------------------------------------------------------------------
-friend QX_CORE_EXPORT QTextStream& operator<<(QTextStream& ts, const GenericError& ge);
+//-Operators-------------------------------------------------------------------------------------------------------
+public:
+    bool operator==(const GenericError& other) const = default;
+    bool operator!=(const GenericError& other) const = default;
+
 };
 
-//-Non-member/Related Functions------------------------------------------------------------------------------------
-QX_CORE_EXPORT QTextStream& operator<<(QTextStream& ts, const GenericError& ge);
-
 }
-
-//-Metatype declarations-------------------------------------------------------------------------------------------
-Q_DECLARE_METATYPE(Qx::GenericError);
 
 #endif // QX_GENERICERROR_H

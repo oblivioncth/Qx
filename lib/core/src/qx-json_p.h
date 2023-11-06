@@ -9,7 +9,7 @@ namespace Qx
 /*! @cond */
 
 //-Component Private Functions--------------------------------------------------------------------
-void recursiveValueFinder(QList<QJsonValue>& hits, QJsonValue currentValue, const QString& key);
+void recursiveValueFinder(QList<QJsonValue>& hits, QJsonValue currentValue, QStringView key);
 
 /*! @endcond */
 }

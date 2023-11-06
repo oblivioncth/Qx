@@ -13,151 +13,52 @@
 namespace Qx
 {
 	
-template<typename T>
-    requires std::integral<T>
-class FreeIndexTracker
+class QX_CORE_EXPORT FreeIndexTracker
 {
 //-Instance Members----------------------------------------------------------------------------------------------
 private:
-    T mMinIndex;
-    T mMaxIndex;
-    QSet<T> mReservedIndicies;
+    // std::vector<bool> Used over QList<bool> since it's is often optimized by std library implementations to use individual bits per element
+    std::vector<bool> mReserved;
+    quint64 mFree;
+    quint64 mMin;
+    quint64 mMax;
 
 //-Constructor---------------------------------------------------------------------------------------------------
 public:
-    FreeIndexTracker(T minIndex = 0, T maxIndex = 0, QSet<T> reservedIndices = QSet<T>()) :
-        mMinIndex(minIndex),
-        mMaxIndex(maxIndex),
-        mReservedIndicies(reservedIndices)
-    {
-        // Determine programmatic limit if "type max" (-1) is specified
-        if(maxIndex < 0)
-            mMaxIndex = std::numeric_limits<T>::max();
-
-        // Insure initial values are valid
-        assert(mMinIndex >= 0 && mMinIndex <= mMaxIndex && (reservedIndices.isEmpty() ||
-               (*std::min_element(reservedIndices.begin(), reservedIndices.end())) >= 0));
-
-        // Change bounds to match initial reserve list if they are mismatched
-        if(!reservedIndices.isEmpty())
-        {
-            T minElement = *std::min_element(reservedIndices.begin(), reservedIndices.end());
-            if(minElement < minIndex)
-                mMinIndex = minElement;
-
-            T maxElement = *std::max_element(reservedIndices.begin(), reservedIndices.end());
-            if(maxElement > mMaxIndex)
-                mMaxIndex = maxElement;
-        }
-    }
+    FreeIndexTracker(quint64 min = 0, quint64 max = 1, QSet<quint64> reserved = QSet<quint64>());
 
 //-Instance Functions----------------------------------------------------------------------------------------------
 private:
-    int reserveInternal(int index)
-    {
-        // Check for valid index
-        assert(index == -1 || (index >= mMinIndex && index <= mMaxIndex));
-
-        int indexAffected = -1;
-
-        // Check if index is free and reserve if so
-        if(index != -1 && !mReservedIndicies.contains(index))
-        {
-            mReservedIndicies.insert(index);
-            indexAffected = index;
-        }
-
-        return indexAffected;
-    }
-
-    int releaseInternal(int index)
-    {
-        // Check for valid index
-        assert(index == -1 || (index >= mMinIndex && index <= mMaxIndex));
-
-        int indexAffected = -1;
-
-        // Check if index is reserved and free if so
-        if(index != -1 && mReservedIndicies.contains(index))
-        {
-            mReservedIndicies.remove(index);
-            indexAffected = index;
-        }
-
-        return indexAffected;
-    }
+    quint64 internalIdx(quint64 extIdx) const;
+    quint64 externalIdx(quint64 intIdx) const;
+    bool resrv(quint64 extIdx);
+    bool relse(quint64 extIdx);
 
 public:
-    bool isReserved(T index) const { return mReservedIndicies.contains(index); }
-    T minimum() const { return mMinIndex; }
-    T maximum() const { return mMaxIndex; }
+    bool isReserved(quint64 index) const;
+    quint64 minimum() const;
+    quint64 maximum() const;
+    quint64 range() const;
+    quint64 free() const;
+    quint64 reserved() const;
+    bool isBooked() const;
 
-    T firstReserved() const
-    {
-        if(!mReservedIndicies.isEmpty())
-            return (*std::min_element(mReservedIndicies.begin(), mReservedIndicies.end()));
-        else
-            return -1;
-    }
+    std::optional<quint64> firstReserved() const;
+    std::optional<quint64> lastReserved() const;
+    std::optional<quint64> firstFree() const;
+    std::optional<quint64> lastFree() const;
+    std::optional<quint64> previousFree(quint64 index) const;
+    std::optional<quint64> nextFree(quint64 index) const;
+    std::optional<quint64> nearestFree(quint64 index) const;
 
-    T lastReserved() const
-    {
-        if(!mReservedIndicies.isEmpty())
-            return (*std::max_element(mReservedIndicies.begin(), mReservedIndicies.end()));
-        else
-            return -1;
-    }
+    bool reserve(quint64 index);
+    std::optional<quint64> reserveFirstFree();
+    std::optional<quint64> reserveLastFree();
+    std::optional<quint64> reserveNextFree(quint64 index);
+    std::optional<quint64> reservePreviousFree(quint64 index);
+    std::optional<quint64> reserveNearestFree(quint64 index);
 
-    T firstFree() const
-    {
-        // Quick check for all reserved
-        if(mReservedIndicies.count() == length(mMinIndex, mMaxIndex))
-            return -1;
-
-        // Full check for first available
-        for(int i = mMinIndex; i <= mMaxIndex; i++)
-            if(!mReservedIndicies.contains(i))
-                return i;
-
-        // Should never be reached, used to prevent warning (all control paths)
-        return -1;
-    }
-
-    T lastFree() const
-    {
-        // Quick check for all reserved
-        if(mReservedIndicies.count() == length(mMinIndex, mMaxIndex))
-            return -1;
-
-        // Full check for first available (backwards)
-        for(int i = mMaxIndex; i >= mMinIndex ; i--)
-            if(!mReservedIndicies.contains(i))
-                return i;
-
-        // Should never be reached, used to prevent warning (all control paths)
-        return -1;
-    }
-
-    bool reserve(int index)
-    {
-        // Check for valid index
-        assert(index >= mMinIndex && index <= mMaxIndex);
-
-        return reserveInternal(index) == index;
-    }
-
-    T reserveFirstFree() { return reserveInternal(firstFree()); }
-
-    T reserveLastFree() { return reserveInternal(lastFree()); }
-
-    bool release(int index)
-    {
-        // Check for valid index
-        assert(index >= mMinIndex && index <= mMaxIndex);
-
-        return releaseInternal(index) == index;
-    }
-
+    bool release(quint64 index);
 };
 
 }

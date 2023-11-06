@@ -5,6 +5,10 @@ on:
       qt_ffynnon_cred:
         description: 'Credentials for getting Qt from Ffynnon'
         required: true
+    outputs:
+      doc_artifact_name:
+        description: "Name of artifact used to update docs"
+        value: ${{ jobs.build-qx.outputs.doc_artifact_name }}
 env:
   qt_install_dir: ${{ github.workspace }}/Qt/Install
   qx_src_suffix: Qx/Source
@@ -48,6 +52,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       cmake_gen: Ninja Multi-Config
+    outputs:
+      doc_artifact_name: ${{ steps.set_doc_artifact_name.outputs.doc_artifact_name }}
     steps:
     - name: Set derived variables with shell because GitHub Actions env context sucks
       run: |
@@ -58,12 +64,21 @@ jobs:
     - name: Install Qt (custom build)
       uses: oblivioncth/actions/general/install-and-cache-qt-from-ffynnon@dev
       with:
-        version: 6.4.2
+        version: 6.5.1
         os: linux
         compiler: ${{ matrix.qt_comp }}
         linkage: ${{ matrix.lib_linkage }}
         path: ${{ env.qt_install_dir }}
         credentials: ${{ secrets.qt_ffynnon_cred }}
+    - name: Update package index
+      run: sudo apt-get update
+    - name: WORKAROUND FOR https://github.com/actions/runner-images/issues/8659
+      if: matrix.os == 'ubuntu-22.04'
+      run: |
+        echo "TEMPORARY WORKAROUND FOR GITHUB RUNNER BUG #8659\n\nRemoving GCC 13 as it breaks Clang14"
+        sudo rm -f /etc/apt/sources.list.d/ubuntu-toolchain-r-ubuntu-test-jammy.list
+        sudo apt-get update
+        sudo apt-get install -y --allow-downgrades libc6=2.35-0ubuntu3.4 libc6-dev=2.35-0ubuntu3.4 libstdc++6=12.3.0-1ubuntu1~22.04 libgcc-s1=12.3.0-1ubuntu1~22.04
     - name: Install OpenGL lib
       run: sudo apt-get install libglu1-mesa-dev
     - name: Install XCB Related libs
@@ -71,7 +86,7 @@ jobs:
     - name: Install Doxygen
       uses: oblivioncth/actions/ubuntu/install-doxygen-from-sourceforge@dev
       with:
-        version: 1.9.4
+        version: 1.9.7
     - name: Install Graphviz
       run: sudo apt-get install graphviz
     - name: Install Ninja
@@ -108,6 +123,10 @@ jobs:
         cpack_name=$(find "${{ env.qx_package_path }}" -type f -name "*.zip")
         artifact_name="$(basename "$cpack_name" .zip) [${{ matrix.cxx_comp }}]"
         echo "current_artifact_name=$artifact_name" >> $GITHUB_ENV
+    - name: Set doc artifact name
+      id: set_doc_artifact_name
+      if: matrix.lib_linkage == 'static' && matrix.cxx_comp == 'clang++-14' 
+      run: echo "doc_artifact_name=${{ env.current_artifact_name }}" >> $GITHUB_OUTPUT
     - name: Upload Qx build artifact
       uses: actions/upload-artifact@v3
       with:

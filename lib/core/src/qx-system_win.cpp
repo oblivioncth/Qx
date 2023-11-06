@@ -6,15 +6,11 @@
 #include <QDir>
 #include <QDirIterator>
 
-// Inner-component Includes
-#include "qx/core/qx-bitarray.h"
-
 // Extra-component Includes
 #include "qx/core/qx-integrity.h"
 
 // Windows Includes
 #include "windows.h"
-#include "comdef.h"
 #include "TlHelp32.h"
 
 namespace Qx
@@ -39,7 +35,7 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
         return true;
     }
 
-    BOOL QT_WIN_CALLBACK cleanKill(HWND hWindow, LPARAM processId)
+    BOOL QT_WIN_CALLBACK cleanKiller(HWND hWindow, LPARAM processId)
     {
         /* This compares target process ID to the process ID of the owner of each window
          * since EnumWindows loops through all open windows, sending the close signal
@@ -60,84 +56,10 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
         return TRUE;
     }
 
-    DWORD convertNtStatusToWin32Error(NTSTATUS ntstatus)
-    {
-            DWORD oldError;
-            DWORD result;
-            DWORD br;
-            OVERLAPPED o;
-
-            o.Internal = ntstatus;
-            o.InternalHigh = 0;
-            o.Offset = 0;
-            o.OffsetHigh = 0;
-            o.hEvent = 0;
-            oldError = GetLastError();
-            GetOverlappedResult(NULL, &o, &br, FALSE);
-            result = GetLastError();
-            SetLastError(oldError);
-            return result;
-    }
-
-    GenericError translateNtstatus(NTSTATUS stat)
-    {
-        BitArray statBits = BitArray::fromInteger(stat);
-
-        // Get severity
-        BitArray severityBits = statBits.extract(30, 2);
-        quint8 severity = severityBits.toInteger<quint8>();
-
-        // Check for success
-        if(severity == 0x00)
-            return GenericError();
-
-        // Get handle to ntdll.dll.
-        HMODULE hNtDll = LoadLibrary(L"NTDLL.DLL");
-
-        // Return unknown error if library fails to load
-        if (hNtDll == NULL)
-            return GenericError::UNKNOWN_ERROR;
-
-        // Use format message to create error string
-        TCHAR* formatedBuffer = nullptr;
-        DWORD formatResult = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_FROM_HMODULE,
-                                           hNtDll, convertNtStatusToWin32Error(stat), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                                           (LPTSTR)&formatedBuffer, 0, NULL);
-
-        // Free loaded dll
-        FreeLibrary(hNtDll);
-
-        // Return unknown error if message fails to format
-        if(!formatResult)
-            return GenericError::UNKNOWN_ERROR;
-
-        // Return translated error
-        return GenericError(severity == 0x03 ? GenericError::Error : GenericError::Warning, QString::fromWCharArray(formatedBuffer));
-    }
-
-    GenericError translateHresult(HRESULT res)
-    {
-        BitArray resBits = BitArray::fromInteger(res);
-
-        // Check if result is actually an ntstatus code
-        if(resBits.testBit(28))
-            return translateNtstatus(res);
-
-        // Check for success
-        if(!resBits.testBit(31))
-            return GenericError();
-
-        // Create com error instance from result
-        _com_error comError(res);
-
-        // Return translated error
-        return GenericError(GenericError::Error, QString::fromWCharArray(comError.ErrorMessage()));
-    }
-
-    GenericError getLastErrorGen()
+    SystemError getLastError(const QString& aError)
     {
         DWORD error = GetLastError();
-        return translateHresult(HRESULT_FROM_WIN32(error));
+        return SystemError::fromHresult(HRESULT_FROM_WIN32(error), aError);
     }
 }
 
@@ -262,24 +184,28 @@ QList<quint32> processChildren(quint32 processId, bool recursive)
     return cPids;
 }
 
-GenericError cleanKillProcess(quint32 processId)
+SystemError cleanKillProcess(quint32 processId)
 {
-    // Try to notify process to close
-    if(!EnumWindows(cleanKill, (LPARAM)processId)) // Tells all top-level windows of the process to close
-        return getLastErrorGen();
+    static const QString ACTION = u"Failed to cleanly kill process %1"_s;
 
-    return GenericError();
+    // Try to notify process to close
+    if(!EnumWindows(cleanKiller, (LPARAM)processId)) // Tells all top-level windows of the process to close
+        return getLastError(ACTION.arg(processId));
+
+    return SystemError();
 }
 
-GenericError forceKillProcess(quint32 processId)
+SystemError forceKillProcess(quint32 processId)
 {
+    static const QString ACTION = u"Failed to forcefully kill process %1"_s;
+
     // Open handle
     HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, processId);
     if(!hProcess)
-        return getLastErrorGen();
+        return getLastError(ACTION.arg(processId));
 
     // Try kill
-    GenericError res = !TerminateProcess(hProcess, 0xFFFF) ? getLastErrorGen() : Qx::GenericError();
+    SystemError res = !TerminateProcess(hProcess, 0xFFFF) ? getLastError(ACTION.arg(processId)) : SystemError();
 
     // Cleanup Handle
     CloseHandle(hProcess);

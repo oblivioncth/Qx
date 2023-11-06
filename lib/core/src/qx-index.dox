@@ -17,7 +17,7 @@ namespace Qx
  *  use -1 to mean 'none' in the context of searches.
  *
  *  The Index type is designed to remedy this issue by providing a more distinct representation of a set's final index
- *  via the member variable Index<T>::LAST, which for completeness is paired with Index<T>::FIRST. The type also
+ *  via the constructor Index(Extent), which can also be used to more explicitly reference the first index. The type also
  *  can be null, providing further clarity for the 'none' case.
  *
  *  To minimize unintentional interactions, Index<T> only has comparison and arithmetic operators defined for when
@@ -52,28 +52,18 @@ namespace Qx
  *  @li 2) 'last' indices are greater than everything except other 'last' indices (highest possible value)
  */
 
-//-Class Members----------------------------------------------------------------------------------------------------
-//Public:
-/*!
- *  @var Index<T> Index<T>::FIRST
- *
- *  Used to refer to the first index of a dataset.
- *
- *  This is equivalent to @c Index<T>(0).
- */
-
-/*!
- *  @var Index<T> Index<T>::LAST
- *
- *  Used to refer to the last index of a dataset.
- */
-
 //-Constructor----------------------------------------------------------------------------------------------
 //Public:
 /*!
  * @fn Index<T>::Index()
  *
  *  Creates an null index.
+ */
+
+/*!
+ * @fn Index<T>::Index(Extent e)
+ *
+ *  Creates an index at the given extent @a e.
  */
 
 /*!
@@ -97,65 +87,29 @@ namespace Qx
  *
  *  Returns @c true if the index represents the last index of an arbitrary dataset; otherwise returns @c false.
  *
- *  This is equivalent to <tt>*this == Index<T>::LAST</tt>.
+ *  This is equivalent to <tt>*this == Index<T>(Qx::Last)</tt>.
  */
 
+//-Operators-------------------------------------------------------------------------------------------------------
+//Public:
 /*!
- * @fn bool Index<T>::isLast() const
- *
- *  Returns @c true if the index represents the last index of an arbitrary dataset; otherwise returns @c false.
- *
- *  This is equivalent to <tt>*this == Index<T>::LAST</tt>.
- */
-
-/*!
- * @fn bool Index<T>::operator==(const Index<T>& other)
+ * @fn bool Index<T>::operator==(const Index<T>& other) const noexcept
  *
  *  Returns @c true if this index and @a other are both null, 'last', or have the same underlying value; otherwise
  *  returns @c false.
  */
 
 /*!
- * @fn bool Index<T>::operator!=(const Index<T>& other)
+ * @fn std::strong_ordering Index<T>::operator<=>(const Index& other) const noexcept
  *
- *  Returns @c true if this index and @a other are not equivalent; otherwise returns @c false.
+ *  Performs a three-way comparison between this index and @a other.
+ *
+ *  Returns:
+ *  - @c <0 if this index is less than @a other
+ *  - @c 0 if this index is equal to @a other
+ *  - @c >0 if this index is greater than @a other
  */
 
-/*!
- * @fn bool Index<T>::operator<(const Index<T>& other)
- *
- *  Returns @c true if one of the following is true:
- *
- *  1) This index is null and @a other is not.
- *  2) This index is not 'last' and @a other is.
- *  3) This index's underlying value is less than @a other's underlying value.
- *
- *  Otherwise returns @c false.
- */
-
-/*!
- * @fn bool Index<T>::operator<=(const Index<T>& other)
- *
- *  See operator<(const Index<T>& other) and operator==(const Index<T>& other)
- */
-
-/*!
- * @fn bool Index<T>::operator>(const Index<T>& other)
- *
- *  Returns @c true if one of the following is true:
- *
- *  1) @a other is null and this index is not.
- *  2) @a other is not 'last' and this index is.
- *  3) This index's underlying value is greater than @a other's underlying value.
- *
- *  Otherwise returns @c false.
- */
-
-/*!
- * @fn bool Index<T>::operator>=(const Index<T>& other)
- *
- *  See operator>(const Index<T>& other) and operator==(const Index<T>& other)
- */
 
 /*!
  * @fn Index<T> Index<T>::operator-(const Index<T>& other)
@@ -254,28 +208,24 @@ namespace Qx
 //-Outer Class Types----------------------------------------------------------------------------------------
 /*!
  * @typedef Index8
- * @ingroup qx-core
  *
  * A convenience synonym for Index<qint8>
  */
 
 /*!
  * @typedef Index16
- * @ingroup qx-core
  *
  * A convenience synonym for Index<qint16>
  */
 
 /*!
  * @typedef Index32
- * @ingroup qx-core
  *
  * A convenience synonym for Index<qint32>
  */
 
 /*!
  * @typedef Index64
- * @ingroup qx-core
  *
  * A convenience synonym for Index<qint64>
  */

@@ -53,7 +53,7 @@ DesktopEntry::DesktopEntry() :
  */
 QString DesktopEntry::keyValueString(const QString& key, bool value)
 {
-    return keyValueString(key, (value ? "true" : "false"));
+    return keyValueString(key, (value ? u"true"_s : u"false"_s));
 }
 
 /*!

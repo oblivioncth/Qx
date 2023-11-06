@@ -27,7 +27,7 @@ namespace Qx
 TextQuery::TextQuery(const QString& string, Qt::CaseSensitivity cs) :
     mString(string),
     mCaseSensitivity(cs),
-    mStartPos(TextPos::START),
+    mStartPos(TextPos(Start)),
     mHitsToSkip(0),
     mHitLimit(-1),
     mAllowSplit(false)
@@ -48,7 +48,7 @@ Qt::CaseSensitivity TextQuery::caseSensitivity() const { return mCaseSensitivity
 /*!
  *  Returns the position from which the search should begin.
  *
- *  The default is @c TextPos::START.
+ *  The default is @c TextPos(Start).
  */
 TextPos TextQuery::startPosition() const { return mStartPos; }
 

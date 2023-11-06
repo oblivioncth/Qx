@@ -105,33 +105,33 @@ QString ApplicationDesktopEntry::toString() const
     QString entryString = DesktopEntry::toString();
 
     // Add standard application key/values
-    entryString += keyValueString("DBusActivatable", mDBusActivatable) + '\n';
+    entryString += keyValueString(u"DBusActivatable"_s, mDBusActivatable) + '\n';
     if(!mTryExec.isEmpty())
-        entryString += keyValueString("TryExec", mTryExec) + '\n';
+        entryString += keyValueString(u"TryExec"_s, mTryExec) + '\n';
     if(!mExec.isEmpty())
-        entryString += keyValueString("Exec", mExec) + '\n';
+        entryString += keyValueString(u"Exec"_s, mExec) + '\n';
     if(!mPath.isEmpty())
-        entryString += keyValueString("Path", mPath) + '\n';
-    entryString += keyValueString("Terminal", mTerminal) + '\n';
+        entryString += keyValueString(u"Path"_s, mPath) + '\n';
+    entryString += keyValueString(u"Terminal"_s, mTerminal) + '\n';
     if(!mMimeTypes.isEmpty())
-        entryString += keyValueString("MimeType", mMimeTypes) + '\n';
+        entryString += keyValueString(u"MimeType"_s, mMimeTypes) + '\n';
     if(!mCategories.isEmpty())
-        entryString += keyValueString("Categories", mCategories) + '\n';
+        entryString += keyValueString(u"Categories"_s, mCategories) + '\n';
     if(!mImplements.isEmpty())
-        entryString += keyValueString("Implements", mImplements) + '\n';
+        entryString += keyValueString(u"Implements"_s, mImplements) + '\n';
     if(!mKeywords.isEmpty())
-        entryString += keyValueString("Keywords", mKeywords) + '\n';
-    entryString += keyValueString("StartupNotify", mStartupNotify) + '\n';
+        entryString += keyValueString(u"Keywords"_s, mKeywords) + '\n';
+    entryString += keyValueString(u"StartupNotify"_s, mStartupNotify) + '\n';
     if(!mStartupWMClass.isEmpty())
-        entryString += keyValueString("StartupWMClass", mStartupWMClass) + '\n';
-    entryString += keyValueString("PrefersNonDefaultGPU", mPrefersNonDefaultGPU) + '\n';
-    entryString += keyValueString("SingleMainWindow", mSingleMainWindow) + '\n';
+        entryString += keyValueString(u"StartupWMClass"_s, mStartupWMClass) + '\n';
+    entryString += keyValueString(u"PrefersNonDefaultGPU"_s, mPrefersNonDefaultGPU) + '\n';
+    entryString += keyValueString(u"SingleMainWindow"_s, mSingleMainWindow) + '\n';
 
     // Add actions
     if(!mActions.isEmpty())
     {
         // Add identifiers
-        entryString += keyValueString("Actions", mActions.keys()) + '\n';
+        entryString += keyValueString(u"Actions"_s, mActions.keys()) + '\n';
         entryString += '\n';
 
         // Add action groups
@@ -142,11 +142,11 @@ QString ApplicationDesktopEntry::toString() const
 
             // Add group key/values
             if(!action.name().isEmpty())
-                entryString += keyValueString("Name", action.name()) + '\n';
+                entryString += keyValueString(u"Name"_s, action.name()) + '\n';
             if(!action.icon().isEmpty())
-                entryString += keyValueString("Icon", action.icon()) + '\n';
+                entryString += keyValueString(u"Icon"_s, action.icon()) + '\n';
             if(!action.exec().isEmpty())
-                entryString += keyValueString("Exec", action.exec()) + '\n';
+                entryString += keyValueString(u"Exec"_s, action.exec()) + '\n';
         }
     }
 

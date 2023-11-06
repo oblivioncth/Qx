@@ -1,21 +1,21 @@
 #================= Project Setup ==========================
 
 # CMake
-cmake_minimum_required(VERSION 3.23.0...3.25.0)
+cmake_minimum_required(VERSION 3.23.0...3.26.0)
 
 # Project
 # NOTE: For versions stick to w.x.y.z, where z is generally
 # avoided and only used for hotfixes. DON'T USE TRAILING
 # ZEROS IN VERSIONS
 project(Qx
-    VERSION 0.5.0.1
+    VERSION 0.5.5
     LANGUAGES CXX
     DESCRIPTION "Qt Extensions Library"
 )
 
 # Get helper scripts
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FetchOBCMake.cmake)
-fetch_ob_cmake("v0.3")
+fetch_ob_cmake("v0.3.2.1")
 
 # Initialize project according to standard rules
 include(OB/Project)
@@ -121,7 +121,7 @@ if(QX_DOCS)
     add_subdirectory(doc)
 endif()
 
-#================ Build Documentation ======================
+#================ Build Tests ======================
 if(QX_TESTS)
     enable_testing()
     set(TESTS_TARGET_PREFIX ${PROJECT_NAMESPACE_LC})

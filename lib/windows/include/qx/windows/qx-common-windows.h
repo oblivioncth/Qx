@@ -11,7 +11,7 @@
 #include "qx/windows/qx-windefs.h"
 
 // Extra-component Includes
-#include "qx/core/qx-genericerror.h"
+#include "qx/core/qx-systemerror.h"
 
 namespace Qx
 {
@@ -50,20 +50,18 @@ QX_WINDOWS_EXPORT QList<DWORD> processThreadIds(DWORD processId);
 
 QX_WINDOWS_EXPORT bool processIsRunning(HANDLE processHandle);
 
-QX_WINDOWS_EXPORT GenericError processIsElevated(bool& elevated);
-QX_WINDOWS_EXPORT GenericError processIsElevated(bool& elevated, HANDLE processHandle);
-QX_WINDOWS_EXPORT GenericError processIsElevated(bool& elevated, DWORD processId);
+QX_WINDOWS_EXPORT SystemError processIsElevated(bool& elevated);
+QX_WINDOWS_EXPORT SystemError processIsElevated(bool& elevated, HANDLE processHandle);
+QX_WINDOWS_EXPORT SystemError processIsElevated(bool& elevated, DWORD processId);
 
-QX_WINDOWS_EXPORT GenericError cleanKillProcess(HANDLE processHandle);
-QX_WINDOWS_EXPORT GenericError forceKillProcess(HANDLE processHandle);
+QX_WINDOWS_EXPORT SystemError cleanKillProcess(HANDLE processHandle);
+QX_WINDOWS_EXPORT SystemError forceKillProcess(HANDLE processHandle);
 
 // Error codes
-QX_WINDOWS_EXPORT GenericError translateHresult(HRESULT res);
-QX_WINDOWS_EXPORT GenericError translateNtstatus(NTSTATUS stat);
-QX_WINDOWS_EXPORT GenericError getLastError();
+QX_WINDOWS_EXPORT SystemError getLastError();
 
 // Filesystem
-QX_WINDOWS_EXPORT GenericError createShortcut(QString shortcutPath, ShortcutProperties sp);
+QX_WINDOWS_EXPORT SystemError createShortcut(QString shortcutPath, ShortcutProperties sp);
 
 }
 

@@ -7,16 +7,15 @@
 // Extra-component Includes
 #include "qx/core/qx-index.h"
 
+// TODO: This class should probably be constexpr construable, though this
+// would mean it cant have separate implementation files which is somewhat ugly.
+// probably should reconsider this once using modules.
+
 namespace Qx
 {
 
 class QX_IO_EXPORT TextPos
 {
-//-Class Types------------------------------------------------------------------------------------------------------
-public:
-    static const TextPos START;
-    static const TextPos END;
-
 //-Instance Variables------------------------------------------------------------------------------------------------
 private:
     Index32 mLine;
@@ -25,6 +24,7 @@ private:
 //-Constructor-------------------------------------------------------------------------------------------------------
 public:
     TextPos();
+    TextPos(Extent e);
     TextPos(Index32 line, Index32 character);
 
 //-Instance Functions------------------------------------------------------------------------------------------------
@@ -35,12 +35,8 @@ public:
     void setCharacter(Index32 character);
     bool isNull() const;
 
-    bool operator== (const TextPos& otherTextPos);
-    bool operator!= (const TextPos& otherTextPos);
-    bool operator> (const TextPos& otherTextPos);
-    bool operator>= (const TextPos& otherTextPos);
-    bool operator< (const TextPos& otherTextPos);
-    bool operator<= (const TextPos& otherTextPos);
+    bool operator==(const TextPos& other) const noexcept = default;
+    std::strong_ordering operator<=>(const TextPos& other) const noexcept;
 };
 
 }

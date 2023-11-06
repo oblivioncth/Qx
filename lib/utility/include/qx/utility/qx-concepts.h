@@ -6,6 +6,26 @@
 #include <iterator>
 #include <type_traits>
 
+// Qt Includes
+#include <QHash>
+#include <QMap>
+
+/*! @cond */
+namespace QxConceptsPrivate
+{
+
+template <class A, template <typename...> class B>
+struct is_specialization_of : std::false_type {};
+
+template <typename... Args, template <typename...> class B>
+struct is_specialization_of<B<Args...>, B> : std::true_type {};
+
+template <typename A, template <typename...> class B>
+inline constexpr bool is_specialization_of_v = is_specialization_of<A, B>::value;
+
+}
+/*! @endcond */
+
 namespace Qx
 {
 
@@ -491,6 +511,19 @@ concept static_castable_to = requires(K klass) {{ static_cast<T>(klass) };};
 // Grouping
 template<class K, class ... L>
 concept any_of = (std::same_as<K, L> || ...);
+
+// Template
+template<typename K, template <typename...> class L>
+concept specializes = QxConceptsPrivate::is_specialization_of_v<K, L>;
+
+// Similiar interface types
+template<typename T>
+concept qassociative = specializes<T, QHash> ||
+                       specializes<T, QMap>;
+
+template<typename T>
+concept qcollective = Qx::specializes<T, QList> ||
+                      Qx::specializes<T, QSet>;
 
 }
 

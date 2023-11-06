@@ -35,7 +35,7 @@ QString LinkDesktopEntry::toString() const
     QString entryString = DesktopEntry::toString();
 
     // Add link key/value
-    entryString += keyValueString("URL", mUrl.toString()) + '\n';
+    entryString += keyValueString(u"URL"_s, mUrl.toString()) + '\n';
 
     return entryString;
 }
