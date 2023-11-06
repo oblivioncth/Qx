@@ -137,6 +137,18 @@ namespace Qx
  *  @qflag{ReadOptions, ReadOption}
  */
 
+/*!
+ *  @enum PathType
+ *
+ *  This denotes the type of a path in terms of relativity.
+ *
+ *  @var PathType Absolute
+ *  An absolute path.
+ *
+ *  @var PathType Relative
+ *  A relative path.
+ */
+
 //-Namespace Variables-------------------------------------------------------------------------------------------------
 /*!
  * @var QChar ENDL
@@ -1312,6 +1324,7 @@ IoOpReport dirContentInfoList(QFileInfoList& returnBuffer, QDir directory, QStri
 /*!
  *  Fills @a returnBuffer with a list of names for all the files and directories in @a directory, limited according
  *  to the name and attribute filters previously set with QDir::setNameFilters() and QDir::setFilter(), while sort flags are ignored.
+ *  The paths will be relative to @a directory if @a pathType is @c PathType::Relative.
  *
  *  The name filter and file attribute filter can be overridden using the @a nameFilters and @a filters arguments respectively.
  *
@@ -1322,7 +1335,7 @@ IoOpReport dirContentInfoList(QFileInfoList& returnBuffer, QDir directory, QStri
  *  @sa QDir::entryList
  */
 IoOpReport dirContentList(QStringList& returnBuffer, QDir directory, QStringList nameFilters,
-                              QDir::Filters filters, QDirIterator::IteratorFlags flags)
+                          QDir::Filters filters, QDirIterator::IteratorFlags flags, PathType pathType)
 {
     // Empty buffer
     returnBuffer = QStringList();
@@ -1344,7 +1357,10 @@ IoOpReport dirContentList(QStringList& returnBuffer, QDir directory, QStringList
     QDirIterator listIterator(directory.path(), nameFilters, filters, flags);
 
     while(listIterator.hasNext())
-        returnBuffer.append(listIterator.next());
+    {
+        QString absPath = listIterator.next();
+        returnBuffer.append(pathType == PathType::Absolute ? absPath : directory.relativeFilePath(absPath));
+    }
 
     return IoOpReport(IO_OP_ENUMERATE, IO_SUCCESS, directory);
 }

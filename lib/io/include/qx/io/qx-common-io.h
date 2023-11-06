@@ -44,6 +44,8 @@ enum ReadOption {
 Q_DECLARE_FLAGS(ReadOptions, ReadOption)
 Q_DECLARE_OPERATORS_FOR_FLAGS(ReadOptions)
 
+enum PathType {Absolute, Relative};
+
 //-Namespace Variables-------------------------------------------------------------------------------------------------
 //TODO: Ensure these work in shared build. Don't think they need to be exported since they are defined here
 const QChar ENDL = '\n'; //Auto cross platform thanks to QIODevice::OpenMode Text
@@ -74,7 +76,7 @@ QX_IO_EXPORT IoOpReport dirContainsFiles(bool& returnBuffer, QDir directory, QDi
 QX_IO_EXPORT IoOpReport dirContentInfoList(QFileInfoList& returnBuffer, QDir directory, QStringList nameFilters = QStringList(),
                                            QDir::Filters filters = QDir::NoFilter, QDirIterator::IteratorFlags flags = QDirIterator::NoIteratorFlags);
 QX_IO_EXPORT IoOpReport dirContentList(QStringList& returnBuffer, QDir directory, QStringList nameFilters = QStringList(),
-                                       QDir::Filters filters = QDir::NoFilter, QDirIterator::IteratorFlags flags = QDirIterator::NoIteratorFlags);
+                                       QDir::Filters filters = QDir::NoFilter, QDirIterator::IteratorFlags flags = QDirIterator::NoIteratorFlags, PathType pathType = Absolute);
 
 // Integrity
 QX_IO_EXPORT IoOpReport calculateFileChecksum(QString& returnBuffer, QFile& file, QCryptographicHash::Algorithm hashAlgorithm);
