@@ -331,7 +331,7 @@ IoOpReport ApplicationLogger::finish(int returnCode)
  *
  *  @sa resetStatus().
  */
-IoOpReport ApplicationLogger::status() { return mErrorStatus; }
+IoOpReport ApplicationLogger::status() const { return mErrorStatus; }
 
 /*!
  *  Resets the status of the logger.
@@ -351,6 +351,13 @@ void ApplicationLogger::resetStatus() { mErrorStatus = IoOpReport(); }
  *
  *  @sa status().
  */
-bool ApplicationLogger::hasError() { return mErrorStatus.isFailure(); }
+bool ApplicationLogger::hasError() const { return mErrorStatus.isFailure(); }
+
+/*!
+ *  Returns @c true if the log is open for writing; otherwise, returns @c false.
+ *
+ *  @sa openLog() and finish().
+ */
+bool ApplicationLogger::isOpen() const { return mTextStreamWriter.fileIsOpen(); }
 
 }
