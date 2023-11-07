@@ -79,9 +79,10 @@ public:
     IoOpReport finish(int returnCode);
 
     // Status
-    IoOpReport status();
+    IoOpReport status() const;
     void resetStatus();
-    bool hasError();
+    bool hasError() const;
+    bool isOpen() const;
 };
 
 }
