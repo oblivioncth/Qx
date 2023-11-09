@@ -737,7 +737,7 @@ void AsyncDownloadManager::processQueue()
         emit downloadProgress(0);
         emit downloadTotalChanged(0);
 
-        if(mSkipEnumeration)
+        if(mSkipEnumeration || taskCount() == 1) // No need to get size for one file
         {
             // Move pending enumerants straight to pending downloads
             mPendingDownloads.swap(mPendingEnumerants);
