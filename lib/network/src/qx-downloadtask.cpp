@@ -27,15 +27,20 @@ namespace Qx
  *  The full local path to download the file to.
  */
 
+/*!
+ *  @var QString DownloadTask::checksum
+ *
+ *  An optional checksum in hexadecimal format to compare the completed file against. An empty string disables
+ *  verification.
+ */
+
 //-Operators----------------------------------------------------------------------------------------------------
 //Public:
 /*!
+ *  @fn bool DownloadTask::operator==(const DownloadTask& lhs, const DownloadTask& rhs) noexcept
+ *
  *  Returns @c true if the target and destination of @a lhs are the same as in @a rhs; otherwise returns @c false
  */
-bool operator==(const DownloadTask& lhs, const DownloadTask& rhs) noexcept
-{
-    return lhs.target == rhs.target && lhs.dest == rhs.dest;
-}
 
 //-Hashing------------------------------------------------------------------------------------------------------
 /*!
@@ -46,6 +51,7 @@ size_t qHash(const DownloadTask& key, size_t seed) noexcept
     QtPrivate::QHashCombine hash;
     seed = hash(seed, key.target);
     seed = hash(seed, key.dest);
+    seed = hash(seed, key.checksum);
 
     return seed;
 }
