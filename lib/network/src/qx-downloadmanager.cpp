@@ -658,7 +658,7 @@ void AsyncDownloadManager::downloadFinishedHandler(QNetworkReply* reply)
     if(reply->error() == QNetworkReply::NoError) // Complete download
     {
         const QString& cs = task.checksum;
-        if(!cs.isEmpty() && !cs.compare(writer->hash().toHex(), Qt::CaseInsensitive))
+        if(!cs.isEmpty() && cs.compare(writer->hash().toHex(), Qt::CaseInsensitive) != 0)
         {
             fail = true;
             recordFinishedDownload(DownloadOpReport::failedDownload(task, ERR_CHECKSUM_MISMATCH));
