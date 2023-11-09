@@ -189,7 +189,7 @@ void FileStreamWriter::setFloatingPointPrecision(QDataStream::FloatingPointPreci
  *  The status is a report of the last write operation performed by FileStreamWriter. If no write operation has
  *  been performed since the stream was constructed or resetStatus() was last called the report will be null.
  */
-IoOpReport FileStreamWriter::status() { return mStatus; }
+IoOpReport FileStreamWriter::status() const { return mStatus; }
 
 /*!
  *  Writes @a data to the stream and returns an operation report.

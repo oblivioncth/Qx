@@ -52,7 +52,7 @@ public:
     void resetStatus();
     void setByteOrder(QDataStream::ByteOrder bo);
     void setFloatingPointPrecision(QDataStream::FloatingPointPrecision precision);
-    IoOpReport status();
+    IoOpReport status() const;
     IoOpReport writeRawData(const QByteArray& data);
 
     template<typename T>

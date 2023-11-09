@@ -50,6 +50,26 @@ class QX_NETWORK_EXPORT AsyncDownloadManager: public QObject
 private:
     enum Status {Initial, Enumerating, Downloading, Aborting, StoppingOnError};
 
+//-Class Structs----------------------------------------------------------------------------------------------------
+private:
+    class Writer
+    {
+    private:
+        FileStreamWriter mFsw;
+        std::optional<QCryptographicHash> mHash;
+
+    public:
+        Writer(const QString& d, WriteOptions o, std::optional<QCryptographicHash::Algorithm> a);
+
+        IoOpReport open();
+        IoOpReport write(const QByteArray& d);
+        void close();
+        bool isOpen() const;
+        QString path() const;
+        IoOpReport status() const;
+        QByteArray hash() const;
+    };
+
 //-Class Members------------------------------------------------------------------------------------------------------
 private:
     // Enumeration
@@ -58,6 +78,7 @@ private:
 
     // Errors - Finish
     static inline const QString ERR_TIMEOUT = u"The data transfer failed to start before the timeout was reached."_s;
+    static inline const QString ERR_CHECKSUM_MISMATCH = u"The file's contents did not produce the expected checksum."_s;
 
     // Errors - Messages
     static inline const QString SSL_ERR = u"The following SSL issues occurred while attempting to download %1"_s;
@@ -78,6 +99,7 @@ private:
     bool mOverwrite;
     bool mStopOnError;
     bool mSkipEnumeration;
+    QCryptographicHash::Algorithm mVerificationMethod;
 
     // Status
     Status mStatus;
@@ -89,7 +111,7 @@ private:
     QList<DownloadTask> mPendingEnumerants;
     QList<DownloadTask> mPendingDownloads;
     QHash<QNetworkReply*, DownloadTask> mActiveTasks;
-    QHash<QNetworkReply*, std::shared_ptr<FileStreamWriter>> mActiveWriters;
+    QHash<QNetworkReply*, std::shared_ptr<Writer>> mActiveWriters;
 
     // Progress
     Cumulation<DownloadTask, quint64> mTotalBytes;
@@ -132,6 +154,7 @@ public:
     bool isOverwrite() const;
     bool isStopOnError() const;
     bool isSkipEnumeration() const;
+    QCryptographicHash::Algorithm verificationMethod() const;
     int taskCount() const;
     bool hasTasks() const;
     bool isProcessing() const;
@@ -143,6 +166,7 @@ public:
     void setOverwrite(bool overwrite);
     void setStopOnError(bool stopOnError);
     void setSkipEnumeration(bool skipEnumeration);
+    void setVerificationMethod(QCryptographicHash::Algorithm method);
 
     // Tasks
     void appendTask(const DownloadTask& task);
@@ -206,6 +230,7 @@ public:
     bool isOverwrite() const;
     bool isStopOnError() const;
     bool isSkipEnumeration() const;
+    QCryptographicHash::Algorithm verificationMethod() const;
     int taskCount() const;
     bool hasTasks() const;
     bool isProcessing() const;
@@ -217,6 +242,7 @@ public:
     void setOverwrite(bool overwrite);
     void setStopOnError(bool stopOnError);
     void setSkipEnumeration(bool skipEnumeration);
+    void setVerificationMethod(QCryptographicHash::Algorithm method);
 
     // Tasks
     void appendTask(const DownloadTask& task);
