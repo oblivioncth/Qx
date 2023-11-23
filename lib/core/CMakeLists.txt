@@ -15,6 +15,7 @@ qx_add_component("Core"
         qx-datetime.h
         qx-dsvtable.h
         qx-error.h
+        qx-exclusiveaccess.h
         qx-freeindextracker.h
         qx-genericerror.h
         qx-global.h
@@ -67,6 +68,7 @@ qx_add_component("Core"
     DOC_ONLY
         qx-regularexpression.dox
         qx-bytearray.dox
+        qx-exclusiveaccess.dox
         qx-index.dox
         qx-iostream.dox
         qx-list.dox
