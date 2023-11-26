@@ -2,7 +2,11 @@
 qx_add_component("Core"
     HEADERS_PRIVATE
         qx-json_p.h
+        qx-processbider_p.h
         qx-system_p.h
+        __private/qx-processwaiter.h
+        __private/qx-processwaiter_win.h
+        __private/qx-processwaiter_linux.h
     HEADERS_API
         qx-abstracterror.h
         qx-algorithm.h
@@ -25,6 +29,7 @@ qx_add_component("Core"
         qx-iostream.h
         qx-json.h
         qx-list.h
+        qx-processbider.h
         qx-progressgroup.h
         qx-table.h
         qx-versionnumber.h
@@ -53,6 +58,7 @@ qx_add_component("Core"
         qx-iostream_win.cpp
         qx-json.cpp
         qx-json_p.cpp
+        qx-processbider.cpp
         qx-progressgroup.cpp
         qx-versionnumber.cpp
         qx-string.cpp
@@ -65,6 +71,10 @@ qx_add_component("Core"
         qx-systemerror_linux.cpp
         qx-systemerror_win.cpp
         __private/qx-internalerror.cpp
+        __private/qx-processwaiter.cpp
+        __private/qx-processwaiter.h
+        __private/qx-processwaiter_win.cpp
+        __private/qx-processwaiter_linux.cpp
     DOC_ONLY
         qx-regularexpression.dox
         qx-bytearray.dox
