@@ -14,6 +14,28 @@ namespace Qx
 {
 
 //===============================================================================================================
+// AsyncDownloadManager::Writer
+//===============================================================================================================
+
+AsyncDownloadManager::Writer::Writer(const QString& d, WriteOptions o, std::optional<QCryptographicHash::Algorithm> a) :
+    mFsw(d, WriteMode::Truncate, o),
+    mHash(a ? std::optional<QCryptographicHash>(a.value()) : std::nullopt)
+{}
+
+IoOpReport AsyncDownloadManager::Writer::open() { return mFsw.openFile(); }
+IoOpReport AsyncDownloadManager::Writer::write(const QByteArray& d)
+{
+    if(mHash)
+        mHash.value().addData(d);
+    return mFsw.writeRawData(d);
+}
+void AsyncDownloadManager::Writer::close() { mFsw.closeFile(); }
+bool AsyncDownloadManager::Writer::isOpen() const { return mFsw.fileIsOpen(); }
+QString AsyncDownloadManager::Writer::path() const { return mFsw.filePath(); }
+IoOpReport AsyncDownloadManager::Writer::status() const { return mFsw.status(); }
+QByteArray AsyncDownloadManager::Writer::hash() const { return mHash->result(); }
+
+//===============================================================================================================
 // AsyncDownloadManager
 //===============================================================================================================
 
@@ -38,8 +60,10 @@ namespace Qx
  *  manner using signals and slots.
  *
  *  An asynchronous download manager can process an arbitrary number of download tasks while tracking overall
- *  progress, forwarding events that require user interaction, and optionally controlling the maximum number
- *  of simultaneous downloads.
+ *  progress, forwarding events that require user interaction, and mediating connections.
+ *
+ *  Optional file content verification is available for tasks provided with non-empty checksums, which are compared
+ *  using the algorithm set via setVerificationMethod().
  *
  *  @sa DownloadTask, SyncDownloadManager
  */
@@ -56,6 +80,7 @@ AsyncDownloadManager::AsyncDownloadManager(QObject* parent) :
     mOverwrite(false),
     mStopOnError(false),
     mSkipEnumeration(false),
+    mVerificationMethod(QCryptographicHash::Sha256),
     mStatus(Status::Initial)
 {
     // Configure access manager
@@ -143,14 +168,15 @@ void AsyncDownloadManager::pushDownloadsUntilFinished()
 
 void AsyncDownloadManager::startDownload(DownloadTask task)
 {
-    // Create stream writer
+    // Create writer
     WriteOptions wo = WriteOption::CreatePath;
     if(!mOverwrite)
         wo |= WriteOption::NewOnly;
-    std::shared_ptr<FileStreamWriter> fileWriter = std::make_shared<FileStreamWriter>(task.dest, WriteMode::Truncate, wo);
+    std::optional<QCryptographicHash::Algorithm> ha = !task.checksum.isEmpty() ? std::optional<QCryptographicHash::Algorithm>(mVerificationMethod) : std::nullopt;
+    std::shared_ptr<Writer> writer = std::make_shared<Writer>(task.dest, wo, ha);
 
     // Open file
-    IoOpReport streamOpen = fileWriter->openFile();
+    IoOpReport streamOpen = writer->open();
     if(streamOpen.isFailure())
     {
         forceFinishProgress(task);
@@ -169,7 +195,7 @@ void AsyncDownloadManager::startDownload(DownloadTask task)
     connect(reply, &QNetworkReply::downloadProgress, this, &AsyncDownloadManager::downloadProgressHandler);
 
     // Add to active writers
-    mActiveWriters[reply] = fileWriter;
+    mActiveWriters[reply] = writer;
 
     // Add to active tasks
     mActiveTasks[reply] = task;
@@ -316,6 +342,15 @@ bool AsyncDownloadManager::isStopOnError() const { return mStopOnError; }
 bool AsyncDownloadManager::isSkipEnumeration() const { return mSkipEnumeration; }
 
 /*!
+ *  Returns the hash algorithm used to verify downloads for tasks that include a checksum.
+ *
+ *  The default is QCryptographicHash::Sha256.
+ *
+ *  @sa setVerificationMethod().
+ */
+QCryptographicHash::Algorithm AsyncDownloadManager::verificationMethod() const { return mVerificationMethod; }
+
+/*!
  *  Returns current number of download tasks remaining, which includes pending and active downloads.
  *
  *  @sa hasTasks().
@@ -407,6 +442,13 @@ void AsyncDownloadManager::setStopOnError(bool stopOnError) { mStopOnError = sto
 void AsyncDownloadManager::setSkipEnumeration(bool skipEnumeration) { mSkipEnumeration = skipEnumeration; }
 
 /*!
+ *  Sets the hash algorithm used to verify downloads for tasks that include a checksum.
+ *
+ *  @sa verificationMethod() and DownloadTask::checksum.
+ */
+void AsyncDownloadManager::setVerificationMethod(QCryptographicHash::Algorithm method) { mVerificationMethod = method; }
+
+/*!
  *  Inserts @a task into the download queue.
  *
  *  If the same task is already present in the queue then this function does nothing.
@@ -492,14 +534,14 @@ void AsyncDownloadManager::readyReadHandler()
         qFatal("Pointer conversion to network reply failed");
 
     // Write available data
-    std::shared_ptr<FileStreamWriter> writer = mActiveWriters[senderNetworkReply];
-    IoOpReport wr = writer->writeRawData(senderNetworkReply->readAll());
+    std::shared_ptr<Writer> writer = mActiveWriters[senderNetworkReply];
+    IoOpReport wr = writer->write(senderNetworkReply->readAll());
 
     if(wr.isFailure())
     {
         // Close and delete file, finished handler will use this info to create correct report
-        writer->closeFile();
-        QFile::remove(writer->filePath());
+        writer->close();
+        QFile::remove(writer->path());
 
         if(mStopOnError)
             stopOnError();
@@ -609,18 +651,30 @@ void AsyncDownloadManager::downloadFinishedHandler(QNetworkReply* reply)
     DownloadTask task = mActiveTasks.take(reply);
 
     // Get writer
-    std::shared_ptr<FileStreamWriter> fileWriter = mActiveWriters[reply];
+    std::shared_ptr<Writer> writer = mActiveWriters[reply];
 
     // Handle outcomes
-    if(reply->error() == QNetworkReply::NoError) // Successful download
-        recordFinishedDownload(DownloadOpReport::completedDownload(task));
-    else
+    bool fail = false;
+    if(reply->error() == QNetworkReply::NoError) // Complete download
     {
+        const QString& cs = task.checksum;
+        if(!cs.isEmpty() && cs.compare(writer->hash().toHex(), Qt::CaseInsensitive) != 0)
+        {
+            fail = true;
+            recordFinishedDownload(DownloadOpReport::failedDownload(task, ERR_CHECKSUM_MISMATCH));
+        }
+        else
+            recordFinishedDownload(DownloadOpReport::completedDownload(task));
+    }
+    else // Incomplete download
+    {
+        fail = true;
+
         // Get error info
         QNetworkReply::NetworkError error = reply->error();
         bool abortLike = error == QNetworkReply::OperationCanceledError;
         bool timeout = abortLike && mStatus != Status::StoppingOnError && mStatus != Status::Aborting;
-        bool writeError = abortLike && !fileWriter->fileIsOpen();
+        bool writeError = abortLike && !writer->isOpen();
 
         // Handle this error
         forceFinishProgress(task);
@@ -628,7 +682,7 @@ void AsyncDownloadManager::downloadFinishedHandler(QNetworkReply* reply)
         if(timeout) // Transfer timeout error
             recordFinishedDownload(DownloadOpReport::failedDownload(task, ERR_TIMEOUT));
         else if(writeError) // IO error
-            recordFinishedDownload(DownloadOpReport::failedDownload(task, fileWriter->status().outcomeInfo()));
+            recordFinishedDownload(DownloadOpReport::failedDownload(task, writer->status().outcomeInfo()));
         else if(abortLike) // True abort (by user or StopOnError)
         {
             switch(mStatus)
@@ -645,14 +699,14 @@ void AsyncDownloadManager::downloadFinishedHandler(QNetworkReply* reply)
         }
         else // Other error
             recordFinishedDownload(DownloadOpReport::failedDownload(task, reply->errorString()));
-
-        // Followup if needed
-        if(mStopOnError && mStatus == Status::Downloading)
-            stopOnError();
     }
 
+    // Followup if needed
+    if(fail && mStopOnError && mStatus == Status::Downloading)
+        stopOnError();
+
     // Cleanup writer
-    fileWriter->closeFile();
+    writer->close();
 
     // Remove from active writers
     mActiveWriters.remove(reply);
@@ -683,7 +737,7 @@ void AsyncDownloadManager::processQueue()
         emit downloadProgress(0);
         emit downloadTotalChanged(0);
 
-        if(mSkipEnumeration)
+        if(mSkipEnumeration || taskCount() == 1) // No need to get size for one file
         {
             // Move pending enumerants straight to pending downloads
             mPendingDownloads.swap(mPendingEnumerants);
@@ -852,8 +906,10 @@ void AsyncDownloadManager::abort()
  *  manner.
  *
  *  A synchronous download manager can process an arbitrary number of download tasks while tracking overall
- *  progress, forwarding events that require user interaction, and optionally controlling the maximum number
- *  of simultaneous downloads.
+ *  progress, forwarding events that require user interaction, and and mediating connections.
+ *
+ *  Optional file content verification is available for tasks provided with non-empty checksums, which are compared
+ *  using the algorithm set via setVerificationMethod().
  *
  *  @note This class internally spins its own event loop in order to keep signals & slots processing while still
  *  blocking execution in the thread that contains the manager.
@@ -919,6 +975,11 @@ bool SyncDownloadManager::isStopOnError() const { return mAsyncDm->isStopOnError
 bool SyncDownloadManager::isSkipEnumeration() const { return mAsyncDm->isSkipEnumeration(); }
 
 /*!
+ *  @copydoc AsyncDownloadManager::verificationMethod()
+ */
+QCryptographicHash::Algorithm SyncDownloadManager::verificationMethod() const { return mAsyncDm->verificationMethod(); }
+
+/*!
  *  @copydoc AsyncDownloadManager::taskCount()
  */
 int SyncDownloadManager::taskCount() const { return mAsyncDm->taskCount(); }
@@ -970,6 +1031,11 @@ void SyncDownloadManager::setStopOnError(bool autoAbort) { mAsyncDm->setStopOnEr
  *  @copydoc AsyncDownloadManager::setSkipEnumeration(bool skipEnumeration)
  */
 void SyncDownloadManager::setSkipEnumeration(bool skipEnumeration) { mAsyncDm->setSkipEnumeration(skipEnumeration); }
+
+/*!
+ *  @copydoc AsyncDownloadManager::setVerificationMethod(QCryptographicHash::Algorithm method)
+ */
+void SyncDownloadManager::setVerificationMethod(QCryptographicHash::Algorithm method) { mAsyncDm->setVerificationMethod(method); }
 
 /*!
  *  @copydoc AsyncDownloadManager::appendTask(const DownloadTask& task)

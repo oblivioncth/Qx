@@ -15,7 +15,7 @@ namespace Qx
  *  contained values is always known, and any individual value can be added, removed, or updated through its
  *  corresponding key.
  *
- *  Additionally, a cumulation can have optional scalers applied to its components in order to differently
+ *  Additionally, a cumulation can have optional scalars applied to its components in order to differently
  *  weight their individual effect on the total.
  *
  *  This is generally useful for keeping a running total, but when a previously added value may need to be
@@ -34,12 +34,12 @@ namespace Qx
 //-Class Functions----------------------------------------------------------------------------------------------
 //Public:
 /*!
- *  @fn void Cumulation<K, V>::insert(K component, V value, V scaler = 1)
+ *  @fn void Cumulation<K, V>::insert(K component, V value, V scalar = 1)
  *
- *  Inserts a new component with key @a component, value @a value, and scaler @a scaler.
+ *  Inserts a new component with key @a component, value @a value, and scalar @a scalar.
  *
- *  If there is already a component with the same key, that component's value and scaler are replaced with
- *  @a value and @a scaler respectively.
+ *  If there is already a component with the same key, that component's value and scalar are replaced with
+ *  @a value and @a scalar respectively.
  */
 
 /*!
@@ -48,19 +48,19 @@ namespace Qx
  *  Sets the value of @a component to @a value.
  *
  *  If the cumulation does not contain the specified component it will be added with a value of
- *  @a value and a scaler of 1.
+ *  @a value and a scalar of 1.
  */
 
 /*!
- *  @fn void Cumulation<K, V>::setScaler(K component, V scaler)
+ *  @fn void Cumulation<K, V>::setScalar(K component, V scalar)
  *
- *  Sets the scaler of @a component to @a scaler.
+ *  Sets the scalar of @a component to @a scalar.
  *
  *  The amount that a component contributes to a cumulation's total is its value multiplied
- *  by its scaler.
+ *  by its scalar.
  *
  *  If the cumulation does not contain the specified component it will be added with a value of
- *  0 and a scaler of @a scaler.
+ *  0 and a scalar of @a scalar.
  */
 
 /*!
@@ -69,7 +69,7 @@ namespace Qx
  *  Adds @a amount to the value of @a component.
  *
  *  If the cumulation does not contain the specified component it will be added with a value of
- *  @a amount and a scaler of 1.
+ *  @a amount and a scalar of 1.
  */
 
 /*!
@@ -78,7 +78,7 @@ namespace Qx
 *  Subtracts @a amount from the value of @a component.
 *
 *  If the cumulation does not contain the specified component it will be added with a value of
-*  <em>-amount</em> and a scaler of 1.
+*  <em>-amount</em> and a scalar of 1.
 */
 
 /*!
@@ -87,7 +87,7 @@ namespace Qx
  *  Increments the value of the given @a component and returns the new total.
  *
  *  If the cumulation does not contain the specified component it will be added with a value of
- *  1 and a scaler of 1.
+ *  1 and a scalar of 1.
  */
 
 /*!
@@ -96,7 +96,7 @@ namespace Qx
  *  Decrements the value of the given @a component and returns the new total.
  *
  *  If the cumulation does not contain the specified component it will be added with a value of
- *  -1 and a scaler of 1.
+ *  -1 and a scalar of 1.
  */
 
 /*!

@@ -56,7 +56,7 @@ public:
     void setByteOrder(QDataStream::ByteOrder bo);
     void setFloatingPointPrecision(QDataStream::FloatingPointPrecision precision);
     IoOpReport skipRawData(int len);
-    IoOpReport status() const ;
+    IoOpReport status() const;
 
     template<typename T>
         requires defines_right_shift_for<QDataStream, T&>

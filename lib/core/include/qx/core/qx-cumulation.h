@@ -7,7 +7,7 @@
 // Extra-component Includes
 #include "qx/utility/qx-concepts.h"
 
-/* TODO: An iterator can't be added to this class unless it deferences to a special class like the QJsonValueRef
+/* TODO: An iterator can't be added to this class unless it dereferences to a special class like the QJsonValueRef
  * approach since when the value is modified the running total would need to be changed as well. That or the running
  * total needs to be done away with and the total() method needs to calculate the total each time its called (ehhhh)
  */
@@ -22,7 +22,7 @@ class Cumulation
 //-Instance Variables----------------------------------------------------------------------------------------------
 private:
     QHash<K, V> mComponents;
-    QHash<K, V> mScalers;
+    QHash<K, V> mScalars;
     V mTotal;
 
 //-Constructor----------------------------------------------------------------------------------------------
@@ -47,31 +47,31 @@ private:
         return !mComponents.isEmpty() ? mTotal/mComponents.count() : 0;
     }
 
-    void basicInsert(K component, V value, V scaler)
+    void basicInsert(K component, V value, V scalar)
     {
-        mTotal += value * scaler;
+        mTotal += value * scalar;
         mComponents[component] = value;
-        mScalers[component] = scaler;
+        mScalars[component] = scalar;
     }
 
 public:
-    void insert(K component, V value, V scaler = 1)
+    void insert(K component, V value, V scalar = 1)
     {
         // If replacing an existing value, remove its portion from the running total if its not the same
         if(mComponents.contains(component))
         {
             const V& curVal = mComponents[component];
-            const V& curScal = mScalers[component];
+            const V& curScal = mScalars[component];
 
             // Remove old component portion from running total if different
-            if(curVal != value || curScal != scaler)
+            if(curVal != value || curScal != scalar)
                 mTotal -= curVal * curScal;
             else
                 return;
         }
 
         // Insert/replace
-        basicInsert(component, value, scaler);
+        basicInsert(component, value, scalar);
     }
 
     void setValue(K component, V value)
@@ -81,8 +81,8 @@ public:
             V& curVal = mComponents[component];
             if(value != curVal)
             {
-                const V& scaler = mScalers[component];
-                mTotal += (value * scaler) - (curVal * scaler);
+                const V& scalar = mScalars[component];
+                mTotal += (value * scalar) - (curVal * scalar);
                 curVal = value;
             }
         }
@@ -90,27 +90,27 @@ public:
             basicInsert(component, value, 1);
     }
 
-    void setScaler(K component, V scaler)
+    void setScalar(K component, V scalar)
     {
         if(mComponents.contains(component))
         {
-            V& curScaler = mScalers[component];
-            if(scaler != curScaler)
+            V& curScalar = mScalars[component];
+            if(scalar != curScalar)
             {
                 const V& value = mComponents[component];
-                mTotal += (value * scaler) - (value * curScaler);
-                curScaler = scaler;
+                mTotal += (value * scalar) - (value * curScalar);
+                curScalar = scalar;
             }
         }
         else
-            basicInsert(component, 0, scaler);
+            basicInsert(component, 0, scalar);
     }
 
     void increase(K component, V amount)
     {
         if(mComponents.contains(component))
         {
-            mTotal += amount * mScalers[component];
+            mTotal += amount * mScalars[component];
             mComponents[component] += amount;
         }
         else
@@ -121,7 +121,7 @@ public:
     {
         if(mComponents.contains(component))
         {
-            mTotal -= amount * mScalers[component];
+            mTotal -= amount * mScalars[component];
             mComponents[component] -= amount;
         }
         else
@@ -132,7 +132,7 @@ public:
     {
         if(mComponents.contains(component))
         {
-            mTotal += mScalers[component];
+            mTotal += mScalars[component];
             mComponents[component]++;
         }
         else
@@ -145,7 +145,7 @@ public:
     {
         if(mComponents.contains(component))
         {
-            mTotal -= mScalers[component];
+            mTotal -= mScalars[component];
             mComponents[component]--;
         }
         else
@@ -158,16 +158,16 @@ public:
     {
         if(mComponents.contains(component))
         {
-            mTotal -= (mComponents[component] * mScalers[component]);
+            mTotal -= (mComponents[component] * mScalars[component]);
             mComponents.remove(component);
-            mScalers.remove(component);
+            mScalars.remove(component);
         }
     }
 
     void clear()
     {
         mComponents.clear();
-        mScalers.clear();
+        mScalars.clear();
         mTotal = 0;
     }
 
@@ -182,7 +182,7 @@ public:
 
     bool operator==(const Cumulation& other) const
     {
-        return mComponents == other.mComponents && mScalers == other.mScalers && mTotal == other.mTotal;
+        return mComponents == other.mComponents && mScalars == other.mScalars && mTotal == other.mTotal;
     }
 
     bool operator!=(const Cumulation& other) const  { return !(*this == other); }

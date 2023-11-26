@@ -2,6 +2,9 @@
 #include "qx/io/qx-common-io.h"
 #include "qx-common-io_p.h"
 
+// Qt Includes
+#include <QRegularExpression>
+
 // Intra-component Includes
 #include "qx/io/qx-textstream.h"
 
@@ -202,29 +205,50 @@ IoOpReport fileIsEmpty(bool& returnBuffer, const QFile& file)
 }
 
 /*!
- *  Returns a version of @a fileName with all illegal filename characters removed.
+ *  Returns a version of @a fileName with all illegal filename characters replaced with similar legal characters or
+ *  outright removed.
+ *
+ *  @note The filtration is not platform specific and instead produces a name that is legal on all supported platforms.
  *
  *  @warning It is possible for two very similarly named files to map to the same kosher name if you aren't careful.
  */
 QString kosherizeFileName(QString fileName) // Can return empty name if all characters are invalid
 {
-    // Handle illegal characters
-    fileName.replace('<','{');
-    fileName.replace('>','}');
-    fileName.replace(':','-');
-    fileName.replace('"','`');
-    fileName.replace('/','_');
-    fileName.replace('\\','_');
-    fileName.replace('|',';');
-    fileName.remove('?');
-    fileName.replace('*','#');
+    // Remove unprintable characters and question mark
+    static const QRegularExpression upc(u"[\\x00-\\x1F\\x7F?]"_s); // ? is Windows
+    fileName.remove(upc);
 
-    // Prevent name from ending with .
+    // Handle reserved Windows filenames.
+    static const QStringList wrn{
+        u"CON"_s,
+        u"PRN"_s,
+        u"AUX"_s,
+        u"NUL"_s,
+        u"COM[0-9]?"_s,
+        u"LPT[0-9]?"_s
+    };
+    static const QRegularExpression wr(u"\\b(?:"_s + wrn.join('|') + u")(?:\\..*)?$"_s);
+    if(fileName.contains(wr))
+        fileName.prepend("_");
+
+    //-WINDOWS--------------------
+
+    // Handle swapable illegal characters
+    fileName.replace('<','{'); // Windows
+    fileName.replace('>','}'); // Windows
+    fileName.replace(':','-'); // Windows
+    fileName.replace('"','`'); // Windows
+    fileName.replace('/','_'); // Windows & Linux
+    fileName.replace('\\','_'); // Windows
+    fileName.replace('|',';'); // Windows
+    fileName.replace('*','#'); // Windows
+
+    // Prevent name from ending with . (Windows)
     while(!fileName.isEmpty() && fileName.back() == '.') // Check size to prevent out of bounds ref
         fileName.chop(1);
 
     // Prevent name from starting or ending with space (this isn't disallowed by various filesystem,
-    // but is generally enforced by the OS
+    // but is generally enforced by the OS)
     fileName = fileName.trimmed();
 
     return fileName;
