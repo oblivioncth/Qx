@@ -8,14 +8,14 @@ cmake_minimum_required(VERSION 3.23.0...3.26.0)
 # avoided and only used for hotfixes. DON'T USE TRAILING
 # ZEROS IN VERSIONS
 project(Qx
-    VERSION 0.5.5.1
+    VERSION 0.5.6
     LANGUAGES CXX
     DESCRIPTION "Qt Extensions Library"
 )
 
 # Get helper scripts
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FetchOBCMake.cmake)
-fetch_ob_cmake("928cbafc2036f97cfaeb50cd892209b6e1037b6d")
+fetch_ob_cmake("v0.3.4")
 
 # Initialize project according to standard rules
 include(OB/Project)
