@@ -18,7 +18,7 @@ Packaging
 ----------
 Qx is provided as a CMake package containing several component libraries that roughly follow the scope and grouping of Qt modules, with Core being the primary component.
 
-See the [Components Index](modules.html) for a list of available components (**NOTE**: Some of these are platform dependent).
+See the [Components Index](topics.html) for a list of available components (**NOTE**: Some of these are platform dependent).
 
 When importing the library package with CMake it is recommended to only include the components you need for a particular application in order to minimize the size of your build.
 
