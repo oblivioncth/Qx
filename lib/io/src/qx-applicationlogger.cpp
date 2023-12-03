@@ -253,7 +253,7 @@ IoOpReport ApplicationLogger::openLog()
  *
  *  @sa recordGeneralEvent(), and recordErrorEvent().
  */
-IoOpReport ApplicationLogger::recordVerbatim(QString text)
+IoOpReport ApplicationLogger::recordVerbatim(const QString& text)
 {
     if(!mErrorStatus.isFailure())
         mErrorStatus = mTextStreamWriter.writeLine(text);
@@ -269,7 +269,7 @@ IoOpReport ApplicationLogger::recordVerbatim(QString text)
  *
  *  @sa recordGeneralEvent().
  */
-IoOpReport ApplicationLogger::recordErrorEvent(QString src, Error error)
+IoOpReport ApplicationLogger::recordErrorEvent(const QString& src, const Error& error)
 {
     if(!mErrorStatus.isFailure())
     {
@@ -294,7 +294,7 @@ IoOpReport ApplicationLogger::recordErrorEvent(QString src, Error error)
  *
  *  @sa recordErrorEvent().
  */
-IoOpReport ApplicationLogger::recordGeneralEvent(QString src, QString event)
+IoOpReport ApplicationLogger::recordGeneralEvent(const QString& src, const QString& event)
 {
     if(!mErrorStatus.isFailure())
         mErrorStatus = mTextStreamWriter.writeLine(EVENT_TEMPLATE.arg(QTime::currentTime().toString(), src, event));
