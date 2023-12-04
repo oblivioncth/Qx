@@ -1,6 +1,14 @@
 // Unit Include
 #include "qx/core/qx-abstracterror.h"
 
+/*!
+ *  @file qx-abstracterror.h
+ *  @ingroup qx-core
+ *
+ *  @brief The qx-abstracterror.h header file provides access to the base class from
+ *  which custom error types should be extended for the Error interface.
+ */
+
 namespace Qx
 {
 

@@ -135,11 +135,13 @@ public:
 template<StringLiteral EName, quint16 ECode>
 const bool AbstractError<EName, ECode>::REGISTER = registerType(TYPE_CODE, TYPE_NAME);
 
+/*! @cond */
 namespace AbstractErrorPrivate
 {
     template<Qx::StringLiteral Y, quint16 Z>
     void aeDerived(Qx::AbstractError<Y, Z>&);
 }
+/*! @endcond */
 
 template<class E>
 concept error_type = requires(E type) {
