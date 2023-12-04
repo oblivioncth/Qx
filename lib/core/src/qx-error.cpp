@@ -4,6 +4,13 @@
 // Qt Includes
 #include <QStringBuilder>
 
+/*!
+ *  @file qx-error.h
+ *  @ingroup qx-core
+ *
+ *  @brief The qx-error.h header file provides access to the Error interface.
+ */
+
 namespace Qx
 {
 
@@ -68,8 +75,8 @@ namespace Qx
  *  not derived from AbstractError can be adapted to the Error interface via an Error Adapter.
  *
  *  An error adapter is a specific derivation of AbstractError, in which the class is not move/copy
- *  constructable and is constructable from the type it's designed to adapt (see error_adapter). Each
- *  pair of adapter and adapted type is considered an Error Adaptation (see error_adaptation). and an
+ *  constructable and is constructable from the type it's designed to adapt (see Qx::error_adapter). Each
+ *  pair of adapter and adapted type is considered an Error Adaptation (see Qx::error_adaptation). and an
  *  instance of Error can be constructed from any valid Error Adaptation. Adaptations must be explicitly
  *  registered via the QX_DECLARE_ERROR_ADAPTATION() macro.
  *

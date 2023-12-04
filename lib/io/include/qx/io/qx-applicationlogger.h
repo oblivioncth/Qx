@@ -73,9 +73,9 @@ public:
 
     // Operate
     IoOpReport openLog();
-    IoOpReport recordVerbatim(QString text);
-    IoOpReport recordErrorEvent(QString src, Error error);
-    IoOpReport recordGeneralEvent(QString src, QString event);
+    IoOpReport recordVerbatim(const QString& text);
+    IoOpReport recordErrorEvent(const QString& src, const Error& error);
+    IoOpReport recordGeneralEvent(const QString& src, const QString& event);
     IoOpReport finish(int returnCode);
 
     // Status

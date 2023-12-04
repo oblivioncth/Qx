@@ -254,7 +254,7 @@ QString QJsonParseErrorAdapter::deriveSecondary() const { return OFFSET_STR.arg(
  *  @fn JsonError parseJson(T& parsed, const QString& filePath)
  *
  *  Parses the entire JSON document file at path @a filePath and stores the result in @a parsed.
- *  @a T must satisfy the json_root concept.
+ *  @a T must satisfy the Qx::json_root concept.
  *
  *  If parsing fails, a valid JsonError is returned that describes the cause; otherwise, an invalid
  *  error is returned.
@@ -264,7 +264,7 @@ QString QJsonParseErrorAdapter::deriveSecondary() const { return OFFSET_STR.arg(
  *  @fn JsonError parseJson(T& parsed, QFile& file)
  *
  *  Parses the entire JSON document file @a file and stores the result in @a parsed.
- *  @a T must satisfy the json_root concept.
+ *  @a T must satisfy the Qx::json_root concept.
  *
  *  If parsing fails, a valid JsonError is returned that describes the cause; otherwise, an invalid
  *  error is returned.
@@ -274,7 +274,7 @@ QString QJsonParseErrorAdapter::deriveSecondary() const { return OFFSET_STR.arg(
  *  @fn JsonError parseJson(T& parsed, const QJsonDocument& doc)
  *
  *  Parses the entire JSON document @a doc and stores the result in @a parsed.
- *  @a T must satisfy the json_root concept.
+ *  @a T must satisfy the Qx::json_root concept.
  *
  *  If parsing fails, a valid JsonError is returned that describes the cause; otherwise, an invalid
  *  error is returned.
