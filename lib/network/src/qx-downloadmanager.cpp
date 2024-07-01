@@ -80,6 +80,7 @@ AsyncDownloadManager::AsyncDownloadManager(QObject* parent) :
     mOverwrite(false),
     mStopOnError(false),
     mSkipEnumeration(false),
+    mDeletePartials(false),
     mVerificationMethod(QCryptographicHash::Sha256),
     mStatus(Status::Initial)
 {
@@ -322,7 +323,7 @@ bool AsyncDownloadManager::isStopOnError() const { return mStopOnError; }
 
 /*!
  *  Returns @c true if the manager is configured to query the size of all queued tasks before
- *  actually initiating any downloads; otherwise returns @c false.
+ *  actually initiating any downloads; otherwise, returns @c false.
  *
  *  If enumeration is disabled, total download progress reported by the manager will be limited
  *  in scope to only active and finished downloads, as the size of future download tasks cannot
@@ -340,6 +341,17 @@ bool AsyncDownloadManager::isStopOnError() const { return mStopOnError; }
  *  @sa setSkipEnumeration().
  */
 bool AsyncDownloadManager::isSkipEnumeration() const { return mSkipEnumeration; }
+
+
+/*!
+ *  Returns @c true if the manager is configured to remove any incomplete downloads after they
+ *  fail or are aborted; otherwise, returns @c false.
+ *
+ *  The default is @c false.
+ *
+ *  @sa setDeletePartialDownloads().
+ */
+bool AsyncDownloadManager::isDeletePartialDownloads() const { return mDeletePartials; }
 
 /*!
  *  Returns the hash algorithm used to verify downloads for tasks that include a checksum.
@@ -442,6 +454,14 @@ void AsyncDownloadManager::setStopOnError(bool stopOnError) { mStopOnError = sto
 void AsyncDownloadManager::setSkipEnumeration(bool skipEnumeration) { mSkipEnumeration = skipEnumeration; }
 
 /*!
+ *  Configures the manager to automatically remove incomplete files after a download fails or is aborted if
+ *  @a deletePartialDownloads is @c true; otherwise, partial downloads are kept.
+ *
+ *  @sa isDeletePartialDownloads().
+ */
+void AsyncDownloadManager::setDeletePartialDownloads(bool deletePartialDownloads) { mDeletePartials = deletePartialDownloads; }
+
+/*!
  *  Sets the hash algorithm used to verify downloads for tasks that include a checksum.
  *
  *  @sa verificationMethod() and DownloadTask::checksum.
@@ -539,9 +559,8 @@ void AsyncDownloadManager::readyReadHandler()
 
     if(wr.isFailure())
     {
-        // Close and delete file, finished handler will use this info to create correct report
+        // Close file, finished handler will use this state to create correct report
         writer->close();
-        QFile::remove(writer->path());
 
         if(mStopOnError)
             stopOnError();
@@ -701,18 +720,22 @@ void AsyncDownloadManager::downloadFinishedHandler(QNetworkReply* reply)
             recordFinishedDownload(DownloadOpReport::failedDownload(task, reply->errorString()));
     }
 
-    // Followup if needed
-    if(fail && mStopOnError && mStatus == Status::Downloading)
-        stopOnError();
-
-    // Cleanup writer
+    // Ensure writer is cleaned up
     writer->close();
-
-    // Remove from active writers
     mActiveWriters.remove(reply);
 
     // Mark reply for deletion
     reply->deleteLater();
+
+    // Followup on fail if needed
+    if(fail)
+    {
+        if(mDeletePartials)
+            QFile::remove(writer->path());
+
+        if(mStopOnError && mStatus == Status::Downloading)
+            stopOnError();
+    }
 
     // Proceed on next loop iteration
     QTimer::singleShot(0, this, &AsyncDownloadManager::pushDownloadsUntilFinished);
@@ -975,6 +998,11 @@ bool SyncDownloadManager::isStopOnError() const { return mAsyncDm->isStopOnError
 bool SyncDownloadManager::isSkipEnumeration() const { return mAsyncDm->isSkipEnumeration(); }
 
 /*!
+ *  @copydoc AsyncDownloadManager::isDeletePartialDownloads()
+ */
+bool SyncDownloadManager::isDeletePartialDownloads() const { return mAsyncDm->isDeletePartialDownloads(); }
+
+/*!
  *  @copydoc AsyncDownloadManager::verificationMethod()
  */
 QCryptographicHash::Algorithm SyncDownloadManager::verificationMethod() const { return mAsyncDm->verificationMethod(); }
@@ -1031,6 +1059,11 @@ void SyncDownloadManager::setStopOnError(bool autoAbort) { mAsyncDm->setStopOnEr
  *  @copydoc AsyncDownloadManager::setSkipEnumeration(bool skipEnumeration)
  */
 void SyncDownloadManager::setSkipEnumeration(bool skipEnumeration) { mAsyncDm->setSkipEnumeration(skipEnumeration); }
+
+/*!
+ *  @copydoc AsyncDownloadManager::setDeletePartialDownloads(bool skipEnumeration)
+ */
+void SyncDownloadManager::setDeletePartialDownloads(bool deletePartialDownloads) { mAsyncDm->setDeletePartialDownloads(deletePartialDownloads); }
 
 /*!
  *  @copydoc AsyncDownloadManager::setVerificationMethod(QCryptographicHash::Algorithm method)
