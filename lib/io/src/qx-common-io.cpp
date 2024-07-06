@@ -27,10 +27,26 @@
 namespace Qx
 {
 //-Namespace Enums-----------------------------------------------------------------------------------------------------
+
+/*!
+ *  @enum ReplaceMode
+ *
+ *  This enum is used to describe how filename conflicts should be handled in operations that move/copy files.
+ *
+ *  @var ReplaceMode Replace
+ *  Existing files should be replaced with new files.
+ *
+ *  @var ReplaceMode Skip
+ *  Existing files should be kept.
+ *
+ *  @var ReplaceMode Stop
+ *  Filename conflicts should be considered an error.
+ */
+
 /*!
  *  @enum WriteMode
  *
- *  This enum is used to describe mode with which data is written to a file.
+ *  This enum is used to describe the mode with which data is written to a file.
  *
  *  The exact effects of its values can vary depending on the context in which they are used.
  */
@@ -1393,7 +1409,7 @@ IoOpReport dirContentList(QStringList& returnBuffer, const QDir& directory, QStr
  *  Copies @a directory to @a destination, recursively if @a recursive is @c true. Existing files are overwritten if
  *  @a overwrite is @c true.
  */
-IoOpReport copyDirectory(const QDir& directory, const QDir& destination, bool recursive, bool overwrite)
+IoOpReport copyDirectory(const QDir& directory, const QDir& destination, bool recursive, ReplaceMode replaceMode)
 {
     // Ensure destination exists
     if(!destination.mkpath(u"."_s))
@@ -1417,7 +1433,9 @@ IoOpReport copyDirectory(const QDir& directory, const QDir& destination, bool re
         {
             if(QFile::exists(absDestPath))
             {
-                if(!overwrite)
+                if(replaceMode == ReplaceMode::Skip)
+                    continue;
+                else if(replaceMode == ReplaceMode::Stop)
                     return IoOpReport(IO_OP_WRITE, IO_ERR_EXISTS, QFile(absDestPath));
                 else if(!QFile::remove(absDestPath))
                     return IoOpReport(IO_OP_WRITE, IO_ERR_REMOVE, QFile(absDestPath));
