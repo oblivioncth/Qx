@@ -90,7 +90,7 @@ jobs:
       if: matrix.os == 'ubuntu-22.04'
       run: sudo apt-get install libegl1-mesa-dev
     - name: Checkout Qx
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: ${{ env.qx_src_suffix }}
         fetch-depth: 0 # Required for verbose versioning to work correctly
@@ -121,7 +121,7 @@ jobs:
       if: matrix.lib_linkage == 'static' && matrix.cxx_comp == 'clang++-14' 
       run: echo "doc_artifact_name=${{ env.current_artifact_name }}" >> $GITHUB_OUTPUT
     - name: Upload Qx build artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ env.current_artifact_name }}
         path: ${{ env.qx_install_path }}
