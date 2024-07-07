@@ -60,20 +60,7 @@ QString DownloadManagerReport::derivePrimary() const
 
 QString DownloadManagerReport::deriveSecondary() const { return mDetailsHeading; };
 
-QString DownloadManagerReport::deriveDetails() const
-{
-    if(mDetailsSpecific.isEmpty() && mDetailsGeneral.isEmpty())
-        return QString();
-
-    QString details;
-    details.reserve(mDetailsSpecific.size() && mDetailsGeneral.size() + 2);
-    details.append(mDetailsGeneral);
-    if(!details.isEmpty())
-        details.append(u"\n\n"_s); // +2
-    details.append(mDetailsSpecific);
-
-    return details;
-}
+QString DownloadManagerReport::deriveDetails() const { return details(); }
 
 //Public:
 /*!
@@ -95,6 +82,24 @@ QString DownloadManagerReport::specificDetails() const { return mDetailsSpecific
  * Returns general extended error information, if present.
  */
 QString DownloadManagerReport::generalDetails() const { return mDetailsGeneral; }
+
+/*!
+ * Returns all extended error information, if present.
+ */
+QString DownloadManagerReport::details() const
+{
+    if(mDetailsSpecific.isEmpty() && mDetailsGeneral.isEmpty())
+        return QString();
+
+    QString details;
+    details.reserve(mDetailsSpecific.size() && mDetailsGeneral.size() + 2);
+    details.append(mDetailsGeneral);
+    if(!details.isEmpty())
+        details.append(u"\n\n"_s); // +2
+    details.append(mDetailsSpecific);
+
+    return details;
+}
 
 /*!
  *  Returns @c true if the download manager that generated this report processed its queue successfully;
