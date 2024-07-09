@@ -41,7 +41,7 @@ jobs:
     - name: Install Doxygen
       uses: oblivioncth/actions/general/cache-and-install-doxygen-from-ffynnon@dev
       with:
-        version: 1.9.8
+        version: 1.10.0
         os: windows
         credentials: ${{ secrets.qt_ffynnon_cred }}
     - name: Install Graphviz
