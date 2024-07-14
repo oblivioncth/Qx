@@ -99,6 +99,8 @@ private:
     bool mOverwrite;
     bool mStopOnError;
     bool mSkipEnumeration;
+    bool mDeletePartials;
+    // TODO: May also want to have option for removing ALL files upon any failure, even complete ones
     QCryptographicHash::Algorithm mVerificationMethod;
 
     // Status
@@ -154,6 +156,7 @@ public:
     bool isOverwrite() const;
     bool isStopOnError() const;
     bool isSkipEnumeration() const;
+    bool isDeletePartialDownloads() const;
     QCryptographicHash::Algorithm verificationMethod() const;
     int taskCount() const;
     bool hasTasks() const;
@@ -166,6 +169,7 @@ public:
     void setOverwrite(bool overwrite);
     void setStopOnError(bool stopOnError);
     void setSkipEnumeration(bool skipEnumeration);
+    void setDeletePartialDownloads(bool deletePartialDownloads);
     void setVerificationMethod(QCryptographicHash::Algorithm method);
 
     // Tasks
@@ -230,6 +234,7 @@ public:
     bool isOverwrite() const;
     bool isStopOnError() const;
     bool isSkipEnumeration() const;
+    bool isDeletePartialDownloads() const;
     QCryptographicHash::Algorithm verificationMethod() const;
     int taskCount() const;
     bool hasTasks() const;
@@ -242,6 +247,7 @@ public:
     void setOverwrite(bool overwrite);
     void setStopOnError(bool stopOnError);
     void setSkipEnumeration(bool skipEnumeration);
+    void setDeletePartialDownloads(bool deletePartialDownloads);
     void setVerificationMethod(QCryptographicHash::Algorithm method);
 
     // Tasks

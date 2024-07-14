@@ -83,7 +83,7 @@ jobs:
     - name: Copy docs into actual build
       run: Copy-Item -Path "${{ env.qt_doc_build_dir }}/doc" -Destination "${{ env.qt_doc_install_dir }}/doc" -Recurse
     - name: Upload Qt build artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ env.qt_build_artifact_name }}
         path: ${{ env.qt_install_dir }}

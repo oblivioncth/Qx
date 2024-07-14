@@ -59,6 +59,7 @@ public:
     QString outcomeString() const;
     QString specificDetails() const;
     QString generalDetails() const;
+    QString details() const;
 
     bool wasSuccessful() const;
     QList<DownloadOpReport> taskReports() const;

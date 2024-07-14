@@ -114,6 +114,7 @@ public:
 public:
     bool operator==(const Error& other) const = default;
     bool operator!=(const Error& other) const = default;
+    operator bool() const;
 
 //-Friend Functions------------------------------------------------------------------------------------------------
 friend QTextStream& ::operator<<(QTextStream& ts, const Error& e);

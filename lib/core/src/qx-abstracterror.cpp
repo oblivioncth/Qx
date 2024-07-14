@@ -216,6 +216,13 @@ QString IError::deriveDetails() const { return QString(); }
  *  Returns @c true if this error is not the same as @a other; otherwise, returns false.
  */
 
+/*!
+ *  @fn AbstractError::operator bool() const;
+ *
+ *  A convenience operator to check if the error is valid. Produces @c true if
+ *  the value of the error is greater than @c 0; otherwise, produces @c false.
+ */
+
 //-Namespace Concepts--------------------------------------------------------------------------------------------------------
 /*!
  *  @concept error_type

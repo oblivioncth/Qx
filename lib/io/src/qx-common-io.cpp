@@ -27,10 +27,26 @@
 namespace Qx
 {
 //-Namespace Enums-----------------------------------------------------------------------------------------------------
+
+/*!
+ *  @enum ReplaceMode
+ *
+ *  This enum is used to describe how filename conflicts should be handled in operations that move/copy files.
+ *
+ *  @var ReplaceMode Replace
+ *  Existing files should be replaced with new files.
+ *
+ *  @var ReplaceMode Skip
+ *  Existing files should be kept.
+ *
+ *  @var ReplaceMode Stop
+ *  Filename conflicts should be considered an error.
+ */
+
 /*!
  *  @enum WriteMode
  *
- *  This enum is used to describe mode with which data is written to a file.
+ *  This enum is used to describe the mode with which data is written to a file.
  *
  *  The exact effects of its values can vary depending on the context in which they are used.
  */
@@ -1270,7 +1286,7 @@ IoOpReport deleteTextFromFile(QFile& textFile, TextPos startPos, TextPos endPos)
  *
  *  @warning This also returns false if the directory doesn't exist.
  */
-bool dirContainsFiles(QDir directory, QDirIterator::IteratorFlags iteratorFlags)
+bool dirContainsFiles(const QDir& directory, QDirIterator::IteratorFlags iteratorFlags)
 {
     // Construct directory iterator
     QDirIterator listIterator(directory.path(), QDir::Files | QDir::NoDotAndDotDot, iteratorFlags);
@@ -1285,7 +1301,7 @@ bool dirContainsFiles(QDir directory, QDirIterator::IteratorFlags iteratorFlags)
  *  If the directory doesn't exist, @a returnBuffer will be set to false and an operation report noting the directory's absence
  *  is returned.
  */
-IoOpReport dirContainsFiles(bool& returnBuffer, QDir directory, QDirIterator::IteratorFlags iteratorFlags)
+IoOpReport dirContainsFiles(bool& returnBuffer, const QDir& directory, QDirIterator::IteratorFlags iteratorFlags)
 {
     // Assume false
     returnBuffer = false;
@@ -1314,7 +1330,7 @@ IoOpReport dirContainsFiles(bool& returnBuffer, QDir directory, QDirIterator::It
  *
  *  @sa QDir::entryInfoList
  */
-IoOpReport dirContentInfoList(QFileInfoList& returnBuffer, QDir directory, QStringList nameFilters,
+IoOpReport dirContentInfoList(QFileInfoList& returnBuffer, const QDir& directory, QStringList nameFilters,
                               QDir::Filters filters, QDirIterator::IteratorFlags flags)
 {
     // Empty buffer
@@ -1358,7 +1374,7 @@ IoOpReport dirContentInfoList(QFileInfoList& returnBuffer, QDir directory, QStri
  *
  *  @sa QDir::entryList
  */
-IoOpReport dirContentList(QStringList& returnBuffer, QDir directory, QStringList nameFilters,
+IoOpReport dirContentList(QStringList& returnBuffer, const QDir& directory, QStringList nameFilters,
                           QDir::Filters filters, QDirIterator::IteratorFlags flags, PathType pathType)
 {
     // Empty buffer
@@ -1387,6 +1403,50 @@ IoOpReport dirContentList(QStringList& returnBuffer, QDir directory, QStringList
     }
 
     return IoOpReport(IO_OP_ENUMERATE, IO_SUCCESS, directory);
+}
+
+/*!
+ *  Copies @a directory to @a destination, recursively if @a recursive is @c true. Existing files are overwritten if
+ *  @a overwrite is @c true.
+ */
+IoOpReport copyDirectory(const QDir& directory, const QDir& destination, bool recursive, ReplaceMode replaceMode)
+{
+    // Ensure destination exists
+    if(!destination.mkpath(u"."_s))
+        return IoOpReport(IO_OP_WRITE, IO_ERR_CANT_CREATE, destination);
+
+    QDirIterator srcItr(directory.path(), QDir::NoDotAndDotDot | QDir::Files | QDir::Dirs, recursive ? QDirIterator::Subdirectories : QDirIterator::NoIteratorFlags);
+    while(srcItr.hasNext())
+    {
+        srcItr.next();
+        QFileInfo fi = srcItr.fileInfo();
+
+        QString subPath = fi.absoluteFilePath().mid(directory.absolutePath().length() + 1); // Drop last '/'
+        QString absDestPath = destination.absoluteFilePath(subPath);
+
+        if(fi.isDir())
+        {
+            if(!destination.mkpath(subPath))
+                return IoOpReport(IO_OP_WRITE, IO_ERR_CANT_CREATE, QDir(absDestPath));
+        }
+        else if(fi.isFile())
+        {
+            if(QFile::exists(absDestPath))
+            {
+                if(replaceMode == ReplaceMode::Skip)
+                    continue;
+                else if(replaceMode == ReplaceMode::Stop)
+                    return IoOpReport(IO_OP_WRITE, IO_ERR_EXISTS, QFile(absDestPath));
+                else if(!QFile::remove(absDestPath))
+                    return IoOpReport(IO_OP_WRITE, IO_ERR_REMOVE, QFile(absDestPath));
+            }
+
+            if(!QFile::copy(fi.absoluteFilePath(), absDestPath))
+                return IoOpReport(IO_OP_WRITE, IO_ERR_COPY, QFile(absDestPath));
+        }
+    }
+
+    return IoOpReport(IO_OP_WRITE, IO_SUCCESS, destination);
 }
 
 /*!

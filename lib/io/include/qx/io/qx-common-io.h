@@ -23,6 +23,7 @@
 namespace Qx
 {
 //-Namespace Enums-----------------------------------------------------------------------------------------------------
+enum ReplaceMode {Replace, Skip, Stop};
 enum WriteMode {Insert, Overwrite, Append, Truncate};
 
 enum WriteOption {
@@ -71,12 +72,13 @@ QX_IO_EXPORT IoOpReport writeStringToFile(QSaveFile& textFile, const QString& te
 QX_IO_EXPORT IoOpReport deleteTextFromFile(QFile& textFile, TextPos startPos, TextPos endPos);
 
 // Directory:
-QX_IO_EXPORT bool dirContainsFiles(QDir directory, QDirIterator::IteratorFlags iteratorFlags);
-QX_IO_EXPORT IoOpReport dirContainsFiles(bool& returnBuffer, QDir directory, QDirIterator::IteratorFlags iteratorFlags);
-QX_IO_EXPORT IoOpReport dirContentInfoList(QFileInfoList& returnBuffer, QDir directory, QStringList nameFilters = QStringList(),
+QX_IO_EXPORT bool dirContainsFiles(const QDir& directory, QDirIterator::IteratorFlags iteratorFlags);
+QX_IO_EXPORT IoOpReport dirContainsFiles(bool& returnBuffer, const QDir& directory, QDirIterator::IteratorFlags iteratorFlags);
+QX_IO_EXPORT IoOpReport dirContentInfoList(QFileInfoList& returnBuffer, const QDir& directory, QStringList nameFilters = QStringList(),
                                            QDir::Filters filters = QDir::NoFilter, QDirIterator::IteratorFlags flags = QDirIterator::NoIteratorFlags);
-QX_IO_EXPORT IoOpReport dirContentList(QStringList& returnBuffer, QDir directory, QStringList nameFilters = QStringList(),
+QX_IO_EXPORT IoOpReport dirContentList(QStringList& returnBuffer, const QDir& directory, QStringList nameFilters = QStringList(),
                                        QDir::Filters filters = QDir::NoFilter, QDirIterator::IteratorFlags flags = QDirIterator::NoIteratorFlags, PathType pathType = Absolute);
+QX_IO_EXPORT IoOpReport copyDirectory(const QDir& directory, const QDir& destination, bool recursive = true, ReplaceMode replaceMode = Stop);
 
 // Integrity
 QX_IO_EXPORT IoOpReport calculateFileChecksum(QString& returnBuffer, QFile& file, QCryptographicHash::Algorithm hashAlgorithm);
