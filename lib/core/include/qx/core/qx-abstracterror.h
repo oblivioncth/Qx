@@ -105,6 +105,7 @@ private:
 public:
     bool operator==(const AbstractError& other) const = default;
     bool operator!=(const AbstractError& other) const = default;
+    operator bool() const { return deriveValue() > 0; };
 };
 
 /* TODO: Get string of the type automatically when it becomes
