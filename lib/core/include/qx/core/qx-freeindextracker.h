@@ -57,8 +57,10 @@ public:
     std::optional<quint64> reserveNextFree(quint64 index);
     std::optional<quint64> reservePreviousFree(quint64 index);
     std::optional<quint64> reserveNearestFree(quint64 index);
+    bool reserveAll();
 
     bool release(quint64 index);
+    bool releaseAll();
 };
 
 }
