@@ -1,7 +1,5 @@
 #================= Add Component ==========================
 qx_add_component("Io"
-    HEADERS_PRIVATE
-        qx-common-io_p.h
     HEADERS_API
         qx-applicationlogger.h
         qx-common-io.h
@@ -16,6 +14,7 @@ qx_add_component("Io"
     IMPLEMENTATION
         qx-applicationlogger.cpp
         qx-common-io.cpp
+        qx-common-io_p.h
         qx-common-io_p.cpp
         qx-filestreamreader.cpp
         qx-filestreamwriter.cpp

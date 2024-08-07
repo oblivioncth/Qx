@@ -1,7 +1,5 @@
 #================= Add Component ==========================
-qx_add_component("Widgets"
-    HEADERS_PRIVATE
-        qx-common-widgets_p.h
+qx_add_component("Widgets"  
     HEADERS_API
         qx-common-widgets.h
         qx-logindialog.h
@@ -9,6 +7,7 @@ qx_add_component("Widgets"
         qx-treeinputdialog.h
     IMPLEMENTATION
         qx-common-widgets.cpp
+        qx-common-widgets_p.h
         qx-common-widgets_p.cpp
         qx-logindialog.cpp
         qx-standarditemmodel.cpp
