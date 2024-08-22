@@ -21,9 +21,6 @@
 #include "qx/utility/qx-macros.h"
 #include "qx/utility/qx-concepts.h"
 
-// TODO: Improve JsonError to allow for more context, i.e. the error
-// can note the full "path" in the JSON tree where the error occurred
-
 //-Macros------------------------------------------------------------------
 /*! @cond */
 #define __QX_JSON_META_STRUCT_INSIDE(meta_tuple) \
@@ -627,7 +624,7 @@ JsonError parseJson(T& parsed, const QJsonArray& array)
     // Use QJsonValue for semi-type erasure
     QJsonValue arrayAsValue(array);
 
-    return QxJson::Converter<T>::fromJson(parsed, array);
+    return QxJson::Converter<T>::fromJson(parsed, arrayAsValue);
 }
 
 template<typename T>
