@@ -1,3 +1,4 @@
 add_subdirectory(qx_array)
 add_subdirectory(qx_freeindextracker)
 add_subdirectory(qx_integrity)
+add_subdirectory(qx_json)
