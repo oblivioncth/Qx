@@ -1,0 +1,15 @@
+name: Generate Release
+on:
+  workflow_run:
+    workflows: Build Project
+    types: completed
+    branches: master
+    
+jobs:
+  generate_release:
+    name: Generate Release
+    if: github.event.workflow_run.conclusion == 'success'
+    uses: oblivioncth/actions/.github/workflows/generate-cxx-release.yml@feature/upgrades
+    with:
+        artifacts_run_id: ${{ github.event.workflow_run.id }}
+        

@@ -1,4 +1,4 @@
-name: Master pull-request checks
+name: Check Release PR When Opened
 on:
   pull_request:
     types: [opened, synchronize, reopened]
@@ -6,7 +6,7 @@ on:
 
 jobs:
   check-pr-correctness:
-    name: Master PR correctness check
+    name: Release PR correctness check
     runs-on: windows-latest
     steps:
     - name: Ensure higher version

@@ -1,4 +1,4 @@
-name: Pull-request auto-labeler
+name: Label PR When Opened
 on:
   pull_request:
     types: [opened]
