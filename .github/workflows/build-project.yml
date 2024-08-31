@@ -15,5 +15,5 @@ jobs:
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     uses: oblivioncth/actions/.github/workflows/build-cxx-project.yml@feature/upgrades
     secrets:
-      ffynnon_cred: ${{ secrets.OBYBOT_FFYNNON_CREDS }}
+      ffynnon_access: ${{ secrets.OBYBOT_FFYNNON_ACCESS }}
   
