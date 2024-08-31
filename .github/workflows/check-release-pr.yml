@@ -1,4 +1,4 @@
-name: Check Release PR When Opened
+name: Check Release PR
 on:
   pull_request:
     types: [opened, synchronize, reopened]

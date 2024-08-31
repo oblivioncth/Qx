@@ -7,7 +7,10 @@ on:
   workflow_run:
     workflows: Tag and Sync
     types: completed
-    branches: master
+    branches: dev
+    # This is the branch that the original workflow ran on, which is technically dev, due to how
+    # the "pull_request" trigger works (it works off master correctly for a merged PR but is triggered
+    # by dev
 
 jobs:
   trigger-build:

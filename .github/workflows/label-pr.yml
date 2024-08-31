@@ -1,12 +1,12 @@
-name: Label PR When Opened
+name: Label PR
 on:
-  pull_request:
-    types: [opened]
+  pull_request_target:
+    types: [opened, synchronize, reopened]
     
 jobs:
-  label_pr:
+  label-pr:
     name: Label pull-request
-    runs-on: ubuntu-latest
-    steps:
-      - name: Label via convention
-        uses: oblivioncth/actions/pull-request/label-pr-conventionally@dev
+    permissions:
+      contents: read
+      pull-requests: write
+    uses: oblivioncth/actions/.github/workflows/label-pr.yml@feature/upgrades

@@ -6,7 +6,9 @@ on:
     - 'master'
     
 jobs:
-  tag_master_and_sync_dev:
+  tag-master-and-sync-dev:
     name: Tag master merge commit, FF back to dev
     if: github.event.pull_request.merged == true
+    permissions:
+      contents: write
     uses: oblivioncth/actions/.github/workflows/tag-main-and-sync-dev.yml@feature/upgrades
