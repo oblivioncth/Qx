@@ -16,7 +16,6 @@ jobs:
   trigger-build:
     name: Build Project
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
-    uses: oblivioncth/actions/.github/workflows/build-cxx-project.yml@feature/upgrades
+    uses: oblivioncth/actions/.github/workflows/build-cxx-project.yml@v1
     secrets:
       ffynnon_access: ${{ secrets.OBYBOT_FFYNNON_ACCESS }}
-  

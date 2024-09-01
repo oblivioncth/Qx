@@ -11,4 +11,4 @@ jobs:
     if: github.event.pull_request.merged == true
     permissions:
       contents: write
-    uses: oblivioncth/actions/.github/workflows/tag-main-and-sync-dev.yml@feature/upgrades
+    uses: oblivioncth/actions/.github/workflows/tag-main-and-sync-dev.yml@v1

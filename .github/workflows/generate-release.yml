@@ -9,11 +9,11 @@ jobs:
   generate-release:
     name: Generate Release
     permissions:
+      actions: read
       contents: write
       pages: write
       id-token: write
     if: github.event.workflow_run.conclusion == 'success'
-    uses: oblivioncth/actions/.github/workflows/generate-cxx-release.yml@feature/upgrades
+    uses: oblivioncth/actions/.github/workflows/generate-cxx-release.yml@v1
     with:
         artifacts_run_id: ${{ github.event.workflow_run.id }}
-        

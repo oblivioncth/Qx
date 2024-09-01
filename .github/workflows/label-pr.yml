@@ -9,4 +9,4 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-    uses: oblivioncth/actions/.github/workflows/label-pr.yml@feature/upgrades
+    uses: oblivioncth/actions/.github/workflows/label-pr.yml@v1

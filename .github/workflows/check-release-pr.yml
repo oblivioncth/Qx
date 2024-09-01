@@ -6,8 +6,5 @@ on:
 
 jobs:
   check-pr-correctness:
-    name: Release PR correctness check
-    runs-on: windows-latest
-    steps:
-    - name: Ensure higher version
-      uses: oblivioncth/actions/cmake/ensure-project-version-gt-tag@dev
+    name: Release PR Correctness Check
+    uses: oblivioncth/actions/.github/workflows/validate-release-pr.yml@v1
