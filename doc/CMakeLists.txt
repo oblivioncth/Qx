@@ -9,10 +9,6 @@ foreach(component ${LIB_COMPONENTS})
 endforeach()
 
 # Set project specific doxygen overrides
-set(DOXYGEN_HTML_COLORSTYLE_HUE 0)
-set(DOXYGEN_HTML_COLORSTYLE_SAT 255)
-set(DOXYGEN_HTML_COLORSTYLE_GAMMA 80)
-
 set(DOXYGEN_PREDEFINED
     "QX_ERROR_TYPE(Type,Name,Code)=Type final : public Qx::AbstractError<Name, Code>"
     "__QX_JSON_META_STRUCT="
@@ -37,4 +33,7 @@ ob_standard_documentation(${DOC_TARGET_NAME}
         ${COMPONENT_DOC_ROOTS}
     INPUT_LIST
         ${COMPONENT_DOC_INPUT}
+    THEME_COLORS
+        PRIMARY "#CC2828"
+        NIGHT_PRIMARY "#E22D2D"
 )
