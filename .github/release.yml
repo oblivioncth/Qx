@@ -1,7 +1,7 @@
 changelog:
   exclude:
     labels:
-      - release-pr
+      - release
   categories:
     - title: Breaking Changes
       labels:
@@ -12,6 +12,9 @@ changelog:
     - title: Bug Fixes
       labels:
         - bug
+    - title: Implementation Improvements
+      labels:
+        - implementation
     - title: Other Changes
       labels:
         - "*"
