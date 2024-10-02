@@ -1,12 +1,5 @@
 #================= Add Component ==========================
-qx_add_component("Core"
-    HEADERS_PRIVATE
-        qx-json_p.h
-        qx-processbider_p.h
-        qx-system_p.h
-        __private/qx-processwaiter.h
-        __private/qx-processwaiter_win.h
-        __private/qx-processwaiter_linux.h
+qx_add_component("Core"     
     HEADERS_API
         qx-abstracterror.h
         qx-algorithm.h
@@ -57,23 +50,28 @@ qx_add_component("Core"
         qx-iostream_linux.cpp
         qx-iostream_win.cpp
         qx-json.cpp
+        qx-json_p.h
         qx-json_p.cpp
         qx-processbider.cpp
+        qx-processbider_p.h
         qx-progressgroup.cpp
         qx-versionnumber.cpp
         qx-string.cpp
         qx-system.cpp
         qx-system_linux.cpp
         qx-system_win.cpp
+        qx-system_p.h
         qx-system_p_win.cpp
         qx-system_p_linux.cpp
         qx-systemerror.cpp
         qx-systemerror_linux.cpp
         qx-systemerror_win.cpp
         __private/qx-internalerror.cpp
-        __private/qx-processwaiter.cpp
         __private/qx-processwaiter.h
+        __private/qx-processwaiter.cpp
+        __private/qx-processwaiter_win.h
         __private/qx-processwaiter_win.cpp
+        __private/qx-processwaiter_linux.h
         __private/qx-processwaiter_linux.cpp
     DOC_ONLY
         qx-regularexpression.dox
@@ -89,6 +87,6 @@ qx_add_component("Core"
         qx-table.dox
     LINKS
         PUBLIC
-            Qt6::Core
+            ${Qt}::Core
             Qx::Utility
 )

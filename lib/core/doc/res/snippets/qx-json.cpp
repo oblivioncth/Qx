@@ -41,10 +41,23 @@ int main()
     // Parse into custom structures
     Qx::JsonError je = Qx::parseJson(myJsonDoc, jsonFile);
     Q_ASSERT(!je.isValid());
+    
+    ...
 }
 //! [1]
 
 //! [2]
+int main()
+{
+    ...
+    
+    // Serialize to JSON
+    je = Qx::serializeJson(jsonFile, myJsonDoc);
+    Q_ASSERT(!je.isValid());
+}
+//! [2]
+
+//! [3]
 struct MyStruct
 {
     int number;
@@ -52,9 +65,9 @@ struct MyStruct
     
     QX_JSON_STRUCT(number, name);
 }
-//! [2]
-
 //! [3]
+
+//! [4]
 struct MyStruct
 {
     int number;
@@ -65,9 +78,9 @@ struct MyStruct
         QX_JSON_MEMBER_ALIASED(name, "aliasName")
     );
 }
-//! [3]
-
 //! [4]
+
+//! [5]
 struct MyStruct
 {
     int number;
@@ -76,9 +89,9 @@ struct MyStruct
 
 // At global scope
 QX_JSON_STRUCT_OUTSIDE(number, name);
-//! [4]
-
 //! [5]
+
+//! [6]
 struct MySpecialStruct
 {
     int number;
@@ -90,13 +103,20 @@ struct MySpecialStruct
 QX_JSON_MEMBER_OVERRIDE(MySpecialStruct, name,
     static Qx::JsonError fromJson(QString& member, const QJsonValue& jv)
     {
-        member = "OverridenName";
+        // Add prefix when parsing
+        member = "Prefix" + jv.toString();
         return Qx::JsonError();
     }
+    
+    static QString toJson(const QString& member)
+    {
+        // Remove prefix when serializing
+        return QString(member).remove("Prefix");
+    }
 )
-//! [5]
-
 //! [6]
+
+//! [7]
 QJsonArray ja;
 // Somehow populate array...
 
@@ -106,9 +126,9 @@ for(int i = 0; i < ja.size(); ++i)
     if(Qx::JsonError je = parseMyElement(ja[i]); je.isValid())
         return je.withContext(QxJson::Array()).withContext(QxJson::ArrayElement(i));
 }
-//! [6]
-
 //! [7]
+
+//! [8]
 class MyType
 {
     ...
@@ -127,11 +147,17 @@ namespace QxJson
             // Return an invalid JsonError upon success, or a valid one if an error occurs
             return Qx::JsonError();
         }
+        
+        static QJsonObject toJson(const MyType& value)
+        {
+            // Use value to return a valid JSON type (i.e. qjson_type concept)
+            return objFromMyType(value);
+        }
     };
 }
-//! [7]
-
 //! [8]
+
+//! [9]
 struct MyStruct
 {
     int number;
@@ -160,4 +186,4 @@ struct OtherStruct
     
     QX_JSON_STRUCT(enabled, myStructs);
 };
-//! [8]
+//! [9]

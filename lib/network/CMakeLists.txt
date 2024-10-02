@@ -14,8 +14,8 @@ qx_add_component("Network"
         qx-downloadtask.cpp
     LINKS
         PUBLIC
-            Qt6::Core
-            Qt6::Network
+            ${Qt}::Core
+            ${Qt}::Network
             Qx::Core
             Qx::Io
 )

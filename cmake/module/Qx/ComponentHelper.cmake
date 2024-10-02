@@ -73,7 +73,6 @@ function(qx_add_component COMPONENT_NAME)
     )
 
     set(multiValueArgs
-        HEADERS_PRIVATE
         HEADERS_API
         IMPLEMENTATION
         DOC_ONLY
@@ -136,8 +135,6 @@ function(qx_add_component COMPONENT_NAME)
         TYPE "${COMPONENT_TYPE}"
         EXPORT_HEADER
             PATH "${PROJECT_NAMESPACE_LC}/${COMPONENT_NAME_LC}/${PROJECT_NAMESPACE_LC}_${COMPONENT_NAME_LC}_export.h"
-        HEADERS_PRIVATE
-            ${COMPONENT_HEADERS_PRIVATE}
         HEADERS_API
             COMMON "${PROJECT_NAMESPACE_LC}/${COMPONENT_NAME_LC}"
             FILES ${COMPONENT_HEADERS_API}

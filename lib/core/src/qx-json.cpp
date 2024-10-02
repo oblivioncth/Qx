@@ -8,6 +8,13 @@
 #include <QJsonValue>
 #include <QJsonDocument>
 
+/* TODO: If possible in an elegant manner, split up the concepts for parseable vs serializable
+ * so that a type doesn't have to have Converter<T> functions for both in order to do just one
+ * of them.
+ */
+
+// TODO: Allow use of more containers, namely those from std
+
 /*!
  *  @file qx-json.h
  *  @ingroup qx-core
@@ -15,13 +22,16 @@
  *  @brief The qx-json header file provides various utilities for JSON data manipulation.
  *
  *  The mechanisms of this file introduce a highly flexible, simple to use, declarative
- *  mechanism for parsing JSON data into user structs and other types.
+ *  mechanism for parsing/serializing JSON data into user structs and other types.
  *
  *  For example, the following JSON data:
  *  @snippet qx-json.cpp 0
  *
  *  can easily be parsed into a corresponding set of C++ data structures like so:
  *  @snippet qx-json.cpp 1
+ *
+ *  Likewise, the structure can be serialized back out into textual JSON data with:
+ *  @snippet qx-json.cpp 2
  *
  *  @sa QX_JSON_STRUCT(), and QxJson.
  */
@@ -49,11 +59,11 @@
  *  @def QX_JSON_STRUCT()
  *
  *  Specifies that a struct is a JSON-tied struct, which enables support for automatic
- *  parsing of a corresponding JSON object.
+ *  parsing/serializing of a corresponding JSON object.
  *
  *  The name of each included member must match the name their corresponding JSON key.
  *
- *  @snippet qx-json.cpp 2
+ *  @snippet qx-json.cpp 3
  *
  *  @sa QX_JSON_STRUCT_OUTSIDE() and QX_JSON_STRUCT_X()
  */
@@ -65,7 +75,7 @@
  *
  *  Each member must be wrapped in QX_JSON_MEMBER() or QX_JSON_MEMBER_ALIASED().
  *
- *  @snippet qx-json.cpp 3
+ *  @snippet qx-json.cpp 4
  */
 
 /*!
@@ -73,7 +83,7 @@
  *
  *  Same as QX_JSON_STRUCT(), but is used outside of a struct instead of inside.
  *
- *  @snippet qx-json.cpp 4
+ *  @snippet qx-json.cpp 5
  *
  *  This is useful for hiding the JSON parsing implementation details of a public
  *  struct within a different source file.
@@ -93,13 +103,13 @@
 /*!
  *  @def QX_JSON_MEMBER_OVERRIDE()
  *
- *  Used to define a member/key specific value parsing override for a JSON-tried struct.
- *  The specified member will be parsed using the provided function instead of a
- *  potentially available generic one for that type.
+ *  Used to define a member/key specific value parsing/serialzing override for a
+ *  JSON-tried struct. The specified member will be proccessed using the provided
+ *  functions instead of potentially available generic ones for that type.
  *
  *  Must be used in namespace scope, outside of the struct definition.
  *
- *  @snippet qx-json.cpp 5
+ *  @snippet qx-json.cpp 6
  */
 
 namespace Qx
@@ -126,6 +136,24 @@ namespace Qx
  *
  *  @var JsonError::Form JsonError::MissingKey
  *  An expected key was missing.
+ *
+ *  @var JsonError::Form JsonError::TypeMismatch
+ *  A JSON value was not of the expected type.
+ *
+ *  @var JsonError::Form JsonError::EmptyDoc
+ *  The provided JSON document is empty.
+ *
+ *  @var JsonError::Form JsonError::MissingFile
+ *  The JSON containing file was not found.
+ *
+ *  @var JsonError::Form JsonError::InaccessibleFile
+ *  The JSON containing file could not be opened.
+ *
+ *  @var JsonError::Form JsonError::FileReadError
+ *  The JSON containing file could not be read.
+ *
+ *  @var JsonError::Form JsonError::FileWriteError
+ *  The JSON containing file.
  */
 
 //-Constructor-----------------------------------------------------------------
@@ -194,7 +222,7 @@ QList<QxJson::ContextNode> JsonError::context() const { return mContext; }
  *  the context of where an error occurred up the call stack. For example, one might
  *  return information about a JSON array related error like so:
  *
- *  @snippet qx-json.cpp 6
+ *  @snippet qx-json.cpp 7
  */
 JsonError& JsonError::withContext(const QxJson::ContextNode& node)
 {
@@ -251,41 +279,19 @@ QString QJsonParseErrorAdapter::deriveSecondary() const { return OFFSET_STR.arg(
 //-Functions---------------------------------------------------------------------------------------------
 //Public:
 /*!
- *  @fn JsonError parseJson(T& parsed, const QString& filePath)
- *
- *  Parses the entire JSON document file at path @a filePath and stores the result in @a parsed.
- *  @a T must satisfy the Qx::json_root concept.
- *
- *  If parsing fails, a valid JsonError is returned that describes the cause; otherwise, an invalid
- *  error is returned.
- */
-
-/*!
- *  @fn JsonError parseJson(T& parsed, QFile& file)
- *
- *  Parses the entire JSON document file @a file and stores the result in @a parsed.
- *  @a T must satisfy the Qx::json_root concept.
- *
- *  If parsing fails, a valid JsonError is returned that describes the cause; otherwise, an invalid
- *  error is returned.
- */
-
-/*!
- *  @fn JsonError parseJson(T& parsed, const QJsonDocument& doc)
- *
- *  Parses the entire JSON document @a doc and stores the result in @a parsed.
- *  @a T must satisfy the Qx::json_root concept.
- *
- *  If parsing fails, a valid JsonError is returned that describes the cause; otherwise, an invalid
- *  error is returned.
- */
-
-/*!
  *  @fn JsonError parseJson(T& parsed, const QJsonObject& obj)
  *
- *  @overload
- *
  *  Parses the JSON object @a obj and stores the result in @a parsed.
+ *  @a T must satisfy the QxJson::json_struct concept.
+ *
+ *  If parsing fails, a valid JsonError is returned that describes the cause; otherwise, an invalid
+ *  error is returned.
+ */
+
+/*!
+ *  @fn void serializeJson(QJsonObject& serialized, const T& struc)
+ *
+ *  Serializes the struct @a struc and stores the result in @a serialized.
  *  @a T must satisfy the QxJson::json_struct concept.
  */
 
@@ -296,6 +302,79 @@ QString QJsonParseErrorAdapter::deriveSecondary() const { return OFFSET_STR.arg(
  *
  *  Parses the JSON array @a array and stores the result in @a parsed.
  *  @a T must satisfy the QxJson::json_containing concept.
+ */
+
+/*!
+ *  @fn void serializeJson(QJsonArray& serialized, const T& container)
+ *
+ *  @overload
+ *
+ *  Serializes the container @a container and stores the result in @a serialized.
+ *  @a T must satisfy the QxJson::json_containing concept.
+ */
+
+/*!
+ *  @fn JsonError parseJson(T& parsed, const QJsonDocument& doc)
+ *
+ *  @overload
+ *
+ *  Parses the entire JSON document @a doc and stores the result in @a parsed.
+ *  @a T must satisfy the Qx::json_root concept.
+ */
+
+/*!
+ *  @fn void serializeJson(QJsonDocument& serialized, const T& root)
+ *
+ *  @overload
+ *
+ *  Serializing the entire JSON root structure @a root and stores the result in @a serialized.
+ *  @a T must satisfy the Qx::json_root concept.
+ */
+
+/*!
+ *  @fn JsonError parseJson(T& parsed, QFile& file)
+ *
+ *  @overload
+ *
+ *  Parses the entire JSON document file @a file and stores the result in @a parsed.
+ *  @a T must satisfy the Qx::json_root concept.
+ */
+
+/*!
+ *  @fn JsonError serializeJson(QFile& serialized, const T& root)
+ *
+ *  @overload
+ *
+ *  Serializes the entire JSON root structure @a root and writes the result to @a serialized in indented format,
+ *  replacing existing contents, if any.
+ *
+ *  @a T must satisfy the Qx::json_root concept.
+ *
+ *  If serialization fails, a valid JsonError is returned that describes the cause; otherwise, an invalid
+ *  error is returned.
+ */
+
+/*!
+ *  @fn JsonError parseJson(T& parsed, const QString& filePath)
+ *
+ *  @overload
+ *
+ *  Parses the entire JSON document file at path @a filePath and stores the result in @a parsed.
+ *  @a T must satisfy the Qx::json_root concept.
+ */
+
+/*!
+ *  @fn JsonError serializeJson(const QString& filePath, const T& root)
+ *
+ *  @overload
+ *
+ *  Serializes the entire JSON root structure @a root and writes the result to the file at path @a
+ *  filePath in indented format, replacing existing contents, if any.
+ *
+ *  @a T must satisfy the Qx::json_root concept.
+ *
+ *  If serialization fails, a valid JsonError is returned that describes the cause; otherwise, an invalid
+ *  error is returned.
  */
 
 /*!
@@ -510,16 +589,17 @@ QString ArrayElement::string() const { return (u"Element: %1"_s).arg(mElement); 
  */
 
 //===============================================================================================================
-// <namepace>
+// Converter
 //===============================================================================================================
 
 /*!
  *  @struct Converter
  *
- *  @brief The Converter template struct acts as an interface that carries details on how to parse JSON to various types.
+ *  @brief The Converter template struct acts as an interface that carries details on how to parse/serialize JSON
+ *  to various types.
  *
- *  JSON data can be converted to an object of any type as Converter provides a specialization for that type that
- *  contains a corresponding fromJson() function.
+ *  JSON data can be converted to/from an object of any type for which a Converter specialization exists that
+ *  contains corresponding fromJson() and toJson functions.
  *
  *  By default, conversions are provided for:
  *  - bool
@@ -534,7 +614,7 @@ QString ArrayElement::string() const { return (u"Element: %1"_s).arg(mElement); 
  *  - QMap<K, T> (when a keygen() specialization exists for K)
  *
  *  Support for additional, non-structural types can be added like so:
- *  @snippet qx-json.cpp 7
+ *  @snippet qx-json.cpp 8
  *
  *  If a structural type needs to be registered, the QX_JSON_STRUCT and QX_JSON_MEMBER macros should be used
  *  instead.
@@ -542,17 +622,121 @@ QString ArrayElement::string() const { return (u"Element: %1"_s).arg(mElement); 
  *  @sa qx-json.h and keygen().
  */
 
+//===============================================================================================================
+// <namespace>
+//===============================================================================================================
+
+//-Concepts---------------------------------------------------------------------------------------------
+/*!
+ *  @concept qjson_type
+ *  @brief Specifies that a type is one of the fundamental JSON types within Qt's JSON system.
+ *
+ *  Satisfied if @a T is one of:
+ *  - bool
+ *  - double
+ *  - QString
+ *  - QJsonArray
+ *  - QJsonObject
+ */
+
+/*!
+ *  @concept json_struct_inside
+ *  @brief Specifies that a type is a JSON-tied struct registered with QX_JSON_STRUCT().
+ *
+ *  Satisfied if @a T has been properly registered with the above macro.
+ */
+
+/*!
+ *  @concept json_struct_outside
+ *  @brief Specifies that a type is a JSON-tied struct registered with QX_JSON_STRUCT_OUTSIDE().
+ *
+ *  Satisfied if @a T has been properly registered with the above macro.
+ */
+
+/*!
+ *  @concept json_struct
+ *  @brief Specifies that a type is a JSON-tied struct.
+ *
+ *  Satisfied if @a T has been properly registered with QX_JSON_STRUCT() or QX_JSON_STRUCT_OUTSIDE().
+ */
+
+/*!
+ *  @concept json_convertible
+ *  @brief Specifies that a type is generally convertible to/from JSON.
+ *
+ *  Satisfied if a Converter specialization exists for @a T that includes functions with the signatures:
+ *  - `static Qx::JsonError fromJson(T& value, const QJsonValue& jValue)`
+ *  - `static R toJson(const T& value)`
+ *
+ *  where @c R is any type that satisfies the qjson_type concept.
+ */
+
+/*!
+ *  @concept json_convertible
+ *  @brief Specifies that a type has override conversions for changing to/from JSON.
+ *
+ *  Satisfied if QX_JSON_MEMBER_OVERRIDE() has been used to add functions to a JSON-tied struct with the
+ *  signatures:
+ *  - `static Qx::JsonError fromJson(T& member, const QJsonValue& jValue)`
+ *  - `static R toJson(const T& member)`
+ *
+ *  where @c R is any type that satisfies the qjson_type concept.
+ */
+
+/*!
+ *  @concept json_keyable
+ *  @brief Specifies that a type has a known method for creating a corresponding key.
+ *
+ *  Satisfied if a keygen() specialization exists for @a Key and @a Value that creates a key from
+ *  an instance of Value.
+ */
+
+/*!
+ *  @concept json_collective
+ *  @brief Specifies that a type is a non-associative container, the value type of which is convertible
+ *  to/from JSON.
+ *
+ *  Satisfied if @a T satisfies Qx::qcollective and T::value_type satisfies json_convertible.
+ */
+
+/*!
+ *  @concept json_associative
+ *  @brief Specifies that a type is an associative container, the value type of which is convertible,
+ *  to/from JSON, and for which a key/value type specializaton of keygen() exists.
+ *
+ *  Satisfied if @a T satisfies Qx::qassociative, T::mapped_type satisfies json_convertible, and
+ *  T::key_type + T::mapped_type satisfy json_keyable.
+ */
+
+ /*!
+ *  @concept json_containing
+ *  @brief Specifies that a type is a container, and abides by the other corresponding restrictions
+ *  for that kind of a container.
+ *
+ *  Satisfied if @a T satisfies json_collective or json_associative.
+ */
+
+/*!
+ *  @concept json_optional
+ *  @brief Specifies that a type is a specialization of std::optional that manages values of a JSON
+ *  convertible type.
+ *
+ *  Satisfied if @a T satisfies Qx::specialize (for std::optional) and T::value_type satisfies
+ *  json_convertible.
+ */
+
+//-Functions---------------------------------------------------------------------------------------------
 /*!
  *  @fn template<typename Key, class Value> Key keygen(const Value& value)
  *
  *  @brief The keygen template function acts as an interface through which the derivation of a key
- *  for a given type when used in associative containers is defined.
+ *  for a given type, when used in associative containers, is defined.
  *
  *  Any otherwise convertible JSON type can be parsed into a map as long as a specialization of keygen() exists
  *  for that type.
  *
  *  Support for additional types can be added like so:
- *  @snippet qx-json.cpp 8
+ *  @snippet qx-json.cpp 9
  *
  *  @sa qx-json.h and Converter.
  */

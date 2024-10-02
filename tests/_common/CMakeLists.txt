@@ -15,5 +15,5 @@ target_include_directories(${TESTS_COMMON_TARGET}
 
 target_link_libraries(${TESTS_COMMON_TARGET}
     INTERFACE
-        Qt6::Test
+        ${Qt}::Test
 )

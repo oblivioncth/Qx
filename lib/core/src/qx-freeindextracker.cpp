@@ -276,12 +276,6 @@ std::optional<quint64> FreeIndexTracker::reserveLastFree()
 }
 
 /*!
- *  Attempts to mark @a index as unoccupied and returns @c true if successful, or @c false if the index was
- *  already free.
- */
-bool FreeIndexTracker::release(quint64 index) { return relse(index); }
-
-/*!
  * Attempts to mark the nearest free index that is at or after @a index as occupied and returns it if successful,
  * or @c std::nullopt if there are no free indices.
  */
@@ -318,6 +312,41 @@ std::optional<quint64> FreeIndexTracker::reserveNearestFree(quint64 index)
         resrv(nf.value());
 
     return nf;
+}
+
+/*!
+ *  Attemps to mark all indicies as occupied and returns @c true if successful, or @c false if all
+ *  were already reserved.
+ */
+bool FreeIndexTracker::reserveAll()
+{
+    if(mFree == 0)
+        return false;
+
+    std::fill(mReserved.begin(), mReserved.end(), true);
+    mFree = 0;
+    return true;
+}
+
+/*!
+ *  Attempts to mark @a index as unoccupied and returns @c true if successful, or @c false if the index was
+ *  already free.
+ */
+bool FreeIndexTracker::release(quint64 index) { return relse(index); }
+
+
+/*!
+ *  Attemps to mark all indicies as unoccupied and returns @c true if successful, or @c false if all
+ *  were already free.
+ */
+bool FreeIndexTracker::releaseAll()
+{
+    if(mFree == range())
+        return false;
+
+    std::fill(mReserved.begin(), mReserved.end(), false);
+    mFree = range();
+    return true;
 }
 
 }

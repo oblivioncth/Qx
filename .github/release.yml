@@ -1,7 +1,10 @@
 changelog:
   exclude:
     labels:
-      - release-pr
+      - release
+      - common-sync
+    authors:
+      - oby-bot
   categories:
     - title: Breaking Changes
       labels:
@@ -12,6 +15,9 @@ changelog:
     - title: Bug Fixes
       labels:
         - bug
+    - title: Implementation Improvements
+      labels:
+        - implementation
     - title: Other Changes
       labels:
         - "*"

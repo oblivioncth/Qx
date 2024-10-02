@@ -522,8 +522,8 @@ concept qassociative = specializes<T, QHash> ||
                        specializes<T, QMap>;
 
 template<typename T>
-concept qcollective = Qx::specializes<T, QList> ||
-                      Qx::specializes<T, QSet>;
+concept qcollective = specializes<T, QList> ||
+                      specializes<T, QSet>;
 
 }
 

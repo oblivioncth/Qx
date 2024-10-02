@@ -6,6 +6,6 @@ qx_add_component("Gui"
         qx-color.cpp
     LINKS
         PUBLIC
-            Qt6::Core
-            Qt6::Gui
+            ${Qt}::Core
+            ${Qt}::Gui
 )

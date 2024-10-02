@@ -13,7 +13,7 @@ qx_add_component("Windows"
         PRIVATE
             Qx::Io
         PUBLIC
-            Qt6::Core
+            ${Qt}::Core
             Version.lib
             Qx::Core
 )

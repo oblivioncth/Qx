@@ -6,6 +6,19 @@
  *  are designed to facilitate common fundamental tasks with as brief syntax as possible.
  */
 
+//Non-namespace Structs----------------------------------------------------------
+/*!
+ *  @struct qxFuncAggregate
+ *
+ *  A template struct that takes an arbitrary number of functors as arguments and, when
+ *  instantiated, produces a struct with all `operator()` overloads from all provided functors.
+ *
+ *  This helper struct is commonly used in the `std::variant` overload visit pattern to concisely
+ *  implement a handler for all alternatives:
+ *
+ *  @snippet qx-helpers.cpp 0
+ */
+
 //Non-namespace Functions----------------------------------------------------------
 /*!
  *  @fn const T qxAsConst(T&& t)
@@ -25,7 +38,6 @@
  *  lvalues and rvalues, instead of having to employ mixed usage of qxAsConst() and
  *  qAsConst().
  */
-
 
 /*!
  *  @fn void qxDelete(T*& pointer)
