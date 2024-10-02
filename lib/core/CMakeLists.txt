@@ -87,6 +87,6 @@ qx_add_component("Core"
         qx-table.dox
     LINKS
         PUBLIC
-            Qt6::Core
+            ${Qt}::Core
             Qx::Utility
 )

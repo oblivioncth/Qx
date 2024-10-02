@@ -13,6 +13,6 @@ qx_add_component("Windows-gui"
             Qx::Windows
             Qx::Core
         PUBLIC
-            Qt6::Core
-            Qt6::Gui
+            ${Qt}::Core
+            ${Qt}::Gui
 )

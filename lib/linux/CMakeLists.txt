@@ -12,7 +12,7 @@ qx_add_component("Linux"
         qx-directorydesktopentry.cpp
     LINKS
         PUBLIC
-            Qt6::Core
+            ${Qt}::Core
             Qx::Core
             Qx::Io
 )

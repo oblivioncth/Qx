@@ -14,7 +14,7 @@ qx_add_component("Widgets"
         qx-treeinputdialog.cpp
     LINKS
         PUBLIC
-            Qt6::Core
-            Qt6::Widgets
+            ${Qt}::Core
+            ${Qt}::Widgets
             Qx::Core
 )

@@ -19,7 +19,7 @@ set(DOXYGEN_PREDEFINED
 ob_standard_documentation(${DOC_TARGET_NAME}
     DOXY_VER 1.9.4
     PROJ_NAME "${PROJECT_NAME}"
-    QT_PREFIX "${Qt6_PREFIX_PATH}"
+    QT_PREFIX "${Qt_PREFIX_PATH}"
     QT_MODULES
         qtconcurrent
         qtcore

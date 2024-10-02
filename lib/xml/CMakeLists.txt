@@ -10,6 +10,6 @@ qx_add_component("Xml"
         qx-xmlstreamwritererror.cpp
     LINKS
         PUBLIC
-            Qt6::Core
-            Qt6::Xml
+            ${Qt}::Core
+            ${Qt}::Xml
 )
