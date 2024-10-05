@@ -154,7 +154,7 @@ namespace Qx
 
 class QX_CORE_EXPORT JsonError final : public AbstractError<"Qx::JsonError", 5>
 {
-    //-Class Enums-------------------------------------------------------------
+//-Class Enums-------------------------------------------------------------
 public:
     enum Form
     {
@@ -162,37 +162,39 @@ public:
         MissingKey,
         TypeMismatch,
         EmptyDoc,
+        InvalidValue,
         MissingFile,
         InaccessibleFile,
         FileReadError,
         FileWriteError
     };
 
-    //-Class Variables-------------------------------------------------------------
+//-Class Variables-------------------------------------------------------------
 private:
     static inline const QHash<Form, QString> ERR_STRINGS{
         {NoError, u""_s},
         {MissingKey, u"The key does not exist."_s},
         {TypeMismatch, u"Value type mismatch."_s},
         {EmptyDoc, u"The document is empty."_s},
+        {InvalidValue, u"Invalid value for type."_s},
         {MissingFile, u"File does not exist."_s},
         {InaccessibleFile, u"Cannot open the file."_s},
         {FileReadError, u"File read error."_s},
         {FileWriteError, u"File write error."_s}
     };
 
-    //-Instance Variables-------------------------------------------------------------
+//-Instance Variables-------------------------------------------------------------
 private:
     QString mAction;
     Form mForm;
     QList<QxJson::ContextNode> mContext;
 
-    //-Constructor-----------------------------------------------------------------
+//-Constructor-----------------------------------------------------------------
 public:
     JsonError();
     JsonError(const QString& a, Form f);
 
-    //-Instance Functions-------------------------------------------------------------
+//-Instance Functions-------------------------------------------------------------
 private:
     quint32 deriveValue() const override;
     QString derivePrimary() const override;

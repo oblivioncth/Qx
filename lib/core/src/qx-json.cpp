@@ -143,6 +143,9 @@ namespace Qx
  *  @var JsonError::Form JsonError::EmptyDoc
  *  The provided JSON document is empty.
  *
+ *  @var JsonError::Form JsonError::InvalidValue
+ *  The value of a type was invalid for that type.
+ *
  *  @var JsonError::Form JsonError::MissingFile
  *  The JSON containing file was not found.
  *
