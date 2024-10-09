@@ -211,57 +211,6 @@ public:
 
 } // namespace Qx
 
-/*! @cond */
-namespace QxJsonPrivate
-{
-//-Namespace Variables---------------------------------------------------
-static inline const QString ERR_CONV_TYPE = u"JSON Error: Converting value to %1"_s;
-static inline const QString ERR_NO_KEY = u"JSON Error: Could not retrieve key '%1'."_s;
-static inline const QString ERR_PARSE_DOC = u"JSON Error: Could not parse JSON document."_s;
-static inline const QString ERR_READ_FILE = u"JSON Error: Could not read JSON file."_s;
-static inline const QString ERR_WRITE_FILE = u"JSON Error: Could not write JSON file."_s;
-
-//-Structs---------------------------------------------------------------
-template<Qx::StringLiteral MemberN, typename MemberT, class Struct>
-struct MemberMetadata
-{
-    constexpr static Qx::StringLiteral M_NAME = MemberN;
-    typedef MemberT M_TYPE;
-    MemberT Struct::* mPtr;
-};
-
-//-Functions-------------------------------------------------------------
-template <Qx::StringLiteral N, typename T, class S>
-constexpr MemberMetadata<N, T, S> makeMemberMetadata(T S::*memberPtr)
-{
-    return {memberPtr};
-}
-
-template<typename T> [[maybe_unused]] static inline QString typeString() = delete;
-template<typename T> [[maybe_unused]] static inline bool isType(const QJsonValue& v) = delete;
-template<typename T> [[maybe_unused]] static inline T toType(const QJsonValue& v) = delete;
-
-template<> inline QString typeString<bool>() { return u"bool"_s; };
-template<> inline QString typeString<double>() { return u"double"_s; };
-template<> inline QString typeString<QString>() { return u"string"_s; };
-template<> inline QString typeString<QJsonArray>() { return u"array"_s; };
-template<> inline QString typeString<QJsonObject>() { return u"object"_s; };
-
-template<> inline bool isType<bool>(const QJsonValue& v) { return v.isBool(); };
-template<> inline bool isType<double>(const QJsonValue& v) { return v.isDouble(); };
-template<> inline bool isType<QString>(const QJsonValue& v) { return v.isString(); };
-template<> inline bool isType<QJsonArray>(const QJsonValue& v) { return v.isArray(); };
-template<> inline bool isType<QJsonObject>(const QJsonValue& v) { return v.isObject(); };
-
-template<> inline bool toType<bool>(const QJsonValue& v) { return v.toBool(); };
-template<> inline double toType<double>(const QJsonValue& v) { return v.toDouble(); };
-template<> inline QString toType<QString>(const QJsonValue& v) { return v.toString(); };
-template<> inline QJsonArray toType<QJsonArray>(const QJsonValue& v) { return v.toArray(); };
-template<> inline QJsonObject toType<QJsonObject>(const QJsonValue& v) { return v.toObject(); };
-
-} // namespace QxJsonPrivate
-/*! @endcond */
-
 namespace QxJson
 {
 //-Structs---------------------------------------------------------------
@@ -335,6 +284,51 @@ concept json_optional = Qx::specializes<T, std::optional> &&
 /*! @cond */
 namespace QxJsonPrivate
 {
+//-Namespace Variables---------------------------------------------------
+static inline const QString ERR_CONV_TYPE = u"JSON Error: Converting value to %1"_s;
+static inline const QString ERR_NO_KEY = u"JSON Error: Could not retrieve key '%1'."_s;
+static inline const QString ERR_PARSE_DOC = u"JSON Error: Could not parse JSON document."_s;
+static inline const QString ERR_READ_FILE = u"JSON Error: Could not read JSON file."_s;
+static inline const QString ERR_WRITE_FILE = u"JSON Error: Could not write JSON file."_s;
+
+//-Structs---------------------------------------------------------------
+template<Qx::StringLiteral MemberN, typename MemberT, class Struct>
+struct MemberMetadata
+{
+    constexpr static Qx::StringLiteral M_NAME = MemberN;
+    typedef MemberT M_TYPE;
+    MemberT Struct::* mPtr;
+};
+
+//-Functions-------------------------------------------------------------
+template <Qx::StringLiteral N, typename T, class S>
+constexpr MemberMetadata<N, T, S> makeMemberMetadata(T S::*memberPtr)
+{
+    return {memberPtr};
+}
+
+template<typename T> [[maybe_unused]] static inline QString typeString() = delete;
+template<typename T> [[maybe_unused]] static inline bool isType(const QJsonValue& v) = delete;
+template<typename T> [[maybe_unused]] static inline T toType(const QJsonValue& v) = delete;
+
+template<> inline QString typeString<bool>() { return u"bool"_s; };
+template<> inline QString typeString<double>() { return u"double"_s; };
+template<> inline QString typeString<QString>() { return u"string"_s; };
+template<> inline QString typeString<QJsonArray>() { return u"array"_s; };
+template<> inline QString typeString<QJsonObject>() { return u"object"_s; };
+
+template<> inline bool isType<bool>(const QJsonValue& v) { return v.isBool(); };
+template<> inline bool isType<double>(const QJsonValue& v) { return v.isDouble(); };
+template<> inline bool isType<QString>(const QJsonValue& v) { return v.isString(); };
+template<> inline bool isType<QJsonArray>(const QJsonValue& v) { return v.isArray(); };
+template<> inline bool isType<QJsonObject>(const QJsonValue& v) { return v.isObject(); };
+
+template<> inline bool toType<bool>(const QJsonValue& v) { return v.toBool(); };
+template<> inline double toType<double>(const QJsonValue& v) { return v.toDouble(); };
+template<> inline QString toType<QString>(const QJsonValue& v) { return v.toString(); };
+template<> inline QJsonArray toType<QJsonArray>(const QJsonValue& v) { return v.toArray(); };
+template<> inline QJsonObject toType<QJsonObject>(const QJsonValue& v) { return v.toObject(); };
+
 //-Functions-------------------------------------------------------------
 /* These helpers are required as a form on indirection within
  *
