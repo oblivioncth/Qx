@@ -225,7 +225,7 @@ FileDetails FileDetails::readFileDetails(QString filePath)
     {
         DWORD verInfoHandle, verInfoSize = GetFileVersionInfoSize((const wchar_t*)filePath.utf16(), &verInfoHandle);
 
-        if (verInfoSize != NULL)
+        if (verInfoSize != 0)
         {
             LPSTR verInfo = new char[verInfoSize];
 

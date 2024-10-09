@@ -1,5 +1,6 @@
 // Unit Includes
 #include "qx/windows/qx-common-windows.h"
+#include "qx-common-windows_p.h"
 
 // Qt Includes
 #include <QFile>
@@ -9,12 +10,14 @@
 // Windows Includes
 #include "qx_windows.h"
 #include "TlHelp32.h"
-#include "comdef.h"
-#include "ShlGuid.h"
-#include "atlbase.h"
+#ifdef Q_CC_MINGW // MinGW headers for this are less fine-grained
+    #include "Shlobj.h"
+#else
+    #include "ShlObj_core.h"
+#endif
+#include <wrl/client.h>
 
 // Extra-component Includes
-#include "qx/core/qx-bitarray.h"
 #include "qx/core/qx-system.h"
 
 /*!
@@ -380,6 +383,7 @@ SystemError getLastError()
     return SystemError::fromHresult(HRESULT_FROM_WIN32(error));
 }
 
+
 /*!
  *  Creates a shortcut on the user's filesystem at the path @a shortcutPath, with the given
  *  shortcut properties @a sp.
@@ -390,83 +394,59 @@ SystemError createShortcut(QString shortcutPath, ShortcutProperties sp)
     if(sp.target.isEmpty() || shortcutPath.isEmpty() || sp.iconIndex < 0)
         return SystemError::fromHresult(E_INVALIDARG);
 
-    // Working vars
-    HRESULT hRes;
-    CComPtr<IShellLink> ipShellLink;
+    // Ensure COM is ready
+    ScopedCom com;
+    if(!com)
+        return com.error();
 
-    // Get full path of target
-    QFileInfo targetInfo(sp.target);
-    QString fullTargetPath = targetInfo.absoluteFilePath();
+    // Access IShelLink interface
+    using namespace Microsoft::WRL;
+    ComPtr<IShellLink> ipShellLink;
+    HRESULT hRes = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&ipShellLink));
+    if(FAILED(hRes))
+        return SystemError::fromHresult(hRes);
 
+    // Get a pointer to the IPersistFile interface
+    ComPtr<IPersistFile> ipPersistFile;
+    hRes = ipShellLink.As(&ipPersistFile);
+    if(FAILED(hRes))
+        return SystemError::fromHresult(hRes);
 
-    // Get a pointer to the IShellLink interface
-    auto getIShellLinkPtr = [](CComPtr<IShellLink>& ptrShellLnk){
-        return CoCreateInstance(CLSID_ShellLink,
-                                NULL,
-                                CLSCTX_INPROC_SERVER,
-                                IID_IShellLink,
-                                (void**)&ptrShellLnk);
-    };
+    // Set shortcut properties
+    // NOTE: The string casts here are only valid on Windows where wchat_t is 2-bytes in size
+    QString tgtPath = QFileInfo(sp.target).absoluteFilePath();
+    hRes = ipShellLink->SetPath((const wchar_t*)tgtPath.utf16());
+    if(FAILED(hRes)) return SystemError::fromHresult(hRes);
 
-    hRes = getIShellLinkPtr(ipShellLink);
-
-    // Handle the case for if the COM server wasn't already initialized in this thread
-    QScopeGuard COMGuard([]{ CoUninitialize(); });
-    if(hRes == CO_E_NOTINITIALIZED)
+    if(!sp.targetArgs.isEmpty())
     {
-        CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
-        hRes = getIShellLinkPtr(ipShellLink);
-    }
-    else
-        COMGuard.dismiss();
-
-    // Commence shortcut creation if COM server was properly connected to
-    if(SUCCEEDED(hRes))
-    {
-        // Get a pointer to the IPersistFile interface
-        CComQIPtr<IPersistFile> ipPersistFile(ipShellLink);
-
-        // Set shortcut properties
-        hRes = ipShellLink->SetPath((const wchar_t*)fullTargetPath.utf16());
-        if(FAILED(hRes))
-            return SystemError::fromHresult(hRes);
-
-        if(!sp.targetArgs.isEmpty())
-        {
-            hRes = ipShellLink->SetArguments((const wchar_t*)sp.targetArgs.utf16());
-            if (FAILED(hRes))
-                return SystemError::fromHresult(hRes);
-        }
-
-        if(!sp.startIn.isEmpty())
-        {
-            hRes = ipShellLink->SetWorkingDirectory((const wchar_t*)sp.startIn.utf16());
-            if (FAILED(hRes))
-                return SystemError::fromHresult(hRes);
-        }
-
-        if(!sp.comment.isEmpty())
-        {
-            hRes = ipShellLink->SetDescription((const wchar_t*)sp.comment.utf16());
-            if (FAILED(hRes))
-                return SystemError::fromHresult(hRes);
-        }
-
-        if(!sp.iconFilePath.isEmpty())
-        {
-            hRes = ipShellLink->SetIconLocation((const wchar_t*)sp.iconFilePath.utf16(), sp.iconIndex);
-            if (FAILED(hRes))
-                return SystemError::fromHresult(hRes);
-        }
-
-        hRes = ipShellLink->SetShowCmd(nativeShowMode(sp.showMode));
-        if(FAILED(hRes))
-            return SystemError::fromHresult(hRes);
-
-        // Write the shortcut to disk
-        hRes = ipPersistFile->Save((const wchar_t*)shortcutPath.utf16(), TRUE);
+        hRes = ipShellLink->SetArguments((const wchar_t*)sp.targetArgs.utf16());
+        if (FAILED(hRes)) return SystemError::fromHresult(hRes);
     }
 
+    if(!sp.startIn.isEmpty())
+    {
+        hRes = ipShellLink->SetWorkingDirectory((const wchar_t*)sp.startIn.utf16());
+        if (FAILED(hRes)) return SystemError::fromHresult(hRes);
+    }
+
+    if(!sp.comment.isEmpty())
+    {
+        hRes = ipShellLink->SetDescription((const wchar_t*)sp.comment.utf16());
+        if (FAILED(hRes)) return SystemError::fromHresult(hRes);
+    }
+
+    if(!sp.iconFilePath.isEmpty())
+    {
+        hRes = ipShellLink->SetIconLocation((const wchar_t*)sp.iconFilePath.utf16(), sp.iconIndex);
+        if (FAILED(hRes)) return SystemError::fromHresult(hRes);
+    }
+
+    hRes = ipShellLink->SetShowCmd(nativeShowMode(sp.showMode));
+    if(FAILED(hRes)) return SystemError::fromHresult(hRes);
+
+    // Write the shortcut to disk
+    hRes = ipPersistFile->Save((const wchar_t*)shortcutPath.utf16(), TRUE);
     return SystemError::fromHresult(hRes);
 }
 

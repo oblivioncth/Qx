@@ -71,7 +71,7 @@ quint32 processId(QString processName)
     PROCESSENTRY32 entry;
     entry.dwSize = sizeof(PROCESSENTRY32);
 
-    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
+    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 
     if(Process32First(snapshot, &entry))
     {
@@ -100,7 +100,7 @@ QString processName(quint32 processId)
     PROCESSENTRY32 entry;
     entry.dwSize = sizeof(PROCESSENTRY32);
 
-    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
+    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 
 
     if(Process32First(snapshot, &entry))
@@ -138,7 +138,7 @@ QList<quint32> processChildren(quint32 processId, bool recursive)
     QList<quint32> cPids = {processId};
 
     // Initialize snapshot
-    if(HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL))
+    if(HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0))
     {
         // Initialize entry data holder
         PROCESSENTRY32 procEntry;

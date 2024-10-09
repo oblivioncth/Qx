@@ -3,6 +3,11 @@
 
 // Windows Includes
 #include "qx_windows.h"
+#ifdef Q_CC_MINGW // MinGW headers for this are less fine-grained
+    #include "Shlobj.h"
+#else
+    #include "ShlObj_core.h"
+#endif
 
 // Intra-component Includes
 #include "qx/windows-gui/qx-winguievent.h"
