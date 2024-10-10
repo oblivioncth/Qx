@@ -6,6 +6,8 @@ qx_add_component("Windows"
         qx-windefs.h
     IMPLEMENTATION
         qx-common-windows.cpp
+        qx-common-windows_p.h
+        qx-common-windows_p.cpp
         qx-filedetails.cpp
     DOC_ONLY
         qx-windefs.dox
