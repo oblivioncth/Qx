@@ -10,8 +10,11 @@
 #include "qx/core/qx-integrity.h"
 
 // Windows Includes
+#define WIN32_LEAN_AND_MEAN
 #include "windows.h"
 #include "TlHelp32.h"
+#include "AccCtrl.h"
+#include "AclAPI.h"
 
 namespace Qx
 {
@@ -60,6 +63,29 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
     {
         DWORD error = GetLastError();
         return SystemError::fromHresult(HRESULT_FROM_WIN32(error), aError);
+    }
+
+    QList<EXPLICIT_ACCESS> prepareAccessPermissions(QFileDevice::Permissions permissions, PSID owner, PSID group)
+    {
+        QList<EXPLICIT_ACCESS> accessControlEntries;
+
+        // Common Settings
+        EXPLICIT_ACCESS ea{
+            .grfAccessPermissions = GENERIC_ALL,
+            .grfAccessMode = SET_ACCESS,
+            .grfInheritance = CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE,
+            .Trustee = {
+                .pMultipleTrustee = NULL, // Value is unused by WIN32 API
+                .MultipleTrusteeOperation = NO_MULTIPLE_TRUSTEE, // Value is unused by WIN32 API and must be set as this
+                .TrusteeForm = TRUSTEE_IS_NAME,
+                .TrusteeType = TRUSTEE_IS_USER,
+                .ptstrName = NULL
+            }
+        };
+
+
+
+
     }
 }
 
@@ -222,5 +248,49 @@ bool enforceSingleInstance(QString uniqueAppId)
 
     return createMutex(hashId);
 }
+
+QFileDevice::Permissions filePermissions(const QString& filePath, QFileDevice::Permissions permissions)
+{
+
+}
+
+bool setFilePermissions(const QString& filePath, QFileDevice::Permissions permissions)
+{
+    /* NOTE: We do two things here that are technically risky, but should be ok:
+     *
+     * 1) We get a pointer to the underlying data of the QString and cast it to const wchar_t*.
+     *    on other platforms the size of wchar_t can vary, but on Windows it's clear that it's
+     *    2-bytes, as it even caused a defect in the C++ standard for being so.
+     * 2) For some reason SetNamedSecurityInfo() takes the path string as non-const, which I'm
+     *    almost certain is an oversight, as the docs make it clear its just an input to be
+     *    read; therefore, we cast away the constness.
+     */
+
+    // Set POSIX-based (NTFS on Windows?) permissions, but ignore results since ACLs take precedence
+    QFile::setPermissions(filePath, permissions);
+
+    // Set ACLs
+    PACL pNewDACL;
+    PSECURITY_DESCRIPTOR pSecurityDescriptor;
+    PSID pOwnerSid, pGroupSid;
+    LPCWSTR cPath = reinterpret_cast<const wchar_t*>(filePath.data());
+
+    QScopeGuard cleanup([&]{
+        LocalFree(pSecurityDescriptor); // Frees the other memory here that is part of the descriptor
+    });
+
+    if(GetNamedSecurityInfo(
+        cPath, // File path
+        SE_FILE_OBJECT, // Security object type (file)
+        OWNER_SECURITY_INFORMATION | GROUP_SECURITY_INFORMATION | DACL_SECURITY_INFORMATION, // Information requested
+        &pOwnerSid, // Owner SID (points to member of security descriptor)
+        &pGroupSid, // Group SID (points to member of security descriptor)
+        NULL, // Current access ACL. Unused since we replace this entirely
+        NULL, // Auditing ACL (ignored)
+        &pSecurityDescriptor // Security descriptor. Not used directly, but managed
+    ) != ERROR_SUCCESS)
+        return false;
+}
+
 
 }

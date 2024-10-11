@@ -6,6 +6,7 @@
 
 // Qt Includes
 #include <QString>
+#include <QFileDevice>
 #ifdef __linux
 #include <QSettings>
 #endif
@@ -32,6 +33,9 @@ QX_CORE_EXPORT bool enforceSingleInstance(QString uniqueAppId);
 QX_CORE_EXPORT bool setDefaultProtocolHandler(const QString& scheme, const QString& name, const QString& path = {}, const QStringList& args = {});
 QX_CORE_EXPORT bool isDefaultProtocolHandler(const QString& scheme, const QString& path = {});
 QX_CORE_EXPORT bool removeDefaultProtocolHandler(const QString& scheme, const QString& path = {});
+
+QX_CORE_EXPORT QFileDevice::Permissions filePermissions(const QString& filePath, QFileDevice::Permissions permissions);
+QX_CORE_EXPORT bool setFilePermissions(const QString& filePath, QFileDevice::Permissions permissions);
 
 #ifdef __linux__
 // Temporary means to and end, will replace with full parser eventually
