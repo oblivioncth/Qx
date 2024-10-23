@@ -1,0 +1,703 @@
+namespace Qx
+{
+
+/*!
+ *  @concept asymmetric_bimap
+ *  @brief Specifies that a bimap has different Left and Right types.
+ *
+ *  Satisfied if @c Left is not the same as @c Right.
+ */
+
+/*!
+ *  @concept bimap_iterator_predicate
+ *  @brief Specifies that a predicate is a valid, iterator based predicate for a bimap.
+ *
+ *  Satisfied if the predicate takes a Qx::Bimap<Left, Right>::const_iterator and returns @c bool.
+ */
+
+/*!
+ *  @concept bimap_pair_predicate
+ *  @brief Specifies that a predicate is a valid, pair based predicate for a bimap.
+ *
+ *  Satisfied if the predicate takes a std::pair<const Left&, const Right&> and returns @c bool.
+ */
+
+/*!
+ *  @concept bimap_predicate
+ *  @brief Specifies that a predicate is a valid predicate for a bimap.
+ *
+ *  Satisfied if the predicate satisfies bimap_iterator_predicate or bimap_pair_predicate.
+ */
+
+//===============================================================================================================
+// Bimap
+//===============================================================================================================
+
+/*!
+ *  @class Bimap qx/core/qx-bimap.h
+ *  @ingroup qx-core
+ *
+ *  @brief The Bimap template class offers a rudimentary bi-directional associative map.
+ *
+ *  Qx::Bimap<Left, Right> is like QHash<Key, T>, except that instead of Key and Value there is
+ *  Left and Right, meaning that no neither type in any specialization of the container is more
+ *  significant than the other. Lookup of one of the "side's" values using the other is possible
+ *  via fromLeft(), fromRight(), and other similarly named functions.
+ *
+ *  Both the Left and Right types must provide operator==() and a global qHash() overload.
+ */
+
+//-Aliases--------------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @typedef Bimap<Left, Right>::left_type
+ *
+ *  Typedef for Left.
+ */
+
+/*!
+ *  @typedef Bimap<Left, Right>::right_type
+ *
+ *  Typedef for Right.
+ */
+
+/*!
+ *  @typedef Bimap<Left, Right>::ConstIterator
+ *
+ *  Qt-style synonym for Bimap::const_iterator.
+ */
+
+//-Constructor----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn Bimap<Left, Right>::Bimap()
+ *
+ *  Creates an empty bimap.
+ *
+ *  @sa clear().
+ */
+
+/*!
+ * @fn Bimap<Left, Right>::Bimap(std::initializer_list<std::pair<Left, Right>> list)
+ *
+ *  Creates a bimap with a copy of each of the elements in the initializer list @a list.
+ */
+
+//-Instance Functions----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn const_iterator Bimap<Left, Right>::begin() const
+ *
+ *  Same as constBegin().
+ */
+
+/*!
+ *  @fn const_iterator Bimap<Left, Right>::cbegin() const
+ *
+ *  Same as constBegin().
+ */
+
+/*!
+ *  @fn const_iterator Bimap<Left, Right>::constBegin() const
+ *
+ *  Returns an STL-style iterator pointing to the first relationship in the bimap.
+ *
+ *  @warning Returned iterators/references should be considered invalidated the next time you call
+ *  a non-const function on the bimap, or when the bimap is destroyed.
+ *
+ *  @sa constEnd().
+ */
+
+/*!
+ *  @fn const_iterator Bimap<Left, Right>::end() const
+ *
+ *  Same as constEnd().
+ */
+
+/*!
+ *  @fn const_iterator Bimap<Left, Right>::cend() const
+ *
+ *  Same as constEnd().
+ */
+
+/*!
+ *  @fn const_iterator Bimap<Left, Right>::constEnd() const
+ *
+ *  Returns an STL-style iterator pointing to the first relationship in the bimap.
+ *
+ *  @warning Returned iterators/references should be considered invalidated the next time you call
+ *  a non-const function on the bimap, or when the bimap is destroyed.
+ *
+ *  @sa constBegin().
+ */
+
+/*!
+ *  @fn const_iterator Bimap<Left, Right>::constFind(const Left& l) const
+ *
+ *  Same as constFindLeft().
+ */
+
+/*!
+ *  @fn const_iterator Bimap<Left, Right>::constFind(const Right& l) const
+ *
+ *  Same as constFindRight().
+ */
+
+/*!
+ *  @fn const_iterator Bimap<Left, Right>::constFindLeft(const Left& l) const
+ *
+ *  Returns an iterator pointing to the relationship with the Left value @a l in the bimap.
+ *
+ *  If the bimaps contains no relationship with the Left value, the function returns constEnd().
+ *
+ *  @warning Returned iterators/references should be considered invalidated the next time you call
+ *  a non-const function on the bimap, or when the bimap is destroyed.
+ */
+
+/*!
+ *  @fn const_iterator Bimap<Left, Right>::constFindRight(const Left& l) const
+ *
+ *  Returns an iterator pointing to the relationship with the Right value @a r in the bimap.
+ *
+ *  If the bimaps contains no relationship with the Right value, the function returns constEnd().
+ *
+ *  @warning Returned iterators/references should be considered invalidated the next time you call
+ *  a non-const function on the bimap, or when the bimap is destroyed.
+ */
+
+/*!
+ *  @fn const_iterator Bimap<Left, Right>::find(const Left& l) const
+ *
+ *  Same as constFindLeft().
+ */
+
+/*!
+ *  @fn const_iterator Bimap<Left, Right>::find(const Right& l) const
+ *
+ *  Same as constFindRight().
+ */
+
+/*!
+ *  @fn const_iterator Bimap<Left, Right>::findLeft(const Left& l) const
+ *
+ *  Same as constFindLeft().
+ */
+
+/*!
+ *  @fn const_iterator Bimap<Left, Right>::findRight(const Right& l) const
+ *
+ *  Same as constFindRight().
+ */
+
+/*!
+ *  @fn const_iterator Bimap<Left, Right>::erase(const_iterator pos)
+ *
+ *  Removes the (Left, Right) pair associated with the iterator @a pos from the bimap,
+ *  and returns an iterator to the next relationship in the bimap.
+ *
+ *  @warning Returned iterators/references should be considered invalidated the next time you call
+ *  a non-const function on the bimap, or when the bimap is destroyed.
+ *
+ *  @sa remove(), take() and find().
+ */
+
+/*!
+ *  @fn void Bimap<Left, Right>::insert(const Bimap& other)
+ *
+ *  Inserts all the relationships in the other bimap into this bimap.
+ *
+ *  If a Left or Right value from any relationship is common to both bimaps, the relationship containing
+ *  then will be replaced with the relation that contains said value(s) stored in other.
+ */
+
+/*!
+ *  @fn const_iterator Bimap<Left, Right>::insert(const Left& l, const Right& r)
+ *
+ *  Inserts a new relationship between the Left value @a l and Right value @a r.
+ *
+ *  If there is already a relationship for either value, that relationship is
+ *  removed, effectively replacing it with the new relationship.
+ *
+ *  Returns an iterator pointing to the new relationship.
+ *
+ *  @warning Returned iterators/references should be considered invalidated the next time you call
+ *  a non-const function on the bimap, or when the bimap is destroyed.
+ */
+
+/*!
+ *  @fn bool Bimap<Left, Right>::containsLeft(const Left& l) const
+ *
+ *  Returns @c true if the bimap contains a relationship with the Left value @a l; otherwise,
+ *  returns @c false.
+ *
+ *  @sa containsRight() and count().
+ */
+
+/*!
+ *  @fn bool Bimap<Left, Right>::containsRight(const Right& r) const
+ *
+ *  Returns @c true if the bimap contains a relationship with the Right value @a r; otherwise,
+ *  returns @c false.
+ *
+ *  @sa containsLeft() and count().
+ */
+
+/*!
+ *  @fn Right Bimap<Left, Right>::fromLeft(const Left& l) const
+ *
+ *  Returns the Right value associated with Left value @a l.
+ *
+ *  If the bimap does not contain a relationship with @a l, a default constructed Right
+ *  value is returned.
+ *
+ *  @sa fromRight().
+ */
+
+/*!
+ *  @fn Right Bimap<Left, Right>::fromLeft(const Left& l, const Right& defaultValue) const
+ *
+ *  @overload
+ *
+ *  Returns the Right value associated with Left value @a l.
+ *
+ *  If the bimap does not contain a relationship with @a l, @a defaultValue is returned.
+ */
+
+/*!
+ *  @fn Left Bimap<Left, Right>::fromRight(const Right& r) const
+ *
+ *  Returns the Left value associated with Right value @a r.
+ *
+ *  If the bimap does not contain a relationship with @a r, a default constructed Left
+ *  value is returned.
+ *
+ *  @sa fromLeft().
+ */
+
+/*!
+ *  @fn Left Bimap<Left, Right>::fromRight(const Right& r, const Left& defaultValue) const
+ *
+ *  @overload
+ *
+ *  Returns the Left value associated with Right value @a r.
+ *
+ *  If the bimap does not contain a relationship with @a r, @a defaultValue is returned.
+ */
+
+/*!
+ *  @fn Right Bimap<Left, Right>::from(const Left& l) const
+ *
+ *  Same as fromLeft().
+ */
+
+/*!
+ *  @fn Right Bimap<Left, Right>::from(const Left& l, const Right& defaultValue) const
+ *
+ *  Same as fromLeft(const Left&, const Right&).
+ */
+
+/*!
+ *  @fn Left Bimap<Left, Right>::from(const Right& r) const
+ *
+ *  Same as fromRight().
+ */
+
+/*!
+ *  @fn Left Bimap<Left, Right>::from(const Right& r, const Left& defaultValue) const
+ *
+ *  Same as fromLeft(const Right&, const Left&).
+ */
+
+/*!
+ *  @fn Left Bimap<Left, Right>::toLeft(const Right& r) const
+ *
+ *  Same as fromRight().
+ *
+ *  @sa toRight().
+ */
+
+/*!
+ *  @fn Left Bimap<Left, Right>::toLeft(const Right& r, const Left& defaultValue) const
+ *
+ *  @overload
+ */
+
+/*!
+ *  @fn Right Bimap<Left, Right>::toRight(const Left& l) const
+ *
+ *  Same as fromLeft().
+ *
+ *  @sa toLeft().
+ */
+
+/*!
+ *  @fn Right Bimap<Left, Right>::toRight(const Left& l, const Right& defaultValue) const
+ *
+ *  @overload
+ */
+
+/*!
+ *  @fn Left Bimap<Left, Right>::to(const Right& r) const
+ *
+ *  Same as toLeft().
+ *
+ *  @sa toRight().
+ */
+
+/*!
+ *  @fn Left Bimap<Left, Right>::to(const Right& r, const Left& defaultValue) const
+ *
+ *  @overload
+ */
+
+/*!
+ *  @fn Right Bimap<Left, Right>::to(const Left& l) const
+ *
+ *  Same as toRight().
+ *
+ *  @sa toLeft().
+ */
+
+/*!
+ *  @fn Right Bimap<Left, Right>::to(const Left& l, const Right& defaultValue) const
+ *
+ *  @overload
+ */
+
+/*!
+ *  @fn bool Bimap<Left, Right>::remove(const Left& l)
+ *
+ *  Same as removeLeft().
+ */
+
+/*!
+ *  @fn bool Bimap<Left, Right>::remove(const Right& r)
+ *
+ *  Same as removeRight().
+ */
+
+/*!
+ *  @fn bool Bimap<Left, Right>::removeLeft(const Left& l)
+ *
+ *  Removes the relationship containing the Left value @a l from the bimap if present and
+ *  returns @c true; otherwise, returns @c false.
+ *
+ *  @sa removeRight() and clear().
+ */
+
+/*!
+ *  @fn bool Bimap<Left, Right>::removeRight(const Right& r)
+ *
+ *  Removes the relationship containing the Right value @a r from the bimap if present and
+ *  returns @c true; otherwise, returns @c false.
+ *
+ *  @sa removeLeft() and clear().
+ */
+
+/*!
+ *  @fn qsizetype Bimap<Left, Right>::removeIf(Predicate pred)
+ *
+ *  Removes all elements for which the predicate pred returns true from the bimap.
+ *
+ *  The function supports predicates which take either an argument of type Bimap<Left, Right>::const_iterator,
+ *  or an argument of type std::pair<const Left&, const Right&>.
+ *
+ *  Returns the number of elements removed, if any.
+ *
+ *  @sa clear() and take().
+ */
+
+/*!
+ *  @fn Right Bimap<Left, Right>::takeRight(const Left& l)
+ *
+ *  Removes the relationship with the Left value @a l from the bimap and returns the Right value
+ *  associated with it.
+ *
+ *  If such a relationship does not exist in the bimap, the function simply returns a default-constructed value
+ *
+ *  If you don't use the return value, remove() is more efficient.
+ *
+ *  @sa remove().
+ */
+
+/*!
+ *  @fn Left Bimap<Left, Right>::takeLeft(const Right& r)
+ *
+ *  Removes the relationship with the Right value @a r from the bimap and returns the Left value
+ *  associated with it.
+ *
+ *  If such a relationship does not exist in the bimap, the function simply returns a default-constructed value
+ *
+ *  If you don't use the return value, remove() is more efficient.
+ *
+ *  @sa remove().
+ */
+
+/*!
+ *  @fn Right Bimap<Left, Right>::take(const Left& l)
+ *
+ *  Same as takeRight().
+ */
+
+/*!
+ *  @fn Left Bimap<Left, Right>::take(const Right& r)
+ *
+ *  Same as takeLeft().
+ */
+
+
+/*!
+ *  @fn void Bimap<Left, Right>::swap(Bimap<Left, Right>& other)
+ *
+ *  Swaps bimap @a other with this bimap. This operation is very fast and never fails.
+ */
+
+/*!
+ *  @fn qsizetype Bimap<Left, Right>::size() const
+ *
+ *  Returns the number of relations in the bimap.
+ *
+ *  @sa isEmpty() and count().
+ */
+
+/*!
+ *  @fn qsizetype Bimap<Left, Right>::count() const
+ *
+ *  Same as size().
+ */
+
+/*!
+ *  @fn bool Bimap<Left, Right>::isEmpty() const
+ *
+ *  Returns @c true if the bimap contains no relations; otherwise, returns @c false.
+ *
+ *  @sa size().
+ */
+
+/*!
+ *  @fn bool Bimap<Left, Right>::empty() const
+ *
+ *  Same as isEmpty().
+ */
+
+/*!
+ *  @fn float Bimap<Left, Right>::load_factor() const
+ *
+ *  Returns the current load factor of the Bimap's internal table. This is the same as
+ *  capacity()/size(). The implementation used will aim to keep the load factor
+ *  between 0.25 and 0.5. This avoids having too many table collisions that would
+ *  degrade performance.
+ *
+ *  Even with a low load factor, the implementation of the bimap table has a very low memory overhead.
+ *
+ *  This method purely exists for diagnostic purposes and you should rarely need to call it yourself.
+ *
+ *  @sa reserve() and squeeze().
+ */
+
+/*!
+ *  @fn qsizetype Bimap<Left, Right>::capacity() const
+ *
+ *  Returns the number of buckets in the bimap's internal table.
+ *
+ *  The sole purpose of this function is to provide a means of fine tuning Bimap's memory
+ *  usage. In general, you will rarely ever need to call this function. If you want to know
+ *  how many items are in the bimap, call size().
+ *
+ *  @sa reserve() and squeeze().
+ */
+
+/*!
+ *  @fn void Bimap<Left, Right>::clear()
+ *
+ *  Removes all relations from the bimap and frees up all memory used by it.
+ *
+ *  @sa remove().
+ */
+
+/*!
+ *  @fn void Bimap<Left, Right>::reserve()
+ *
+ *  Ensures that the bimap's internal table has space to store at least @a size items without
+ *  having to grow the table.
+ *
+ *  This function is useful for code that needs to build a huge bimap and wants to avoid repeated
+ *  reallocation.
+ *
+ *  In general, you will rarely ever need to call this function. Bimap's internal table
+ *  automatically grows to provide good performance without wasting too much memory.
+ *
+ *  @sa squeeze() and capacity().
+ */
+
+/*!
+ *  @fn void Bimap<Left, Right>::squeeze()
+ *
+ * Reduces the size of the Bimap's internal table to save memory.
+ *
+ * The sole purpose of this function is to provide a means of fine tuning Bimap's memory usage.
+ * In general, you will rarely ever need to call this function.
+ *
+ * @sa reserve() and capacity().
+ */
+
+/*!
+ *  @fn QList<Left> Bimap<Left, Right>::lefts() const
+ *
+ *  Returns a list containing all of the Left values in the bimap, in an arbitrary order.
+ *
+ *  This function creates a new list, in linear time.  The time and memory use that entails can be avoided
+ *  by iterating from begin() to end().
+ *
+ *  @sa rights() and fromRight().
+ */
+
+/*!
+ *  @fn QList<Right> Bimap<Left, Right>::rights() const
+ *
+ *  Returns a list containing all of the Right values in the bimap, in an arbitrary order.
+ *
+ *  This function creates a new list, in linear time.  The time and memory use that entails can be avoided
+ *  by iterating from begin() to end().
+ *
+ *  @sa lefts() and fromLeft().
+ */
+
+//-Operators---------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn Right Bimap<Left, Right>::operator[](const Left& l) const
+ *
+ *  Returns the Right value associated with the Left value @a l.
+ *
+ *  Throws `std::invalid_argument()` if the bimap does not contain a relationship with the Left value @a l.
+ *
+ *  @sa fromLeft() and fromRight().
+ */
+
+/*!
+ *  @fn Left Bimap<Left, Right>::operator[](const Right& r) const
+ *
+ *  Returns the Left value associated with the Right value @a r.
+ *
+ *  Throws `std::invalid_argument()` if the bimap does not contain a relationship with the Right value @a r.
+ *
+ *  @sa fromLeft() and fromRight().
+ */
+
+/*!
+ *  @fn bool Bimap<Left, Right>::operator==(const Bimap& other) const
+ *
+ *  Returns @c true if @a other is equal to this bimap; otherwise, returns @c false.
+ *
+ *  Two bimap's are considered equal if they contain the same (right, left) relationships.
+ *
+ *  This function requires the Right and Left types to implement operator==().
+ *
+ *  @sa operator!=().
+ */
+
+/*!
+ *  @fn bool Bimap<Left, Right>::operator!=(const Bimap& other) const
+ *
+ *  Returns @c true if @a other is not equal to this bimap; otherwise, returns @c false.
+ *
+ *  Two bimap's are considered equal if they contain the same (right, left) relationships.
+ *
+ *  This function requires the Right and Left types to implement operator==().
+ *
+ *  @sa operator==().
+ */
+
+//===============================================================================================================
+// Bimap::const_iterator
+//===============================================================================================================
+
+/*!
+ *  @class Bimap::const_iterator qx/core/qx-bimap.h
+ *  @ingroup qx-core
+ *
+ *  @brief The Bimap::const_iterator class provides an STL-style const iterator for Bimap.
+ *
+ *  Bimap<Left, Right>::const_iterator allows you to iterate over a Bimap.
+ *
+ *  The default Bimap::const_iterator constructor creates an uninitialized iterator. You must initialize it using
+ *  a Bimap function like Bimap::cbegin(), Bimap::cend(), or Bimap::constFind() before you can start iterating.
+ *
+ *  Bimap stores its relationships in an arbitrary order.
+ *
+ *  Multiple iterators can be used on the same bimap. However, be aware that any modification performed directly on
+ *  the Bimap (inserting and removing items) can cause the iterators to become invalid.
+ *
+ *  Inserting relationships into the bimap or calling methods such as Bimap::reserve() or Bimap::squeeze() can
+ *  invalidate all iterators pointing into the bimap. Iterators are guaranteed to stay valid only as long as the
+ *  Bimap doesn't have to grow/shrink its internal table. Using any iterator after a rehashing operation has
+ *  occurred will lead to undefined behavior.
+ *
+ *  You can however safely use iterators to remove entries from the bimap using the Bimap::erase() method.
+ *  This function can safely be called while iterating, and won't affect the order of items in the bimap.
+ *
+ *  @warning Iterators on this container do not work exactly like STL-iterators. You should avoid copying a bimap
+ *  while iterators are active on it. For more information, read Qt's "Implicit sharing iterator problem".
+ */
+
+//-Constructor----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn Bimap<Left, Right>::const_iterator::const_iterator()
+ *
+ *  Constructs an uninitialized iterator.
+ *
+ *  Functions like left(), right(), and operator++() must not be called on an uninitialized iterator.
+ *  Use operator=() to assign a value to it before using it.
+ *
+ *  @sa Bimap::constBegin() and Bimap::constEnd().
+ */
+
+//-Instance Functions----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn const Left& Bimap<Left, Right>::const_iterator::left() const
+ *
+ *  Returns the current relationship's Left value.
+ */
+
+/*!
+ *  @fn const Right& Bimap<Left, Right>::const_iterator::right() const
+ *
+ *  Returns the current relationship's Right value.
+ */
+
+//-Operators---------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn bool Right& Bimap<Left, Right>::const_iterator::operator==(const const_iterator& other) const
+ *
+ *  Returns @c true if @a other points to the same relationship as this iterator; otherwise, returns @c false.
+ */
+
+/*!
+ *  @fn std::pair<const Left&, const Right&> Bimap<Left, Right>::const_iterator::operator*() const
+ *
+ *  Returns the current relationship.
+ */
+
+/*!
+ *  @fn const_iterator Bimap<Left, Right>::const_iterator::operator++()
+ *
+ *  The prefix @c ++ operator @c (++i) advances the iterator to the next relationship in the bimap and
+ *  returns an iterator to the new current relationship.
+ *
+ *  Calling this function on Bimap::constEnd() leads to undefined results.
+ */
+
+/*!
+ *  @fn const_iterator Bimap<Left, Right>::const_iterator::operator++(int)
+ *
+ *  The postfix @c ++ operator @c (i++) advances the iterator to the next relationship in the bimap and
+ *  returns an iterator to the previously current relationship.
+ *
+ *  Calling this function on Bimap::constEnd() leads to undefined results.
+ */
+
+}
