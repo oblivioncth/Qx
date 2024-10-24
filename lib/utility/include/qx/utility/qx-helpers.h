@@ -15,6 +15,12 @@ struct qxFuncAggregate : Functors... {
     using Functors::operator()...;
 };
 
+// Explicit deduction guide. Shouldn't be needed as of C++20 but Clang was late to the party
+#ifdef Q_CC_CLANG
+template<class... Ts>
+qxFuncAggregate(Ts...) -> qxFuncAggregate<Ts...>;
+#endif
+
 //Non-namespace Functions----------------------------------------------------------
 template <typename T>
 const T qxAsConst(T&& t) { return std::move(t); }
