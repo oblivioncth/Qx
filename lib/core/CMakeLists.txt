@@ -5,6 +5,7 @@ qx_add_component("Core"
         qx-algorithm.h
         qx-array.h
         qx-base85.h
+        qx-bimap.h
         qx-bitarray.h
         qx-bytearray.h
         qx-char.h
@@ -74,6 +75,7 @@ qx_add_component("Core"
         __private/qx-processwaiter_linux.h
         __private/qx-processwaiter_linux.cpp
     DOC_ONLY
+        qx-bimap.dox
         qx-regularexpression.dox
         qx-bytearray.dox
         qx-exclusiveaccess.dox
