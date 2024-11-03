@@ -122,8 +122,8 @@ public:
     void registerBider(ProcessBider* bider);
     void notifyWorkerFinished();
 
-/*! @endcond */
 };
+/*! @endcond */
 
 }
 
