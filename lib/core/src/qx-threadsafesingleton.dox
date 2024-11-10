@@ -1,0 +1,58 @@
+namespace Qx
+{
+//===============================================================================================================
+// ThreadSafeSingleton
+//===============================================================================================================
+
+/*!
+ *  @class ThreadSafeSingleton qx/core/qx-threadsafesingleton.h
+ *  @ingroup qx-core
+ *
+ *  @brief The ThreadSafeSingleton template class provides access to a static singleton instance in a thread-safe
+ *  manner.
+ *
+ *  This class allows one to easily utilize the singleton pattern while ensuring that access to the global shared
+ *  instance remains thread-safe. This is achieved by providing basic scaffolding through a base class from which
+ *  the actual singleton should derive. The instance() method provides a mutex protected pointer to the
+ *  singleton instance via Qx::ExclusiveAccess. By declaring the final class' constructor as private, and accessing
+ *  the class through instance(), one can be certain that the instance is only ever being used by one thread at a
+ *  time.
+ *
+ *  If code in your singleton calls external code that in turn results in instance() being called again
+ *  from within the same thread, be sure to use QRecursiveMutex when instantiating this template or else you
+ *  may cause a dead-lock.
+ *
+ *  The following is a complete example for using Qx::ThreadSafeSingleton:
+ *
+ *  @snippet qx-threadsafesingleton.cpp 0
+ */
+
+//-Constructor----------------------------------------------------------------------------------------------
+//Protected:
+/*!
+ * @fn ThreadSafeSingleton<Singleton, Mutex>::ThreadSafeSingleton()
+ *
+ *  Constructs a ThreadSafeSingleton.
+ *
+ *  @sa instance().
+ */
+
+//-Class Functions----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn Qx::ExclusiveAccess<Singleton, QMutex> ThreadSafeSingleton<Singleton, Mutex>::instance()
+ *
+ *  Returns a handle to the singleton instance.
+ */
+
+//-Macros----------------------------------------------------------------------------------------------------------
+/*!
+ *  @def QX_THREAD_SAFE_SINGLETON(Singleton)
+ *
+ *  This macro must be used within the class definition of any singleton that derived from this class, similar to
+ *  Q_OBJECT for classes derived from QObject.
+ *
+ *  The argument is to be the name of the derived class itself (similar to CRTP).
+ */
+
+}
