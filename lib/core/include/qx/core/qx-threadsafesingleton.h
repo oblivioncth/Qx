@@ -1,14 +1,15 @@
 #ifndef QX_THREADSAFE_SINGLETON
 #define QX_THREADSAFE_SINGLETON
 
+// Qt Includes
+#include <QMutex>
+#include <QRecursiveMutex>
+
 // Intra-component Includes
 #include "qx/core/qx-exclusiveaccess.h"
 
 // Extra-component Includes
 #include "qx/utility/qx-concepts.h"
-
-class QMutex;
-class QRecursiveMutex;
 
 namespace Qx
 {
