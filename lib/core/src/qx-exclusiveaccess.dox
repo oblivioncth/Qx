@@ -23,7 +23,7 @@ namespace Qx
 //-Constructor----------------------------------------------------------------------------------------------
 //Public:
 /*!
- * @fn ExclusiveAccess<Type, Mutex>::ExclusiveAccess(AccessType* data, Mutex* mutex)
+ * @fn ExclusiveAccess<AccessType, Mutex>::ExclusiveAccess(AccessType* data, Mutex* mutex)
  *
  *  Constructs an ExclusiveAccess and locks @a mutex. The mutex will be unlocked when the ExclusiveAccess is
  *  destroyed. If @a mutex is @c nullptr, ExclusiveAccess only provides access to @a data.
@@ -32,7 +32,7 @@ namespace Qx
  */
 
 /*!
- * @fn ExclusiveAccess<Type, Mutex>::ExclusiveAccess(ExclusiveAccess&& other)
+ * @fn ExclusiveAccess<AccessType, Mutex>::ExclusiveAccess(ExclusiveAccess&& other)
  *
  *  Move-constructs and ExclusiveAccess from @a other. The mutex, data pointer, and state of @a other is
  *  transferred to the newly constructed instance. After the move, @a other will no longer manage the mutex,
@@ -44,28 +44,28 @@ namespace Qx
 //-Destructor------------------------------------------------------------------------------------------------
 //Public:
 /*!
- * @fn ExclusiveAccess<Type, Mutex>::~ExclusiveAccess()
+ * @fn ExclusiveAccess<AccessType, Mutex>::~ExclusiveAccess()
  *
  *  Destroys the ExclusiveAccess and unlocks the mutex provided by the constructor if it's still locked.
  */
 
-//-Class Functions----------------------------------------------------------------------------------------------
+//-Instance Functions----------------------------------------------------------------------------------------------
 //Public:
 /*!
- *  @fn void ExclusiveAccess<Type, Mutex>::isLocked() const
+ *  @fn void ExclusiveAccess<AccessType, Mutex>::isLocked() const
  *
  *  Returns @c true if this ExclusiveAccess is currently locking its associated mutex; otherwise, returns
  *  @c false.
  */
 
 /*!
- *  @fn void ExclusiveAccess<Type, Mutex>::mutex() const
+ *  @fn void ExclusiveAccess<AccessType, Mutex>::mutex() const
  *
  *  Returns the mutex on which the ExclusiveAccess is operating.
  */
 
 /*!
- *  @fn void ExclusiveAccess<Type, Mutex>::relock()
+ *  @fn void ExclusiveAccess<AccessType, Mutex>::relock()
  *
  *  Relocks an unlocked ExclusiveAccess.
  *
@@ -73,14 +73,14 @@ namespace Qx
  */
 
 /*!
- *  @fn void ExclusiveAccess<Type, Mutex>::swap(ExclusiveAccess& other)
+ *  @fn void ExclusiveAccess<AccessType, Mutex>::swap(ExclusiveAccess& other)
  *
  *  Swaps the mutex, data pointer, and state of this ExclusiveAccess with @a other. This operation
  *  is very fast and never fails.
  */
 
 /*!
-*  @fn void ExclusiveAccess<Type, Mutex>::unlock()
+*  @fn void ExclusiveAccess<AccessType, Mutex>::unlock()
 *
 *  Unlocks this ExclusiveAccess. You can use relock() to lock it again. It does not need to be
 *  locked when destroyed.
@@ -89,43 +89,43 @@ namespace Qx
 */
 
 /*!
-*  @fn AccessType* ExclusiveAccess<Type, Mutex>::access()
+*  @fn AccessType* ExclusiveAccess<AccessType, Mutex>::access()
 *
 *  Returns a pointer to the data the ExclusiveAccess is providing access to.
 */
 
 /*!
-*  @fn const AccessType* ExclusiveAccess<Type, Mutex>::access() const
+*  @fn const AccessType* ExclusiveAccess<AccessType, Mutex>::access() const
 *
 *  @overload
 */
 
 /*!
-*  @fn AccessType& ExclusiveAccess<Type, Mutex>::operator*()
+*  @fn AccessType& ExclusiveAccess<AccessType, Mutex>::operator*()
 *
 *  Returns a reference to the data the ExclusiveAccess is providing access to.
 */
 
 /*!
-*  @fn const AccessType& ExclusiveAccess<Type, Mutex>::operator*() const
+*  @fn const AccessType& ExclusiveAccess<AccessType, Mutex>::operator*() const
 *
 *  @overload
 */
 
 /*!
-*  @fn AccessType* ExclusiveAccess<Type, Mutex>::operator->()
+*  @fn AccessType* ExclusiveAccess<AccessType, Mutex>::operator->()
 *
 *  Provides convenient access to the members of @a DataType for the accessible data.
 */
 
 /*!
-*  @fn const AccessType* ExclusiveAccess<Type, Mutex>::operator->() const
+*  @fn const AccessType* ExclusiveAccess<AccessType, Mutex>::operator->() const
 *
 *  @overload
 */
 
 /*!
-*  @fn void ExclusiveAccess<Type, Mutex>::operator=(ExclusiveAccess&& other)
+*  @fn void ExclusiveAccess<AccessType, Mutex>::operator=(ExclusiveAccess&& other)
 *
 *  Move-assigns @a other onto this ExclusiveAccess. If this ExclusiveAccess was holding onto a
 *  locked mutex before the assignment, the mutex will be unlocked. The mutex, data pointer, and

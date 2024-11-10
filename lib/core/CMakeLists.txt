@@ -26,6 +26,7 @@ qx_add_component("Core"
         qx-processbider.h
         qx-progressgroup.h
         qx-table.h
+        qx-threadsafesingleton.h
         qx-versionnumber.h
         qx-regularexpression.h
         qx-setonce.h
@@ -87,6 +88,7 @@ qx_add_component("Core"
         qx-array.dox
         qx-setonce.dox
         qx-table.dox
+        qx-threadsafesingleton.dox
     LINKS
         PUBLIC
             ${Qt}::Core

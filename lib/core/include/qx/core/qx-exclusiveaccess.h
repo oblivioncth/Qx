@@ -10,7 +10,7 @@ class QRecursiveMutex;
 namespace Qx
 {
 
-template<typename AccessType, typename Mutex>
+template<typename AccessType, typename Mutex = QMutex>
     requires any_of<Mutex, QMutex, QRecursiveMutex>
 class ExclusiveAccess
 {
