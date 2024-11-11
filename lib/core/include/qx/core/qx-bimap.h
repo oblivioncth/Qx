@@ -37,7 +37,7 @@ template<typename Left, typename Right, typename Predicate>
 qsizetype _erase_if(Qx::Bimap<Left, Right>& bm, Predicate& pred)
 {
     // This could be moved to a private file and made more generic for any other container types if needed
-    using ConstIterator = Qx::Bimap<Left, Right>::const_iterator;
+    using ConstIterator = typename Qx::Bimap<Left, Right>::const_iterator;
 
     qsizetype result = 0;
 
@@ -91,7 +91,7 @@ public:
         friend class Bimap<Left, Right>;
     //-Aliases------------------------------------------------------------------------------------------------------
     private:
-        using PIterator = QHash<Left, const Right*>::const_iterator;
+        using PIterator = typename QHash<Left, const Right*>::const_iterator;
 
     //-Instance Variables-------------------------------------------------------------------------------------------
     private:
