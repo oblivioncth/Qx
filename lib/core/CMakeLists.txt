@@ -68,6 +68,8 @@ qx_add_component("Core"
         qx-systemerror.cpp
         qx-systemerror_linux.cpp
         qx-systemerror_win.cpp
+        __private/qx-generalworkerthread.h
+        __private/qx-generalworkerthread.cpp
         __private/qx-internalerror.cpp
         __private/qx-processwaiter.h
         __private/qx-processwaiter.cpp
