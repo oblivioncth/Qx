@@ -136,7 +136,7 @@ void ProcessBiderWorker::handleClosure(std::chrono::milliseconds timeout, bool f
         /* In case a grace expiration is queued and the process might still be running, queue a closure
          * for if the process is hooked again
          */
-        Qt::ConnectionType ct = static_cast<Qt::ConnectionType>(Qt::AutoConnection | Qt::SingleShotConnection | Qt::UniqueConnection);
+        Qt::ConnectionType ct = static_cast<Qt::ConnectionType>(Qt::AutoConnection | Qt::SingleShotConnection | Qt::UniqueConnection); // NOLINT(clang-analyzer-optin.core.EnumCastOutOfRange)
         connect(this, &ProcessBiderWorker::processHooked, this, [this, timeout, force]{
                 mWaiter.close(timeout, force);
         }, ct);
@@ -175,22 +175,7 @@ ProcessBiderManager::ProcessBiderManager() :
 ProcessBiderManager::~ProcessBiderManager()
 {
     // In theory this could be deleted while something else is accessing it, however unlikely that is given it's static
-    QMutexLocker lock(&smMutex);
     stopThreadIfStarted(true);
-}
-
-//-Class Functions----------------------------------------------------------------------------------------------
-//Private:
-Qx::ExclusiveAccess<ProcessBiderManager, QMutex> ProcessBiderManager::instance()
-{
-    /* We don't control the ProcessBider instances, so they could be in any thread and we need
-     * to synchronize access to the manager (also becuase workers access this).
-     * An alternative is making the manager a QObject and using signals/slots, but that gets tricky since it's created
-     * via RAII and therefore may be created in a thread that gets destroyed (and would then have no affinity).
-     * This is simpler.
-     */
-    static ProcessBiderManager m;
-    return Qx::ExclusiveAccess(&m, &smMutex); // Provides locked access to manager, that unlocks when destroyed
 }
 
 //-Instance Functions---------------------------------------------------------------------------------------------

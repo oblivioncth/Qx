@@ -9,6 +9,7 @@
 
 // Inter-component Includes
 #include <qx/core/qx-exclusiveaccess.h>
+#include <qx/core/qx-threadsafesingleton.h>
 
 // Project Includes
 /* The split headers like this are a touch messy as they rely on the public method's of all implementations being the same
@@ -89,13 +90,9 @@ signals:
 
 class ProcessBider;
 
-class ProcessBiderManager
+class ProcessBiderManager : public ThreadSafeSingleton<ProcessBiderManager>
 {
-//-Class Members---------------------------------------------------------------------------------------------
-private:
-     // Needs to be static so it can be locked before the the singleton is created, or else a race in instance() could occur.
-    static inline constinit QMutex smMutex;
-
+    QX_THREAD_SAFE_SINGLETON(ProcessBiderManager);
 //-Instance Members------------------------------------------------------------------------------------------
 private:
     QThread* mThread;
@@ -108,10 +105,6 @@ private:
 //-Destructor----------------------------------------------------------------------------------------------
 public:
     ~ProcessBiderManager();
-
-//-Class Functions----------------------------------------------------------------------------------------------
-public:
-    static Qx::ExclusiveAccess<ProcessBiderManager, QMutex> instance();
 
 //-Instance Functions----------------------------------------------------------------------------------------------
 private:
