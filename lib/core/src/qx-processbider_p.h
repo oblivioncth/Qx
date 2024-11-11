@@ -9,7 +9,6 @@
 
 // Inter-component Includes
 #include <qx/core/qx-exclusiveaccess.h>
-#include <qx/core/qx-threadsafesingleton.h>
 
 // Project Includes
 /* The split headers like this are a touch messy as they rely on the public method's of all implementations being the same
@@ -90,31 +89,13 @@ signals:
 
 class ProcessBider;
 
-class ProcessBiderManager : public ThreadSafeSingleton<ProcessBiderManager>
+class ProcessBiderManager
 {
-    QX_THREAD_SAFE_SINGLETON(ProcessBiderManager);
-//-Instance Members------------------------------------------------------------------------------------------
-private:
-    QThread* mThread;
-    int mWorkerCount;
-
-//-Constructor----------------------------------------------------------------------------------------------
-private:
-    explicit ProcessBiderManager();
-
-//-Destructor----------------------------------------------------------------------------------------------
+    // Doesn't need synchronization (i.e. ThreadSafeSingleton) as there are no data members
+    // TODO: This is so simple, maybe just make it a static member of ProcessBider
+//-Class Functions---------------------------------------------------------------------------------------------
 public:
-    ~ProcessBiderManager();
-
-//-Instance Functions----------------------------------------------------------------------------------------------
-private:
-    void startThreadIfStopped();
-    void stopThreadIfStarted(bool wait = false);
-
-public:
-    void registerBider(ProcessBider* bider);
-    void notifyWorkerFinished();
-
+    static void registerBider(ProcessBider* bider);
 };
 /*! @endcond */
 
