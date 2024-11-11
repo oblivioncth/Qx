@@ -1,5 +1,5 @@
-#ifndef QX_THREADSAFE_SINGLETON
-#define QX_THREADSAFE_SINGLETON
+#ifndef QX_THREAD_SAFE_SINGLETON_H
+#define QX_THREAD_SAFE_SINGLETON_H
 
 // Qt Includes
 #include <QMutex>
@@ -36,10 +36,10 @@ public:
     }
 };
 
+}
+
 //-Macros----------------------------------------------------------------------------------------------------------
 // Macro to be used in all derivatives
 #define QX_THREAD_SAFE_SINGLETON(Singleton) friend ThreadSafeSingleton<Singleton>
 
-}
-
-#endif // QX_THREADSAFE_SINGLETON
+#endif // QX_THREAD_SAFE_SINGLETON_H
