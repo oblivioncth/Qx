@@ -277,8 +277,8 @@ public:
     Right to(const Left& l) const { return toRight(l); }
     Right to(const Left& l, const Right& defaultValue) const { return toRight(l, defaultValue); }
 
-    bool remove(const Left& l) { removeLeft(l); }
-    bool remove(const Right& r) { removeRight(r); }
+    bool remove(const Left& l) { return removeLeft(l); }
+    bool remove(const Right& r) { return removeRight(r); }
     bool removeLeft(const Left& l) { return remove(mL2R, mR2L, l); }
     bool removeRight(const Right& r) { return remove(mR2L, mL2R, r); }
 
