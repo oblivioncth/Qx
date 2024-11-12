@@ -272,10 +272,6 @@ public:
     Left toLeft(const Right& r, const Left& defaultValue) const { return fromRight(r, defaultValue); }
     Right toRight(const Left& l) const { return fromLeft(l); }
     Right toRight(const Left& l, const Right& defaultValue) const { return fromLeft(l, defaultValue); }
-    Left to(const Right& r) const { return toLeft(r); }
-    Left to(const Right& r, const Left& defaultValue) const { return toLeft(r, defaultValue); }
-    Right to(const Left& l) const { return toRight(l); }
-    Right to(const Left& l, const Right& defaultValue) const { return toRight(l, defaultValue); }
 
     bool remove(const Left& l) { return removeLeft(l); }
     bool remove(const Right& r) { return removeRight(r); }

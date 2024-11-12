@@ -337,34 +337,6 @@ namespace Qx
  */
 
 /*!
- *  @fn Left Bimap<Left, Right>::to(const Right& r) const
- *
- *  Same as toLeft().
- *
- *  @sa toRight().
- */
-
-/*!
- *  @fn Left Bimap<Left, Right>::to(const Right& r, const Left& defaultValue) const
- *
- *  @overload
- */
-
-/*!
- *  @fn Right Bimap<Left, Right>::to(const Left& l) const
- *
- *  Same as toRight().
- *
- *  @sa toLeft().
- */
-
-/*!
- *  @fn Right Bimap<Left, Right>::to(const Left& l, const Right& defaultValue) const
- *
- *  @overload
- */
-
-/*!
  *  @fn bool Bimap<Left, Right>::remove(const Left& l)
  *
  *  Same as removeLeft().
