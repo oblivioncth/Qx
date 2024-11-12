@@ -33,6 +33,7 @@ qx_add_component("Core"
         qx-string.h
         qx-system.h
         qx-systemerror.h
+        qx-systemsignalwatcher.h
         qx-traverser.h
         __private/qx-internalerror.h
     IMPLEMENTATION
@@ -68,6 +69,8 @@ qx_add_component("Core"
         qx-systemerror.cpp
         qx-systemerror_linux.cpp
         qx-systemerror_win.cpp
+        qx-systemsignalwatcher.cpp
+        qx-systemsignalwatcher_p.h
         __private/qx-generalworkerthread.h
         __private/qx-generalworkerthread.cpp
         __private/qx-internalerror.cpp
@@ -77,6 +80,11 @@ qx_add_component("Core"
         __private/qx-processwaiter_win.cpp
         __private/qx-processwaiter_linux.h
         __private/qx-processwaiter_linux.cpp
+        __private/qx-signaldaemon.h
+        __private/qx-signaldaemon_win.h
+        __private/qx-signaldaemon_win.cpp
+        __private/qx-signaldaemon_linux.h
+        __private/qx-signaldaemon_linux.cpp
     DOC_ONLY
         qx-bimap.dox
         qx-regularexpression.dox
