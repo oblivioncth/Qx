@@ -40,6 +40,6 @@ public:
 
 //-Macros----------------------------------------------------------------------------------------------------------
 // Macro to be used in all derivatives
-#define QX_THREAD_SAFE_SINGLETON(Singleton) friend ThreadSafeSingleton<Singleton>
+#define QX_THREAD_SAFE_SINGLETON(...) friend ThreadSafeSingleton<__VA_ARGS__>
 
 #endif // QX_THREAD_SAFE_SINGLETON_H
