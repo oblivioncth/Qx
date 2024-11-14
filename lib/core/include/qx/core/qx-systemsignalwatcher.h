@@ -1,6 +1,9 @@
 #ifndef QX_SYSTEMSIGNALWATCHER_H
 #define QX_SYSTEMSIGNALWATCHER_H
 
+// Shared Lib Support
+#include "qx/core/qx_core_export.h"
+
 // Qt Includes
 #include <QObject>
 
@@ -9,7 +12,7 @@ namespace Qx
 
 class SystemSignalWatcherPrivate;
 
-class SystemSignalWatcher : public QObject
+class QX_CORE_EXPORT SystemSignalWatcher : public QObject
 {
     Q_OBJECT;
     Q_DECLARE_PRIVATE(SystemSignalWatcher);
