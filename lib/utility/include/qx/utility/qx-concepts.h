@@ -504,6 +504,9 @@ concept traverseable = std::bidirectional_iterator<typename K::const_iterator> &
                        std::is_default_constructible_v<K> &&
                        requires(K klass) {{ klass.size() } -> std::integral<>;};
 
+template<typename F, typename T>
+concept comparator = defines_call_for_s<F, bool, T, T>;
+
 // Conversion
 template<class K, typename T>
 concept static_castable_to = requires(K klass) {{ static_cast<T>(klass) };};

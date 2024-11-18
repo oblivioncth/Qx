@@ -1101,6 +1101,16 @@ namespace Qx
  *  is default constructable, and defines a member function 'size' that returns an integral type.
  */
 
+/*!
+ *  @concept comparator
+ *  @brief Specifies that a type can act as a comparator.
+ *
+ *  Satisfied if @c F returns a @c bool when called with two values of T.
+ *
+ *  Generally it is assumed that the comparator will return @c true if the values are equal, and
+ *  @c false otherwise.
+ */
+
 // Conversion
 /*!
  *  @concept static_castable_to
