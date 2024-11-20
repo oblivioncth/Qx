@@ -72,16 +72,11 @@ int Char::compare(QChar cOne, QChar cTwo, Qt::CaseSensitivity cs)
     // Equalize case if case-insensitive
     if(cs == Qt::CaseInsensitive)
     {
-        cOne = cOne.toLower();
-        cTwo = cTwo.toLower();
+        cOne = cOne.toCaseFolded();
+        cTwo = cTwo.toCaseFolded();
     }
 
-    if(cOne < cTwo)
-        return -1;
-    else if(cOne > cTwo)
-        return 1;
-    else
-        return 0;
+    return cOne.unicode() - cTwo.unicode();
 }
 	
 }
