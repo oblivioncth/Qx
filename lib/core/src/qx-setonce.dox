@@ -5,48 +5,49 @@ namespace Qx
 //===============================================================================================================
 
 /*!
- *  @class SetOnce qx/core/qx-setonce.h
+ *  @class SetOnce<T, C> qx/core/qx-setonce.h
  *  @ingroup qx-core
  *
  *  @brief The SetOnce template class acts as a container for a value that can only be set once.
  *
- *  The optional @a CompareEq template parameter can be used to provide a custom compare-equal function
- *  object type.
+ *  The optional @a C template parameter (defaults to @c void) can be used to provide a comparator
+ *  (such as std::equal_to), which is then used to reject assignment if the passed value is the same
+ *  as the containers default.
+ *
+ *  @sa operator=().
  */
 
 //-Constructor----------------------------------------------------------------------------------------------
 //Public:
 /*!
- * @fn SetOnce<T, CompareEq>::SetOnce(T initial, const CompareEq& comp)
+ * @fn SetOnce<T, C>::SetOnce(T initial, C&& comp = C())
  *
  *  Creates a SetOnce container that holds the initial value @a initial.
  *
  *  The container is initially unset and only holds this value until it is set.
  *
- *  Optionally, a custom compare-equal function can be provided through @a comp, which
- *  is used to determine whether or not an assigned value is different from the
- *  container's initial value.
+ *  When C is not @c void, @a comp is used to compare the input value to the container's
+ *  default value when performing an assignment.
  *
  *  @sa operator=(const T& value).
  */
 
-
 //-Instance Functions----------------------------------------------------------------------------------------------
 //Public:
 /*!
- * @fn SetOnce<T, CompareEq>::isSet() const
+ * @fn SetOnce<T, C>::isSet() const
  *
  *  Returns @c true if the containers value has been set; otherwise returns @c false.
  */
 
 /*!
- * @fn const T& SetOnce<T, CompareEq>::value() const
+ * @fn const T& SetOnce<T, C>::value() const
  *
  *  Returns the current value of the container.
  */
 
 /*!
- * @fn void SetOnce<T, CompareEq>::reset()
+ * @fn void SetOnce<T, C>::reset()
  *
  *  Resets the container to its initial state.
  *
@@ -56,12 +57,41 @@ namespace Qx
  */
 
 /*!
- * @fn SetOnce<T, CompareEq>& SetOnce<T, CompareEq>::operator=(const T& value)
+ * @fn SetOnce<T, C>& SetOnce<T, C>::operator=(const T& value)
  *
- *  Sets the value of the container to @a value, if it is different from its initial value.
+ *  Sets the value of the container to @a value. If C is not @c void and @a value is
+ *  the same as the container's default value, the container is not considered to
+ *  be set.
+ *
+ *  To clarify:
+ *  - C = void: Any assignment causes the container to be considered set.
+ *  - C satisfies @ref Qx::comparator<C, T> : Only assignment of a value other than the default
+ *    causes the container to be considered set.
  *
  *  Once the containers value has been set it cannot be changed again until it is reset.
  *
  *  @sa reset().
  */
+
+//-Instance Functions----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ * @fn const T& SetOnce<T, C>::operator*() const
+ *
+ *  Same as value().
+ */
+
+/*!
+ * @fn const T* SetOnce<T, C>::operator->() const
+ *
+ *  Allows access to members of T for the value of the container.
+ */
+
+/*!
+ * @fn SetOnce<T, C>::operator bool() const
+ *
+ *  Produces the boolean value @c true if the container is set; otherwise, produces @c false.
+ */
+
+
 }
