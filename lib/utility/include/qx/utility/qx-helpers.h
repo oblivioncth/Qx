@@ -15,11 +15,16 @@ struct qxFuncAggregate : Functors... {
     using Functors::operator()...;
 };
 
-// Explicit deduction guide. Shouldn't be needed as of C++20 but Clang was late to the party
-#ifdef Q_CC_CLANG
+/* Explicit deduction guide. Shouldn't be needed as of C++20, but some compilers are late to the party.
+ * We'd like to check for #if __cpp_deduction_guides < 201907 to see if the compiler has the feature,
+ * but it seems that GCC 10.x still won't compile without this even though it reports 201907
+ * implementation. This might have been an oversight, or have to due with P2082R1
+ * (Fixing CTAD for aggregates) which wasn't implemented in GCC until 11.x
+ */
+/*! @cond */
 template<class... Ts>
 qxFuncAggregate(Ts...) -> qxFuncAggregate<Ts...>;
-#endif
+/*! @endcond */
 
 //Non-namespace Functions----------------------------------------------------------
 template <typename T>
