@@ -25,6 +25,7 @@ qx_add_component("Core"
         qx-list.h
         qx-processbider.h
         qx-progressgroup.h
+        qx-property.h
         qx-table.h
         qx-threadsafesingleton.h
         qx-versionnumber.h
@@ -99,6 +100,7 @@ qx_add_component("Core"
         qx-setonce.dox
         qx-table.dox
         qx-threadsafesingleton.dox
+        qx-property.dox
     LINKS
         PUBLIC
             ${Qt}::Core

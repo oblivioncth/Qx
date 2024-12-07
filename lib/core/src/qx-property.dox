@@ -1,0 +1,172 @@
+/*!
+ *  @file qx-property.h
+ *  @ingroup qx-core
+ *
+ *  @brief The qx-property.h header file provides access to extended bindable property types.
+ */
+
+//-Macros----------------------------------------------------------------------------------------------------------
+/*!
+ *  @def QX_Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(...)
+ *
+ *  Same as Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS, but uses Qx::ObjectBindableProperty.
+ */
+
+/*!
+ *  @def QX_Q_OBJECT_BINDABLE_PROPERTY(...)
+ *
+ *  Same as Q_OBJECT_BINDABLE_PROPERTY, but uses Qx::ObjectBindableProperty.
+ */
+
+/*!
+ *  @def QX_Q_OBJECT_COMPUTED_PROPERTY(...)
+ *
+ *  Same as Q_OBJECT_COMPUTED_PROPERTY, but uses Qx::ObjectComputedProperty.
+ */
+
+namespace Qx
+{
+//===============================================================================================================
+// Property
+//===============================================================================================================
+
+/*!
+ *  @class Property qx/core/qx-property.h
+ *  @ingroup qx-core
+ *
+ *  @brief The Property class extends QProperty<T> with additional convenience functions.
+ */
+
+//-Class Functions----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn template<typename Functor> QPropertyNotifier Property::addSubscription(Functor f) const
+ *
+ *  Equivalent to calling f(), followed by addNotifier(f).
+ *
+ *  Returns a QPropertyNotifier, which is easier to store than QPropertyChangeHandler since it isn't a template.
+ */
+
+/*!
+ *  @fn template<typename Functor> void Property::lifetimeSubscribe(Functor f) const
+ *
+ *  Same as subscribe(), except that the lifetime of the subscription is tied to the lifetime
+ *  of the property, such that it's canceled when the property is destroyed as does not need to be managed
+ *  by the user.
+ *
+ *  @warning This is convenient for cases where the subscription binds together shared resources of the
+ *  same class that will have the same lifetime, but be certain that no objects that are referenced in
+ *  the provided functor outlive the property when using this function.
+ */
+
+/*!
+ *  @fn template<typename Functor> void Property::lifetimeOnValueChanged(Functor f) const
+ *
+ *  Same as onValueChanged(), except that the lifetime of the subscription is tied to the lifetime
+ *  of the property, such that it's canceled when the property is destroyed as does not need to be managed
+ *  by the user.
+ *
+ *  @warning This is convenient for cases where the subscription binds together shared resources of the
+ *  same class that will have the same lifetime, but be certain that no objects that are referenced in
+ *  the provided functor outlive the property when using this function.
+ */
+
+//===============================================================================================================
+// Bindable
+//===============================================================================================================
+
+/*!
+ *  @class Bindable qx/core/qx-property.h
+ *  @ingroup qx-core
+ *
+ *  @brief The Bindable class extends QBindable<T> with additional convenience functions.
+ */
+
+//-Class Functions----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn template<typename Functor> QPropertyNotifier Bindable::addSubscription(Functor f) const
+ *
+ *  @copydoc Property::addSubscription()
+ */
+
+/*!
+ *  @fn template<typename Functor> void Bindable::lifetimeSubscribe(Functor f) const
+ *
+ *  @copydoc Property::lifetimeSubscribe()
+ */
+
+/*!
+ *  @fn template<typename Functor> void Bindable::lifetimeOnValueChanged(Functor f) const
+ *
+ *  @copydoc Property::lifetimeOnValueChanged()
+ */
+
+//===============================================================================================================
+// ObjectBindableProperty
+//===============================================================================================================
+
+/*!
+ *  @class ObjectBindableProperty qx/core/qx-property.h
+ *  @ingroup qx-core
+ *
+ *  @brief The ObjectBindableProperty class extends QObjectBindableProperty<T> with additional convenience functions.
+ *
+ *  @note This class should not be instantiated directly, but instead with QX_Q_OBJECT_BINDABLE_PROPERTY()
+ *  or QX_Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS().
+ */
+
+//-Class Functions----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn template<typename Functor> QPropertyNotifier ObjectBindableProperty::addSubscription(Functor f) const
+ *
+ *  @copydoc Property::addSubscription()
+ */
+
+/*!
+ *  @fn template<typename Functor> void ObjectBindableProperty::lifetimeSubscribe(Functor f) const
+ *
+ *  @copydoc Property::lifetimeSubscribe()
+ */
+
+/*!
+ *  @fn template<typename Functor> void ObjectBindableProperty::lifetimeOnValueChanged(Functor f) const
+ *
+ *  @copydoc Property::lifetimeOnValueChanged()
+ */
+
+//===============================================================================================================
+// ObjectComputedProperty
+//===============================================================================================================
+
+/*!
+ *  @class ObjectComputedProperty qx/core/qx-property.h
+ *  @ingroup qx-core
+ *
+ *  @brief The ObjectComputedProperty class extends QObjectComputedProperty<T> with additional convenience functions.
+ *
+ *  @note This class should not be instantiated directly, but instead with QX_Q_OBJECT_COMPUTED_PROPERTY().
+ */
+
+//-Class Functions----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn template<typename Functor> QPropertyNotifier ObjectComputedProperty::addSubscription(Functor f) const
+ *
+ *  @copydoc Property::addSubscription()
+ */
+
+/*!
+ *  @fn template<typename Functor> void ObjectComputedProperty::lifetimeSubscribe(Functor f) const
+ *
+ *  @copydoc Property::lifetimeSubscribe()
+ */
+
+/*!
+ *  @fn template<typename Functor> void ObjectComputedProperty::lifetimeOnValueChanged(Functor f) const
+ *
+ *  @copydoc Property::lifetimeOnValueChanged()
+ */
+
+}
