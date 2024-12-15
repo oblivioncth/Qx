@@ -23,6 +23,7 @@ qx_add_component("Core"
         qx-iostream.h
         qx-json.h
         qx-list.h
+        qx-lopmap.h
         qx-processbider.h
         qx-progressgroup.h
         qx-table.h
@@ -93,6 +94,7 @@ qx_add_component("Core"
         qx-index.dox
         qx-iostream.dox
         qx-list.dox
+        qx-lopmap.dox
         qx-traverser.dox
         qx-cumulation.dox
         qx-array.dox
