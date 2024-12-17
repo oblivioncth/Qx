@@ -125,9 +125,12 @@ public:
 
 //-Aliases------------------------------------------------------------------------------------------------------
 public:
+    using iterator = const_iterator;
     using left_type = Left;
     using right_type = Right;
     using ConstIterator = const_iterator;
+    using difference_type = typename QHash<Left, const Right*>::difference_type;
+    using size_type = typename QHash<Left, const Right*>::size_type;
 
 //-Instance Variables-------------------------------------------------------------------------------------------
 private:
@@ -193,9 +196,11 @@ private:
     }
 
 public:
+    iterator begin() { return iterator(mL2R.begin()); }
     const_iterator begin() const { return constBegin(); }
     const_iterator cbegin() const { return constBegin(); }
     const_iterator constBegin() const { return const_iterator(mL2R.cbegin()); }
+    iterator end() { return iterator(mL2R.end()); }
     const_iterator end() const { return constEnd(); }
     const_iterator cend() const { return constEnd(); }
     const_iterator constEnd() const { return const_iterator(mL2R.cend()); }
@@ -209,9 +214,13 @@ public:
         return const_iterator(rItr != mR2L.cend() ? mL2R.constFind(*(*rItr)) : mL2R.cend());
     }
 
+    iterator find(const Left& l) requires asymmetric_bimap<Left, Right> { return findLeft(l); }
     const_iterator find(const Left& l) const requires asymmetric_bimap<Left, Right> { return findLeft(l); }
+    iterator find(const Right& r) requires asymmetric_bimap<Left, Right> { return findRight(r); }
     const_iterator find(const Right& r) const requires asymmetric_bimap<Left, Right> { return findRight(r); }
+    iterator findLeft(const Left& l) { return iterator(constFindLeft(l)); }
     const_iterator findLeft(const Left& l) const { return const_iterator(constFindLeft(l)); }
+    iterator findRight(const Right& r) { return iterator(constFindRight(r)); }
     const_iterator findRight(const Right& r) const { return const_iterator(constFindRight(r)); }
 
     const_iterator erase(const_iterator pos)

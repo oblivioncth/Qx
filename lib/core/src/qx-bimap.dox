@@ -44,11 +44,20 @@ namespace Qx
  *  significant than the other. Lookup of one of the "side's" values using the other is possible
  *  via fromLeft(), fromRight(), and other similarly named functions.
  *
+ *  iterator is simply an alias for const_iterator as values cannot be modified through
+ *  bimap iterators due to technical limitations.
+ *
  *  Both the Left and Right types must provide operator==() and a global qHash() overload.
  */
 
 //-Aliases--------------------------------------------------------------------------------------------------
 //Public:
+/*!
+ *  @typedef Bimap<Left, Right>::iterator
+ *
+ *  Typedef for const_iterator.
+ */
+
 /*!
  *  @typedef Bimap<Left, Right>::left_type
  *
@@ -65,6 +74,18 @@ namespace Qx
  *  @typedef Bimap<Left, Right>::ConstIterator
  *
  *  Qt-style synonym for Bimap::const_iterator.
+ */
+
+/*!
+ *  @typedef Bimap<Left, Right>::difference_type
+ *
+ *  Typedef for ptrdiff_t. Provided for STL compatibility.
+ */
+
+/*!
+ *  @typedef Bimap<Left, Right>::size_type
+ *
+ *  Typedef for int. Provided for STL compatibility.
  */
 
 //-Constructor----------------------------------------------------------------------------------------------
@@ -86,9 +107,15 @@ namespace Qx
 //-Instance Functions----------------------------------------------------------------------------------------------
 //Public:
 /*!
- *  @fn const_iterator Bimap<Left, Right>::begin() const
+ *  @fn iterator Bimap<Left, Right>::begin()
  *
  *  Same as constBegin().
+ */
+
+/*!
+ *  @fn const_iterator Bimap<Left, Right>::begin() const
+ *
+ *  @overload
  */
 
 /*!
@@ -109,9 +136,15 @@ namespace Qx
  */
 
 /*!
- *  @fn const_iterator Bimap<Left, Right>::end() const
+ *  @fn iterator Bimap<Left, Right>::end()
  *
  *  Same as constEnd().
+ */
+
+/*!
+ *  @fn const_iterator Bimap<Left, Right>::end() const
+ *
+ *  @overload
  */
 
 /*!
@@ -123,7 +156,7 @@ namespace Qx
 /*!
  *  @fn const_iterator Bimap<Left, Right>::constEnd() const
  *
- *  Returns an STL-style iterator pointing to the first relationship in the bimap.
+ *  Returns an STL-style iterator pointing to the last relationship in the bimap.
  *
  *  @warning Returned iterators/references should be considered invalidated the next time you call
  *  a non-const function on the bimap, or when the bimap is destroyed.
@@ -166,27 +199,51 @@ namespace Qx
  */
 
 /*!
+ *  @fn iterator Bimap<Left, Right>::find(const Left& l)
+ *
+ *  Same as constFindLeft().
+ */
+
+/*!
  *  @fn const_iterator Bimap<Left, Right>::find(const Left& l) const
  *
- *  Same as constFindLeft().
+ *  @overload
  */
 
 /*!
- *  @fn const_iterator Bimap<Left, Right>::find(const Right& l) const
+ *  @fn iterator Bimap<Left, Right>::find(const Right& r)
  *
  *  Same as constFindRight().
  */
 
 /*!
- *  @fn const_iterator Bimap<Left, Right>::findLeft(const Left& l) const
+ *  @fn const_iterator Bimap<Left, Right>::find(const Right& r) const
+ *
+ *  @overload
+ */
+
+/*!
+ *  @fn iterator Bimap<Left, Right>::findLeft(const Left& r)
  *
  *  Same as constFindLeft().
  */
 
 /*!
- *  @fn const_iterator Bimap<Left, Right>::findRight(const Right& l) const
+ *  @fn const_iterator Bimap<Left, Right>::findLeft(const Left& r) const
+ *
+ *  @overload
+ */
+
+/*!
+ *  @fn iterator Bimap<Left, Right>::findRight(const Right& r)
  *
  *  Same as constFindRight().
+ */
+
+/*!
+ *  @fn const_iterator Bimap<Left, Right>::findRight(const Right& r) const
+ *
+ *  @overload
  */
 
 /*!
