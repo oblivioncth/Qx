@@ -309,11 +309,11 @@ public:
         return std::make_pair<const_iterator, const_iterator>(sItrPair.first, sItrPair.second);
     }
 
-    const T& first() const { Q_ASSERT(!mStorage.empty()); mStorage.cbegin()->value; }
-    const Key& firstKey() const { Q_ASSERT(!mStorage.empty()); *mStorage.cbegin()->keyPtr; }
+    const T& first() const { Q_ASSERT(!mStorage.empty()); return mStorage.cbegin()->value; }
+    const Key& firstKey() const { Q_ASSERT(!mStorage.empty()); return *mStorage.cbegin()->keyPtr; }
 
-    const T& last() const { Q_ASSERT(!mStorage.empty()); mStorage.cend()->value; }
-    const Key& lastKey() const { Q_ASSERT(!mStorage.empty()); *mStorage.cend()->keyPtr; }
+    const T& last() const { Q_ASSERT(!mStorage.empty()); return mStorage.cend()->value; }
+    const Key& lastKey() const { Q_ASSERT(!mStorage.empty()); return *mStorage.cend()->keyPtr; }
 
     Key key(const T& value, const Key& defaultKey = Key()) const
     {
