@@ -3,6 +3,7 @@
 
 // Qt Includes
 #include <QStringList>
+#include <QStringDecoder>
 
 // Intra-component Includes
 #include "qx/core/qx-regularexpression.h"
