@@ -237,10 +237,11 @@ concept defines_address_of_s = requires(K klass) {{ &klass } -> std::same_as<R*>
 template<class K>
 concept defines_address_of = requires(K klass) {{ &klass };};
 
-/* TODO: Not sure how to do this one, there is a "b" parameter but its type could be anything
- * template<class K, typename R>
- * concept defines_member_ptr_s = requires(K klass, R ret) {{ klass-> } -> std::same_as<R*>;};
- */
+template<class K>
+concept defines_member_ptr = requires(K klass) {{ klass.operator->() };};
+
+template<class K, typename R>
+concept defines_member_ptr_s = requires(K klass) {{ klass.operator->() } -> std::same_as<R*>;};
 
 template<class K, typename R, typename T>
 concept defines_ptr_to_member_ptr_for_s = requires(K klass, T type) {{ klass->*type } -> std::same_as<R&>;};
@@ -266,7 +267,6 @@ concept defines_comma_for_s = requires(K klass, T type) {{ klass, type } -> std:
 
 template<class K, typename T>
 concept defines_comma_for = requires(K klass, T type) {{ klass, type };};
-
 
 // Arithmetic Operators
 template<class K>
