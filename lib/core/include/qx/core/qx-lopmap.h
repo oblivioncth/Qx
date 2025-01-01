@@ -250,9 +250,15 @@ private:
          */
         auto [lItr, isNew] = mLookup.emplace(key, StorageItr());
 
-        // Erase the old value in storage if present
         if(!isNew)
+        {
+            // Don't do anything if the value is the same as the current, to avoid iterator invalidation
+            if(lItr->second->value == value)
+                return iterator(lItr->second);
+
+            // Otherwise, we have to erase and re-insert, which unfortunately invalidates iterators pointing to key
             mStorage.erase(lItr->second);
+        }
 
         // Store the new data
         auto sItr = hint ? mStorage.emplace_hint(*hint, &lItr->first, value) : mStorage.emplace(&lItr->first, value);
