@@ -1,0 +1,452 @@
+namespace Qx
+{
+
+/*!
+ *  @concept flatmultiset_predicate
+ *  @brief Specifies that a predicate is a valid predicate for a FlatMultiSet.
+ *
+ *  Satisfied if the predicate takes const T& and returns @c bool.
+ */
+
+//===============================================================================================================
+// FlatMultiSet
+//===============================================================================================================
+
+/*!
+ *  @class FlatMultiSet qx/core/qx-flatmultiset.h
+ *  @ingroup qx-core
+ *
+ *  @brief The FlatMultiSet class is a container whose elements are always sorted.
+ *
+ *  Essentially a more Qt aligned version of C++23's std::flat_multiset, backed by a QList.
+ *
+ *  iterator is an alias for const_iterator since modifying an element in-place could affect ordering.
+ *
+ *  Iterator invalidation rules are the same as for QList.
+ */
+
+//-Aliases--------------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @typedef FlatMultiSet<T, Compare>::const_iterator
+ *  The container's regular iterator type, an alias for QList<T>::const_iterator.
+ *
+ *  @typedef FlatMultiSet<T, Compare>::iterator
+ *  Typedef for const_iterator.
+ *
+ *  @typedef FlatMultiSet<T, Compare>::ConstIterator
+ *  Qt-style synonym for FlatMultiSet::const_iterator.
+ *
+ *  @typedef FlatMultiSet<T, Compare>::Iterator
+ *  Qt-style synonym for FlatMultiSet::iterator.
+ *
+ *  @typedef FlatMultiSet<T, Compare>::const_pointer
+ *  Provided for STL compatibility.
+ *
+ *  @typedef FlatMultiSet<T, Compare>::const_reference
+ *  Provided for STL compatibility.
+ *
+ *  @typedef FlatMultiSet<T, Compare>::const_reverse_iterator
+ *  The container's reverse iterator type, an alias for QList<T>::const_reverse_iterator.
+ *
+ *  @typedef FlatMultiSet<T, Compare>::ConstReverseIterator
+ *  Qt-style synonym for const_reverse_iterator.
+ *
+ *  @typedef FlatMultiSet<T, Compare>::difference_type
+ *  Provided for STL compatibility.
+ *
+ *  @typedef FlatMultiSet<T, Compare>::pointer
+ *  Provided for STL compatibility.
+ *
+ *  @typedef FlatMultiSet<T, Compare>::reference
+ *  Provided for STL compatibility.
+ *
+ *  @typedef FlatMultiSet<T, Compare>::reverse_iterator
+ *  Typedef for const_reverse_iterator.
+ *
+ *  @typedef FlatMultiSet<T, Compare>::ReverseIterator
+ *  Qt-style synonym for reverse_iterator.
+ *
+ *  @typedef FlatMultiSet<T, Compare>::key_type
+ *  Typedef for T.
+ *
+ *  @typedef FlatMultiSet<T, Compare>::size_type
+ *  Typedef for the container's size_type, usually std::size_t.
+ *
+ *  @typedef FlatMultiSet<T, Compare>::value_type
+ *  Typedef for T.
+ */
+
+//-Constructor----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn FlatMultiSet<T, Compare>::FlatMultiSet()
+ *
+ *  Creates an empty flat-multiset.
+ *
+ *  @sa clear().
+ */
+
+/*!
+ * @fn FlatMultiSet<T, Compare>::FlatMultiSet(std::initializer_list<T> list)
+ *
+ *  Creates a FlatMultiSet with a copy of each of the elements in the initializer list @a list.
+ */
+
+/*!
+ * @fn FlatMultiSet<T, Compare>::FlatMultiSet(InputIterator first, InputIterator last)
+ *
+ *  Creates a FlatMultiSet with a copy of each of the elements between [first, last).
+ */
+
+//-Instance Functions----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn bool FlatMultiSet<T, Compare>::contains(const FlatMultiSet& other) const
+ *
+ *  Returns @c true if the FlatMultiSet contains all of the items in @a other; otherwise,
+ *  returns @c false.
+ *
+ *  @sa count().
+ */
+
+/*!
+ *  @fn bool FlatMultiSet<T, Compare>::contains(const T& value) const
+ *
+ *  Returns @c true if the FlatMultiSet contains @a value; otherwise,
+ *  returns @c false.
+ *
+ *  @sa count().
+ */
+
+/*!
+ *  @fn qsizetype FlatMultiSet<T, Compare>::count() const
+ *
+ *  Same as size().
+ */
+
+/*!
+ *  @fn qsizetype FlatMultiSet<T, Compare>::size() const
+ *
+ *  Returns the number of items in the FlatMultiSet.
+ *
+ *  @sa isEmpty() and count().
+ */
+
+/*!
+ *  @fn bool FlatMultiSet<T, Compare>::empty() const
+ *
+ *  Same as isEmpty().
+ */
+
+/*!
+ *  @fn bool FlatMultiSet<T, Compare>::isEmpty() const
+ *
+ *  Returns @c true if the FlatMultiSet contains no items; otherwise, returns @c false.
+ *
+ *  @sa size().
+ */
+
+/*!
+ *  @fn const T& FlatMultiSet<T, Compare>::first() const
+ *
+ *  Same as constFirst().
+ */
+
+/*!
+ *  @fn const T& FlatMultiSet<T, Compare>::constFirst() const
+ *
+ *  Returns a reference to the first item in the set. This function assumes that the set isn't empty.
+ *
+ *  @sa last() and isEmpty().
+ */
+
+/*!
+ *  @fn const T& FlatMultiSet<T, Compare>::last() const
+ *
+ *  Same as constLast().
+ */
+
+/*!
+ *  @fn const T& FlatMultiSet<T, Compare>::constLast() const
+ *
+ *  Returns a reference to the last item in the set. This function assumes that the set isn't empty.
+ *
+ *  @sa first() and isEmpty().
+ */
+
+/*!
+ *  @fn qsizetype FlatMultiSet<T, Compare>::capacity() const
+ *
+ *  Returns the maximum number of items that can be stored in the flat-multiset without forcing a reallocation.
+ *
+ *  The sole purpose of this function is to provide a means of fine tuning FlatMultiSet's memory usage. In general,
+ *  you will rarely ever need to call this function. If you want to know how many items are in the flat-multiset,
+ *  call size().
+ *
+ *  @note a statically allocated flat-multiset will report a capacity of 0, even if it's not empty.
+ *
+ *  @sa reserve() and squeeze().
+ */
+
+/*!
+ *  @fn void FlatMultiSet<T, Compare>::reserve()
+ *
+ * Attempts to allocate memory for at least size elements.
+ *
+ *  If you know in advance how large the flat-multiset will be, you should call this function to prevent reallocations
+ *  and memory fragmentation. If you resize the flat-multiset often, you are also likely to get better performance.
+ *
+ *  If in doubt about how much space shall be needed, it is usually better to use an upper bound as size, or a
+ *  high estimate of the most likely size, if a strict upper bound would be much bigger than this. If size is an
+ *  underestimate, the flat-multiset will grow as needed once the reserved size is exceeded, which may lead to a larger
+ *  allocation than your best overestimate would have and will slow the operation that triggers it.
+ *
+ *  @warning reserve() reserves memory but does not change the size of the flat-multiset. Accessing data beyond the
+ *  current end of the flat-multiset is undefined behavior.
+ *
+ *  @sa capacity() and squeeze().
+ */
+
+/*!
+ *  @fn void FlatMultiSet<T, Compare>::squeeze()
+ *
+ *  Releases any memory not required to store the items.
+ *
+ *  The sole purpose of this function is to provide a means of fine tuning FlatMultiSet's memory usage. In general,
+ *  you will rarely ever need to call this function.
+ *
+ *  @sa reserve() and capacity().
+ */
+
+/*!
+ *  @fn iterator FlatMultiSet<T, Compare>::begin() const
+ *
+ *  Same as constBegin().
+ */
+
+/*!
+ *  @fn const_iterator FlatMultiSet<T, Compare>::cbegin() const
+ *
+ *  Same as constBegin().
+ */
+
+/*!
+ *  @fn const_iterator FlatMultiSet<T, Compare>::constBegin() const
+ *
+ *  Returns an STL-style iterator pointing to the first item in the FlatMultiSet.
+ *
+ *  @sa constEnd().
+ */
+
+/*!
+ *  @fn iterator FlatMultiSet<T, Compare>::end() const
+ *
+ *  Same as constEnd().
+ */
+
+/*!
+ *  @fn const_iterator FlatMultiSet<T, Compare>::cend() const
+ *
+ *  Same as constEnd().
+ */
+
+/*!
+ *  @fn const_iterator FlatMultiSet<T, Compare>::constEnd() const
+ *
+ *  Returns an STL-style iterator pointing to the imaginary item after the last item in the FlatMultiSet.
+ *
+ *  @sa constBegin().
+ */
+
+/*!
+ *  @fn reverse_iterator FlatMultiSet<T, Compare>::rbegin() const
+ *
+ *  Same as constReverseBegin().
+ */
+
+/*!
+ *  @fn const_reverse_iterator FlatMultiSet<T, Compare>::crbegin() const
+ *
+ *  Same as constReverseBegin().
+ */
+
+/*!
+ *  @fn const_reverse_iterator FlatMultiSet<T, Compare>::constReverseBegin() const
+ *
+ *  Returns an STL-style iterator pointing to the last item in the FlatMultiSet.
+ *
+ *  @sa constReverseEnd().
+ */
+
+/*!
+ *  @fn reverse_iterator FlatMultiSet<T, Compare>::rend() const
+ *
+ *  Same as constReverseEnd().
+ */
+
+/*!
+ *  @fn const_reverse_iterator FlatMultiSet<T, Compare>::crend() const
+ *
+ *  Same as constReverseEnd().
+ */
+
+/*!
+ *  @fn const_reverse_iterator FlatMultiSet<T, Compare>::constReverseEnd() const
+ *
+ *  Returns an STL-style iterator pointing to the imaginary item after the first item in the FlatMultiSet.
+ *
+ *  @sa constReverseBegin().
+ */
+
+/*!
+ *  @fn iterator FlatMultiSet<T, Compare>::find(const T& value) const
+ *
+ *  Same as constFind().
+ */
+
+/*!
+ *  @fn const_iterator FlatMultiSet<T, Compare>::constFind(const T& value) const
+ *
+ *  Returns an iterator positioned at the item @a value in the set. If the set contains multiple
+ *  items of @a value, it is unspecified to which the iterator points.
+ *
+ *  If the set contains no item @a value, the function returns constEnd().
+ */
+
+/*!
+ *  @fn iterator FlatMultiSet<T, Compare>::erase(const_iterator pos)
+ *
+ *  Removes the item pointed to by the iterator @a pos from the FlatMultiSet, and returns an
+ *  iterator to the next item in the set.
+ *
+ *  @note The iterator @a pos @e must be valid and dereferenceable.
+ *
+ *  @sa remove().
+ */
+
+/*!
+ *  @fn std::pair<const_iterator, const_iterator> FlatMultiSet<T, Compare>::equal_range(const T& value) const
+ *
+ *  Returns a pair of iterators delimiting the range of values [first, second), that are stored with @a value.
+ */
+
+
+/*!
+ *  @fn const_iterator FlatMultiSet<T, Compare>::lowerBound(const T& value) const
+ *
+ *  Returns an iterator pointing to the first item with value @a value in the FlatMultiSet. If the set contains no
+ *  item with value @a value, the function returns an iterator to the nearest item with a greater value,
+ *  or constEnd() if there is none.
+ *
+ *  @sa upperBound() and find().
+ */
+
+/*!
+ *  @fn const_iterator FlatMultiSet<T, Compare>::upperBound(const T& value) const
+ *
+ *  Returns an iterator pointing to the item that immediately follows the last item with value @a value in the
+ *  FlatMultiSet. If the set contains no item with value @a value, the function returns an iterator to the nearest
+ *  item with a greater value, or constEnd() if there is none.
+ *
+ *  @sa lowerBound() and find().
+ */
+
+/*!
+ *  @fn void FlatMultiSet<T, Compare>::clear()
+ *
+ *  Removes all items from the FlatMultiSet.
+ *
+ *  @sa remove().
+ */
+
+/*!
+ *  @fn iterator FlatMultiSet<T, Compare>::insert(const T& value)
+ *
+ *  Inserts an item with the value @a value into the FlatMultiSet.
+ *
+ *  If the container has items with the same value, inserts at the upper bound of that range.
+ *
+ *  Returns an iterator pointing to the new item.
+ */
+
+/*!
+ *  @fn iterator FlatMultiSet<T, Compare>::insert(const_iterator pos, const T& value)
+ *
+ *  Inserts an item with the value @a value into the FlatMultiSet, using @a pos as a hint as to
+ *  where the item should be inserted. If the hint is correct, the item is inserted directly
+ *  to that position; otherwise, this function is equivalent to insert(const T& value), which
+ *  first has to search for the correct position.
+ *
+ *  Returns an iterator pointing to the new element.
+ */
+
+/*!
+ *  @fn iterator FlatMultiSet<T, Compare>::emplace(Args&&... args)
+ *
+ *  Inserts an item, constructed in-place using the arguments @a args, into the FlatMultiSet.
+ *
+ *  If the container has items with the same value, inserts at the upper bound of that range.
+ *
+ *  Returns an iterator pointing to the new item.
+ */
+
+/*!
+ *  @fn iterator FlatMultiSet<T, Compare>::emplace(const_iterator pos, Args&&... args)
+ *
+ *  Inserts an item, constructed in-place using the arguments @a args, into the FlatMultiSet,
+ *  using @a pos as a hint as to where the item should be inserted. If the hint is correct,
+ *  the item is inserted directly to that position; otherwise, this function is equivalent to
+ *  insert(const T& value), which first has to search for the correct position.
+ *
+ *  Returns an iterator pointing to the new element.
+ */
+
+
+/*!
+ *  @fn size_type FlatMultiSet<T, Compare>::remove(const T& value)
+ *
+ *  Removes all items with the value @a value from the FlatMultiSet and returns the number of
+ *  items removed, if any.
+ *
+ *  @sa clear().
+ */
+
+/*!
+ *  @fn qsizetype FlatMultiSet<T, Compare>::removeIf(Predicate pred)
+ *
+ *  Removes all items for which the predicate @a pred returns true from the FlatMultiSet.
+ *
+ *  Returns the number of elements removed, if any.
+ *
+ *  @sa clear() and.
+ */
+
+/*!
+ *  @fn void FlatMultiSet<T, Compare>::swap(FlatMultiSet<Key, t>& other)
+ *
+ *  Swaps FlatMultiSet @a other with this FlatMultiSet. This operation is very fast and never fails.
+ */
+
+/*!
+ *  @fn QList<T> FlatMultiSet<T, Compare>::values() const
+ *
+ *  Returns a list containing all of the values in the FlatMultiSet in order.
+ *
+ *  This function creates a new list, in linear time. The time and memory use that entails can be
+ *  avoided by iterating from begin() to end().
+ */
+
+//-Operators---------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn bool FlatMultiSet<T, Compare>::operator==(const FlatMultiSet& other) const
+ *
+ *  Returns @c true if @a other is equal to this FlatMultiSet; otherwise, returns @c false.
+ *
+ *  Two FlatMultiSet's are considered equal if they contain the same items, and only the same items.
+ *
+ *  This function requires T to implement @c operator==().
+ */
+
+}
