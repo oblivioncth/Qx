@@ -2,7 +2,6 @@
 #define QX_CONCEPTS_H
 
 // Standard Library Includes
-#include <utility>
 #include <iterator>
 #include <type_traits>
 

@@ -12,8 +12,6 @@
  *  The constrained variants enforce a strict return type that matches the standard
  *  return type for the default implementation of that operator, or a user defined type, @c R, if there
  *  is none.
- *
- *  @todo Figure out how to make a concept that uses the member of pointer (arrow) operator.
  */
 
 namespace Qx
