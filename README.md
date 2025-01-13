@@ -13,6 +13,7 @@ Detailed documentation of this library, facilitated by Doxygen, is available at:
 
 ### Highlights:
 
+- [Declarative JSON](https://oblivioncth.github.io/Qx/declarativejson.html)
 - [Qx::ApplicationLogger](https://oblivioncth.github.io/Qx/classQx_1_1ApplicationLogger.html)
 - [Qx::AsyncDownloadManager](https://oblivioncth.github.io/Qx/classQx_1_1AsyncDownloadManager.html)/[Qx::SyncDownloadManager](https://oblivioncth.github.io/Qx/classQx_1_1SyncDownloadManager.html)
 - [Qx::Base85](https://oblivioncth.github.io/Qx/classQx_1_1Base85.html)
@@ -20,7 +21,6 @@ Detailed documentation of this library, facilitated by Doxygen, is available at:
 - [Qx::Table< T >](https://oblivioncth.github.io/Qx/classQx_1_1Table.html)/[Qx::DsvTable](https://oblivioncth.github.io/Qx/classQx_1_1DsvTable.html)
 - [Qx::Error](https://oblivioncth.github.io/Qx/classQx_1_1Error.html)
 - [Qx::GroupedProgressManager](https://oblivioncth.github.io/Qx/classQx_1_1GroupedProgressManager.html)
-- [Qx::Json](https://oblivioncth.github.io/Qx/qx-json_8h.html)
 - [Qx::SetOnce< T >](https://oblivioncth.github.io/Qx/classQx_1_1SetOnce.html)
 - [Qx::TaskbarButton](https://oblivioncth.github.io/Qx/classQx_1_1TaskbarButton.html)
 - [qx-common-io.h](https://oblivioncth.github.io/Qx/qx-common-io_8h.html)
