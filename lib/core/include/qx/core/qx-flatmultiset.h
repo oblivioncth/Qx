@@ -62,22 +62,22 @@ private:
     using Container = QList<T>; // Makes it easier to move to a user-provided container later, if desired
 
 public:
-    using const_iterator = Container::const_iterator;
+    using const_iterator = typename Container::const_iterator;
     using iterator = const_iterator; // No modifications allowed
     using ConstIterator = const_iterator;
     using Iterator = iterator;
-    using const_pointer = Container::const_pointer;
-    using const_reference = Container::const_reference;
-    using const_reverse_iterator = Container::const_reverse_iterator;
+    using const_pointer = typename Container::const_pointer;
+    using const_reference = typename Container::const_reference;
+    using const_reverse_iterator = typename Container::const_reverse_iterator;
     using ConstReverseIterator = const_reverse_iterator;
-    using difference_type = Container::difference_type;
-    using pointer = Container::pointer;
-    using reference = Container::reference;
+    using difference_type = typename Container::difference_type;
+    using pointer = typename Container::pointer;
+    using reference = typename Container::reference;
     using reverse_iterator = const_reverse_iterator; // No modifications allowed
     using ReverseIterator = reverse_iterator;
-    using size_type = Container::size_type;
-    using key_type = Container::value_type;
-    using value_type = Container::value_type;
+    using size_type = typename Container::size_type;
+    using key_type = typename Container::value_type;
+    using value_type = typename Container::value_type;
 
 //-Instance Variables-------------------------------------------------------------------------------------------
 private:
