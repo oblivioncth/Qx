@@ -28,7 +28,7 @@ GeneralWorkerThread::GeneralWorkerThread() :
     {
         // It's documented that you're not supposed to use QObjects before QCoreAppliation is created,
         // but check explicitly anyway
-        qCritical("Cannot use QObject's before QCoreApplication is created!");
+        qFatal("Cannot use QObject's before QCoreApplication is created!");
     }
 
     mThread.moveToThread(mainThread);
