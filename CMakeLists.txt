@@ -15,7 +15,7 @@ project(Qx
 
 # Get helper scripts
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FetchOBCMake.cmake)
-fetch_ob_cmake("3336ff1e397faab10021890db2151265ee3e8c04")
+fetch_ob_cmake("ce73362b5447b9866155b7639fcfff936b9c70c0")
 
 # Initialize project according to standard rules
 include(OB/Project)
