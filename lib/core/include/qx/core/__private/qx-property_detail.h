@@ -11,18 +11,23 @@
 // Qt Includes
 #include <QtClassHelperMacros>
 #include <QtTypes>
+#include <QHash>
+#include <QMetaProperty>
+
+// Intra-component Includes
+#include "qx/core/qx-threadsafesingleton.h"
 
 /*! @cond */
 namespace Qx
 {
     class PropertyNode;
-    template<typename T> class Property;
+    template<typename T> class AbstractBindableProperty;
 }
 
 namespace _QxPrivate
 {
 
-class QX_CORE_EXPORT PropertyBase
+class QX_CORE_EXPORT BindableInterface
 {
 //-Instance Variables-------------------------------------------------------------
 private:
@@ -30,12 +35,12 @@ private:
 
 //-Constructor--------------------------------------------------------------------
 protected:
-    PropertyBase();
-    PropertyBase(PropertyBase&& other);
+    BindableInterface();
+    BindableInterface(BindableInterface&& other);
 
 //-Destructor--------------------------------------------------------------------
 public:
-    ~PropertyBase();
+    virtual ~BindableInterface();
 
 //-Instance Functions-------------------------------------------------------------
 protected:
@@ -51,13 +56,13 @@ public:
 
 //-Operators-------------------------------------------------------------
 protected:
-    PropertyBase& operator=(PropertyBase&& other);
+    BindableInterface& operator=(BindableInterface&& other);
 };
 
 class QX_CORE_EXPORT PropertyObserverManager
 {
     template<typename T>
-    friend class Qx::Property;
+    friend class Qx::AbstractBindableProperty;
     Q_DISABLE_COPY_MOVE(PropertyObserverManager);
 //-Aliases------------------------------------------------------------------
 public:
@@ -105,6 +110,71 @@ public:
     ObserverId add(Functor&& f) { mObservers.emplace_back(mNextId++, std::forward<Functor>(f)); return mObservers.back().id(); }
     void remove(ObserverId id);
     void invokeAll() const;
+};
+
+class ObjectPropertyAdapterRegistry : private Qx::ThreadSafeSingleton<ObjectPropertyAdapterRegistry>
+{
+    QX_THREAD_SAFE_SINGLETON(ObjectPropertyAdapterRegistry);
+    template<typename T>
+    friend class ObjectPropertyAdapter;
+//-Types--------------------------------------------------------------
+private:
+    /* It would be more sane to store the adapters here using the common base class BindableInterface,
+     * but that class is inherited privately by AbstractProperty so ObjectPropertyAdapter cannot decay to
+     * that base type, nor convert back to itself without introducing some kind of empty base on top of
+     * BindalbeInterface that inherits from the latter privately, but then is inherited from
+     * (by AbstractProperty) using protected inheritance and storing that instead; or, introducing some
+     * kind of static function to BindableInterface that acts as a wrapper to static_cast<T> and has it
+     * handle the casting of itself to whatever, but that is a little leaky (thought it could be private,
+     * with friend used for ObjectPropertyAdapter, but that's bleh).
+     *
+     * So... until a better method is settled on, we just use void* for now since the class retrieving any stored
+     * adapters will always be the right type.
+     */
+    using AdapterList = QList<void*>;
+    using AdapterMap = QHash<const QObject*, AdapterList>;
+
+//-Instance Variables-------------------------------------------------------------
+private:
+    AdapterMap mStorage;
+
+//-Constructor-------------------------------------------------------------
+private:
+    ObjectPropertyAdapterRegistry() = default;
+
+//-Instance Functions-------------------------------------------------------------
+public:
+    void* retrieve(const QObject* obj, const QMetaProperty& property);
+    void store(const QObject* obj, const QMetaProperty& property, void* adapter);
+    void remove(const QObject* obj, const QMetaProperty& property);
+};
+
+class ObjectPropertyAdapterLiaison : public QObject
+{
+    template<typename T>
+    friend class ObjectPropertyAdapter;
+
+//-Instance Variables-------------------------------------------------------------
+private:
+    bool mIgnoreUpdates = false;
+
+    Q_OBJECT;
+//-Constructor-------------------------------------------------------------
+private:
+    ObjectPropertyAdapterLiaison() = default;
+
+//-Instance Functions-------------------------------------------------------------
+public:
+    bool configure(const QObject* o, QMetaProperty p);
+    void setIgnoreUpdates(bool ignore);
+
+//-Signals & Slots-------------------------------------------------------------
+private slots:
+    void handleNotify();
+
+signals:
+    void propertyNotified();
+    void objectDeleted();
 };
 
 }

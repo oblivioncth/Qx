@@ -61,7 +61,7 @@ DepthSortedLinks::const_iterator DepthSortedLinks::insert(PropertyNode* node)
 
 //-Constructor-------------------------------------------------------------
 //Public:
-PropertyNode::PropertyNode(Base* property) :
+PropertyNode::PropertyNode(IFace* property) :
     mProperty(property)
 {}
 
@@ -131,13 +131,13 @@ void PropertyNode::removeDependent(const PropertyNode* dependent)
 }
 
 //Public:
-PropertyNode::Base* PropertyNode::property() const { return mProperty; }
+PropertyNode::IFace* PropertyNode::property() const { return mProperty; }
 PropertyNode::Depth PropertyNode::depth() const { return mDependents.isEmpty() ? 0 : mDependents.first().stableDepth + 1; }
 PropertyNode::Itr PropertyNode::cbeginDependents() const { return mDependents.cbegin(); }
 PropertyNode::Itr PropertyNode::cendDependents() const { return mDependents.cend(); }
 PropertyNode::Links PropertyNode::dependencies() const { return mDependencies; }
 
-void PropertyNode::relinkProperty(PropertyNode::Base* property) { mProperty = property; }
+void PropertyNode::relinkProperty(PropertyNode::IFace* property) { mProperty = property; }
 
 bool PropertyNode::addDependency(PropertyNode* dependency)
 {
@@ -583,7 +583,7 @@ void PropertyCoordinator::processUpdateQueue()
 //Public:
 bool PropertyCoordinator::isBindingBeingEvaluated() const { return !mEvaluationStack.empty(); }
 
-bool PropertyCoordinator::evaluate(PropertyCoordinator::Base* property)
+bool PropertyCoordinator::evaluate(PropertyCoordinator::IFace* property)
 {
     mEvaluationStack.push(property->node());
     bool changed = property->callBinding();
@@ -591,20 +591,20 @@ bool PropertyCoordinator::evaluate(PropertyCoordinator::Base* property)
     return changed;
 }
 
-void PropertyCoordinator::evaluateAndNotify(PropertyCoordinator::Base* property)
+void PropertyCoordinator::evaluateAndNotify(PropertyCoordinator::IFace* property)
 {
     if(evaluate(property))
         notify(property);
 }
 
-void PropertyCoordinator::notify(PropertyCoordinator::Base* property)
+void PropertyCoordinator::notify(PropertyCoordinator::IFace* property)
 {
     auto node = property->node();
     checkForCycle(node);
     queueUpdateWave(node);
 }
 
-void PropertyCoordinator::addOrUpdateCurrentEvalDependency(const PropertyCoordinator::Base* property)
+void PropertyCoordinator::addOrUpdateCurrentEvalDependency(const PropertyCoordinator::IFace* property)
 {
     if(mEvaluationStack.empty())
         return;
@@ -658,7 +658,7 @@ namespace _QxPrivate
 {
 
 //===============================================================================================================
-// PropertyBase
+// BindableInterface
 //===============================================================================================================
 
 /* NOTE: The assertions here that make sure no evaluations are running should stay here,
@@ -669,20 +669,20 @@ namespace _QxPrivate
 
 //-Constructor-------------------------------------------------------------
 //Protected:
-PropertyBase::PropertyBase() :
+BindableInterface::BindableInterface() :
     mNode(std::make_unique<Qx::PropertyNode>(this))
 {}
 
-PropertyBase::PropertyBase(PropertyBase&& other) { *this = std::move(other); }
+BindableInterface::BindableInterface(BindableInterface&& other) { *this = std::move(other); }
 
 //-Destructor--------------------------------------------------------------------
 //Public:
 // Needed for std::unique_ptr to see the implementation of PropertyNode::~PropertyNode()
-PropertyBase::~PropertyBase() = default;
+BindableInterface::~BindableInterface() = default;
 
 //-Instance Functions-------------------------------------------------------------
 //Protected:
-void PropertyBase::notifyBindingAdded()
+void BindableInterface::notifyBindingAdded()
 {
     Q_ASSERT_X(!Qx::PropertyCoordinator::instance()->isBindingBeingEvaluated(),
         "notifyBindingAdded",
@@ -691,7 +691,7 @@ void PropertyBase::notifyBindingAdded()
     Qx::PropertyCoordinator::instance()->evaluateAndNotify(this);
 }
 
-void PropertyBase::notifyBindingRemoved()
+void BindableInterface::notifyBindingRemoved()
 {
     Q_ASSERT_X(!Qx::PropertyCoordinator::instance()->isBindingBeingEvaluated(),
         "notifyBindingRemoved",
@@ -700,7 +700,7 @@ void PropertyBase::notifyBindingRemoved()
     mNode->disconnectDependencies();
 }
 
-void PropertyBase::notifyValueChanged()
+void BindableInterface::notifyValueChanged()
 {
     Q_ASSERT_X(!Qx::PropertyCoordinator::instance()->isBindingBeingEvaluated(),
         "notifyValueChanged",
@@ -708,14 +708,14 @@ void PropertyBase::notifyValueChanged()
     );
     Qx::PropertyCoordinator::instance()->notify(this);
 }
-void PropertyBase::attachToCurrentEval() const { Qx::PropertyCoordinator::instance()->addOrUpdateCurrentEvalDependency(this); }
+void BindableInterface::attachToCurrentEval() const { Qx::PropertyCoordinator::instance()->addOrUpdateCurrentEvalDependency(this); }
 
 //Public:
-Qx::PropertyNode* PropertyBase::node() const { return mNode.get(); }
+Qx::PropertyNode* BindableInterface::node() const { return mNode.get(); }
 
 //-Operators-------------------------------------------------------------
 //Protected:
-PropertyBase& PropertyBase::operator=(PropertyBase&& other)
+BindableInterface& BindableInterface::operator=(BindableInterface&& other)
 {
     mNode = std::exchange(other.mNode, nullptr);
     mNode->relinkProperty(this); // Re-link node to new address
@@ -739,6 +739,97 @@ void PropertyObserverManager::invokeAll() const
     for(const auto& o : mObservers)
         o.invoke();
 }
+
+//===============================================================================================================
+// ObjectPropertyAdapterManager
+//===============================================================================================================
+
+//-Instance Functions-------------------------------------------------------------
+//Public:
+void* ObjectPropertyAdapterRegistry::retrieve(const QObject* obj, const QMetaProperty& property)
+{
+    Q_ASSERT(obj && property.isValid());
+
+    auto adaptedObj = mStorage.constFind(obj);
+    if(adaptedObj == mStorage.cend())
+        return nullptr;
+
+    auto pi = property.propertyIndex();
+    return adaptedObj->at(pi);
+}
+
+void ObjectPropertyAdapterRegistry::store(const QObject* obj, const QMetaProperty& property, void* adapter)
+{
+    Q_ASSERT(obj && property.isValid());
+    auto pc = obj->metaObject()->propertyCount();
+    auto pi = property.propertyIndex();
+    Q_ASSERT(pi < pc);
+
+    auto objStore = mStorage.find(obj);
+    if(objStore == mStorage.end())
+        objStore = mStorage.emplace(obj, pc); // Setup storage for this specific object (size list to property count)
+
+    auto& adptrSlot = (*objStore)[pi];
+    Q_ASSERT(!adptrSlot); // Should be no adapter yet
+    adptrSlot = adapter;
+}
+
+void ObjectPropertyAdapterRegistry::remove(const QObject* obj, const QMetaProperty& property)
+{
+    Q_ASSERT(obj && property.isValid());
+    auto pi = property.propertyIndex();
+
+    /* Do not check the property count of 'obj's meta-object against the index of 'property'
+     * here because this might be called due to 'obj's 'destroyed' signal which means that
+     * its v-table has collapsed down to just QObject itself, in which case the property count
+     * reported will only reflect the properties it has (1) and therefore never match whatever
+     * it was originally when the adapter was stored.
+     */
+
+    auto objStore = mStorage.find(obj);
+    Q_ASSERT(objStore != mStorage.end()); // Obj should b here
+    auto& adptrSlot = (*objStore)[pi]; // operator[] will assert that 'pi' is within range of the original property count
+    Q_ASSERT(adptrSlot); // Should be an adapter here
+    adptrSlot = nullptr;
+}
+
+
+//===============================================================================================================
+// ObjectPropertyAdapterLiaison
+//===============================================================================================================
+
+//-Instance Functions-------------------------------------------------------------
+//Public:
+bool ObjectPropertyAdapterLiaison::configure(const QObject* o, QMetaProperty p)
+{
+    static QMetaMethod thisNotifySlot = [this]{
+        auto sig = QMetaObject::normalizedSignature("handleNotify()");
+        auto idx = this->metaObject()->indexOfMethod(sig);
+        auto meth = this->metaObject()->method(idx);
+        Q_ASSERT(meth.isValid());
+        return meth;
+    }();
+
+    if(!connect(o, &QObject::destroyed, this, &ObjectPropertyAdapterLiaison::objectDeleted))
+    {
+        qWarning("Qx::ObjectPropertyAdapter: Failed to connect to destroyed signal for QObject bindable.");
+        return false;
+    }
+
+    if(!connect(o, p.notifySignal(), this, thisNotifySlot, Qt::DirectConnection))
+    {
+        qWarning("Qx::ObjectPropertyAdapter: Failed to connect to notify signal for QObject bindable.");
+        return false;
+    }
+
+    return true;
+}
+
+void ObjectPropertyAdapterLiaison::setIgnoreUpdates(bool ignore) { mIgnoreUpdates = ignore; }
+
+//-Signals & Slots-------------------------------------------------------------
+//Private Slots:
+void ObjectPropertyAdapterLiaison::handleNotify() { if(!mIgnoreUpdates) emit propertyNotified(); }
 
 } // namespace _QxPrivate
 /*! @endcond */
@@ -806,56 +897,6 @@ PropertyNotifier& PropertyNotifier::operator=(PropertyNotifier&& other) noexcept
     return *this;
 }
 
-
-//===============================================================================================================
-// PropertyData
-//===============================================================================================================
-
-/*!
- *  @class PropertyData qx/core/qx-property.h
- *  @ingroup qx-core
- *
- *  @brief The PropertyData class is a helper class for properties with automatic property bindings.
- *
- *  PropertyData is a common base class for classes that can hold properties with automatic data bindings.
- *  It mainly wraps the stored data, and offers low level access to that data.
- *
- *  The low level access to the data provided by this class bypasses the binding mechanism, and should only be
- *  used in situations where one wishes to read/write data without triggering binding evaluation of dependent
- *  properties.
- *
- *  Generally, you should usually call value() and setValue() on Property<T>, not use the low level mechanisms
- *  provided in this class.
- */
-
-//-Instance Functions----------------------------------------------------------------------------------------------
-//Public:
-/*!
- *  @fn void PropertyData<T>::setValueBypassingBindings(const T& v)
- *
- *  Sets the value of this property to @a v.
- *
- *  @note Using this method will bypass any potential binding registered for this property.
- */
-
-/*!
- *  @fn void PropertyData<T>::setValueBypassingBindings(T&& v)
- *
- *  @overload
- *
- *  Sets the value of this property to @a v.
- *
- *  @note Using this method will bypass any potential binding registered for this property.
- */
-
-/*!
- *  @fn const T& PropertyData<T>::valueBypassingBindings() const
- *
- *  Returns the direct value of the property.
- *
- *  @note Using this method will not register the property acess with any currently executing binding.
- */
-
 //===============================================================================================================
 // PropertyBinding
 //===============================================================================================================
@@ -914,6 +955,471 @@ PropertyNotifier& PropertyNotifier::operator=(PropertyNotifier&& other) noexcept
  */
 
 //===============================================================================================================
+// AbstractBindableProperty
+//===============================================================================================================
+
+/*!
+ *  @class AbstractBindableProperty qx/core/qx-property.h
+ *  @ingroup qx-core
+ *
+ *  @brief The AbstractBindableProperty class provides the baseline feature for bindable properties.
+ *
+ *  AbstractBindableProperty is the standard interface shared by all bindable properties and contains
+ *  most of the functionality that any given implementation will provide to user code; that is, most
+ *  individual implementations are minimal annex that simply dictate how the underlying data of the
+ *  property is read/written, and the bulk of the Bindable Properties System is contained within this
+ *  base class.
+ *
+ *  You can assign a value to properties and you can read them via value(), operator*(), or operator const T&().
+ *  You can also tie a property to an expression that computes the value dynamically, called  a
+ *  "binding expression". The binding expression can be any C++ functor, though most often a lambda, and
+ *  can be used to express relationships between different properties in your application.
+ *
+ *  @sa Property.
+ */
+
+//-Constructor----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn AbstractBindableProperty<T>::AbstractBindableProperty()
+ *
+ *  Constructs an AbstractBindableProperty.
+ */
+
+/*!
+ *  @fn AbstractBindableProperty<T>::AbstractBindableProperty(AbstractBindableProperty&& other) noexecpt
+ *
+ *  Move-constructs an AbstractBindableProperty using @a other.
+ */
+
+//-Instance Functions----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn void AbstractBindableProperty<T>::setValueBypassingBindings(const T& v) = 0
+ *
+ *  Directly sets the value of the property to @a v.
+ *
+ *  This is generally only used by a derived class to control how the underlying data is written
+ *  when a copy of T is provided, but there are some cases (like maintaining class invariants)
+ *  where it is useful externally.
+ *
+ *  @note Using this method will bypass any potential binding registered for this property.
+ */
+
+/*!
+ *  @fn void AbstractBindableProperty<T>::setValueBypassingBindings(T&& v) = 0
+ *
+ *  @overload
+ *
+ *  Directly sets the value of this property to @a v.
+ *
+ *  This is generally only used by a derived class to control how the underlying data is written
+ *  when an rvalue of T is provided, but there are some cases (like maintaining class invariants)
+ *  where it is useful externally.
+ *
+ *  @note Using this method will bypass any potential binding registered for this property.
+ */
+
+/*!
+ *  @fn const T& AbstractBindableProperty<T>::valueBypassingBindings() const = 0
+ *
+ *  Returns the direct value of the property.
+ *
+ *  This is generally only used by a derived class to control how the underlying data is read
+ *  when requested, but there are some cases where it is useful externally.
+ *
+ *  @note Using this method will not register the property access with any currently executing binding.
+ */
+
+/*!
+ *  @fn PropertyBinding<T> AbstractBindableProperty<T>::binding() const
+ *
+ *  Returns the binding expression that is associated with this property. A default constructed PropertyBinding
+ *  will be returned if no such association exists.
+ */
+
+/*!
+ *  @fn PropertyBinding<T> AbstractBindableProperty<T>::takeBinding()
+ *
+ *  Disassociates the binding expression from this property and returns it. After calling this function, the value
+ *  of the property will only change if you assign a new value to it, or when a new binding is set.
+ *
+ *  @sa removeBinding() and setBinding().
+ */
+
+/*!
+ *  @fn void AbstractBindableProperty<T>::removeBinding()
+ *
+ *  Disassociates the binding expression from this property. After calling this function, the value
+ *  of the property will only change if you assign a new value to it, or when a new binding is set.
+ *
+ *  @sa takeBinding() and setBinding().
+ */
+
+/*!
+ *  @fn PropertyBinding<T> AbstractBindableProperty<T>::setBinding(Functor&& f)
+ *
+ *  Associates the value of this property with the provided functor @a f and returns the previously associated
+ *  binding. The property's value is set to the result of evaluating the new binding. Whenever a dependency of
+ *  the binding changes, the binding will be re-evaluated, and the property's value gets updated accordingly.
+ */
+
+/*!
+ *  @fn PropertyBinding<T> AbstractBindableProperty<T>::setBinding(const PropertyBinding<T>& binding)
+ *
+ *  @overload
+ *
+ *  Associates the value of this property with the provided @a binding expression and returns the previously
+ *  associated binding. The property's value is set to the result of evaluating the new binding. Whenever a
+ *  dependency of the binding changes, the binding will be re-evaluated, and the property's value gets updated
+ *  accordingly.
+ */
+
+/*!
+ *  @fn bool AbstractBindableProperty<T>::hasBinding() const
+ *
+ *  Returns @c true if the property has a binding associated with it; otherwise, returns @a false.
+ */
+
+/*!
+ *  @fn const T& AbstractBindableProperty<T>::value() const
+ *
+ *  Returns the value of the property. This may evaluate a binding expression that is tied to this property,
+ *  before returning the value.
+ *
+ *  @sa value().
+ */
+
+/*!
+ *  @fn void AbstractBindableProperty<T>::setValue(const T& newValue)
+ *
+ *  Assigns @a newValue to this property and removes the property's associated binding, if present.
+ *
+ *  @sa binding() and beginPropertyUpdateGroup().
+ */
+
+/*!
+ *  @fn void AbstractBindableProperty<T>::setValue(T&& newValue)
+ *
+ *  @overload
+ */
+
+/*!
+ *  @fn PropertyNotifier AbstractBindableProperty<T>::addNotifier(Functor&& f)
+ *
+ *  Subscribes the given functor @a f as a callback that is called whenever the value of the property changes.
+ *
+ *  The callback @a f is expected to be a type that has a plain call @c operator() without any parameters.
+ *  This means that you can provide a C++ lambda expression, a std::function or even a custom struct with a call
+ *  operator.
+ *
+ *  The returned property change handler object keeps track of the subscription. When it goes out of scope,
+ *  the callback is unsubscribed.
+ *
+ *  @sa addLifetimeNotifier() and subscribe().
+ */
+
+/*!
+ *  @fn void AbstractBindableProperty<T>::addLifetimeNotifier(Functor&& f)
+ *
+ *  Same as addNotifier(), but the lifetime of the subscription is tied to the lifetime of the property so
+ *  no change handler object is returned.
+ *
+ *  @warning Be sure that any data referenced in @a f lives as long as the property itself.
+ *
+ *  @sa addNotifier() and subscribeLifetime().
+ */
+
+/*!
+ *  @fn PropertyNotifier AbstractBindableProperty<T>::subscribe(Functor&& f)
+ *
+ *  Same as invoking f (e.g. `f()`), followed by `addNotifier(f)`.
+ *
+ *  That is, the callback functor is called immediately before it's registered.
+ *
+ *  @sa subscribeLifetime() and addNotifier().
+ */
+
+/*!
+ *  @fn void AbstractBindableProperty<T>::subscribeLifetime(Functor&& f)
+ *
+ *  Same as invoking f (e.g. `f()`), followed by `addLifetimeNotifier(f)`.
+ *
+ *  That is, the callback functor is called immediately before it's registered.
+ *
+ *  @sa subscribe() and addLifetimeNotifier().
+ */
+
+//-Operators-------------------------------------------------------------
+//Protected:
+/*!
+ *  @fn AbstractBindableProperty& AbstractBindableProperty<T>::operator=(AbstractBindableProperty&& other) noexecpt
+ *
+ *  Move-assigns an AbstractBindableProperty using @a other.
+ */
+
+//Public:
+/*!
+ *  @fn const T* AbstractBindableProperty<T>::operator->() const
+ *
+ *  Returns a pointer to the underlying property data (bindings are still respected).
+ *
+ *  @sa value().
+ */
+
+/*!
+ *  @fn const T& AbstractBindableProperty<T>::operator*() const
+ *
+ *  Same as value().
+ */
+
+/*!
+ *  @fn AbstractBindableProperty<T>::operator const T&() const
+ *
+ *  Type-conversion operator for a const reference to the underlying type.
+ */
+
+//===============================================================================================================
+// Bindable
+//===============================================================================================================
+
+/*!
+ *  @class Bindable qx/core/qx-property.h
+ *  @ingroup qx-core
+ *
+ *  @brief Bindable is a wrapper class around binding-enabled properties that provides uniform access,
+ *  regardless of the specific type.
+ *
+ *  Bindable acts as a convenience type for sharing access to any concrete bindable property without the need
+ *  to use interface pointers directly, via a thin, cheap to copy wrapper.
+ *
+ *  The methods of this class essentially mirror those of AbstractBindableProperty and an instance of this class
+ *  can be used in an identical fashion as the property it shadows.
+ *
+ *  Additionally, the constructors that take a QObject pointer can be used to wrap a property of a classes based
+ *  on it (i.e. those created using Q_PROPERTY()), which are not already bindable.
+ *
+ *  Due to the abstraction that this class provides, instances may be "read-only", meaning that any attempt to
+ *  use a non-const method will fail and a warning will be emitted. The contexts in which this is the case
+ *  are noted in the documentation for the constructors of this class. Use isReadOnly() to check if a particular
+ *  instance cannot mutate the property it wraps.
+ *
+ *  @note
+ *  @parblock
+ *  Since the Qx Bindable Properties System does not directly interact with the native Qt equivalent, the
+ *  aforementioned constructor of QBindable will need to be used to bind to the property of any any QObject
+ *  derived typed that does not have accessor methods to underlying Qx bindable properties (e.g. Qx::Property),
+ *  even if the property in question is already bindable using Qt's system.
+ *
+ *  The best way to create a QObject-based class that natively uses Qx properties is to add instances of
+ *  Property as class members and provide an accessor method to them that returns a Qx::Bindable, like so:
+ *  @code{.cpp}
+ *  class MyObject : public QObject
+ *  {
+ *      Q_OBJECT
+ *      Qx::Property<int> data;
+ *  public:
+ *      Qx::Bindable<int> bindableData() { return &data; }
+ *  };
+ *  @endcode
+ *  @endparblock
+ *
+ *  @sa Property.
+ */
+
+//-Constructor----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn Bindable<T>::Bindable(AbstractBindableProperty<T>& bp)
+ *
+ *  Constructs a Bindable wrapper for the bindable property @a bp.
+ */
+
+/*!
+ *  @fn Bindable<T>::Bindable(const AbstractBindableProperty<T>& bp)
+ *
+ *  Constructs a Bindable wrapper for the bindable property @a bp.
+ *
+ *  @note The Bindable will be read-only since @a bp is const.
+ */
+
+/*!
+ *  @fn Bindable<T>::Bindable(QObject* obj, const QMetaProperty& property)
+ *
+ *  Constructs a Bindable wrapper for property @a property of @a obj.
+ *
+ *  The property must have a notify signal, and you must access the property through
+ *  the created Bindable (e.g. via value(), etc.) instead of the normal property READ
+ *  function (or MEMBER) to enable dependency tracking.
+ *
+ *  When binding using a lambda, you may prefer to capture the QBindable by value to
+ *  avoid the cost of calling this constructor in the binding expression.
+ *
+ *  @note The Bindable will be read-only if @a property is itself read-only.
+ */
+
+/*!
+ *  @fn Bindable<T>::Bindable(QObject* obj, const char* property)
+ *
+ *  Constructs a Bindable wrapper for the property named @a property of @a obj.
+ *
+ *  See Bindable(QObject*, const QMetaProperty&).
+ *
+ *  @note The Bindable will be read-only if @a property is read-only itself.
+ */
+
+//-Instance Functions----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn void Bindable<T>::setValueBypassingBindings(const T& v)
+ *
+ *  @copydoc AbstractBindableProperty<T>::setValueBypassingBindings(const T& v)
+ */
+
+/*!
+ *  @fn void Bindable<T>::setValueBypassingBindings(T&& v)
+ *
+ *  @copydoc AbstractBindableProperty<T>::setValueBypassingBindings(T&& v)
+ */
+
+/*!
+ *  @fn const T& Bindable<T>::valueBypassingBindings() const
+ *
+ *  @copydoc AbstractBindableProperty<T>::valueBypassingBindings() const
+ */
+
+/*!
+ *  @fn PropertyBinding<T> Bindable<T>::binding() const
+ *
+ *  @copydoc AbstractBindableProperty<T>::binding() const
+ */
+
+/*!
+ *  @fn PropertyBinding<T> Bindable<T>::takeBinding()
+ *
+ *  @copydoc AbstractBindableProperty<T>::takeBinding()
+ */
+
+/*!
+ *  @fn void Bindable<T>::removeBinding()
+ *
+ *  @copydoc AbstractBindableProperty<T>::removeBinding()
+ */
+
+/*!
+ *  @fn PropertyBinding<T> Bindable<T>::setBinding(Functor&& f)
+ *
+ *  @copydoc AbstractBindableProperty<T>::setBinding(Functor&& f)
+ */
+
+/*!
+ *  @fn PropertyBinding<T> Bindable<T>::setBinding(const PropertyBinding<T>& binding)
+ *
+ *  @copydoc AbstractBindableProperty<T>::setBinding(const PropertyBinding<T>& binding)
+ */
+
+/*!
+ *  @fn bool Bindable<T>::hasBinding() const
+ *
+ *  @copydoc AbstractBindableProperty<T>::hasBinding() const
+ */
+
+/*!
+ *  @fn const T& Bindable<T>::value() const
+ *
+ *  @copydoc AbstractBindableProperty<T>::value() const
+ */
+
+/*!
+ *  @fn void Bindable<T>::setValue(const T& newValue)
+ *
+ *  @copydoc AbstractBindableProperty<T>::setValue(const T& newValue)
+ */
+
+/*!
+ *  @fn void Bindable<T>::setValue(T&& newValue)
+ *
+ *  @copydoc AbstractBindableProperty<T>::setValue(T&& newValue)
+ */
+
+/*!
+ *  @fn PropertyNotifier Bindable<T>::addNotifier(Functor&& f) const
+ *
+ *  @copydoc AbstractBindableProperty<T>::addNotifier(Functor&& f) const
+ */
+
+/*!
+ *  @fn void Bindable<T>::addLifetimeNotifier(Functor&& f) const
+ *
+ *  @copydoc AbstractBindableProperty<T>::addLifetimeNotifier(Functor&& f) const
+ */
+
+/*!
+ *  @fn PropertyNotifier Bindable<T>::subscribe(Functor&& f) const
+ *
+ *  @copydoc AbstractBindableProperty<T>::subscribe(Functor&& f) const
+ */
+
+/*!
+ *  @fn void Bindable<T>::subscribeLifetime(Functor&& f) const
+ *
+ *  @copydoc AbstractBindableProperty<T>::subscribeLifetime(Functor&& f) const
+ */
+
+/*!
+ *  @fn bool Bindable<T>::isValid() const
+ *
+ *  Returns @c true if the Bindable is valid; otherwise, returns @c false.
+ *
+ *  A binding is invalid if there was an issue the arguments passed to its constructor,
+ *  like a null pointer or a property being specified that does not actually belong
+ *  to the preceding object.
+ */
+
+/*!
+ *  @fn bool Bindable<T>::isReadOnly() const
+ *
+ *  Returns @c true if the Bindable wraps a read-only property; otherwise, returns @c false.
+ *
+ *  A Bindable may be read-only depending on how it was constructed.
+ *
+ *  @sa Bindable(QObject* obj, const QMetaProperty&) and Bindable(const AbstractBindableProperty<T>&)
+ */
+
+//-Operators-----------------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn const T* Bindable<T>::operator->() const
+ *
+ *  @copydoc AbstractBindableProperty<T>::operator->() const
+ */
+
+/*!
+ *  @fn const T& Bindable<T>::operator*() const
+ *
+ *  @copydoc AbstractBindableProperty<T>::operator*() const
+ */
+
+// copydoc not working here for some reason
+/*!
+ *  @fn Bindable<T>::operator const T&() const
+ *
+ *  Type-conversion operator for a const reference to the underlying type.
+ */
+
+/*!
+ *  @fn Bindable& Bindable<T>::operator=(T&& newValue) noexcept
+ *
+ *  Assigns @a newValue to the property and returns a reference to this bindable.
+ */
+
+/*!
+ *  @fn Bindable& Bindable<T>::operator=(const T& newValue) noexcept
+ *
+ *  @overload
+ */
+
+//===============================================================================================================
 // Property
 //===============================================================================================================
 
@@ -923,11 +1429,10 @@ PropertyNotifier& PropertyNotifier::operator=(PropertyNotifier&& other) noexcept
  *
  *  @brief The Property class is a template class that enables automatic property bindings
  *
- *  Property is the class that implements the @ref properties "Qx Bindable Properties System". It is a container
- *  that holds an instance of T. You can assign a value to it and you can read it via value(), operator*(), or
- *  operator const T&(). You can also tie the property to an expression that computes the value dynamically, called
- *  a "binding expression". The binding expression can be any C++ functor, though most often a lambda, and
- *  can be used to express relationships between different properties in your application.
+ *  Property is the principal implementation of the @ref properties "Qx Bindable Properties System". It is a container
+ *  that holds an instance of T.
+ *
+ *  It can be used in all of the ways described in AbstractBindableProperty to build a web of dynamic properties.
  */
 
 //-Constructor----------------------------------------------------------------------------------------------
@@ -972,127 +1477,6 @@ PropertyNotifier& PropertyNotifier::operator=(PropertyNotifier&& other) noexcept
  *  Constructs a property with the provided @a initialValue.
  */
 
-//-Instance Functions----------------------------------------------------------------------------------------------
-//Public:
-/*!
- *  @fn PropertyBinding<T> Property<T>::binding() const
- *
- *  Returns the binding expression that is associated with this property. A default constructed PropertyBinding
- *  will be returned if no such association exists.
- */
-
-/*!
- *  @fn PropertyBinding<T> Property<T>::takeBinding()
- *
- *  Disassociates the binding expression from this property and returns it. After calling this function, the value
- *  of the property will only change if you assign a new value to it, or when a new binding is set.
- *
- *  @sa removeBinding() and setBinding().
- */
-
-/*!
- *  @fn PropertyBinding<T> Property<T>::removeBinding()
- *
- *  Disassociates the binding expression from this property. After calling this function, the value
- *  of the property will only change if you assign a new value to it, or when a new binding is set.
- *
- *  @sa takeBinding() and setBinding().
- */
-
-/*!
- *  @fn PropertyBinding<T> Property<T>::setBinding(Functor&& f)
- *
- *  Associates the value of this property with the provided functor @a f and returns the previously associated
- *  binding. The property's value is set to the result of evaluating the new binding. Whenever a dependency of
- *  the binding changes, the binding will be re-evaluated, and the property's value gets updated accordingly.
- */
-
-/*!
- *  @fn PropertyBinding<T> Property<T>::setBinding(const PropertyBinding<T>& binding)
- *
- *  @overload
- *
- *  Associates the value of this property with the provided @a binding expression and returns the previously
- *  associated binding. The property's value is set to the result of evaluating the new binding. Whenever a
- *  dependency of the binding changes, the binding will be re-evaluated, and the property's value gets updated
- *  accordingly.
- */
-
-/*!
- *  @fn bool Property<T>::hasBinding() const
- *
- *  Returns @c true if the property has a binding associated with it; otherwise, returns @a false.
- */
-
-/*!
- *  @fn const T& Property<T>::value() const
- *
- *  Returns the value of the property. This may evaluate a binding expression that is tied to this property,
- *  before returning the value.
- *
- *  @sa value().
- */
-
-/*!
- *  @fn void Property<T>::setValue(const T& newValue)
- *
- *  Assigns @a newValue to this property and removes the property's associated binding, if present.
- *
- *  @sa binding() and beginPropertyUpdateGroup().
- */
-
-/*!
- *  @fn void Property<T>::setValue(T&& newValue)
- *
- *  @overload
- */
-
-/*!
- *  @fn PropertyNotifier Property<T>::addNotifier(Functor&& f)
- *
- *  Subscribes the given functor @a f as a callback that is called whenever the value of the property changes.
- *
- *  The callback @a f is expected to be a type that has a plain call @c operator() without any parameters.
- *  This means that you can provide a C++ lambda expression, a std::function or even a custom struct with a call
- *  operator.
- *
- *  The returned property change handler object keeps track of the subscription. When it goes out of scope,
- *  the callback is unsubscribed.
- *
- *  @sa addLifetimeNotifier() and subscribe().
- */
-
-/*!
- *  @fn void Property<T>::addLifetimeNotifier(Functor&& f)
- *
- *  Same as addNotifier(), but the lifetime of the subscription is tied to the lifetime of the property so
- *  no change handler object is returned.
- *
- *  @warning Be sure that any data referenced in @a f lives as long as the property itself.
- *
- *  @sa addNotifier() and subscribeLifetime().
- */
-
-/*!
- *  @fn PropertyNotifier Property<T>::subscribe(Functor&& f)
- *
- *  Same as invoking f (e.g. `f()`), followed by `addNotifier(f)`.
- *
- *  That is, the callback functor is called immediately before it's registered.
- *
- *  @sa subscribeLifetime() and addNotifier().
- */
-
-/*!
- *  @fn void Property<T>::subscribeLifetime(Functor&& f)
- *
- *  Same as invoking f (e.g. `f()`), followed by `addLifetimeNotifier(f)`.
- *
- *  That is, the callback functor is called immediately before it's registered.
- *
- *  @sa subscribe() and addLifetimeNotifier().
- */
-
 //-Operators-----------------------------------------------------------------------------------------------------
 //Public:
 /*!
@@ -1111,26 +1495,6 @@ PropertyNotifier& PropertyNotifier::operator=(PropertyNotifier&& other) noexcept
  *  @fn Property& Property<T>::operator=(const T& newValue) noexcept
  *
  *  @overload
- */
-
-/*!
- *  @fn const T* Property<T>::operator->() const
- *
- *  Returns a pointer to the underlying property data (bindings are still respected).
- *
- *  @sa value().
- */
-
-/*!
- *  @fn const T& Property<T>::operator*() const
- *
- *  Same as value().
- */
-
-/*!
- *  @fn Property<T>::operator const T&() const
- *
- *  Type-conversion operator for a const reference to the underlying type.
  */
 
 //===============================================================================================================

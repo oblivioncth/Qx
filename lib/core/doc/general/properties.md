@@ -32,6 +32,7 @@ What's the Same?
 Pretty much everything between Qx properties and Qt properties are the same, other than what is mentioned under the Advantages and Disadvantages sections below. Regardless, the following is a non-exhaustive list of some key aspects that both systems share that are important to keep in mind:
 
  - Most methods and the overall API is the same.
+ - Qx::Bindable, like QBindable exists as a property wrapper that allows for generic access to any property that implements the bindable interface, and can wrap QObject properties (i.e. declared with Q_PROPERTY())
  - You can still group property value changes using Qx::beginPropertyUpdateGroup() and Qx::endPropertyUpdateGroup().
  - Dependency/update cycles are detected.
  - Qx properties are not thread safe. In general, only interact with a property through it's owning thread.
@@ -165,8 +166,6 @@ Qx's implementation is designed so that bindings should **never** be evaluated m
 
 ### Other:
 
- - Only one property class.
-	 - Qx::Property. Meaning no need for the QBindable interface (and the complication that comes with it, like whether or not an instance is "read-only" due to being created from a const property), though this is also a disadvantage as noted below.
  - More idiomatic const correctness.
 	 - Due to implementation constraints, some methods on some Qt property classes that are "read" in nature (i.e. do not modify principle data) are non-const, making accessing them in non-const contexts impossible, even though you're not writing to the value in any way.
  - Use of `[[nodiscard]]` for callback handles to catch subtle bugs in which a callback would be immediately unregistered due to the handle being discarded
@@ -180,7 +179,10 @@ Disadvantages
 Given enough motivation, these drawbacks may be reduced or outright eliminated in the future.
 
  - No tie-in with QML, which is of course the biggest downside currently
- - No advance error system like QPropertyBindingError that notes the source location of an error and allows reactionary steps to be taken at runtime. If something like a cycle is detected, the program simply aborts through an assertion with a diagnostic.
+ - No integration with QMetaObject/MOC
+	 - These bindable properties cannot be queried, or used in a type-erased fashion through QMetaObject, since that would require modifying MOC itself
+ - No advance error system like QPropertyBindingError that notes the source location of an error and allows reactionary steps to be taken at runtime.
+	 - If something like a cycle is detected, the program simply aborts through an assertion with a diagnostic.
  - No equivalent to QObjectBindableProperty for making property data a "built-in" part of the QObject itself, though simply adding Qx::Property to a QObject derived class as a member variable is not much different
  - Performance between the two has not been properly profiled. It's conceivable that Qt properties are a bit more efficient given their maturity and pedigree, though the Qx implementation should still be fairly performant due to its approach. Additionally, the fact that Qt's system sometimes re-evaluates bindings when not necessary situationally gives an edge to Qx's system.
  - Some other minor facets of Qt Properties that Qx Properties do not have, which make the former a bit more robust

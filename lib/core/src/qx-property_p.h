@@ -13,7 +13,7 @@
 // Intra-component Includes
 #include "qx/core/qx-flatmultiset.h"
 
-/* NOTE: DO NOT STORE POINTERS TO PROPERTYBASE INSTANCES AS THEY CAN BE INVALIDATED.
+/* NOTE: DO NOT STORE POINTERS TO BINDABLEINTERFACE INSTANCES AS THEY CAN BE INVALIDATED.
  * INSTEAD, IF NEED, STORE A POINTER TO ITS NODE AND THEN GET THE PROPERTY THROUGH
  * THAT THE MOMENT ITS REQUIRED.
  *
@@ -21,7 +21,7 @@
  */
 
 /*! @cond */
-namespace _QxPrivate { class PropertyBase; }
+namespace _QxPrivate { class BindableInterface; }
 
 namespace Qx
 {
@@ -84,7 +84,7 @@ class PropertyNode
     Q_DISABLE_COPY_MOVE(PropertyNode);
 //-Aliases------------------------------------------------------------------------
 public:
-    using Base = _QxPrivate::PropertyBase;
+    using IFace = _QxPrivate::BindableInterface;
     using Depth = DepthLink::Depth;
     using Links = QList<PropertyNode*>; // Using list for iteration speed TODO: Possible candidate for std::flat_set for when using C++23
     using Itr = DepthSortedLinks::const_iterator;
@@ -93,11 +93,11 @@ public:
 private:
     DepthSortedLinks mDependents;
     Links mDependencies;
-    Base* mProperty;
+    IFace* mProperty;
 
 //-Constructor--------------------------------------------------------------------
 public:
-    PropertyNode(Base* property);
+    PropertyNode(IFace* property);
 
 //-Destructor--------------------------------------------------------------------
 public:
@@ -114,13 +114,13 @@ private:
     void removeDependent(const PropertyNode* dependent);
 
 public:
-    Base* property() const;
+    IFace* property() const;
     Depth depth() const;
     Itr cbeginDependents() const;
     Itr cendDependents() const;
     Links dependencies() const;
 
-    void relinkProperty(Base* property); // For moves
+    void relinkProperty(IFace* property); // For moves
     bool addDependency(PropertyNode* dependency);
     void disconnectDependents();
     void disconnectDependencies();
@@ -242,7 +242,7 @@ class PropertyCoordinator
     Q_DISABLE_COPY_MOVE(PropertyCoordinator);
 //-Aliases------------------------------------------------------------------------
 private:
-    using Base = _QxPrivate::PropertyBase;
+    using IFace = _QxPrivate::BindableInterface;
     using EvaluationStack = std::stack<PropertyNode*>;
     using UpdateStack = QVarLengthArray<PropertyNode*, 16>; // Could be QSet, but given the likely small element counts this is likely faster
     using UpdateQueue = std::queue<PropertyUpdateWave>;
@@ -272,10 +272,10 @@ private:
 
 public:
     bool isBindingBeingEvaluated() const;
-    bool evaluate(Base* property);
-    void evaluateAndNotify(Base* property);
-    void notify(Base* property);
-    void addOrUpdateCurrentEvalDependency(const Base* property);
+    bool evaluate(IFace* property);
+    void evaluateAndNotify(IFace* property);
+    void notify(IFace* property);
+    void addOrUpdateCurrentEvalDependency(const IFace* property);
     void incrementUpdateDelay();
     void decrementUpdateDelay();
 };

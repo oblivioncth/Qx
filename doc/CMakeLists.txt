@@ -15,6 +15,10 @@ set(DOXYGEN_PREDEFINED
     "QX_DECLARE_ERROR_ADAPTATION(Adaptable, Adapter)="
 )
 
+set(DOXYGEN_EXCLUDE_SYMBOLS
+    "_QxPrivate"
+)
+
 # Setup documentation
 ob_standard_documentation(${DOC_TARGET_NAME}
     DOXY_VER 1.9.4
