@@ -5,6 +5,45 @@
 #include <type_traits>
 #include <utility>
 
+// Qt Includes
+#include <QMetaObject>
+#include <QObject>
+
+namespace Qx
+{
+
+class ScopedConnection
+{
+    Q_DISABLE_COPY(ScopedConnection);
+//-Instance Variables------------------------------------------------------------------------------------------
+private:
+    QMetaObject::Connection mConnection;
+
+//-Constructor-------------------------------------------------------------------------------------------------
+public:
+    inline ScopedConnection(const QMetaObject::Connection& connection) : mConnection(connection) {}
+    inline ScopedConnection(ScopedConnection&& other) = default;
+
+//-Destructor-------------------------------------------------------------------------------------------------
+public:
+    inline ~ScopedConnection() { if(mConnection) QObject::disconnect(mConnection); }
+
+//-Operators--------------------------------------------------------------------------------------------------
+public:
+    inline ScopedConnection& operator=(ScopedConnection&& other) = default;
+    inline operator bool() const { return static_cast<bool>(mConnection); }
+};
+
+//Namespace Functions-----------------------------------------------------------------------------------------
+template<typename PointerToMemberFunction, typename Functor>
+ScopedConnection scopedConnect(const QObject* sender, PointerToMemberFunction signal, Functor&& functor)
+{
+    return QObject::connect(sender, std::forward<PointerToMemberFunction>(signal), std::forward<Functor>(functor));
+}
+
+}
+
+
 //Non-namespace Structs----------------------------------------------------------
 /* TODO: Figure out how to constrain this to only accept functors, issue is at least as of C++20
  * there doesnt seem to be a way to check if a type has an arbitrary number of operator() overloads

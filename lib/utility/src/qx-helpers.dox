@@ -6,6 +6,72 @@
  *  are designed to facilitate common fundamental tasks with as brief syntax as possible.
  */
 
+namespace Qx
+{
+//===============================================================================================================
+// ScopedConnection
+//===============================================================================================================
+
+/*!
+ *  @class ScopedConnection qx/utility/qx-helpers.h
+ *  @ingroup qx-core
+ *
+ *  @brief The ScopedConnection class disconnects a connection when it goes out of scope
+ *
+ *  This is useful when you have a connection that you want disconnected when a certain context is left,
+ *  but do not have a QObject based context object to use.
+ *
+ *  @sa scopedConnect().
+ */
+
+//-Constructor----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn ScopedConnection::ScopedConnection(const QMetaObject::Connection& connection)
+ *
+ *  Creates a scoped connection guard from @a connection.
+ */
+
+/*!
+ *  @fn ScopedConnection::ScopedConnection(ScopedConnection&& other)
+ *
+ *  Move constructs a ScopedConnection from @a other.
+ */
+
+//-Destructor-------------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn ScopedConnection::~ScopedConnection()
+ *
+ *  Destroys the scoped connection guard. The underlying connection will be disconnected if it's valid.
+ */
+
+//-Operators--------------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn ScopedConnection::operator bool() const
+ *
+ *  Returns @c true if the underlying connection is valid (was successful when connect was called); otherwise,
+ *  returns @c false.
+ */
+
+//Public:
+/*!
+ *  @fn ScopedConnection& ScopedConnection::operator=(ScopedConnection&& other)
+ *
+ *  Move assigns this ScopedCOnnection using @a other.
+ */
+
+//Namespace Functions----------------------------------------------------------
+/*!
+ *  @fn ScopedConnection scopedConnect(const QObject* sender, PointerToMemberFunction signal, Functor&& functor)
+ *
+ *  The same as QObject::connect(const QObject* sender, PointerToMemberFunction signal, Functor functor), but
+ *  the resulting connection handle is returned as a ScopedConnection instead.
+ */
+
+}
+
 //Non-namespace Structs----------------------------------------------------------
 /*!
  *  @struct qxFuncAggregate
