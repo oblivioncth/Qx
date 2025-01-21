@@ -962,7 +962,8 @@ PropertyNotifier& PropertyNotifier::operator=(PropertyNotifier&& other) noexcept
  *  @class AbstractBindableProperty qx/core/qx-property.h
  *  @ingroup qx-core
  *
- *  @brief The AbstractBindableProperty class provides the baseline feature for bindable properties.
+ *  @brief The AbstractBindableProperty class provides the baseline feature for bindable properties
+ *  of the @ref properties "Qx Bindable Properties System".
  *
  *  AbstractBindableProperty is the standard interface shared by all bindable properties and contains
  *  most of the functionality that any given implementation will provide to user code; that is, most
@@ -1224,7 +1225,7 @@ PropertyNotifier& PropertyNotifier::operator=(PropertyNotifier&& other) noexcept
  *  @endcode
  *  @endparblock
  *
- *  @sa Property.
+ *  @sa Property and @ref properties "Qx Bindable Properties System"
  */
 
 //-Constructor----------------------------------------------------------------------------------------------

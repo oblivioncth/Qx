@@ -21,7 +21,7 @@ height = 1;
 
 The Qx Bindable Properties System can thought of as an alternate implementation of Qt Bindable Properties, and as such its interface is closely modeled after the latter.
 
-This system is utilized via the classes that are part of the qx-property.h header, namely Qx::Property.
+The foundation of the system is Qx::AbstractBindableProperty, which represents the general bindable properties interface, while Qx::Property is the primary implementation of said interface. Additional utilities related to the system are accessible through the qx-property.h header.
 
 Qx properties can, for the most part, be used interchangeably with Qt in the context of C++ code (QML integration is not supported, and may or may not be attempted at a later time), just with some behavioral and feature set quality of life changes; thus, for brevity this documentation focuses on the differences between the two systems and if you are totally unfamiliar with bindable properties it is recommended to read the documentation for Qt Bindable Properties first.
 
@@ -66,6 +66,35 @@ x = 3;
 Going off just the notifier callback output, nothing initially looks amiss.
 
 Here we have a dependency graph that looks like this:
+@cond@
+This isn't as nice looking and has rendering issues with DoxygenAwesome (inverted colors and grey scrollbar)
+
+@dot
+digraph Dependencies {
+    rankdir=BT;
+    node [
+        shape=circle,
+        fixedsize=true,
+        width=0.8,
+        style=filled,
+        color="#380000",
+        fillcolor="#8F1717",
+        
+    ];
+    splines=ortho;
+    nodesep=1.5;
+    ranksep=0.7;
+
+    A [label="poly"];
+    B [label="x2"];
+    C [label="x"];
+    
+    B -> A;
+    C -> A;
+    C -> B;
+}
+@enddot
+@endcond
 
 ![Polynomial property example graph](properties-0.png){html: width=35%}
 
