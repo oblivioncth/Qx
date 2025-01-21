@@ -27,6 +27,7 @@ qx_add_component("Core"
         qx-lopmap.h
         qx-processbider.h
         qx-progressgroup.h
+        qx-property.h
         qx-table.h
         qx-threadsafesingleton.h
         qx-versionnumber.h
@@ -38,6 +39,7 @@ qx_add_component("Core"
         qx-systemsignalwatcher.h
         qx-traverser.h
         __private/qx-internalerror.h
+        __private/qx-property_detail.h
     IMPLEMENTATION
         qx-abstracterror.cpp
         qx-algorithm.cpp
@@ -60,6 +62,8 @@ qx_add_component("Core"
         qx-processbider.cpp
         qx-processbider_p.h
         qx-progressgroup.cpp
+        qx-property_p.h
+        qx-property.cpp
         qx-versionnumber.cpp
         qx-string.cpp
         qx-system.cpp
