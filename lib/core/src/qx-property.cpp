@@ -1220,7 +1220,7 @@ PropertyNotifier& PropertyNotifier::operator=(PropertyNotifier&& other) noexcept
  *      Q_OBJECT
  *      Qx::Property<int> data;
  *  public:
- *      Qx::Bindable<int> bindableData() { return &data; }
+ *      Qx::Bindable<int> bindableData() { return data; }
  *  };
  *  @endcode
  *  @endparblock
