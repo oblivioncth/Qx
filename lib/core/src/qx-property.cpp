@@ -1231,6 +1231,12 @@ PropertyNotifier& PropertyNotifier::operator=(PropertyNotifier&& other) noexcept
 //-Constructor----------------------------------------------------------------------------------------------
 //Public:
 /*!
+ *  @fn Bindable<T>::Bindable()
+ *
+ *  Constructs an invalid Bindable.
+ */
+
+/*!
  *  @fn Bindable<T>::Bindable(AbstractBindableProperty<T>& bp)
  *
  *  Constructs a Bindable wrapper for the bindable property @a bp.
@@ -1374,7 +1380,7 @@ PropertyNotifier& PropertyNotifier::operator=(PropertyNotifier&& other) noexcept
  *
  *  A binding is invalid if there was an issue the arguments passed to its constructor,
  *  like a null pointer or a property being specified that does not actually belong
- *  to the preceding object.
+ *  to the preceding object, or if the default constructor was used.
  */
 
 /*!

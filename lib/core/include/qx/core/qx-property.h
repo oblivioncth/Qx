@@ -480,6 +480,11 @@ private:
 
 //-Constructor-----------------------------------------------------------------
 public:
+    Bindable() :
+        mBindable(nullptr),
+        mReadOnly(true)
+    {}
+
     Bindable(AbstractBindableProperty<T>& bp) :
         mBindable(&bp),
         mReadOnly(false)
