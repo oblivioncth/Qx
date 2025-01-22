@@ -9,6 +9,10 @@
 #include <QMetaObject>
 #include <QObject>
 
+// Inner-component Includes
+#include "qx/utility/qx-typetraits.h"
+#include "qx/utility/qx-concepts.h"
+
 namespace Qx
 {
 
@@ -41,8 +45,24 @@ ScopedConnection scopedConnect(const QObject* sender, PointerToMemberFunction si
     return QObject::connect(sender, std::forward<PointerToMemberFunction>(signal), std::forward<Functor>(functor));
 }
 
+//TODO: Might want to move this to a container tools specific header (along with some other todos related to them)
+template<typename T>
+using container_arrow_result = std::conditional_t<defines_member_ptr<T>, T&,
+                               std::conditional_t<std::is_class_v<target_type<T>>, target_type<T>*, void>>;
+
+template<typename T>
+concept arrowable_container_type = defines_member_ptr<T> || std::is_class_v<target_type<T>>;
+
+template<arrowable_container_type T>
+container_arrow_result<T> container_arrow_operator(T& data)
+{
+    if constexpr(defines_member_ptr<T> || std::is_pointer_v<T>)
+        return data;
+    else
+        return &data;
 }
 
+}
 
 //Non-namespace Structs----------------------------------------------------------
 /* TODO: Figure out how to constrain this to only accept functors, issue is at least as of C++20

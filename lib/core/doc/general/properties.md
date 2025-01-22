@@ -196,12 +196,14 @@ Qx's implementation is designed so that bindings should **never** be evaluated m
 ### Other:
 
  - More idiomatic const correctness.
-	 - Due to implementation constraints, some methods on some Qt property classes that are "read" in nature (i.e. do not modify principle data) are non-const, making accessing them in non-const contexts impossible, even though you're not writing to the value in any way.
+    - Due to implementation constraints, some methods on some Qt property classes that are "read" in nature (i.e. do not modify principle data) are non-const, making accessing them in non-const contexts impossible, even though you're not writing to the value in any way.
  - Use of `[[nodiscard]]` for callback handles to catch subtle bugs in which a callback would be immediately unregistered due to the handle being discarded
  - Non-templated callback handles.
-	 - All methods that return a callback function "handle" (i.e. lifecycle handler) return a non-templated type, which makes storing them in a container trivial, unlike `QPropertyChangeHandler<Functor>`
+	- All methods that return a callback function "handle" (i.e. lifecycle handler) return a non-templated type, which makes storing them in a container trivial, unlike `QPropertyChangeHandler<Functor>`
  - "Lifetime" callback registration.
-	 - Additional registration methods that tie the lifetime of the callback to the lifetime of the property and don't require the user to manage a handle object
+    - Additional registration methods that tie the lifetime of the callback to the lifetime of the property and don't require the user to manage a handle object
+ - More flexible operator->().
+    - Implementation of operator->() that allows for chaining through more T types, like basic aggregates.
 
 Disadvantages
 ------------

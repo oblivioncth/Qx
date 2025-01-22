@@ -15,8 +15,9 @@
 // Qt Includes
 #include <QtGlobal>
 
-// Intra-component Includes
+// Extra-component Includes
 #include "qx/utility/qx-concepts.h"
+#include "qx/utility/qx-helpers.h"
 
 /* TODO: In general, utilize more non-template base types to reduce code bloat
  * and hide away implementation details like how the Qt Bindable Property system
@@ -251,9 +252,9 @@ protected:
     AbstractBindableProperty& operator=(AbstractBindableProperty&& other) noexcept = default;
 
 public:
-    const T* operator->() const requires defines_member_ptr<T> || std::is_pointer_v<T>
+    auto operator->() const requires arrowable_container_type<T>
     {
-        return &value();
+        return container_arrow_operator(value());
     }
 
     const T& operator*() const { return value(); }
@@ -640,7 +641,7 @@ public:
 
 //-Operators-------------------------------------------------------------
 public:
-    const T* operator->() const requires defines_member_ptr<decltype(mBindable)>
+    auto operator->() const requires defines_member_ptr<decltype(mBindable)>
     {
         Q_ASSERT(mBindable);
         return mBindable->operator->();
