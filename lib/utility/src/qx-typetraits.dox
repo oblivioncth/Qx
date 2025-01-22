@@ -1,0 +1,38 @@
+/*!
+ *  @file qx-typetraits.h
+ *  @ingroup qx-utility
+ *
+ *  @brief The qx-typetraits header file provides a library of general purpose type-traits as an extension of
+ *  the standard type-traits library.
+ */
+
+namespace Qx
+{
+// Specialization
+/*!
+ *  @struct is_specialization_of
+ *  @brief Checks whether A is a specialization of B.
+ *  @sa is_specialization_of_v
+ *
+ *  @var is_specialization_of_v
+ *  @brief See is_specialization_of.
+ */
+
+// Qualifiers
+/*!
+ *  @typedef target_type
+ *
+ *  Returns T with the top most reference and pointer removed so that:
+ *  - @c U&
+ *  - @c U*
+ *  - @c U*&
+ *  - @c U
+ *
+ *  all become @c U.
+ *
+ *  In other words, returns type U that type T "targets", unless T is already a pure type.
+ *
+ *  Does not influence constness or other qualifiers.
+ */
+
+}
