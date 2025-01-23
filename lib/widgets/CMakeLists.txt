@@ -1,11 +1,13 @@
 #================= Add Component ==========================
 qx_add_component("Widgets"  
     HEADERS_API
+        qx-buttongroup.h
         qx-common-widgets.h
         qx-logindialog.h
         qx-standarditemmodel.h
         qx-treeinputdialog.h
     IMPLEMENTATION
+        qx-buttongroup.cpp
         qx-common-widgets.cpp
         qx-common-widgets_p.h
         qx-common-widgets_p.cpp
