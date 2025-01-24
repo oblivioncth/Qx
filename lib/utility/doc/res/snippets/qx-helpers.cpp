@@ -50,12 +50,12 @@ class Container
 public:
     Container(const T& v) : mT(v) {}
 
-    auto operator->() const requires Qx::arrowable_container_type<T>
+    decltype(auto) operator->() const requires Qx::arrowable_container_type<T>
     {
         return Qx::container_arrow_operator(mT);
     }
 
-    auto operator->() requires Qx::arrowable_container_type<T>
+    decltype(auto) operator->() requires Qx::arrowable_container_type<T>
     {
         return Qx::container_arrow_operator(mT);
     }

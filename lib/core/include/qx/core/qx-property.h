@@ -252,7 +252,7 @@ protected:
     AbstractBindableProperty& operator=(AbstractBindableProperty&& other) noexcept = default;
 
 public:
-    auto operator->() const requires arrowable_container_type<T>
+    decltype(auto) operator->() const requires arrowable_container_type<T>
     {
         return container_arrow_operator(value());
     }
@@ -645,7 +645,7 @@ public:
 
 //-Operators-------------------------------------------------------------
 public:
-    auto operator->() const requires defines_member_ptr<WrappedProperty>
+    decltype(auto) operator->() const requires defines_member_ptr<WrappedProperty>
     {
         Q_ASSERT(mBindable);
         return mBindable->operator->();
