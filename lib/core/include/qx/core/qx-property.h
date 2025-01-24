@@ -474,9 +474,13 @@ class Bindable
      * hides the QObject specific adapter internally.
      */
 
+//-Aliases-------------------------------------------------------------
+private:
+    using WrappedProperty = AbstractBindableProperty<T>;
+
 //-Instance Variables-------------------------------------------------------------
 private:
-    AbstractBindableProperty<T>* mBindable;
+    WrappedProperty* mBindable;
     bool mReadOnly;
 
 //-Constructor-----------------------------------------------------------------
@@ -641,7 +645,7 @@ public:
 
 //-Operators-------------------------------------------------------------
 public:
-    auto operator->() const requires defines_member_ptr<decltype(mBindable)>
+    auto operator->() const requires defines_member_ptr<WrappedProperty>
     {
         Q_ASSERT(mBindable);
         return mBindable->operator->();
