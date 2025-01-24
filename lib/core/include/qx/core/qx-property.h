@@ -189,8 +189,21 @@ private:
     void notifyObservers() const override { mObserverManager->invokeAll(); }
 
 public:
-    virtual void setValueBypassingBindings(const T& v) = 0;
     virtual void setValueBypassingBindings(T&& v) = 0;
+
+    /* This is a bit of a blemish. Originally, this was a pure virtual function like the T&& version
+     * in order to let implementations optimize their copy assignment to the greatest extent possible;
+     * however, as soon as the method is virtual the compiler tries to instantiate it derivatives always,
+     * regardless of T, which means that properties would stop working with move-only types (unacceptable).
+     * Ideally we'd just constrain the virtual method, but even though technically it's possible (GCC allows it),
+     * it's not allowed by the standard. So instead we implement it here as a manual copy/move, delegating to the
+     * T&& version. In most cases the compiler should be able to optimize this to be equivalent to a direct copy
+     * assignment (assuming that's what the derived class did), and in other cases it should be barely more
+     * expensive. Regardless, this is something to try and work around as soon as any other class hierarchy or
+     * approach changes make a better way possible, or if the standard every allows constraining virtual methods.
+     */
+    void setValueBypassingBindings(const T& v) requires std::copyable<T> { setValueBypassingBindings(T(v)); }
+
     virtual const T& valueBypassingBindings() const = 0;
 
     PropertyBinding<T> binding() const { return mBinding; }
@@ -440,12 +453,7 @@ private:
     }
 
 public:
-    void setValueBypassingBindings(const T& v) override
-    {
-        mCache = v;
-        writeProperty(mCache);
-    }
-
+    using Qx::AbstractBindableProperty<T>::setValueBypassingBindings;
     void setValueBypassingBindings(T&& v) override
     {
         mCache = std::move(v);
@@ -546,7 +554,7 @@ public:
         if(!mutableCheck())
             return;
 
-        setValueBypassingBindings(v);
+        mBindable->setValueBypassingBindings(v);
     }
 
     void setValueBypassingBindings(T&& v)
@@ -555,7 +563,7 @@ public:
         if(!mutableCheck())
             return;
 
-        setValueBypassingBindings(std::forward<T>(v));
+        mBindable->setValueBypassingBindings(std::forward<T>(v));
     }
 
     const T& valueBypassingBindings() const { Q_ASSERT(mBindable); return mBindable->valueBypassingBindings(); }
@@ -706,7 +714,7 @@ public:
 
 //-Instance Functions-------------------------------------------------------------
 public:
-    void setValueBypassingBindings(const T& v) override { mData = v; }
+    using AbstractBindableProperty<T>::setValueBypassingBindings;
     void setValueBypassingBindings(T&& v) override { mData = std::move(v); }
     const T& valueBypassingBindings() const override { return mData; }
 
