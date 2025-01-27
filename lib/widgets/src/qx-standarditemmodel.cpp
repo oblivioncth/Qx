@@ -137,7 +137,7 @@ void StandardItemModel::setAutoTristate(bool autoTristate) { mAutoTristate = aut
  *  @param parent A model index pointing to the item for processing to start at. A null index causes
  *  processing to start at the root item of the model, thereby calling the routine on all items.
  */
-void StandardItemModel::forEachItem(const std::function<void (QStandardItem*)>& func, QModelIndex parent)
+void StandardItemModel::forEachItem(const std::function<void (QStandardItem*)>& func, QModelIndex parent) const
 {
     for(int r = 0; r < rowCount(parent); ++r)
     {

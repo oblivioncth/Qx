@@ -15,11 +15,14 @@ set(DOXYGEN_PREDEFINED
     "QX_DECLARE_ERROR_ADAPTATION(Adaptable, Adapter)="
 )
 
+set(DOXYGEN_EXCLUDE_SYMBOLS
+    "_QxPrivate"
+)
+
 # Setup documentation
 ob_standard_documentation(${DOC_TARGET_NAME}
     DOXY_VER 1.9.4
     PROJ_NAME "${PROJECT_NAME}"
-    QT_PREFIX "${Qt_PREFIX_PATH}"
     QT_MODULES
         qtconcurrent
         qtcore

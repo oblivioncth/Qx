@@ -2,7 +2,6 @@
 #define QX_CONCEPTS_H
 
 // Standard Library Includes
-#include <utility>
 #include <iterator>
 #include <type_traits>
 
@@ -10,21 +9,8 @@
 #include <QHash>
 #include <QMap>
 
-/*! @cond */
-namespace QxConceptsPrivate
-{
-
-template <class A, template <typename...> class B>
-struct is_specialization_of : std::false_type {};
-
-template <typename... Args, template <typename...> class B>
-struct is_specialization_of<B<Args...>, B> : std::true_type {};
-
-template <typename A, template <typename...> class B>
-inline constexpr bool is_specialization_of_v = is_specialization_of<A, B>::value;
-
-}
-/*! @endcond */
+// Inter-component Includes
+#include "qx/utility/qx-typetraits.h"
 
 namespace Qx
 {
@@ -237,10 +223,11 @@ concept defines_address_of_s = requires(K klass) {{ &klass } -> std::same_as<R*>
 template<class K>
 concept defines_address_of = requires(K klass) {{ &klass };};
 
-/* TODO: Not sure how to do this one, there is a "b" parameter but its type could be anything
- * template<class K, typename R>
- * concept defines_member_ptr_s = requires(K klass, R ret) {{ klass-> } -> std::same_as<R*>;};
- */
+template<class K>
+concept defines_member_ptr = requires(K klass) {{ klass.operator->() };};
+
+template<class K, typename R>
+concept defines_member_ptr_s = requires(K klass) {{ klass.operator->() } -> std::same_as<R*>;};
 
 template<class K, typename R, typename T>
 concept defines_ptr_to_member_ptr_for_s = requires(K klass, T type) {{ klass->*type } -> std::same_as<R&>;};
@@ -266,7 +253,6 @@ concept defines_comma_for_s = requires(K klass, T type) {{ klass, type } -> std:
 
 template<class K, typename T>
 concept defines_comma_for = requires(K klass, T type) {{ klass, type };};
-
 
 // Arithmetic Operators
 template<class K>
@@ -504,6 +490,9 @@ concept traverseable = std::bidirectional_iterator<typename K::const_iterator> &
                        std::is_default_constructible_v<K> &&
                        requires(K klass) {{ klass.size() } -> std::integral<>;};
 
+template<typename F, typename T>
+concept comparator = defines_call_for_s<F, bool, T, T>;
+
 // Conversion
 template<class K, typename T>
 concept static_castable_to = requires(K klass) {{ static_cast<T>(klass) };};
@@ -514,9 +503,9 @@ concept any_of = (std::same_as<K, L> || ...);
 
 // Template
 template<typename K, template <typename...> class L>
-concept specializes = QxConceptsPrivate::is_specialization_of_v<K, L>;
+concept specializes = is_specialization_of_v<K, L>;
 
-// Similiar interface types
+// Similar interface types
 template<typename T>
 concept qassociative = specializes<T, QHash> ||
                        specializes<T, QMap>;

@@ -91,39 +91,13 @@ class ProcessBider;
 
 class ProcessBiderManager
 {
-//-Class Members---------------------------------------------------------------------------------------------
-private:
-     // Needs to be static so it can be locked before the the singleton is created, or else a race in instance() could occur.
-    static inline constinit QMutex smMutex;
-
-//-Instance Members------------------------------------------------------------------------------------------
-private:
-    QThread* mThread;
-    int mWorkerCount;
-
-//-Constructor----------------------------------------------------------------------------------------------
-private:
-    explicit ProcessBiderManager();
-
-//-Destructor----------------------------------------------------------------------------------------------
+    // Doesn't need synchronization (i.e. ThreadSafeSingleton) as there are no data members
+    // TODO: This is so simple, maybe just make it a static member of ProcessBider
+//-Class Functions---------------------------------------------------------------------------------------------
 public:
-    ~ProcessBiderManager();
-
-//-Class Functions----------------------------------------------------------------------------------------------
-public:
-    static Qx::ExclusiveAccess<ProcessBiderManager, QMutex> instance();
-
-//-Instance Functions----------------------------------------------------------------------------------------------
-private:
-    void startThreadIfStopped();
-    void stopThreadIfStarted(bool wait = false);
-
-public:
-    void registerBider(ProcessBider* bider);
-    void notifyWorkerFinished();
-
-/*! @endcond */
+    static void registerBider(ProcessBider* bider);
 };
+/*! @endcond */
 
 }
 

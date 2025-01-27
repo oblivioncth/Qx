@@ -47,7 +47,7 @@ TextPos::TextPos(Extent e)
             break;
 
         default:
-            qCritical("Invalid extent");
+            qFatal("Invalid extent");
     }
 }
 

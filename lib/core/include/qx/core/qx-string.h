@@ -64,6 +64,8 @@ public:
 
     static QString trimLeading(const QStringView string);
     static QString trimTrailing(const QStringView string);
+
+    static QString mapArg(QAnyStringView s, const QMap<QString, QString>& map, Qt::CaseSensitivity cs = Qt::CaseSensitive);
 };
 
 }

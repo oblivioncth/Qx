@@ -41,3 +41,73 @@ int main()
 // c (from wrapped char free function)
 // hello (from string named lambda)
 //! [0]
+
+//! [1]
+template<typename T>
+class Container
+{
+    T mT;
+public:
+    Container(const T& v) : mT(v) {}
+
+    decltype(auto) operator->() const requires Qx::arrowable_container_type<T>
+    {
+        return Qx::container_arrow_operator(mT);
+    }
+
+    decltype(auto) operator->() requires Qx::arrowable_container_type<T>
+    {
+        return Qx::container_arrow_operator(mT);
+    }
+};
+
+struct Foo
+{
+    int data = -1;
+    void print() const { std::cout << "Const " << data << std::endl; } 
+    void print() { std::cout << "Non-const " << data << std::endl; } 
+};
+
+int main() {
+    // Helper
+    Foo fooForPtr{4};
+    Foo fooForRef{5};
+    Foo eight{8};
+    const Foo* fooForPtrRef{&eight};
+    int ten{10};
+
+    // Demo
+    Foo f{0};
+    Container<Foo> cf(Foo{1});
+    Container<std::optional<Foo>> cof(Foo{2});
+    Container<std::shared_ptr<Foo>> csf = std::make_shared<Foo>(3);
+    Container<Foo*> cpf = &fooForPtr;
+    Container<Foo&> crf = fooForRef;
+    const Container<Foo> ccf(Foo{6});
+    Container<const Foo> ccf2(Foo{7});
+    Container<const Foo*&> ccfpr = fooForPtrRef;
+    Container<int> ci = 9;
+    Container<int*> cpi = &ten;
+
+    cf->print();
+    cof->print();
+    csf->print();
+    cpf->print();
+    crf->print();
+    ccf->print();
+    ccf2->print();
+    ccfpr->print();
+    //ci->print(); Constraints not satisfied, int doesn't make sense for operator->()
+    //cpi-print(); Constraints not satisfied, int doesn't make sense for operator->()
+}
+
+//Output:
+//Non-const 1
+//Non-const 2
+//Non-const 3
+//Non-const 4
+//Non-const 5
+//Const 6
+//Const 7
+//Const 8
+//! [1]

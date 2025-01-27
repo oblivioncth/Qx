@@ -6,11 +6,13 @@ qx_add_component("Utility"
         qx-helpers.h
         qx-macros.h
         qx-stringliteral.h
+        qx-typetraits.h
     DOC_ONLY
         qx-concepts.dox
         qx-helpers.dox
         qx-macros.dox
         qx-stringliteral.dox
+        qx-typetraits.dox
 )
 
 # Force conforming preprocessor for MSVC, required for

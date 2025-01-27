@@ -7,6 +7,7 @@
 
 // Inter-component Includes
 #include "qx/core/qx-system.h"
+#include "__private/qx-generalworkerthread.h"
 
 // TODO: Add the ability to add a starting PID so that if more than one process with the same
 // name are running, the user can specify which to latch to (won't matter for grace restart though)
@@ -136,7 +137,7 @@ void ProcessBiderWorker::handleClosure(std::chrono::milliseconds timeout, bool f
         /* In case a grace expiration is queued and the process might still be running, queue a closure
          * for if the process is hooked again
          */
-        Qt::ConnectionType ct = static_cast<Qt::ConnectionType>(Qt::AutoConnection | Qt::SingleShotConnection | Qt::UniqueConnection);
+        Qt::ConnectionType ct = static_cast<Qt::ConnectionType>(Qt::AutoConnection | Qt::SingleShotConnection | Qt::UniqueConnection); // NOLINT(clang-analyzer-optin.core.EnumCastOutOfRange)
         connect(this, &ProcessBiderWorker::processHooked, this, [this, timeout, force]{
                 mWaiter.close(timeout, force);
         }, ct);
@@ -155,100 +156,24 @@ void ProcessBiderWorker::bide()
 // ProcessBiderManager
 //===============================================================================================================
 
-/* NOTE: We explicitly avoid haivng the manager be a QObject here since it may be spawned in any thread
- * due to RAII and therefore we can't be certain about thread afinity. Additionally, for this reason, we
+/* NOTE: We explicitly avoid having the manager be a QObject here since it may be spawned in any thread
+ * due to RAII and therefore we can't be certain about thread affinity. Additionally, for this reason, we
  * must be sure to avoid using 'this' as a context parameter for any connections that the manager makes
  * so that nothing is set to run in the managers thread. The manager could be a QObject and could be moved
  * to the main thread upon creation to ensure it's thread affinity is always valid, but we don't want the
  * managers operation to potentially get held up just because the main thread may block.
  */
 
-//-Constructor----------------------------------------------------------------------------------------------
-//private:
-ProcessBiderManager::ProcessBiderManager() :
-    mThread(nullptr),
-    mWorkerCount(0)
-{}
-
-//-Destructor----------------------------------------------------------------------------------------------
-//Public:
-ProcessBiderManager::~ProcessBiderManager()
-{
-    // In theory this could be deleted while something else is accessing it, however unlikely that is given it's static
-    QMutexLocker lock(&smMutex);
-    stopThreadIfStarted(true);
-}
-
-//-Class Functions----------------------------------------------------------------------------------------------
-//Private:
-Qx::ExclusiveAccess<ProcessBiderManager, QMutex> ProcessBiderManager::instance()
-{
-    /* We don't control the ProcessBider instances, so they could be in any thread and we need
-     * to synchronize access to the manager (also becuase workers access this).
-     * An alternative is making the manager a QObject and using signals/slots, but that gets tricky since it's created
-     * via RAII and therefore may be created in a thread that gets destroyed (and would then have no affinity).
-     * This is simpler.
-     */
-    static ProcessBiderManager m;
-    return Qx::ExclusiveAccess(&m, &smMutex); // Provides locked access to manager, that unlocks when destroyed
-}
-
-//-Instance Functions---------------------------------------------------------------------------------------------
-//Private:
-void ProcessBiderManager::startThreadIfStopped()
-{
-    if(mThread)
-        return;
-
-    QThread* mainThread = QCoreApplication::instance()->thread();
-    if(!mainThread) [[unlikely]]
-    {
-        // It's documented that you're not supposed to use QObjects before QCoreAppliation is created,
-        // but check explicitly anyway
-        qCritical("Cannot use ProcessBiders before QCoreApplication is created");
-    }
-
-    mThread = new QThread();
-
-    /* mThread is the only QObject member of this class. We need to move it to the main thread because
-     * the manager can be created in any thread since it's done by RAII and UB occurs if a Object (in this case
-     * the QThread) continues to be used if the thread it belongs to is shutdown. moveToThread() already checks
-     * if this is the main thread and results in a no-op if so
-     */
-    mThread->moveToThread(mainThread);
-    mThread->start();
-}
-
-void ProcessBiderManager::stopThreadIfStarted(bool wait)
-{
-    if(!mThread || !mThread->isRunning())
-        return;
-
-    // Quit thread, queue it for deletion, and abandon it
-    mThread->quit();
-    QObject::connect(mThread, &QThread::finished, mThread, &QObject::deleteLater);
-    if(wait)
-        mThread->wait();
-    mThread = nullptr;
-}
-
 //Public:
 void ProcessBiderManager::registerBider(ProcessBider* bider)
 {
-    startThreadIfStopped();
-
     ProcessBiderWorker* worker = new ProcessBiderWorker();
     worker->setGrace(bider->respawnGrace());
     worker->setProcessName(bider->processName());
     worker->setStartWithGrace(bider->initialGrace());
-    worker->moveToThread(mThread);
-    mWorkerCount++;
 
     // Management
     QObject::connect(bider, &QObject::destroyed, worker, &QObject::deleteLater); // If bider is unexpectedly deleted, remove bide worker
-    QObject::connect(mThread, &QThread::finished, worker, &QObject::deleteLater); // Kill worker if it still exists and the thread is being shutdown
-    QObject::connect(worker, &QObject::destroyed, worker, []{ ProcessBiderManager::instance()->notifyWorkerFinished(); });
-         // ^ Have worker notify the manager when it dies to track count. Use static accessor for synchronization instead of capturing 'this'
     QObject::connect(worker, &ProcessBiderWorker::complete, worker, &QObject::deleteLater); // Self-trigger cleanup of worker
     QObject::connect(bider, &ProcessBider::stopped, worker, &ProcessBiderWorker::handleAbort); // Handle aborts
     QObject::connect(bider, &ProcessBider::__startClose, worker, &ProcessBiderWorker::handleClosure); // Handle closes
@@ -281,14 +206,12 @@ void ProcessBiderManager::registerBider(ProcessBider* bider)
         });
     });
 
+    // Move to worker thread
+    auto gwt = GeneralWorkerThread::instance();
+    gwt->moveTo(worker);
+
     // Start work asynchronously
     QMetaObject::invokeMethod(worker, &ProcessBiderWorker::bide);
-}
-
-void ProcessBiderManager::notifyWorkerFinished()
-{
-    if(!--mWorkerCount)
-        stopThreadIfStarted();
 }
 
 /*! @endcond */
@@ -523,7 +446,7 @@ void ProcessBider::start()
         return;
 
     mBiding = true;
-    ProcessBiderManager::instance()->registerBider(this);
+    ProcessBiderManager::registerBider(this);
     emit started();
 }
 

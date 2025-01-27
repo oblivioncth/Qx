@@ -12,8 +12,6 @@
  *  The constrained variants enforce a strict return type that matches the standard
  *  return type for the default implementation of that operator, or a user defined type, @c R, if there
  *  is none.
- *
- *  @todo Figure out how to make a concept that uses the member of pointer (arrow) operator.
  */
 
 namespace Qx
@@ -1099,6 +1097,16 @@ namespace Qx
  *
  *  Satisfied if @c K contains the type 'const_iterator' that satisfies @c std::bidirectional_iterator,
  *  is default constructable, and defines a member function 'size' that returns an integral type.
+ */
+
+/*!
+ *  @concept comparator
+ *  @brief Specifies that a type can act as a comparator.
+ *
+ *  Satisfied if @c F returns a @c bool when called with two values of T.
+ *
+ *  Generally it is assumed that the comparator will return @c true if the values are equal, and
+ *  @c false otherwise.
  */
 
 // Conversion

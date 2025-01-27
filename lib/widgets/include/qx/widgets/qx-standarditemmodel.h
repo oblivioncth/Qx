@@ -19,19 +19,19 @@ private:
 
 //-Constructor-------------------------------------------------------------------------------------------------------
 public:
-    StandardItemModel(int rows, int columns, QObject *parent = nullptr);
-    StandardItemModel(QObject *parent = nullptr);
+    StandardItemModel(int rows, int columns, QObject* parent = nullptr);
+    StandardItemModel(QObject* parent = nullptr);
 
 //-Instance Functions-----------------------------------------------------------------------------------------------
 private:
-    void autoTristateChildren(QStandardItem* changingItem, const QVariant&  value, int role);
-    void autoTristateParents(QStandardItem* changingItem, const QVariant&  changingValue);
+    void autoTristateChildren(QStandardItem* changingItem, const QVariant& value, int role);
+    void autoTristateParents(QStandardItem* changingItem, const QVariant& changingValue);
 
 public:
-    virtual bool setData(const QModelIndex&  index, const QVariant&  value, int role = Qt::EditRole);
+    virtual bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
     bool isAutoTristate();
     void setAutoTristate(bool autoTristate);
-    void forEachItem(std::function<void(QStandardItem*)> const& func, QModelIndex parent = QModelIndex());
+    void forEachItem(const std::function<void(QStandardItem*)>& func, QModelIndex parent = QModelIndex()) const;
 
     void selectAll();
     void selectNone();

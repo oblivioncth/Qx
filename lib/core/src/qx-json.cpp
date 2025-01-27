@@ -19,19 +19,9 @@
  *  @file qx-json.h
  *  @ingroup qx-core
  *
- *  @brief The qx-json header file provides various utilities for JSON data manipulation.
+ *  @brief The qx-json header file offers various utilities for JSON data manipulation.
  *
- *  The mechanisms of this file introduce a highly flexible, simple to use, declarative
- *  mechanism for parsing/serializing JSON data into user structs and other types.
- *
- *  For example, the following JSON data:
- *  @snippet qx-json.cpp 0
- *
- *  can easily be parsed into a corresponding set of C++ data structures like so:
- *  @snippet qx-json.cpp 1
- *
- *  Likewise, the structure can be serialized back out into textual JSON data with:
- *  @snippet qx-json.cpp 2
+ *  Most significantly this file provides access to @ref declarativejson "Qx Declarative JSON".
  *
  *  @sa QX_JSON_STRUCT(), and QxJson.
  */
@@ -142,6 +132,9 @@ namespace Qx
  *
  *  @var JsonError::Form JsonError::EmptyDoc
  *  The provided JSON document is empty.
+ *
+ *  @var JsonError::Form JsonError::InvalidValue
+ *  The value of a type was invalid for that type.
  *
  *  @var JsonError::Form JsonError::MissingFile
  *  The JSON containing file was not found.

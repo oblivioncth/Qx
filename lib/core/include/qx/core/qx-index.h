@@ -51,7 +51,7 @@ public:
                 break;
 
             default:
-                qCritical("Invalid extent");
+                qFatal("Invalid extent");
         }
     }
 

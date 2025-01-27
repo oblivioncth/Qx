@@ -50,7 +50,7 @@ void AbstractProcessWaiter::waitForDead(std::chrono::milliseconds timeout, std::
             mDeadWaitTimer.stop();
             postDeadWait(true);
         }
-    }, Qt::ConnectionType(Qt::DirectConnection | Qt::SingleShotConnection));
+    }, Qt::ConnectionType(Qt::DirectConnection | Qt::SingleShotConnection)); // NOLINT(clang-analyzer-optin.core.EnumCastOutOfRange)
     mDeadWaitTimer.start(timeout, this);
 }
 

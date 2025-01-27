@@ -5,6 +5,7 @@ qx_add_component("Core"
         qx-algorithm.h
         qx-array.h
         qx-base85.h
+        qx-bimap.h
         qx-bitarray.h
         qx-bytearray.h
         qx-char.h
@@ -13,6 +14,7 @@ qx_add_component("Core"
         qx-dsvtable.h
         qx-error.h
         qx-exclusiveaccess.h
+        qx-flatmultiset.h
         qx-freeindextracker.h
         qx-genericerror.h
         qx-global.h
@@ -22,17 +24,22 @@ qx_add_component("Core"
         qx-iostream.h
         qx-json.h
         qx-list.h
+        qx-lopmap.h
         qx-processbider.h
         qx-progressgroup.h
+        qx-property.h
         qx-table.h
+        qx-threadsafesingleton.h
         qx-versionnumber.h
         qx-regularexpression.h
         qx-setonce.h
         qx-string.h
         qx-system.h
         qx-systemerror.h
+        qx-systemsignalwatcher.h
         qx-traverser.h
         __private/qx-internalerror.h
+        __private/qx-property_detail.h
     IMPLEMENTATION
         qx-abstracterror.cpp
         qx-algorithm.cpp
@@ -55,6 +62,8 @@ qx_add_component("Core"
         qx-processbider.cpp
         qx-processbider_p.h
         qx-progressgroup.cpp
+        qx-property_p.h
+        qx-property.cpp
         qx-versionnumber.cpp
         qx-string.cpp
         qx-system.cpp
@@ -66,6 +75,10 @@ qx_add_component("Core"
         qx-systemerror.cpp
         qx-systemerror_linux.cpp
         qx-systemerror_win.cpp
+        qx-systemsignalwatcher.cpp
+        qx-systemsignalwatcher_p.h
+        __private/qx-generalworkerthread.h
+        __private/qx-generalworkerthread.cpp
         __private/qx-internalerror.cpp
         __private/qx-processwaiter.h
         __private/qx-processwaiter.cpp
@@ -73,18 +86,27 @@ qx_add_component("Core"
         __private/qx-processwaiter_win.cpp
         __private/qx-processwaiter_linux.h
         __private/qx-processwaiter_linux.cpp
+        __private/qx-signaldaemon.h
+        __private/qx-signaldaemon_win.h
+        __private/qx-signaldaemon_win.cpp
+        __private/qx-signaldaemon_linux.h
+        __private/qx-signaldaemon_linux.cpp
     DOC_ONLY
+        qx-bimap.dox
         qx-regularexpression.dox
         qx-bytearray.dox
         qx-exclusiveaccess.dox
+        qx-flatmultiset.dox
         qx-index.dox
         qx-iostream.dox
         qx-list.dox
+        qx-lopmap.dox
         qx-traverser.dox
         qx-cumulation.dox
         qx-array.dox
         qx-setonce.dox
         qx-table.dox
+        qx-threadsafesingleton.dox
     LINKS
         PUBLIC
             ${Qt}::Core
