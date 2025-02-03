@@ -19,6 +19,17 @@ struct StringLiteral
     }
 };
 
+template <size_t N>
+struct StringLiteral16
+{
+    char16_t value[N];
+
+    constexpr StringLiteral16(const char16_t (&str)[N])
+    {
+        std::copy_n(str, N, value);
+    }
+};
+
 }
 
 #endif // QX_STRINGLITERAL_H
