@@ -7,6 +7,7 @@
 #include <QDir>
 #include <QDirIterator>
 #include <QSettings>
+#include <QProcess>
 
 // Extra-component Includes
 #include "qx/core/qx-integrity.h"
@@ -140,6 +141,14 @@ bool removeUriSchemeHandler(const QString& scheme, const QString& path)
     // Save and return status
     schemeKey.sync();
     return schemeKey.status() == QSettings::NoError;
+}
+
+void prepareShellProcess(QProcess& proc, const QString& command, const QString& arguments)
+{
+    static const QString CMD_ARG_TEMPLATE = uR"(/d /s /c ""%1" %2")"_s;
+    proc.setProgram(u"cmd.exe"_s);
+    QString cmdCommand = CMD_ARG_TEMPLATE.arg(command, arguments);
+    proc.setNativeArguments(cmdCommand);
 }
 
 //-Namespace Functions-------------------------------------------------------------------------------------------------------------

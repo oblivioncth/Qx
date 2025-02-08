@@ -16,6 +16,14 @@
 namespace Qx
 {
 
+//-Namespace Structs-------------------------------------------------------------------------------------------------------------
+struct ExecuteResult
+{
+    // TODO: Maybe move this and execute to a Process class/file
+    int exitCode;
+    QString output;
+};
+
 //-Namespace Functions-------------------------------------------------------------------------------------------------------------
 QX_CORE_EXPORT quint32 processId(QString processName);
 QX_CORE_EXPORT QString processName(quint32 processId);
@@ -32,6 +40,9 @@ QX_CORE_EXPORT bool enforceSingleInstance(QString uniqueAppId);
 QX_CORE_EXPORT bool setDefaultProtocolHandler(const QString& scheme, const QString& name, const QString& path = {}, const QStringList& args = {});
 QX_CORE_EXPORT bool isDefaultProtocolHandler(const QString& scheme, const QString& path = {});
 QX_CORE_EXPORT bool removeDefaultProtocolHandler(const QString& scheme, const QString& path = {});
+
+QX_CORE_EXPORT ExecuteResult execute(const QString& program, const QStringList& arguments = {});
+QX_CORE_EXPORT ExecuteResult shellExecute(const QString& command, const QString& arguments);
 
 #ifdef __linux__
 // Temporary means to and end, will replace with full parser eventually

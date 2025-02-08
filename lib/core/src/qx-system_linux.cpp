@@ -563,6 +563,15 @@ bool removeUriSchemeHandler(const QString& scheme, const QString& path)
     return ma.status() == QSettings::NoError;
 }
 
+void prepareShellProcess(QProcess& proc, const QString& command, const QString& arguments)
+{
+    proc.setProgram(u"/bin/sh"_s);
+
+    // Set arguments
+    QString bashCommand = u"'"_s + command + u"' "_s + arguments;
+    proc.setArguments({u"-c"_s, bashCommand});
+}
+
 //-Namespace Functions-------------------------------------------------------------------------------------------------------------
 quint32 processId(QString processName)
 {
