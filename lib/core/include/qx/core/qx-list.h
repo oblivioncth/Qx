@@ -44,7 +44,7 @@ public:
     {
         QList<T*> toList;
         toList.reserve(fromList.size());
-        for(F* item : qAsConst(fromList))
+        for(F* item : std::as_const(fromList))
             toList.append(static_cast<T*>(item));
 
         return toList;

@@ -82,13 +82,13 @@ QByteArray BitArray::toByteArray(QSysInfo::Endian endianness)
 
     // Convert
     int bitIdx = 0;
-    for(int byte = 0; byte < ba.count() && bitIdx < count(); byte++)
+    for(int byte = 0; byte < ba.length() && bitIdx < count(); byte++)
     {
         char val = 0;
         for(int bit = 0; bit < 8 && bitIdx < count(); ++bit, ++bitIdx)
             val |= ((testBit(bit + byte * 8) ? 0b1 : 0b0) << bit);
 
-        int byteIdx = endianness == QSysInfo::BigEndian ? byte : (ba.count() - 1) - byte;
+        int byteIdx = endianness == QSysInfo::BigEndian ? byte : (ba.length() - 1) - byte;
         ba.replace(byteIdx, 1, &val, 1);
     }
 

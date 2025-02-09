@@ -105,7 +105,7 @@ namespace Qx
 /*!
  *  @fn const T qxAsConst(T&& t)
  *
- *  Serves the same purpose as qAsConst() (preventing implicitly-shared Qt containers from
+ *  Serves the same purpose as std::as_const() (preventing implicitly-shared Qt containers from
  *  detaching), but this version works for rvalues, albeit with some efficiency concerns
  *  depending on the nature of @a t.
  */
@@ -114,11 +114,11 @@ namespace Qx
  *  @fn std::add_const<T>::type qxAsConst(T& t)
  *  @overload
  *
- *  Equivalent to qAsConst(T& t).
+ *  Equivalent to std::as_const(T& t).
  *
  *  This overload exists so that qxAsConst can consistently be used everywhere for both
  *  lvalues and rvalues, instead of having to employ mixed usage of qxAsConst() and
- *  qAsConst().
+ *  std::as_const().
  */
 
 /*!
