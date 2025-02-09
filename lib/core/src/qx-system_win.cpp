@@ -20,6 +20,7 @@ using namespace Qt::Literals::StringLiterals;
 
 namespace Qx
 {
+/*! @cond */
 
 namespace  // Anonymous namespace for effectively private (to this cpp) functions
 {
@@ -150,6 +151,7 @@ void prepareShellProcess(QProcess& proc, const QString& command, const QString& 
     QString cmdCommand = CMD_ARG_TEMPLATE.arg(command, arguments);
     proc.setNativeArguments(cmdCommand);
 }
+/*! @endcond */
 
 //-Namespace Functions-------------------------------------------------------------------------------------------------------------
 quint32 processId(QString processName)

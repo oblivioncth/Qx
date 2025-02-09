@@ -26,6 +26,7 @@ using namespace Qt::Literals::StringLiterals;
 
 namespace Qx
 {
+/*! @cond */
 
 namespace  // Anonymous namespace for local only definitions
 {
@@ -571,6 +572,7 @@ void prepareShellProcess(QProcess& proc, const QString& command, const QString& 
     QString bashCommand = u"'"_s + command + u"' "_s + arguments;
     proc.setArguments({u"-c"_s, bashCommand});
 }
+/*! @endcond */
 
 //-Namespace Functions-------------------------------------------------------------------------------------------------------------
 quint32 processId(QString processName)
