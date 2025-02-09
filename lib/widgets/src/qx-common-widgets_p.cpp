@@ -7,7 +7,7 @@ namespace Qx
 void prepareErrorPostBox(const Error& error, QMessageBox& msgBox)
 {
     // Determine icon
-    QMessageBox::Icon icon;
+    QMessageBox::Icon icon{}; // Default init to silence "uninitialized" warning
 
     switch(error.severity())
     {
@@ -22,6 +22,8 @@ void prepareErrorPostBox(const Error& error, QMessageBox& msgBox)
         case Severity::Critical:
             icon = QMessageBox::Critical;
             break;
+        default:
+            qFatal("Unhandled error severity!");
     }
 
     // Prepare dialog

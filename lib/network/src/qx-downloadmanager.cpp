@@ -582,7 +582,7 @@ void AsyncDownloadManager::downloadProgressHandler(qint64 bytesCurrent, qint64 b
     DownloadTask task = mActiveTasks.value(senderNetworkReply);
 
     // Update total size if needed
-    if(bytesTotal != 0 && mTotalBytes.value(task) != bytesTotal)
+    if(bytesTotal != 0 && mTotalBytes.value(task) != static_cast<quint64>(bytesTotal))
     {
         mTotalBytes.setValue(task, bytesTotal);
         emit downloadTotalChanged(mTotalBytes.total());
