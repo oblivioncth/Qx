@@ -44,7 +44,7 @@ public:
         if(table.size() == 0)
             return;
 
-        qsizetype headerWidth = table.begin()->size();
+        auto headerWidth = table.begin()->size();
 
         for(auto itr = table.begin(); itr != table.end(); itr++)
         {
