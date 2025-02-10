@@ -153,8 +153,8 @@ private:
     {
         if constexpr(defines_equality_s<T>)
             return value == valueBypassingBindings();
-
-        return false;
+        else
+            return false;
     }
 
     template<typename U>
