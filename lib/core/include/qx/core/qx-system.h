@@ -41,8 +41,8 @@ QX_CORE_EXPORT bool setDefaultProtocolHandler(const QString& scheme, const QStri
 QX_CORE_EXPORT bool isDefaultProtocolHandler(const QString& scheme, const QString& path = {});
 QX_CORE_EXPORT bool removeDefaultProtocolHandler(const QString& scheme, const QString& path = {});
 
-QX_CORE_EXPORT ExecuteResult execute(const QString& program, const QStringList& arguments = {});
-QX_CORE_EXPORT ExecuteResult shellExecute(const QString& command, const QString& arguments);
+QX_CORE_EXPORT ExecuteResult execute(const QString& program, const QStringList& arguments = {}, uint timeout = 2'000);
+QX_CORE_EXPORT ExecuteResult shellExecute(const QString& command, const QString& arguments = {}, uint timeout = 2'000);
 
 #ifdef __linux__
 // Temporary means to and end, will replace with full parser eventually

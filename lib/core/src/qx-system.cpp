@@ -22,17 +22,17 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
 
 bool isValidScheme(QStringView scheme) { return !scheme.isEmpty() && !scheme.contains(QChar::Space); };
 
-ExecuteResult execute(QProcess& proc)
+ExecuteResult execute(QProcess& proc, uint timeout)
 {
     ExecuteResult res;
 
     proc.start();
-    if(!proc.waitForStarted(5000))
+    if(!proc.waitForStarted(1000))
     {
         res.exitCode = -2;
         return res;
     }
-    if(!proc.waitForFinished(5000))
+    if(!proc.waitForFinished(timeout))
     {
         proc.kill(); // Force close
         proc.waitForFinished();
@@ -274,8 +274,9 @@ bool removeDefaultProtocolHandler(const QString& scheme, const QString& path)
 }
 
 /*!
- *  Starts the program @a program with the arguments @a arguments in a new process, waits for it to finish, and then returns the
- *  exit code of the process, along with all of it's standard output, from which any trailing line break is removed.
+ *  Starts the program @a program with the arguments @a arguments in a new process, waits for it to finish (or for @a
+ *  timeout to elapse), and then returns the exit code of the process, along with all of it's standard output,
+ *  from which any trailing line break is removed.
  *
  *  The environment and working directory are inherited from the calling process.
  *
@@ -289,18 +290,18 @@ bool removeDefaultProtocolHandler(const QString& scheme, const QString& path)
  *
  *  @sa shellExecute().
  */
-ExecuteResult execute(const QString& program, const QStringList& arguments)
+ExecuteResult execute(const QString& program, const QStringList& arguments, uint timeout)
 {
     QProcess proc;
     proc.setProgram(program);
     proc.setArguments(arguments);
-    return execute(proc);
+    return execute(proc, timeout);
 }
 
 /*!
  *  Starts the program/command @a command with the arguments @a arguments in a new process using a system shell,
- *  waits for it to finish, and then returns the exit code of the process, along with all of it's standard output,
- *  from which any trailing line break is removed.
+ *  waits for it to finish (or for @a timeout to elapse), and then returns the exit code of the process, along
+ *  with all of it's standard output, from which any trailing line break is removed.
  *
  *  This is equivalent to:
  *  - Windows: `cmd /d /s /c ""command" arguments"`
@@ -318,11 +319,11 @@ ExecuteResult execute(const QString& program, const QStringList& arguments)
  *
  *  @sa execute().
  */
-ExecuteResult shellExecute(const QString& command, const QString& arguments)
+ExecuteResult shellExecute(const QString& command, const QString& arguments, uint timeout)
 {
     QProcess proc;
     prepareShellProcess(proc, command, arguments);
-    return execute(proc);
+    return execute(proc, timeout);
 }
 
 }
