@@ -148,7 +148,7 @@ namespace  // Anonymous namespace for local only definitions
         {
             // Get name entry, strip parentheses
             QString nameEntry = stats.value(1);
-            return nameEntry.sliced(1, nameEntry.count() - 2);
+            return nameEntry.sliced(1, nameEntry.length() - 2);
         }
 
         return QString();
@@ -210,11 +210,11 @@ namespace  // Anonymous namespace for local only definitions
 
     //-Class Functions---------------------------------------------------------------
     private:
-        static bool validGroup(QStringView group) { return GROUP_VALIDATOR.match(group).hasMatch(); };
+        static bool validGroup(QStringView group) { return GROUP_VALIDATOR.matchView(group).hasMatch(); };
 
     //-Instance Functions------------------------------------------------------------
     private:
-        bool validKey(QStringView key) { return mKeyValidator.match(key).hasMatch(); };
+        bool validKey(QStringView key) { return mKeyValidator.matchView(key).hasMatch(); };
         bool parseGroup(QStringView groupStr)
         {
             if(groupStr.front() != '[' && groupStr.back() != ']')
@@ -301,11 +301,11 @@ namespace  // Anonymous namespace for local only definitions
 
     //-Class Functions---------------------------------------------------------------
     private:
-        static bool validGroup(QStringView group) { return GROUP_VALIDATOR.match(group).hasMatch(); };
+        static bool validGroup(QStringView group) { return GROUP_VALIDATOR.matchView(group).hasMatch(); };
 
     //-Instance Functions------------------------------------------------------------
     private:
-        bool validKey(QStringView key) { return mKeyValidator.match(key).hasMatch(); };
+        bool validKey(QStringView key) { return mKeyValidator.matchView(key).hasMatch(); };
         bool writeLine(QStringView line)
         {
             QByteArray data = line.toUtf8() + '\n';
