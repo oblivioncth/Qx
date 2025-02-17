@@ -5,6 +5,7 @@
 // Qt Includes
 #include <QDir>
 #include <QCoreApplication>
+#include <QProcess>
 
 /*!
  *  @file qx-system.h
@@ -21,7 +22,54 @@ namespace  // Anonymous namespace for effectively private (to this cpp) function
 
 bool isValidScheme(QStringView scheme) { return !scheme.isEmpty() && !scheme.contains(QChar::Space); };
 
+ExecuteResult execute(QProcess& proc, uint timeout)
+{
+    ExecuteResult res;
+
+    proc.start();
+    if(!proc.waitForStarted(1000))
+    {
+        res.exitCode = -2;
+        return res;
+    }
+    if(!proc.waitForFinished(timeout))
+    {
+        proc.kill(); // Force close
+        proc.waitForFinished();
+        res.exitCode = -3;
+        return res;
+    }
+    if(proc.exitStatus() != proc.NormalExit)
+    {
+        res.exitCode = -2;
+        return res;
+    }
+
+    res.exitCode = proc.exitCode();
+    res.output = QString::fromLatin1(proc.readAllStandardOutput());
+    if(!res.output.isEmpty() && res.output.back() == '\n')
+        res.output.chop(1);
+    if(!res.output.isEmpty() && res.output.back() == '\r')
+        res.output.chop(1);
+
+    return res;
 }
+
+}
+
+//-Namespace Structs-------------------------------------------------------------------------------------------------------------
+/*!
+ *  @struct ExecuteResult
+ *  @ingroup qx-core
+ *
+ *  @brief The ExecuteResult struct contains the result of a call to execute() or shellExecute().
+ *
+ *  @var int ExecuteResult::exitCode
+ *  The exit code of the process.
+ *
+ *  @var QString ExecuteResult::output
+ *  The standard output of the process.
+ */
 
 //-Namespace Functions-------------------------------------------------------------------------------------------------------------
 /*!
@@ -223,6 +271,59 @@ bool removeDefaultProtocolHandler(const QString& scheme, const QString& path)
 
     QString p = QDir::toNativeSeparators(!path.isEmpty() ? path : QCoreApplication::applicationFilePath());
     return removeUriSchemeHandler(scheme, p);
+}
+
+/*!
+ *  Starts the program @a program with the arguments @a arguments in a new process, waits for it to finish (or for @a
+ *  timeout to elapse), and then returns the exit code of the process, along with all of it's standard output,
+ *  from which any trailing line break is removed.
+ *
+ *  The environment and working directory are inherited from the calling process.
+ *
+ *  Argument handling is identical to QProcess::start().
+ *
+ *  If the process cannot be started, the returned exit code will be@c -2, if the process crashes, @c -1, and if the process
+ *  takes too long to finish, @c -3.
+ *
+ *  @note This function is best used for starting processes that return quickly and provide exit codes or output
+ *  that are straightforward to programmatically parse. If more than this is needed, it's best to work with QProcess directly.
+ *
+ *  @sa shellExecute().
+ */
+ExecuteResult execute(const QString& program, const QStringList& arguments, uint timeout)
+{
+    QProcess proc;
+    proc.setProgram(program);
+    proc.setArguments(arguments);
+    return execute(proc, timeout);
+}
+
+/*!
+ *  Starts the program/command @a command with the arguments @a arguments in a new process using a system shell,
+ *  waits for it to finish (or for @a timeout to elapse), and then returns the exit code of the process, along
+ *  with all of it's standard output, from which any trailing line break is removed.
+ *
+ *  This is equivalent to:
+ *  - Windows: `cmd /d /s /c ""command" arguments"`
+ *  - Linux: `/bin/sh` with the direct arguments `{-c, 'command' arguments}`
+ *
+ *  The environment and working directory are inherited from the calling process.
+ *
+ *  Argument handling is identical to QProcess::start().
+ *
+ *  If the process cannot be started, the returned exit code will be@c -2, if the process crashes, @c -1, and if the process
+ *  takes too long to finish, @c -3.
+ *
+ *  @note This function is best used for starting processes that return quickly and provide exit codes or output
+ *  that are straightforward to programmatically parse. If more than this is needed, it's best to work with QProcess directly.
+ *
+ *  @sa execute().
+ */
+ExecuteResult shellExecute(const QString& command, const QString& arguments, uint timeout)
+{
+    QProcess proc;
+    prepareShellProcess(proc, command, arguments);
+    return execute(proc, timeout);
 }
 
 }

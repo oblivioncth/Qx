@@ -161,7 +161,7 @@ const QHash<char, int>& Base85Encoding::decodeMapOriginalSet()
     static QHash<char, int> decodeMap;
     if(decodeMap.isEmpty())
     {
-        for(int i = 0; i < CHAR_SET_ORIGINAL.size(); i++)
+        for(uint i = 0; i < CHAR_SET_ORIGINAL.size(); i++)
             decodeMap[CHAR_SET_ORIGINAL[i]] = i;
     }
 
@@ -173,7 +173,7 @@ const QHash<char, int>& Base85Encoding::decodeMapZ85Set()
     static QHash<char, int> decodeMap;
     if(decodeMap.isEmpty())
     {
-        for(int i = 0; i < CHAR_SET_Z85.size(); i++)
+        for(uint i = 0; i < CHAR_SET_Z85.size(); i++)
             decodeMap[CHAR_SET_Z85[i]] = i;
     }
 
@@ -184,7 +184,7 @@ const QHash<char, int>& Base85Encoding::decodeMapRfc1924Set()
     static QHash<char, int> decodeMap;
     if(decodeMap.isEmpty())
     {
-        for(int i = 0; i < CHAR_SET_RFC_1924.size(); i++)
+        for(uint i = 0; i < CHAR_SET_RFC_1924.size(); i++)
             decodeMap[CHAR_SET_RFC_1924[i]] = i;
     }
 
@@ -274,13 +274,13 @@ const Base85Encoding* Base85Encoding::encodingFromStandard(StandardEncoding enc)
 void Base85Encoding::generateDecodeMap()
 {
     mDecodeMap.clear();
-    for(int i = 0; i < mCharSet.size(); i++)
+    for(uint i = 0; i < mCharSet.size(); i++)
         mDecodeMap[mCharSet[i]] = i;
 }
 
 void Base85Encoding::evaluateValidity()
 {
-    if(mCharSet.size() != mDecodeMap.size()) // This indicates the char map has duplicate characters
+    if(mCharSet.size() != static_cast<size_t>(mDecodeMap.size())) // This indicates the char map has duplicate characters
         mValid = false;
     else if(mZeroGroupChar && mDecodeMap.contains(mZeroGroupChar.value())) // Can't be in the character set
         mValid = false;

@@ -368,7 +368,7 @@ IoOpReport textFileLayout(QList<int>& returnBuffer, QFile& textFile, bool ignore
 
     // Count lines
     while(!fileTextStream.atEnd())
-        returnBuffer.append(fileTextStream.readLine().count());
+        returnBuffer.append(fileTextStream.readLine().length());
 
     // Account for blank line if present and desired
     if(!ignoreTrailingEmpty && fileTextStream.precedingBreak())
@@ -496,7 +496,7 @@ IoOpReport findStringInFile(QList<TextPos>& returnBuffer, QFile& textFile, const
         qFatal("The start position cannot be null!");
 
     // If for whatever reason hit limit is 0, or the query is empty, return
-    if(query.hitLimit() == 0 || query.string().count() == 0)
+    if(query.hitLimit() == 0 || query.string().length() == 0)
         return IoOpReport(IO_OP_INSPECT, IO_SUCCESS, textFile);
 
     // Check file
@@ -1070,7 +1070,7 @@ namespace
                 }
                 if(!startPos.character().isLast())
                 {
-                    int lastLineCharCount = beforeNew.count() - (beforeNew.lastIndexOf(ENDL) + 1);
+                    int lastLineCharCount = beforeNew.length() - (beforeNew.lastIndexOf(ENDL) + 1);
                     int charNeeded = std::max(*startPos.character() - lastLineCharCount, 0);
                     beforeNew += QString(' ').repeated(charNeeded);
 
@@ -1097,7 +1097,7 @@ namespace
             if(writeMode == Overwrite && !afterNew.isEmpty())
             {
                 int newTextLines = text.count(ENDL) + 1;
-                int lastNewLineLength = text.count() - (text.lastIndexOf(ENDL) + 1);
+                int lastNewLineLength = text.length() - (text.lastIndexOf(ENDL) + 1);
 
                 // Find start and end of last line to remove
                 int lineCount = 0;
@@ -1120,7 +1120,7 @@ namespace
                 {
                     // Determine last overwritten line start, end, and length
                     qint64 lastLineStart = lastLf + 1;
-                    qint64 lastLineEnd = (nextLf == -1 ? afterNew.count(): nextLf) - 1;
+                    qint64 lastLineEnd = (nextLf == -1 ? afterNew.length(): nextLf) - 1;
                     qint64 lastLineLength = length(lastLineStart, lastLineEnd);
 
                     // Keep portion of last line that is past replacement last line

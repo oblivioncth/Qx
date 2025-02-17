@@ -49,6 +49,7 @@ public:
     inline QByteArray fromPrimitive<bool>(bool primitive, QSysInfo::Endian endianness)
 #endif
     {
+        Q_UNUSED(endianness);
         // Ensures true -> 0x01 and false -> 0x00
         return primitive ? QByteArray(1, '\x01') : QByteArray(1, '\x00');
     }

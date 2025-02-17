@@ -179,7 +179,7 @@ DownloadManagerReport DownloadManagerReport::Builder::build()
         QStringList errorList;
 
         // Enumerate individual errors
-        for(const DownloadOpReport& dop : qAsConst(mWorkingReport.mTaskReports))
+        for(const DownloadOpReport& dop : std::as_const(mWorkingReport.mTaskReports))
         {
             switch(dop.result())
             {

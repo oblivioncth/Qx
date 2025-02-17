@@ -36,7 +36,7 @@ struct DepthLink
 
     inline bool operator<(const DepthLink& other) const { return this->stableDepth > other.stableDepth; }
     inline bool operator<(Depth depth) const { return this->stableDepth > depth; }
-    inline bool operator==(const PropertyNode* node) const { return this->node == node; }
+    inline bool operator==(const PropertyNode* n) const { return this->node == n; }
 };
 
 class DepthSortedLinks : private FlatMultiSet<DepthLink>

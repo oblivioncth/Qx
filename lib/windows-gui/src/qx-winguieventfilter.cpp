@@ -78,6 +78,8 @@ QWindow* WinGuiEventFilter::getQtWindow(HWND nativeWindowHandle)
  */
 bool WinGuiEventFilter::nativeEventFilter(const QByteArray& eventType, void* message, qintptr* result)
 {
+    Q_UNUSED(eventType);
+
     // Change void pointer to actual Windows window message type
     MSG *msg = static_cast<MSG*>(message);
 

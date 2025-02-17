@@ -90,7 +90,7 @@ template <typename T>
 const T qxAsConst(T&& t) { return std::move(t); }
 
 template <typename T>
-typename std::add_const<T>::type qxAsConst(T& t) { return qAsConst(t); }
+typename std::add_const<T>::type qxAsConst(T& t) { return std::as_const(t); }
 
 template <typename T>
 void qxDelete(T*& pointer)

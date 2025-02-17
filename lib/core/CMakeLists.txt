@@ -70,8 +70,6 @@ qx_add_component("Core"
         qx-system_linux.cpp
         qx-system_win.cpp
         qx-system_p.h
-        qx-system_p_win.cpp
-        qx-system_p_linux.cpp
         qx-systemerror.cpp
         qx-systemerror_linux.cpp
         qx-systemerror_win.cpp
