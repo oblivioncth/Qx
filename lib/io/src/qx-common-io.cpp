@@ -409,6 +409,15 @@ QString kosherizeFileName(QString fileName) // Can return empty name if all char
 }
 
 /*!
+ *  @fn bool createFile(const QString& fileName)
+ *
+ *  Creates a file at path @a fileName, but does not open it. This is useful for if you need to create
+ *  files as fast as possible.
+ *
+ *  Returns @c true if the file did not already exist and was created; otherwise, returns false.
+ */
+
+/*!
  *  Tests if @a textFile has a trailing end-of-line character
  *
  *  @param[out] returnBuffer Set to @c true if the file's last character(s) are @c "\\n"
