@@ -15,7 +15,6 @@ qx_add_component("Io"
         qx-applicationlogger.cpp
         qx-common-io.cpp
         qx-common-io_p.h
-        qx-common-io_p.cpp
         qx-filestreamreader.cpp
         qx-filestreamwriter.cpp
         qx-ioopreport.cpp
