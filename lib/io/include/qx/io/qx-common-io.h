@@ -56,6 +56,7 @@ const QString LIST_ITEM_PREFIX = u"- "_s;
 QX_IO_EXPORT bool fileIsEmpty(const QFile& file);
 QX_IO_EXPORT IoOpReport fileIsEmpty(bool& returnBuffer, const QFile& file);
 QX_IO_EXPORT QString kosherizeFileName(QString fileName);
+QX_IO_EXPORT bool createFile(const QString& fileName);
 
 // Text
 QX_IO_EXPORT IoOpReport textFileEndsWithNewline(bool& returnBuffer, QFile& textFile);
