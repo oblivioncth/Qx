@@ -379,4 +379,30 @@ QString String::mapArg(QAnyStringView s, const QMap<QString, QString>& args, Qt:
     return result;
 }
 
+/* Capitalizes the first letter of every word in @a string, and ensures the rest of the letters
+ * are in lower case. This is not the same as Title Case, where some words are never capitalized.
+ *
+ * This function considers a 'word' to be distinct after any whitespace occurs.
+ */
+QString String::toHeadlineCase(const QString& string)
+{
+    QString hc(string);
+
+    bool firstCh = true;
+    for(QChar& ch : hc)
+    {
+        if(ch.isSpace())
+            firstCh = true;
+        else if(firstCh)
+        {
+            ch = ch.toUpper();
+            firstCh = false;
+        }
+        else
+            ch = ch.toLower();
+    }
+
+    return hc;
+}
+
 }

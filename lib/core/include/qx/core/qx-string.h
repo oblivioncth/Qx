@@ -66,6 +66,8 @@ public:
     static QString trimTrailing(const QStringView string);
 
     static QString mapArg(QAnyStringView s, const QMap<QString, QString>& map, Qt::CaseSensitivity cs = Qt::CaseSensitive);
+
+    static QString toHeadlineCase(const QString& string);
 };
 
 }
