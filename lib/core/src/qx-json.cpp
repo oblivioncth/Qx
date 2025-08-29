@@ -325,6 +325,28 @@ QString QJsonParseErrorAdapter::deriveSecondary() const { return OFFSET_STR.arg(
  */
 
 /*!
+ *  @fn JsonError parseJson(T& parsed, const QByteArray& data)
+ *
+ *  @overload
+ *
+ *  Parses @a data as a JSON document and stores the result in @a parsed.
+ *  @a T must satisfy the Qx::json_root concept.
+ */
+
+/*!
+ *  @fn JsonError serializeJson(QByteArray& serialized, const T& root, QJsonDocument::JsonFormat fmt)
+ *
+ *  @overload
+ *
+ *  Serializes the entire JSON root structure @a root and writes the result to @a serialized in format @a fmt.
+ *
+ *  @a T must satisfy the Qx::json_root concept.
+ *
+ *  If serialization fails, a valid JsonError is returned that describes the cause; otherwise, an invalid
+ *  error is returned.
+ */
+
+/*!
  *  @fn JsonError parseJson(T& parsed, QFile& file)
  *
  *  @overload
@@ -334,11 +356,11 @@ QString QJsonParseErrorAdapter::deriveSecondary() const { return OFFSET_STR.arg(
  */
 
 /*!
- *  @fn JsonError serializeJson(QFile& serialized, const T& root)
+ *  @fn JsonError serializeJson(QFile& serialized, const T& root, QJsonDocument::JsonFormat fmt)
  *
  *  @overload
  *
- *  Serializes the entire JSON root structure @a root and writes the result to @a serialized in indented format,
+ *  Serializes the entire JSON root structure @a root and writes the result to @a serialized in format @a fmt,
  *  replacing existing contents, if any.
  *
  *  @a T must satisfy the Qx::json_root concept.
@@ -357,12 +379,12 @@ QString QJsonParseErrorAdapter::deriveSecondary() const { return OFFSET_STR.arg(
  */
 
 /*!
- *  @fn JsonError serializeJson(const QString& filePath, const T& root)
+ *  @fn JsonError serializeJson(const QString& filePath, const T& root, QJsonDocument::JsonFormat fmt)
  *
  *  @overload
  *
  *  Serializes the entire JSON root structure @a root and writes the result to the file at path @a
- *  filePath in indented format, replacing existing contents, if any.
+ *  filePath in format @a fmt, replacing existing contents, if any.
  *
  *  @a T must satisfy the Qx::json_root concept.
  *
@@ -475,6 +497,26 @@ QString File::string() const
 
     return str;
 }
+
+/*!
+ *  @class Data
+ *  @brief The document class represents a JSON data node for use in error contexts.
+ *
+ *  @note This class is irrelevant in user code except for some instances of complex
+ *  custom JSON parsing
+ *
+ *  @sa Qx::JsonError::withContext().
+ */
+
+/*!
+ *  Constructs a data element node.
+ */
+Data::Data() {}
+
+/*!
+ *  Returns the string representation of the node.
+ */
+QString Data::string() const { return u"Data"_s; }
 
 /*!
  *  @class Document
