@@ -14,8 +14,8 @@ class QX_CORE_EXPORT BitArray : public QBitArray
 {
 //-Constructor--------------------------------------------------------------------------------------------------
 public:
-    BitArray();
-    BitArray(int size, bool value = false);
+    BitArray() noexcept;
+    explicit BitArray(int size, bool value = false);
 
 //-Class Functions----------------------------------------------------------------------------------------------
 public:

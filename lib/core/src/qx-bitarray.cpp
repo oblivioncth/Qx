@@ -39,7 +39,7 @@ namespace Qx
 /*!
  *  Constructs an empty bit array.
  */
-BitArray::BitArray() : QBitArray() {}
+BitArray::BitArray() noexcept : QBitArray() {}
 
 /*!
  *  Constructs a bit array containing @a size bits. The bits are
