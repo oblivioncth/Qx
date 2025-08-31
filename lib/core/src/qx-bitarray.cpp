@@ -1,9 +1,6 @@
 // Unit Includes
 #include "qx/core/qx-bitarray.h"
 
-// Standard Library Includes
-#include <stdexcept>
-
 namespace Qx
 {
 //===============================================================================================================
@@ -75,7 +72,7 @@ BitArray::BitArray(int size, bool value) : QBitArray(size, value) {}
  *  @warning The accuracy of the provided @a endianness relies on the contents of the bit array being in
  *  big-endian order, since using QSysInfo::LittleEndian simply reverses the resultant byte array's byte order.
 */
-QByteArray BitArray::toByteArray(QSysInfo::Endian endianness)
+QByteArray BitArray::toByteArray(QSysInfo::Endian endianness) const
 {
     // Byte array
     QByteArray ba(std::ceil(count()/8.0), 0);
@@ -134,7 +131,7 @@ void BitArray::replace(const BitArray& bits, int start, int length)
  *
  *  A value of -1 for @a length will result all bits from @a start to the end of the array being included.
  */
-BitArray BitArray::subArray(int start, int length)
+BitArray BitArray::subArray(int start, int length) const
 {
     if(start < 0 || start >= count())
         qFatal("Least significant bit index was outside BitArray contents");
@@ -196,7 +193,7 @@ BitArray BitArray::takeFromEnd(int length)
 /*!
  *  Returns a new bit array with the contents of the original shifted left @a n times.
  */
-BitArray BitArray::operator<<(int n)
+BitArray BitArray::operator<<(int n) const
 {
     BitArray shifted(count());
 
@@ -220,7 +217,7 @@ void BitArray::operator<<=(int n)
 /*!
  *  Returns a new bit array with the contents of the original shifted right @a n times.
  */
-BitArray BitArray::operator>>(int n)
+BitArray BitArray::operator>>(int n) const
 {
     BitArray shifted(count());
 
@@ -244,7 +241,7 @@ void BitArray::operator>>=(int n)
 /*!
  *  Returns a bit array which is the result of concatenating this bit array and @a rhs.
  */
-BitArray BitArray::operator+(BitArray rhs)
+BitArray BitArray::operator+(BitArray rhs) const
 {
     BitArray sum(count() + rhs.count());
     sum |= *this;
