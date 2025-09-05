@@ -345,27 +345,30 @@ QString String::mapArg(QAnyStringView s, const QMap<QString, QString>& args, Qt:
 
     for(const QAnyStringView& view : resultBp.views())
     {
-        // QString::arg() uses size() here instead of isEmpty(), so we keep consistent
         resultRaw = view.visit(qxFuncAggregate{
             [resultRaw](QLatin1StringView v){
-                if(v.size())
-                {
-                    auto fromLatin1 = QStringDecoder(QStringDecoder::Latin1, QStringDecoder::Flag::Stateless);
-                    auto postAppend = fromLatin1.appendToBuffer(resultRaw, v);
-                    Q_ASSERT(!fromLatin1.hasError());
-                    return postAppend;
-                }
-                return resultRaw + v.size();
+                if(v.isEmpty())
+                    return resultRaw;
+
+                thread_local auto fromLatin1 = QStringDecoder(QStringDecoder::Latin1, QStringDecoder::Flag::Stateless);
+                auto postAppend = fromLatin1.appendToBuffer(resultRaw, v);
+                Q_ASSERT(!fromLatin1.hasError());
+                return postAppend;
             },
             [resultRaw](QUtf8StringView v){
-                auto fromUtf8 = QStringDecoder(QStringDecoder::Utf8, QStringDecoder::Flag::Stateless);
+                if(v.isEmpty())
+                    return resultRaw;
+
+                thread_local auto fromUtf8 = QStringDecoder(QStringDecoder::Utf8, QStringDecoder::Flag::Stateless);
                 auto postAppend = fromUtf8.appendToBuffer(resultRaw, v);
                 Q_ASSERT(!fromUtf8.hasError());
                 return postAppend;
             },
             [resultRaw](QStringView v){
-                if(v.size())
-                    memcpy(resultRaw, v.data(), v.size() * sizeof(QChar));
+                if(v.isEmpty())
+                    return resultRaw;
+
+                memcpy(resultRaw, v.data(), v.size() * sizeof(QChar));
                 return resultRaw + v.size();
             }
         });
@@ -377,6 +380,32 @@ QString String::mapArg(QAnyStringView s, const QMap<QString, QString>& args, Qt:
     result.truncate(resultRaw - result.cbegin());
 
     return result;
+}
+
+/*! Capitalizes the first letter of every word in @a string, and ensures the rest of the letters
+ * are in lower case. This is not the same as Title Case, where some words are never capitalized.
+ *
+ * This function considers a 'word' to be distinct after any whitespace occurs.
+ */
+QString String::toHeadlineCase(const QString& string)
+{
+    QString hc(string);
+
+    bool firstCh = true;
+    for(QChar& ch : hc)
+    {
+        if(ch.isSpace())
+            firstCh = true;
+        else if(firstCh)
+        {
+            ch = ch.toUpper();
+            firstCh = false;
+        }
+        else
+            ch = ch.toLower();
+    }
+
+    return hc;
 }
 
 }

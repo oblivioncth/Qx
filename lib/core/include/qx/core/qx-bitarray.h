@@ -14,8 +14,8 @@ class QX_CORE_EXPORT BitArray : public QBitArray
 {
 //-Constructor--------------------------------------------------------------------------------------------------
 public:
-    BitArray();
-    BitArray(int size, bool value = false);
+    BitArray() noexcept;
+    explicit BitArray(int size, bool value = false);
 
 //-Class Functions----------------------------------------------------------------------------------------------
 public:
@@ -38,7 +38,7 @@ public:
 public:
     template<typename T>
         requires std::integral<T>
-    T toInteger()
+    T toInteger() const
     {
         int bitCount = sizeof(T)*8;
         T integer = 0;
@@ -49,7 +49,7 @@ public:
         return integer;
     }
 
-    QByteArray toByteArray(QSysInfo::Endian endianness = QSysInfo::BigEndian);
+    QByteArray toByteArray(QSysInfo::Endian endianness = QSysInfo::BigEndian) const;
 
     void append(bool bit = false);
     void replace(const BitArray& bits, int start = 0, int length = -1);
@@ -62,15 +62,15 @@ public:
         replace(converted, start, length);
     }
 
-    BitArray subArray(int start, int length = -1);
+    BitArray subArray(int start, int length = -1) const;
     BitArray takeFromStart(int length = -1);
     BitArray takeFromEnd(int length = -1);
 
-    BitArray operator<<(int n);
+    BitArray operator<<(int n) const;
     void operator<<=(int n);
-    BitArray operator>>(int n);
+    BitArray operator>>(int n) const;
     void operator>>=(int n);
-    BitArray operator+(BitArray rhs);
+    BitArray operator+(BitArray rhs) const;
     void operator+=(const BitArray& rhs);
 };
 

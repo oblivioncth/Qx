@@ -96,6 +96,14 @@ public:
     QString string() const;
 };
 
+class QX_CORE_EXPORT Data
+{
+public:
+    Data();
+
+    QString string() const;
+};
+
 class QX_CORE_EXPORT Document
 {
 private:
@@ -145,7 +153,7 @@ public:
     QString string() const;
 };
 
-using ContextNode = std::variant<File, Document, Object, ObjectKey, Array, ArrayElement>;
+using ContextNode = std::variant<File, Data, Document, Object, ObjectKey, Array, ArrayElement>;
 
 } // namespace QxJson
 
@@ -163,6 +171,7 @@ public:
         TypeMismatch,
         EmptyDoc,
         InvalidValue,
+        InvalidData,
         MissingFile,
         InaccessibleFile,
         FileReadError,
@@ -177,6 +186,7 @@ private:
         {TypeMismatch, u"Value type mismatch."_s},
         {EmptyDoc, u"The document is empty."_s},
         {InvalidValue, u"Invalid value for type."_s},
+        {InvalidData, u"Data parse error."_s},
         {MissingFile, u"File does not exist."_s},
         {InaccessibleFile, u"Cannot open the file."_s},
         {FileReadError, u"File read error."_s},
@@ -289,6 +299,7 @@ static inline const QString ERR_CONV_TYPE = u"JSON Error: Converting value to %1
 static inline const QString ERR_NO_KEY = u"JSON Error: Could not retrieve key '%1'."_s;
 static inline const QString ERR_PARSE_DOC = u"JSON Error: Could not parse JSON document."_s;
 static inline const QString ERR_READ_FILE = u"JSON Error: Could not read JSON file."_s;
+static inline const QString ERR_READ_DATA = u"JSON Error: Could not read JSON data."_s;
 static inline const QString ERR_WRITE_FILE = u"JSON Error: Could not write JSON file."_s;
 
 //-Structs---------------------------------------------------------------
@@ -790,8 +801,43 @@ void serializeJson(QJsonDocument& serialized, const T& root)
 
 template<typename T>
     requires json_root<T>
+JsonError parseJson(T& parsed, const QByteArray& data)
+{
+    // Check for no data
+    if(data.isEmpty())
+        return JsonError(QxJsonPrivate::ERR_READ_DATA, JsonError::EmptyDoc).withContext(QxJson::Data());
+
+    // Basic parse
+    QJsonParseError jpe;
+    QJsonDocument jd = QJsonDocument::fromJson(data, &jpe);
+
+    if(jpe.error != jpe.NoError)
+        return JsonError(QxJsonPrivate::ERR_READ_DATA, JsonError::InvalidData).withContext(QxJson::Data());
+
+    // True parse
+    return parseJson(parsed, jd).withContext(QxJson::Data());
+}
+
+template<typename T>
+    requires json_root<T>
+void serializeJson(QByteArray& serialized, const T& root, QJsonDocument::JsonFormat fmt = QJsonDocument::Indented)
+{
+    // Ensure buffer is clear
+    serialized.clear();
+
+    // Create document
+    QJsonDocument jd;
+    serializeJson(jd, root);
+
+    // Write data
+    serialized = jd.toJson(fmt);
+}
+
+template<typename T>
+    requires json_root<T>
 JsonError parseJson(T& parsed, QFile& file)
 {
+    // NOTE: Don't utilize the QByteArray "data" overload here as we would lose the better error info
     if(!file.exists())
         return JsonError(QxJsonPrivate::ERR_READ_FILE, JsonError::MissingFile).withContext(QxJson::File(file.fileName()));
 
@@ -828,7 +874,7 @@ JsonError parseJson(T& parsed, QFile& file)
 
 template<typename T>
     requires json_root<T>
-JsonError serializeJson(QFile& serialized, const T& root)
+JsonError serializeJson(QFile& serialized, const T& root, QJsonDocument::JsonFormat fmt = QJsonDocument::Indented)
 {
     // Close and re-open file, if open, to ensure correct mode and start of file
     if(serialized.isOpen())
@@ -840,15 +886,9 @@ JsonError serializeJson(QFile& serialized, const T& root)
     // Close file when finished
     QScopeGuard fileGuard([&serialized]{ serialized.close(); });
 
-    // Create document
-    QJsonDocument jd;
-    serializeJson(jd, root);
-
-    // Write data
-    QByteArray jsonData = jd.toJson();
-    if(jsonData.isEmpty())
-        return JsonError(); // No-op
-
+    // Serialize
+    QByteArray jsonData;
+    serializeJson(jsonData, root, fmt);
     if(serialized.write(jsonData) != jsonData.size())
         return JsonError(QxJsonPrivate::ERR_WRITE_FILE, JsonError::FileWriteError).withContext(QxJson::File(serialized.fileName(), serialized.errorString()));
 
@@ -866,11 +906,11 @@ JsonError parseJson(T& parsed, const QString& filePath)
 
 template<typename T>
     requires json_root<T>
-JsonError serializeJson(const QString& serializedPath, const T& root)
+JsonError serializeJson(const QString& serializedPath, const T& root, QJsonDocument::JsonFormat fmt = QJsonDocument::Indented)
 {
     QFile file(serializedPath);
 
-    return serializeJson(file, root);
+    return serializeJson(file, root, fmt);
 }
 
 QX_CORE_EXPORT QList<QJsonValue> findAllValues(const QJsonValue& rootValue, QStringView key);
