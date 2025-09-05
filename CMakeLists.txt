@@ -1,21 +1,21 @@
 #================= Project Setup ==========================
 
 # CMake
-cmake_minimum_required(VERSION 3.23.0...3.26.0)
+cmake_minimum_required(VERSION 3.23.0...3.31.0)
 
 # Project
 # NOTE: For versions stick to w.x.y.z, where z is generally
 # avoided and only used for hotfixes. DON'T USE TRAILING
 # ZEROS IN VERSIONS
 project(Qx
-    VERSION 0.6.2
+    VERSION 0.6.3
     LANGUAGES CXX
     DESCRIPTION "Qt Extensions Library"
 )
 
 # Get helper scripts
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FetchOBCMake.cmake)
-fetch_ob_cmake("v0.3.9")
+fetch_ob_cmake("v0.3.10")
 
 # Initialize project according to standard rules
 include(OB/Project)
