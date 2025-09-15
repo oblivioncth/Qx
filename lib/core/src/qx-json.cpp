@@ -509,14 +509,24 @@ QString File::string() const
  */
 
 /*!
- *  Constructs a data element node.
+ *  Constructs a data element node with data specific error information @a dataError,
+ *  if any.
  */
-Data::Data() {}
+Data::Data(const QString& dataError) :
+    mDataError(dataError)
+{}
 
 /*!
  *  Returns the string representation of the node.
  */
-QString Data::string() const { return u"Data"_s; }
+QString Data::string() const
+{
+    QString str = u"Data:"_s;
+    if(!mDataError.isEmpty())
+        str += (u"\n  [%1]"_s).arg(mDataError);
+
+    return str;
+}
 
 /*!
  *  @class Document

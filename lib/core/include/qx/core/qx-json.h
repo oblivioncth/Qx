@@ -98,8 +98,11 @@ public:
 
 class QX_CORE_EXPORT Data
 {
+private:
+    QString mDataError;
+
 public:
-    Data();
+    Data(const QString& dataError = {});
 
     QString string() const;
 };
@@ -812,7 +815,7 @@ JsonError parseJson(T& parsed, const QByteArray& data)
     QJsonDocument jd = QJsonDocument::fromJson(data, &jpe);
 
     if(jpe.error != jpe.NoError)
-        return JsonError(QxJsonPrivate::ERR_READ_DATA, JsonError::InvalidData).withContext(QxJson::Data());
+        return JsonError(QxJsonPrivate::ERR_READ_DATA, JsonError::InvalidData).withContext(QxJson::Data(jpe.errorString()));
 
     // True parse
     return parseJson(parsed, jd).withContext(QxJson::Data());
