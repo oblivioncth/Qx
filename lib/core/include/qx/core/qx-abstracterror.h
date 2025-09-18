@@ -133,10 +133,10 @@ public:
  * if those libraries are used by multiple targets in the same project. This would cause an error type
  * to call registerType() multiple times.
  */
+/*! @cond */
 template<CStringLiteral EName, quint16 ECode>
 const bool AbstractError<EName, ECode>::REGISTER = registerType(TYPE_CODE, TYPE_NAME);
 
-/*! @cond */
 namespace AbstractErrorPrivate
 {
     template<Qx::CStringLiteral Y, quint16 Z>
