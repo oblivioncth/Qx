@@ -81,14 +81,14 @@ public:
     bool operator!=(const IError& other) const = default;
 };
 
-template<StringLiteral EName, quint16 ECode>
+template<CStringLiteral EName, quint16 ECode>
 class AbstractError : protected IError
 {
 friend class Error;
 //-Class Variables----------------------------------------------------------------------------------------------------------
 public:
     static constexpr quint16 TYPE_CODE = ECode;
-    static constexpr QLatin1StringView TYPE_NAME{EName.value};
+    static constexpr QLatin1StringView TYPE_NAME{EName};
 
 private:
     static const bool REGISTER;
@@ -124,22 +124,22 @@ public:
 //template<class E>
 //concept error_type = requires(E type) {
 //    // IIFE that ensures E is a specialization of AbstractError
-//    []<StringLiteral Y, quint16 Z>(AbstractError<Y, Z>&){}(type);
+//    []<CStringLiteral Y, quint16 Z>(AbstractError<Y, Z>&){}(type);
 //};
 
 /* Define error type registrar variable. This must be done out of line to ensure that only
  * one instance of the variable exists per-error-type across an entire program. If the variable
- * is defined inline, multiple versiosn of it can exist in parallel when linking via shared-libraries,
+ * is defined inline, multiple versions of it can exist in parallel when linking via shared-libraries,
  * if those libraries are used by multiple targets in the same project. This would cause an error type
  * to call registerType() multiple times.
  */
-template<StringLiteral EName, quint16 ECode>
+template<CStringLiteral EName, quint16 ECode>
 const bool AbstractError<EName, ECode>::REGISTER = registerType(TYPE_CODE, TYPE_NAME);
 
 /*! @cond */
 namespace AbstractErrorPrivate
 {
-    template<Qx::StringLiteral Y, quint16 Z>
+    template<Qx::CStringLiteral Y, quint16 Z>
     void aeDerived(Qx::AbstractError<Y, Z>&);
 }
 /*! @endcond */

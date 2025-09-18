@@ -191,12 +191,12 @@ QString IError::deriveDetails() const { return QString(); }
 //-Class Variables----------------------------------------------------------------------------------------------------------
 //Public:
 /*!
- *  @var quint16 AbstractError<StringLiteral EName, quint16 ECode>::TYPE_CODE
+ *  @var quint16 AbstractError<CStringLiteral EName, quint16 ECode>::TYPE_CODE
  *  The type code of the specific error type. Dictated by @a ECode.
  */
 
 /*!
- *  @var quint16 AbstractError<StringLiteral EName, quint16 ECode>::TYPE_NAME
+ *  @var quint16 AbstractError<CStringLiteral EName, quint16 ECode>::TYPE_NAME
  *  The type name of the specific error type. Dictated by @a EName.
  */
 

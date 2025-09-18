@@ -1133,6 +1133,14 @@ namespace Qx
  *  Satisfied if @c K is a specialization of @c L with any parameters.
  */
 
+/*!
+ *  @concept derived_from_specialization_of
+ *  @brief Specifies that a type is a derivation of any specialization
+ *  of a template.
+ *
+ *  Satisfied if @c K is derived from @c L with any parameters.
+ */
+
 // Similiar interface types
 /*!
  *  @concept qassociative
