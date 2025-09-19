@@ -51,6 +51,10 @@ namespace Qx
  * @fn StringLiteral::StringLiteral(const C (&str)[N])
  *
  *  Wraps the raw string @a str of length @a N.
+ *
+ *  @warning If preparing a character array manually, be sure to included a null-terminator as its presence
+ *  is assumed! If none is provided, the "size" members will report incorrect values and concatenation will
+ *  result in UB.
  */
 
 //-Instance Functions----------------------------------------------------------------------------------------------------
@@ -149,9 +153,9 @@ namespace Qx
 //-Constructor-------------------------------------------------------------------------------------------------
 //Public:
 /*!
- * @fn CStringLiteral::CStringLiteral(const char (&str)[N])
+ *  @fn CStringLiteral::CStringLiteral(const char (&str)[N])
  *
- *  Wraps the raw string @a str of length @a N.
+ *  @copydoc StringLiteral::StringLiteral(const C (&str)[N])
  */
 
 //===============================================================================================================
@@ -168,9 +172,9 @@ namespace Qx
 //-Constructor-------------------------------------------------------------------------------------------------
 //Public:
 /*!
- * @fn WStringLiteral::WStringLiteral(const wchar_t (&str)[N])
+ *  @fn WStringLiteral::WStringLiteral(const wchar_t (&str)[N])
  *
- *  Wraps the raw string @a str of length @a N.
+ *  @copydoc StringLiteral::StringLiteral(const C (&str)[N])
  */
 
 //===============================================================================================================
@@ -187,9 +191,9 @@ namespace Qx
 //-Constructor-------------------------------------------------------------------------------------------------
 //Public:
 /*!
- * @fn U8StringLiteral::U8StringLiteral(const char8_t (&str)[N])
+ *  @fn U8StringLiteral::U8StringLiteral(const char8_t (&str)[N])
  *
- *  Wraps the raw string @a str of length @a N.
+ *  @copydoc StringLiteral::StringLiteral(const C (&str)[N])
  */
 
 //===============================================================================================================
@@ -206,9 +210,9 @@ namespace Qx
 //-Constructor-------------------------------------------------------------------------------------------------
 //Public:
 /*!
- * @fn U16StringLiteral::U16StringLiteral(const char16_t (&str)[N])
+ *  @fn U16StringLiteral::U16StringLiteral(const char16_t (&str)[N])
  *
- *  Wraps the raw string @a str of length @a N.
+ *  @copydoc StringLiteral::StringLiteral(const C (&str)[N])
  */
 
 //===============================================================================================================
@@ -225,8 +229,8 @@ namespace Qx
 //-Constructor-------------------------------------------------------------------------------------------------
 //Public:
 /*!
- * @fn U32StringLiteral::U32StringLiteral(const char32_t (&str)[N])
+ *  @fn U32StringLiteral::U32StringLiteral(const char32_t (&str)[N])
  *
- *  Wraps the raw string @a str of length @a N.
+ *  @copydoc StringLiteral::StringLiteral(const C (&str)[N])
  */
 }

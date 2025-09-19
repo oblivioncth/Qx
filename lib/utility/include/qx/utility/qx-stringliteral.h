@@ -160,7 +160,7 @@ constexpr auto operator+(const typename S::data_t (&a)[N1], const S& b) { return
  *  Returns a string which is the result of concatenating @a a and @a b.
  */
 template<string_literal S>
-constexpr auto operator+(const S& a, typename S::data_t b) { return operator+(a, {b}); }
+constexpr auto operator+(const S& a, typename S::data_t b) { return operator+(a, {b, '\0'}); }
 
 // Doc'ed here cause doxygen is finicky
 /*!
@@ -169,7 +169,7 @@ constexpr auto operator+(const S& a, typename S::data_t b) { return operator+(a,
  *  Returns a string which is the result of concatenating @a a and @a b.
  */
 template<string_literal S>
-constexpr auto operator+(typename S::data_t a, const S& b) { return operator+({a}, b); }
+constexpr auto operator+(typename S::data_t a, const S& b) { return operator+({a, '\0'}, b); }
 
 /* TOOO: We use derivations here instead of template aliases as parameter deduction for aliases
  * (what allows the parameter to deduce the character type and size just based on the
