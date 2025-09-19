@@ -23,6 +23,27 @@ namespace _QxPrivate
 template<std::integral C>
 class StringLiteralBase {};
 
+template<typename O, size_t N1, size_t N2>
+constexpr auto concatNewStringLiteral(const typename O::data_t (&a)[N1], const typename O::data_t (&b)[N2])
+{
+    using C = typename O::data_t;
+    constexpr size_t L1 = N1 - 1;
+    constexpr size_t return_n = N1 + N2 - 1;
+    using result_t = typename O::template rebind<return_n>;
+
+    /* THIS ASSUMES THAT BOTH ARRAYS HAVE NULL TERMINATORS
+     * Using a buffer here results in needing to copy twice, but is much simpler than
+     * added a default ctor for each StringLiteral type, constructing, and copying in
+     * there directly. It's compile time so the inefficiency is basically a non-issue.
+     * Plus, this won't be an issue anyway once we can switch to aliases for the fixed
+     * width variants.
+     */
+    C buff[return_n];
+    std::copy_n(a, L1, buff); // a chars (without '/0')
+    std::copy_n(b, N2, buff + L1); // b chars (with '/0')
+    return result_t(buff);
+}
+
 }
 /*! @endcond */
 
@@ -99,23 +120,7 @@ template<typename StringLiteralA, typename StringLiteralB>
     requires compatible_string_literals<StringLiteralA, StringLiteralB>
 constexpr auto operator+(const StringLiteralA& a, const StringLiteralA& b)
 {
-    // It's important to note here than L1 and L2 are sizes without
-    using C = typename StringLiteralA::data_t;
-    constexpr size_t L1 = StringLiteralA::size_v;
-    constexpr size_t L2 = StringLiteralB::size_v;
-    constexpr size_t R = L1 + L2 +1;
-    using result_t = typename StringLiteralA::template rebind<R>;
-    /* Separate buffer is an extra copy, vs just making the result string and copying
-     * into it directly, but this avoids the cruft of having to make these all friends
-     * with the class and the speed loss is largely irrelevant since these are used
-     * at compile time.
-     */
-
-
-    C buff[R] ;
-    std::copy_n(a._str, L1, buff); // a chars
-    std::copy_n(b._str, L2 + 1, buff + L1); // b chars + '/0'
-    return result_t(buff);
+    return _QxPrivate::concatNewStringLiteral<StringLiteralA>(a._str, b._str);
 }
 
 // Doc'ed here cause doxygen is finicky
@@ -127,21 +132,7 @@ constexpr auto operator+(const StringLiteralA& a, const StringLiteralA& b)
 template<string_literal S, size_t N2>
 constexpr auto operator+(const S& a, const typename S::data_t (&b)[N2])
 {
-    // It's important to note here than N2 is a size including '/0' and L1 is a size without '/0'
-    using C = typename S::data_t;
-    constexpr size_t L1 = S::size_v;
-    constexpr size_t R = L1 + N2;
-    using result_t = typename S::template rebind<R>;
-
-    /* Separate buffer is an extra copy, vs just making the result string and copying
-     * into it directly, but this avoids the cruft of having to make these all friends
-     * with the class and the speed loss is largely irrelevant since these are used
-     * at compile time.
-     */
-    C buff[R] ; // a chars + (b chars + '/0')
-    std::copy_n(a._str, L1, buff); // a chars
-    std::copy_n(b, N2, buff + L1); // b chars + '/0'
-    return result_t(buff);
+    return _QxPrivate::concatNewStringLiteral<S>(a._str, b);
 }
 
 // Doc'ed here cause doxygen is finicky
@@ -151,7 +142,10 @@ constexpr auto operator+(const S& a, const typename S::data_t (&b)[N2])
  *  Returns a string which is the result of concatenating @a a and @a b.
  */
 template<size_t N1, string_literal S>
-constexpr auto operator+(const typename S::data_t (&a)[N1], const S& b) { return b + a; }
+constexpr auto operator+(const typename S::data_t (&a)[N1], const S& b)
+{
+    return _QxPrivate::concatNewStringLiteral<S>(a, b._str);
+}
 
 // Doc'ed here cause doxygen is finicky
 /*!
