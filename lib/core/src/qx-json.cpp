@@ -717,7 +717,7 @@ QString ArrayElement::string() const { return (u"Element: %1"_s).arg(mElement); 
  */
 
 /*!
- *  @concept json_convertible
+ *  @concept json_override_convertible
  *  @brief Specifies that a type has override conversions for changing to/from JSON.
  *
  *  Satisfied if QX_JSON_MEMBER_OVERRIDE() has been used to add functions to a JSON-tied struct with the
