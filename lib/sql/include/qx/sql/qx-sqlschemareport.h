@@ -51,6 +51,18 @@ public:
     };
     Q_DECLARE_FLAGS(StrictnessFlags, Strictness);
 
+//-Class Aliases-------------------------------------------------------------
+private:
+    // HELPER
+    template<typename T>
+    struct unwrap_optional { using type = T; };
+
+    template<typename U>
+    struct unwrap_optional<std::optional<U>> { using type = U; };
+
+    template<typename T>
+    using unwrap_optional_t = typename unwrap_optional<T>::type;
+
 //-Class Structs-------------------------------------------------------------
 public:
     struct FieldMismatch
@@ -137,7 +149,7 @@ private:
                             allFields.removeAll(memName.toString());
 
                             // Check type
-                            QMetaType expectedCppType = QMetaType::fromType<memType>();
+                            QMetaType expectedCppType = QMetaType::fromType<unwrap_optional_t<memType>>();
                             QMetaType actualCppType = field.metaType();
 
                             bool strict = strictness.testFlag(TypeStrict);
@@ -145,7 +157,7 @@ private:
                                (!strict && (!QMetaType::canConvert(actualCppType, expectedCppType))))
                                 addDefect(rp, tableDefects, TypeMismatches);
                         }
-                        else
+                        else if constexpr(!QxSql::sql_optional<memType>)
                         {
                             addDefect(rp, tableDefects, MissingFields);
                             tableDefects.missingFields.append(memName);

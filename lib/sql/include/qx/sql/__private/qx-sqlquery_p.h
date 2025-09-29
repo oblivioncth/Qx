@@ -141,6 +141,17 @@ struct FieldMatchChecker
 };
 
 template<typename T>
+    requires QxSql::sql_optional<T>
+struct FieldMatchChecker<T>
+{
+    static Qx::SqlError check(const QVariant& v, const QString& field = {})
+    {
+        Q_ASSERT(v.isValid());
+        return FieldMatchChecker<typename T::value_type>::check(v, field);
+    }
+};
+
+template<typename T>
     requires QxSql::sql_struct<T>
 struct FieldMatchChecker<T>
 {
