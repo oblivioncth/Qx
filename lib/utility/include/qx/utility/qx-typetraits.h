@@ -21,6 +21,10 @@ inline constexpr bool is_specialization_of_v = is_specialization_of<A, B>::value
 template<typename T>
 using target_type = std::remove_pointer_t<std::remove_reference_t<T>>;
 
+// Misc
+template<class... T>
+inline constexpr bool always_false = false;
+
 }
 
 #endif // QX_TYPETRAITS_H
