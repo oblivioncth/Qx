@@ -21,7 +21,7 @@ set(DOXYGEN_EXCLUDE_SYMBOLS
 
 # Setup documentation
 ob_standard_documentation(${DOC_TARGET_NAME}
-    DOXY_VER 1.9.4
+    DOXY_VER 1.12.0
     PROJ_NAME "${PROJECT_NAME}"
     QT_MODULES
         qtconcurrent
