@@ -1,0 +1,18 @@
+/*!
+ *  @defgroup qx-sql Qx SQL
+ *
+ *  @brief The SQL component is a module dedicated to interacting with SQL relational databases.
+ *
+ *  @component{Sql,sql.h}
+ *
+ *  Qx SQL extends the Qt SQL module to allow for easier use of databases for some of the most
+ *  common use-cases.
+ */
+ 
+/*!
+ *  @namespace QxSql
+ *
+ *  @brief The @c QxSql namespace contains several utilities that are specific to the SQL module
+ *  and grouped together for better organization and encapsulation when making use of `using` directives.
+ */
+

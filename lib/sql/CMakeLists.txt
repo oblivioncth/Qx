@@ -1,0 +1,28 @@
+#================= Add Component ==========================
+qx_add_component("Sql"
+    HEADERS_API
+        qx-sqlconcepts.h
+        qx-sqldatabase.h
+        qx-sqlerror.h
+        qx-sqlinlines.h
+        qx-sqlquery.h
+        qx-sqlresult.h
+        qx-sqlschemareport.h
+        qx-sqlstring.h
+        __private/qx-sqlstring_helpers.h
+        __private/qx-sqlquery_p.h
+    IMPLEMENTATION
+        qx-sqldatabase.cpp
+        qx-sqlerror.cpp
+        qx-sqlquery.cpp
+        qx-sqlschemareport.cpp
+        qx-sqlstring.cpp
+    DOC_ONLY
+        qx-sqlconcepts.dox
+        qx-sqlinlines.dox
+        qx-sqlresult.dox
+    LINKS
+        PUBLIC
+            ${Qt}::Sql
+            Qx::Core
+)

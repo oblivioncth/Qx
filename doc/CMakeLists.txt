@@ -17,7 +17,10 @@ set(DOXYGEN_PREDEFINED
 
 set(DOXYGEN_EXCLUDE_SYMBOLS
     "_QxPrivate"
+    "__QX*"
 )
+
+include(cmake/SqlMacros.cmake)
 
 # Setup documentation
 ob_standard_documentation(${DOC_TARGET_NAME}
