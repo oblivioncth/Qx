@@ -18,6 +18,25 @@ namespace Qx
  *  @brief See is_specialization_of.
  */
 
+// Containers
+/*!
+ *  @struct unwrap
+ *  @brief Provides the inner type of T if T wraps or contains another type; otherwise, provides T itself.
+ *
+ *  Provides types based on the following alias availability:
+ *  - T::value_type -> T::value_type
+ *  - T::mapped_type -> T::mapped_type
+ *  - else -> T
+ *
+ *  @sa unwrap_t
+ *
+ *  @var unwrap::type
+ *  The unwrapped type.
+ *
+ *  @typedef unwrap_t
+ *  @brief See unwrap.
+ */
+
 // Qualifiers
 /*!
  *  @typedef target_type
