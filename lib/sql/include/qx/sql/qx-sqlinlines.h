@@ -72,13 +72,13 @@ public:
     template<Qx::sql_stringable First>
     inline explicit ConcreteInline(First&& first) requires (enabled(Cs, Constructor::SingleStringable))
     {
-        QxPrivate::appendKeyword(mStr, word.view(), std::forward<First>(first));
+        _QxPrivate::appendKeyword(mStr, word.view(), std::forward<First>(first));
     }
 
     template<Qx::sql_stringable First, Qx::sql_stringable ...Rest>
     inline explicit ConcreteInline(First&& first, Rest&&... rest) requires (enabled(Cs, Constructor::MultiStringable))
     {
-        QxPrivate::appendKeyword(mStr, word.view(), std::forward<First>(first), std::forward<Rest>(rest)...);
+        _QxPrivate::appendKeyword(mStr, word.view(), std::forward<First>(first), std::forward<Rest>(rest)...);
     }
 
     inline explicit ConcreteInline(const Qx::SqlQuery& q) requires (enabled(Cs, Constructor::Query)) :

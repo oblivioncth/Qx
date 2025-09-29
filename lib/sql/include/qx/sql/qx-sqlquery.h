@@ -210,7 +210,7 @@ protected:
     template<typename FirstArg, typename ...RestArgs>
     void appendKeyword(const QString& word, FirstArg&& firstArg, RestArgs&&... restArgs)
     {
-        QxPrivate::appendKeyword(mQueryStr, word, std::forward<FirstArg>(firstArg), std::forward<RestArgs>(restArgs)...);
+        _QxPrivate::appendKeyword(mQueryStr, word, std::forward<FirstArg>(firstArg), std::forward<RestArgs>(restArgs)...);
     }
 
     void appendKeyword(const QString& word);

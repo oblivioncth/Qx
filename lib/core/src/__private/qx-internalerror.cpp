@@ -2,7 +2,7 @@
 #include "qx/core/__private/qx-internalerror.h"
 
 /*! @cond */
-namespace QxPrivate
+namespace _QxPrivate
 {
 
 //===============================================================================================================

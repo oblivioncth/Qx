@@ -9,7 +9,7 @@
 #include <qx/sql/qx-sqlstring.h>
 
 /*! @cond */
-namespace QxPrivate
+namespace _QxPrivate
 {
 
 namespace __private

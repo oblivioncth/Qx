@@ -150,8 +150,8 @@ SqlQuery::SqlQuery(SqlDatabase& db) :
 //-Class Functions--------------------------------------------------------------------------------------------
 //Protected:
 /*! @cond */
-void SqlQuery::appendKeyword(const QString& word) { QxPrivate::append(mQueryStr, word); }
-void SqlQuery::append(QStringView sql, bool space) { return QxPrivate::append(mQueryStr, sql, space); }
+void SqlQuery::appendKeyword(const QString& word) { _QxPrivate::append(mQueryStr, word); }
+void SqlQuery::append(QStringView sql, bool space) { return _QxPrivate::append(mQueryStr, sql, space); }
 /*! @endcond */
 
 //-Instance Functions--------------------------------------------------------------------------------------------
