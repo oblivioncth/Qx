@@ -34,7 +34,7 @@ using namespace Qt::StringLiterals;
         { \
             return meta_tuple; \
         } \
-    }
+    };
 
 #define __QX_SQL_META_STRUCT_OUTSIDE(self_type, id, meta_tuple) \
     namespace QxSql \
