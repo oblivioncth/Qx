@@ -113,6 +113,15 @@
  */
 
 /*!
+ *  @def QX_SQL_STRUCT_OUTSIDE_FRIEND()
+ *
+ *  Place this inside of a class to enable the use of QX_SQL_STRUCT_OUTSIDE() and QX_SQL_STRUCT_OUTSIDE_X()
+ *  with a struct/class with private data members.
+ *
+ *  QX_SQL_STRUCT() and QX_SQL_STRUCT_X() have no need for this in either case.
+ */
+
+/*!
  *  @def QX_SQL_MEMBER_OVERRIDE()
  *
  *  Used to define a member/field specific value parsing/serialzing override for a

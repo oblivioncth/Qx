@@ -93,6 +93,8 @@ using namespace Qt::StringLiterals;
 // This doesn't call QX_SQL_QUERY_STRUCT_OUTSIDE, user must manually use it
 #define QX_SQL_STRUCT_OUTSIDE_X(Struct, id, ...) __QX_SQL_META_STRUCT_OUTSIDE(Struct, id, std::make_tuple(__VA_ARGS__))
 
+#define QX_SQL_STRUCT_OUTSIDE_FRIEND(struct_type) friend QxSql::QxSqlMetaStructOutside<struct_type, struct_type>;
+
 #define QX_SQL_MEMBER_OVERRIDE(Struct, member, ...) \
 namespace QxSql \
 { \
