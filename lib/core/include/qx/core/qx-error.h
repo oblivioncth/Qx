@@ -28,11 +28,38 @@ namespace QxErrorPrivate
  * half the purpose of the adapters.
  */
 namespace Qx { class Error; }
-
 QX_CORE_EXPORT QTextStream& operator<<(QTextStream& ts, const Qx::Error& e);
 
 namespace Qx
 {
+
+class Error;
+
+// Need to define here, needed later
+template<class E>
+concept adapted_error = error_adaptation<E, typename QxErrorPrivate::adapter_registry<E>::adapter>;
+
+}
+
+/*! @cond */
+namespace QxErrorPrivate
+{
+
+template <typename T>
+inline constexpr bool variant_has_error_types = false;
+
+template <typename... Types>
+inline constexpr bool variant_has_error_types<std::variant<Types...>> =
+    ((Qx::error_type<Types> || Qx::adapted_error<Types>) && ...);
+
+}
+/*! @endcond */
+
+namespace Qx
+{
+
+template <typename V>
+concept error_variant = QxErrorPrivate::variant_has_error_types<V>;
 
 class QX_CORE_EXPORT Error
 {
@@ -42,7 +69,7 @@ private:
 
     // Adapter Registry Alias
     template <class K>
-    using AdapterRegistry = QxErrorPrivate::adapter_registry<K>;
+    using AdapterType = typename QxErrorPrivate::adapter_registry<K>::adapter;
 
 public:
     static constexpr quint16 TYPE_CODE = 0;
@@ -82,9 +109,14 @@ public:
         }
     }
 
-    template<class EAble, class EAter = typename AdapterRegistry<EAble>::adapter>
-        requires error_adaptation<EAble, EAter>
-    Error(const EAble& adapted) : Error(EAter(adapted))
+    template<class EAble>
+        requires adapted_error<EAble>
+    Error(const EAble& adapted) : Error(AdapterType<EAble>(adapted))
+    {}
+
+    template<typename Errors>
+        requires error_variant<Errors>
+    Error(const Errors& e) : Error(std::visit([](auto&& arg){ return arg; }, e))
     {}
 
 //-Instance Functions------------------------------------------------------------------------------------------------------

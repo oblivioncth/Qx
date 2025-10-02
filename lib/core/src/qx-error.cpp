@@ -14,6 +14,21 @@
 namespace Qx
 {
 
+/*!
+ *  @concept adapted_error
+ *  @brief Specifies that a non-error type has a registered error adapter.
+ *
+ *  Satisfied if @a E has an error adapter type prepared for it that, with E, satisfies error_adaptation and
+ *  was registered with QX_DECLARE_ERROR_ADAPTATION().
+ */
+
+/*!
+ *  @concept error_variant
+ *  @brief Specifies that a type is a Qx error variant.
+ *
+ *  Satisfied if @a V is a vartiant composed entirely of types that satisfy the error_type or error_adaptation concept.
+ */
+
 //===============================================================================================================
 // Error
 //===============================================================================================================
@@ -127,10 +142,15 @@ Error::Error() :
  */
 
 /*!
- *  @fn Error::Error<EAble, EAter>(const EAble& adapted)
+ *  @fn Error::Error<EAble>(const EAble& adapted)
  *
- *  Constructs a standard error object from @a adapted using its corresponding error
- *  adapter @a EAter.
+ *  Constructs a standard error object from @a adapted using its registered error adapter.
+ */
+
+/*!
+ *  @fn Error::Error<Errors>(const Errors& e)
+ *
+ *  Constructs a standard error object from the specific error alternative within @a e.
  */
 
 //-Instance Functions----------------------------------------------------------------------------------------------
