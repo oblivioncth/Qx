@@ -82,10 +82,15 @@
  *
  *  Each member must be wrapped in QX_SQL_MEMBER() or QX_SQL_MEMBER_ALIASED().
  *
- *  @note When using this macro, you must manually invoke QX_SQL_QUERY_STRUCT() if you want
- *  to generate the SQL identifier convenience struct.
- *
  *  @snippet qx-sqlquery.cpp 2
+ */
+
+/*!
+ *  @def QX_SQL_STRUCT_FULL()
+ *
+ *  Same as QX_SQL_STRUCT(), but also invokes QX_SQL_QUERY_STRUCT() for you at the same time.
+ *
+ *  @sa QX_SQL_STRUCT_OUTSIDE_FULL()
  */
 
 /*!
@@ -108,8 +113,20 @@
  *
  *  @note When using this macro, you must manually invoke QX_SQL_QUERY_STRUCT_OUTSIDE() if you want
  *  to generate the SQL identifier convenience struct.
-
+ *
  *  @sa QX_SQL_STRUCT_OUTSIDE()
+ */
+
+/*!
+ *  @def QX_SQL_STRUCT_OUTSIDE_FULL()
+ *
+ *  Same as QX_SQL_STRUCT_OUTSIDE(), but also invokes QX_SQL_QUERY_STRUCT_OUTSIDE() for you at the same time.
+ *
+ *  @note This macro cannot be used if you need to specify a struct via the `::` scope operator, since it
+ *  attempts to use the struct name as a basis for the query struct name. Either use a different macro
+ *  or a typedef/alias to workaround this.
+ *
+ *  @sa QX_SQL_STRUCT_FULL()
  */
 
 /*!

@@ -77,21 +77,19 @@ using namespace Qt::StringLiterals;
  * different ways to access the fields. Maybe it's not a big deal but this is fine for now
  */
 
-// This calls QX_SQL_QUERY_STRUCT for the user
-#define QX_SQL_STRUCT(id, ...) \
-    __QX_SQL_META_STRUCT_INSIDE(id, std::make_tuple(QX_FOR_EACH_DELIM(QX_SQL_MEMBER, __VA_ARGS__))) \
-    QX_SQL_QUERY_STRUCT(id, __VA_ARGS__)
-
-// This doesn't call QX_SQL_QUERY_STRUCT, user must manually use it
+#define QX_SQL_STRUCT(id, ...) __QX_SQL_META_STRUCT_INSIDE(id, std::make_tuple(QX_FOR_EACH_DELIM(QX_SQL_MEMBER, __VA_ARGS__)))
 #define QX_SQL_STRUCT_X(id, ...) __QX_SQL_META_STRUCT_INSIDE(id, std::make_tuple(__VA_ARGS__))
 
-// This calls QX_SQL_QUERY_STRUCT_OUTSIDE for the user
-#define QX_SQL_STRUCT_OUTSIDE(Struct, id, ...) \
-    __QX_SQL_META_STRUCT_OUTSIDE(Struct, id, std::make_tuple(QX_FOR_EACH_DELIM(QX_SQL_MEMBER, __VA_ARGS__))) \
-    QX_SQL_QUERY_STRUCT_OUTSIDE(Struct, id, __VA_ARGS__)
+#define QX_SQL_STRUCT_FULL(id, ...) \
+    QX_SQL_STRUCT(id, __VA_ARGS__) \
+    QX_SQL_QUERY_STRUCT(id, __VA_ARGS__)
 
-// This doesn't call QX_SQL_QUERY_STRUCT_OUTSIDE, user must manually use it
+#define QX_SQL_STRUCT_OUTSIDE(Struct, id, ...) __QX_SQL_META_STRUCT_OUTSIDE(Struct, id, std::make_tuple(QX_FOR_EACH_DELIM(QX_SQL_MEMBER, __VA_ARGS__)))
 #define QX_SQL_STRUCT_OUTSIDE_X(Struct, id, ...) __QX_SQL_META_STRUCT_OUTSIDE(Struct, id, std::make_tuple(__VA_ARGS__))
+
+#define QX_SQL_STRUCT_OUTSIDE_FULL(id, ...) \
+    QX_SQL_STRUCT_OUTSIDE(id, __VA_ARGS__) \
+    QX_SQL_QUERY_STRUCT_OUTSIDE(id, __VA_ARGS__)
 
 #define QX_SQL_STRUCT_OUTSIDE_FRIEND(struct_type) friend QxSql::QxSqlMetaStructOutside<struct_type, struct_type>;
 
