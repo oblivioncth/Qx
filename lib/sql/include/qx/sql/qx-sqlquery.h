@@ -54,15 +54,8 @@ using namespace Qt::StringLiterals;
 #define __QX_SQL_QUERY_STRUCT_MEMBER(member) static inline const Qx::SqlString member = Qx::SqlString::makeIdentifier(u ## #member);
 /*! @endcond */
 
-#define QX_SQL_QUERY_STRUCT(id, ...) \
-    struct Sql \
-    { \
-        static inline const Qx::SqlString _ = Qx::SqlString::makeIdentifier(u ## id); \
-        QX_FOR_EACH(__QX_SQL_QUERY_STRUCT_MEMBER, __VA_ARGS__) \
-    };
-
-#define QX_SQL_QUERY_STRUCT_OUTSIDE(struct_type, id, ...) \
-    struct struct_type##Sql \
+#define QX_SQL_QUERY_STRUCT(struct_name, id, ...) \
+    struct struct_name \
     { \
         static inline const Qx::SqlString _ = Qx::SqlString::makeIdentifier(u ## id); \
         QX_FOR_EACH(__QX_SQL_QUERY_STRUCT_MEMBER, __VA_ARGS__) \
@@ -80,16 +73,17 @@ using namespace Qt::StringLiterals;
 #define QX_SQL_STRUCT(id, ...) __QX_SQL_META_STRUCT_INSIDE(id, std::make_tuple(QX_FOR_EACH_DELIM(QX_SQL_MEMBER, __VA_ARGS__)))
 #define QX_SQL_STRUCT_X(id, ...) __QX_SQL_META_STRUCT_INSIDE(id, std::make_tuple(__VA_ARGS__))
 
-#define QX_SQL_STRUCT_FULL(id, ...) \
+#define QX_SQL_STRUCT_FULL(id, query_struct, ...) \
     QX_SQL_STRUCT(id, __VA_ARGS__) \
-    QX_SQL_QUERY_STRUCT(id, __VA_ARGS__)
+    QX_SQL_QUERY_STRUCT(query_struct, id, __VA_ARGS__)
 
 #define QX_SQL_STRUCT_OUTSIDE(Struct, id, ...) __QX_SQL_META_STRUCT_OUTSIDE(Struct, id, std::make_tuple(QX_FOR_EACH_DELIM(QX_SQL_MEMBER, __VA_ARGS__)))
 #define QX_SQL_STRUCT_OUTSIDE_X(Struct, id, ...) __QX_SQL_META_STRUCT_OUTSIDE(Struct, id, std::make_tuple(__VA_ARGS__))
 
-#define QX_SQL_STRUCT_OUTSIDE_FULL(id, ...) \
-    QX_SQL_STRUCT_OUTSIDE(id, __VA_ARGS__) \
-    QX_SQL_QUERY_STRUCT_OUTSIDE(id, __VA_ARGS__)
+#define QX_SQL_STRUCT_OUTSIDE_FULL(Struct, id, query_struct, ...) \
+    QX_SQL_STRUCT_OUTSIDE(Struct, id, __VA_ARGS__) \
+    QX_SQL_QUERY_STRUCT(query_struct, id, __VA_ARGS__)
+
 
 #define QX_SQL_STRUCT_OUTSIDE_FRIEND(struct_type) friend QxSql::QxSqlMetaStructOutside<struct_type, struct_type>;
 

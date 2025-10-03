@@ -21,26 +21,15 @@
  */
 
 /*!
- *  @def QX_SQL_QUERY_STRUCT(id, ...)
+ *  @def QX_SQL_QUERY_STRUCT(struct_name, id, ...)
  *
- *  Creates an inner struct named `Sql` that reflects the same members as the original struct as
- *  quoted strings, for conveniently using them as identifiers in an SQL statement.
+ *  Creates a struct named `struct_name` that is intended to reflect the same members from the
+ *  original struct as quoted strings, for conveniently using them as identifiers in an SQL statement.
  *
- *  Additionally, an identifier for the Struct itself is created as the member `_` using @a id.
+ *  Additionally, an identifier for the struct itself is created as the member `_` using @a id.
  *
- *  When using QX_SQL_STRUCT() this is already invoked for you.
- */
-
-/*!
- *  @def QX_SQL_QUERY_STRUCT_OUTSIDE(struct_type, id, ...)
- *
- *  Creates a struct with the same name as @a struct_type plus an `Sql` suffix, that reflects the
- *  same members as the original struct as quoted strings, for conveniently using them as identifiers
- *  in an SQL statement.
- *
- *  Additionally, an identifier for the Struct itself is created as the member `_` using @a id.
- *
- *  When using QX_SQL_STRUCT_OUTSIDE() this is already invoked for you.
+ *  Technically however, this struct isn't directly tied to the original, so it can bear any name and
+ *  placed anywhere.
  */
 
 /*!
@@ -63,12 +52,14 @@
  */
 
 /*!
- *  @def QX_SQL_STRUCT()
+ *  @def QX_SQL_STRUCT(id, ...)
  *
- *  Specifies that a struct is a SQL-tied struct, which enables support for automatic
+ *  Specifies that the surrounding struct is a SQL-tied struct, which enables support for automatic
  *  parsing/serializing or binding of a corresponding SQL row.
  *
- *  The name of each included member must match the name their corresponding SQL field.
+ *  The name of each included member (varargs) must match the name their corresponding SQL field.
+ *
+ *  @a id is the identifier of the table that the struct represent in the database.
  *
  *  @snippet qx-sqlquery.cpp 1
  *
@@ -86,17 +77,19 @@
  */
 
 /*!
- *  @def QX_SQL_STRUCT_FULL()
+ *  @def QX_SQL_STRUCT_FULL(id, query_struct, ...)
  *
- *  Same as QX_SQL_STRUCT(), but also invokes QX_SQL_QUERY_STRUCT() for you at the same time.
+ *  Same as QX_SQL_STRUCT(), but also invokes QX_SQL_QUERY_STRUCT() for you at the same time, using
+ *  @a query_struct as the query struct name.
  *
  *  @sa QX_SQL_STRUCT_OUTSIDE_FULL()
  */
 
 /*!
- *  @def QX_SQL_STRUCT_OUTSIDE()
+ *  @def QX_SQL_STRUCT_OUTSIDE(Struct, id, ...)
  *
- *  Same as QX_SQL_STRUCT(), but is used outside of a struct instead of inside.
+ *  Same as QX_SQL_STRUCT(), but is used outside of a struct instead of inside, with @a Struct used to
+ *  identify the target struct.
  *
  *  @snippet qx-sqlquery.cpp 3
  *
@@ -118,13 +111,10 @@
  */
 
 /*!
- *  @def QX_SQL_STRUCT_OUTSIDE_FULL()
+ *  @def QX_SQL_STRUCT_OUTSIDE_FULL(Struct, id, query_struct, ...)
  *
- *  Same as QX_SQL_STRUCT_OUTSIDE(), but also invokes QX_SQL_QUERY_STRUCT_OUTSIDE() for you at the same time.
- *
- *  @note This macro cannot be used if you need to specify a struct via the `::` scope operator, since it
- *  attempts to use the struct name as a basis for the query struct name. Either use a different macro
- *  or a typedef/alias to workaround this.
+ *  Same as QX_SQL_STRUCT_OUTSIDE(), but also invokes QX_SQL_QUERY_STRUCT() for you at the same time, using
+ *  @a query_struct as the query struct name.
  *
  *  @sa QX_SQL_STRUCT_FULL()
  */
