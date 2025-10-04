@@ -37,7 +37,7 @@ public:
 public:
     int size() const { return mSize; }
     bool isValid() const { return mResult.isValid(); }
-    SqlError value(T& value) const { return QxSql::Converter<T>::fromSql(value, mResult); }
+    SqlError value(T& value) const { return QxSqlPrivate::RowConverter<T>::fromSql(value, mResult); }
     bool next() { return mResult.next(); }
 };
 

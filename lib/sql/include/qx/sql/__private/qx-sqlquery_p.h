@@ -193,42 +193,37 @@ struct FieldMatchChecker<T>
     }
 };
 
-} // namespace QxSqlPrivate
-
-namespace QxSql
-{
-
-//-Default Converter Specializations-------------------------------------
+/* This is used as the first step for converting from a full row, whereas the public namespace
+ * version (Converter) is used for handling the conversion of fields.
+ */
 template<typename T>
-    requires sql_optional<T>
-struct Converter<T>
+struct RowConverter
 {
-    using O = typename T::value_type;
-
-    static Qx::SqlError fromSql(T& optional, const QVariant& vValue)
+    // Default just grabs the first value
+    static Qx::SqlError fromSql(T& value, const QSqlQuery& queryResult)
     {
-        O opt;
-        Qx::SqlError se = Converter<O>::fromSql(opt, vValue);
-
-        if(!se.isValid())
-            optional = std::move(opt);
-
-        return se;
+        Q_ASSERT(queryResult.isActive());
+        QVariant v = queryResult.value(0);
+        Q_ASSERT(v.isValid());
+        return QxSql::Converter<T>::fromSql(value, v);
     }
 
-    static auto toSql(const T& value)
+    static QVariant toSql(const T& value)
     {
-        Q_ASSERT(value); // Optional must have value if this is reached
-        return Converter<O>::toJson(*value);
+        Q_UNUSED(value);
+        static_assert(Qx::always_false<T>, "Use of toSql for rows is not implemented!");
+        return {};
     }
 };
 
 template<typename T>
-    requires sql_struct<T>
-struct Converter<T>
+    requires QxSql::sql_struct<T>
+struct RowConverter<T>
 {
-    static Qx::SqlError fromSql(T& struc, const QSqlQuery& result)
+    static Qx::SqlError fromSql(T& struc, const QSqlQuery& queryResult)
     {
+        Q_ASSERT(queryResult.isValid());
+
         // Error tracker
         Qx::SqlError cnvError;
 
@@ -249,10 +244,10 @@ struct Converter<T>
                 auto& mRef = struc.*(memberMeta.mPtr);
 
                 // Get variant
-                QVariant vField = result.value(mField);
+                QVariant vField = queryResult.value(mField);
                 if(!vField.isValid())
                 {
-                    if constexpr(sql_optional<mType>)
+                    if constexpr(QxSql::sql_optional<mType>)
                     {
                         mRef = std::nullopt;
                         return true; // Go to next "iteration"
@@ -283,8 +278,8 @@ struct Converter<T>
 };
 
 template<typename T>
-    requires sql_collective<T>
-struct Converter<T>
+    requires QxSql::sql_collective<T>
+struct RowConverter<T>
 {
     static Qx::SqlError fromSql(T& container, QSqlQuery& queryResult)
     {
@@ -292,7 +287,7 @@ struct Converter<T>
 
         // Check
         using E = typename T::value_type;
-        if constexpr(sql_struct<E>)
+        if constexpr(QxSql::sql_struct<E>)
         {
             // Ensure types match
             if(auto err = QxSqlPrivate::FieldMatchChecker<E>::check(queryResult); err.isValid())
@@ -307,7 +302,7 @@ struct Converter<T>
         do
         {
             E element;
-            if(auto err = Converter<E>::fromSql(element, queryResult); err.isValid())
+            if(auto err = RowConverter<E>::fromSql(element, queryResult); err.isValid())
             {
                 container.clear();
                 return err;
@@ -329,8 +324,8 @@ struct Converter<T>
 };
 
 template<typename T>
-    requires sql_associative<T>
-struct Converter<T>
+    requires QxSql::sql_associative<T>
+struct RowConverter<T>
 {
     static Qx::SqlError fromSql(T& container, QSqlQuery& queryResult)
     {
@@ -339,7 +334,7 @@ struct Converter<T>
         // Check
         using K = typename T::key_type;
         using V = typename T::mapped_type;
-        if constexpr(sql_struct<V>)
+        if constexpr(QxSql::sql_struct<V>)
         {
             // Ensure types match
             if(auto err = QxSqlPrivate::FieldMatchChecker<V>::check(queryResult); err.isValid())
@@ -354,7 +349,7 @@ struct Converter<T>
         do
         {
             V element;
-            if(auto err = Converter<V>::fromSql(element, queryResult); err.isValid())
+            if(auto err = RowConverter<V>::fromSql(element, queryResult); err.isValid())
             {
                 container.clear();
                 return err;
@@ -375,6 +370,36 @@ struct Converter<T>
     }
 };
 
+} // namespace QxSqlPrivate
+
+namespace QxSql
+{
+
+//-Default Converter Specializations-------------------------------------
+template<typename T>
+    requires sql_optional<T>
+struct Converter<T>
+{
+    using O = typename T::value_type;
+
+    static Qx::SqlError fromSql(T& optional, const QVariant& vValue)
+    {
+        O opt;
+        Qx::SqlError se = Converter<O>::fromSql(opt, vValue);
+
+        if(!se.isValid())
+            optional = std::move(opt);
+
+        return se;
+    }
+
+    static auto toSql(const T& value)
+    {
+        Q_ASSERT(value); // Optional must have value if this is reached
+        return Converter<O>::toJson(*value);
+    }
+};
+
 /* This could use a lot of work. As a temporary "good-enough" we'd like to
  * just say that any type that can be put into a QVariant is valid for
  * converting from SQL, when obviously not every QVariant type (including custom types)
@@ -387,7 +412,7 @@ struct Converter<T>
  *
  * It would be better if more invalid types could be stopped at compile time, though there is
  * no comprehensive list though of which metatypes are used by the database drivers so until
- * extension testing/educated guesses are done to create such a list, this is
+ * extensive testing/educated guesses are done to create such a list, this is
  * what we have for now.
  */
 template<typename T> // Currently unconstrained due to the above note

@@ -451,7 +451,7 @@ public:
             return SqlError();
 
         // Process
-        if(auto err = QxSql::Converter<Container>::fromSql(result, queryResult); err.isValid())
+        if(auto err = QxSqlPrivate::RowConverter<Container>::fromSql(result, queryResult); err.isValid())
             return err.withQuery(*this);
 
         return SqlError();

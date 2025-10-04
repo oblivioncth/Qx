@@ -45,9 +45,6 @@ template<typename T>
 concept sql_convertible = requires(T& tValue) {
     { Converter<T>::fromSql(tValue, QVariant()) } -> std::same_as<Qx::SqlError>;
     { Converter<T>::toSql(tValue) } -> std::same_as<QVariant>;
-} || requires(T& tValue)  {
-    { Converter<T>::fromSql(tValue, QSqlQuery()) } -> std::same_as<Qx::SqlError>;
-    { Converter<T>::toSql(tValue) } -> std::same_as<QVariant>;
 };
 
 template<class K, typename T, Qx::CStringLiteral N>
