@@ -231,7 +231,24 @@ namespace QxSql
  *  Creates an SQL identifier string; that is, the original string is automatically double-quoted.
  *
  *  @fn SqlString operator""_sqs(const char16_t* str, size_t size) noexcept
- *  Creates an SQL striing literal string; that is, the original string is automatically single-quoted.
+ *  Creates an SQL string literal string; that is, the original string is automatically single-quoted.
  */
 
+/*!
+ *  @fn SqlString sq(const QString& s) noexcept
+ *  Creates an SQL identifier string from @a s; that is, the original string is automatically double-quoted.
+ *
+ *  There is generally no need to use this over the QString constructors or literal operators, other
+ *  than consistency.
+ */
+
+/*!
+ *  @fn SqlString sqi(const QString& s) noexcept
+ *  Creates an SQL identifier string from @a s; that is, the original string is automatically double-quoted.
+ */
+
+/*!
+ *  @fn SqlString sqs(const QString& s) noexcept
+ *  Creates an SQL string literal string from @a s; that is, the original string is automatically single-quoted.
+ */
 }

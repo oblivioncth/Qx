@@ -133,6 +133,9 @@ inline Qx::SqlString operator""_sq(const char16_t* str, size_t size) noexcept { 
 inline Qx::SqlString operator""_sqi(const char16_t* str, size_t size) noexcept { return Qx::SqlString(str, size, Qx::SqlString::Identifier); }
 inline Qx::SqlString operator""_sqs(const char16_t* str, size_t size) noexcept { return Qx::SqlString(str, size, Qx::SqlString::Literal); }
 
+inline Qx::SqlString sq(const QString& s) noexcept { return Qx::SqlString(s); }
+inline Qx::SqlString sqi(const QString& s) noexcept { return Qx::SqlString(u'"' + s + u'"'); }
+inline Qx::SqlString sqs(const QString& s) noexcept { return Qx::SqlString(u'\'' + s + u'\''); }
 }
 
 #endif // QX_SQLSTRING_H
