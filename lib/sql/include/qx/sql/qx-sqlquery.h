@@ -563,6 +563,13 @@ public:
      */
     __QX_SQL_QUERY_ADD_KEYWORD_SINGLE_ARG(UPDATE);
 
+    template<QxSql::sql_struct Struct>
+    auto& UPDATE()
+    {
+        appendKeyword(u"UPDATE"_s, QxSqlPrivate::getStructIdQuoted<Struct>().view());
+        return *this_d;
+    }
+
     // [VALUES]
     template<QxSql::sql_struct Struct>
     auto& VALUES(const Struct& s)

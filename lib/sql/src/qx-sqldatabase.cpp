@@ -296,6 +296,12 @@ bool SqlDatabase::closeConnection()
  *  Returns a new DML style query that starts with an `UPDATE` clause using @a fs.
  */
 
+/*!
+ *  @fn SqlDmlQuery SqlDatabase::UPDATE()
+ *
+ *  Returns a new DML style query that starts with an `UPDATE` clause using @a Struct.
+ */
+
 //-Operators------------------------------------------------------------------------------------------------------
 //Public:
 /*!

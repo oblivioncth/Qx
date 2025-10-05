@@ -470,6 +470,13 @@ SqlDmlQuery::SqlDmlQuery(SqlDatabase& db) :
  */
 
 /*!
+ *  @fn SqlDmlQuery& SqlDmlQuery::UPDATE()
+ *
+ *  Adds an `UPDATE` clause to the query using @a Struct as the identifier and returns a reference to
+ *  the query.
+ */
+
+/*!
  *  @fn SqlDmlQuery& SqlDmlQuery::VALUES(const Struct& s)
  *
  *  Adds a `VALUES` clause to the query using all of the fields from @a s and returns a reference to

@@ -97,6 +97,11 @@ public:
         return SqlError();
     }
 
+    /* TODO: See if we can make concepts that basically allow saying that these methods can be called with any type
+     * and combination of arguments that the same keyword in the respective query type allows, and then just always
+     * forward the arguments, so that for the keywords will multiple signatures, we don't need to repeat them
+     * multiple times here.
+     */
     // SQL - DQL
     template<sql_stringable First, sql_stringable ...Rest>
     SqlDqlQuery SELECT(First&& fs, Rest&&... s)
@@ -138,27 +143,35 @@ public:
         return q;
     }
 
-    template<sql_stringable First, sql_stringable ...Rest> \
-    SqlDmlQuery INSERT_INTO(const SqlString& table, First&& fs, Rest&&... s) \
+    template<sql_stringable First, sql_stringable ...Rest>
+    SqlDmlQuery INSERT_INTO(const SqlString& table, First&& fs, Rest&&... s)
     {
         SqlDmlQuery q(*this);
         q.INSERT_INTO(table, std::forward<First>(fs), std::forward<Rest>(s)...);
         return q;
     }
 
-    template<sql_stringable First> \
-    SqlDmlQuery MERGE_INTO(First&& fs) \
+    template<sql_stringable First>
+    SqlDmlQuery MERGE_INTO(First&& fs)
     {
         SqlDmlQuery q(*this);
         q.MERGE_INTO(std::forward<First>(fs));
         return q;
     }
 
-    template<sql_stringable First> \
-    SqlDmlQuery UPDATE(First&& fs) \
+    template<sql_stringable First>
+    SqlDmlQuery UPDATE(First&& fs)
     {
         SqlDmlQuery q(*this);
         q.UPDATE(std::forward<First>(fs));
+        return q;
+    }
+
+    template<QxSql::sql_struct Struct>
+    SqlDmlQuery UPDATE()
+    {
+        SqlDmlQuery q(*this);
+        q.UPDATE<Struct>();
         return q;
     }
 
