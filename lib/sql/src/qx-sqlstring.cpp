@@ -56,7 +56,6 @@ namespace Qx
 
 //-Constructor--------------------------------------------------------------------------------------------------
 //Private:
-SqlString::SqlString() : mStr() {}
 SqlString::SqlString(const char16_t* str, size_t size, Type type) :
     mStr(Qt::operator""_s(str, size)) // construct as if QString literal was used
 {
@@ -74,6 +73,11 @@ SqlString::SqlString(const char16_t* str, size_t size, Type type) :
 }
 
 //Public:
+/*!
+ *  Constructs an empty SQL string.
+ */
+SqlString::SqlString() : mStr() {}
+
 /*!
  *  Move constructs an SQL string using @a str.
  */

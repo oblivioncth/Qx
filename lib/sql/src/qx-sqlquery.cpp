@@ -277,6 +277,14 @@ void SqlQuery::bindValue(const QString& placeholder, const QVariant& val) { mBin
  */
 
 /*!
+ *  @fn Derived& AbstractSqlQuery::IN(const R& range)
+ *
+ *  Adds an `IN` clause to the query using all of the elments from @a range.
+ *
+ *  If @a range is empty, the SQL statement will be ill-formed.
+ */
+
+/*!
  *  @fn Derived& AbstractSqlQuery::SELECT(First&& fs, Rest&&... s)
  *
  *  Adds a `SELECT` clause to the query using @a fs through @a s, and returns a reference to

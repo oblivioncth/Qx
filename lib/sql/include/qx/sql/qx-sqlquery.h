@@ -341,6 +341,25 @@ public:
     __QX_SQL_QUERY_ADD_KEYWORD_MULTI_ARG_PAREN(IN);
     __QX_SQL_QUERY_ADD_KEYWORD_SUB_QUERY(IN);
 
+    template <std::ranges::input_range R>
+        requires sql_stringable<unwrap_t<R>>
+    Derived& IN(const R& range)
+    {
+        /* The boxing here is inefficient, but I'm not sure how to improve the situation since
+         * we rely on the SqlString ctor to reliably get a string from value_type.
+         */
+        QString in;
+        for(auto n = std::size(range); const auto& value : range)
+        {
+            in += SqlString(value).toString();
+            if(n-- != 1)
+                in += u',';
+        }
+
+        appendKeyword(u"IN"_s, u"("_s, in, u")");
+        return *this_d;
+    }
+
     // [IS]
     __QX_SQL_QUERY_ADD_KEYWORD_ZERO_ARG(IS);
     __QX_SQL_QUERY_ADD_KEYWORD_SINGLE_ARG(IS);

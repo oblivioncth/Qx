@@ -64,10 +64,10 @@ private:
 
 //-Constructor-------------------------------------------------------------------------------------------------
 private:
-    explicit SqlString();
     explicit SqlString(const char16_t* str, size_t size, Type type = Default);
 
 public:
+    explicit SqlString();
     explicit SqlString(QString&& str);
     explicit SqlString(const QString& str);
 
