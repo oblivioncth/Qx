@@ -143,6 +143,14 @@ using DEFAULT = ConcreteInline<"DEFAULT", Inline::Constructor(
     Inline::Constructor::Default
 )>;
 
+using ASC = ConcreteInline<"ASC", Inline::Constructor(
+    Inline::Constructor::Default
+)>;
+
+using DESC = ConcreteInline<"DESC", Inline::Constructor(
+    Inline::Constructor::Default
+)>;
+
 }
 
 #endif // QX_SQLINLINES_H

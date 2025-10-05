@@ -158,6 +158,12 @@ namespace QxSql
  *
  *  @typedef DEFAULT
  *  The keyword DEFAULT
+ *
+ *  @typedef ASC
+ *  The keyword ASC
+ *
+ *  @typedef DESC
+ *  The keyword DESC
  */
 
 }
