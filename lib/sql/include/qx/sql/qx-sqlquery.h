@@ -482,6 +482,18 @@ public:
 
         return SqlError();
     }
+
+    // Single row TODO: constrain this to only SQL types if that concept is ever created
+    template<std::default_initializable T>
+        requires (!QxSql::sql_struct<T> && !QxSql::sql_containing<T>)
+    SqlError execute(T& result)
+    {
+        // TODO: Implement this idependently of the list version
+        QList<T> res;
+        auto err = execute(res);
+        result = (!err && !res.isEmpty()) ? res.first() : T{};
+        return err;
+    }
 };
 
 class QX_SQL_EXPORT SqlDmlQuery : public AbstractSqlQuery<SqlDmlQuery>

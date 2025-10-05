@@ -413,6 +413,15 @@ SqlError SqlDqlQuery::selectSizeWorkaround(int& size)
  *  A valid error is returned if there was an issue executing the query.
  */
 
+/*!
+ *  @fn SqlError SqlDqlQuery::execute(T& result)
+ *
+ *  Executes the query, placing the result into @a result. If the original result contains more than one row,
+ *  only the first row is returned, and if empty, then @a result is set to a default constructed value.
+ *
+ *  A valid error is returned if there was an issue executing the query.
+ */
+
 //===============================================================================================================
 // SqlDmlQuery
 //===============================================================================================================
