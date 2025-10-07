@@ -109,7 +109,7 @@ public:
         QString csv = u"'"_s;
         for(auto n = std::size(range); const auto& value : range)
         {
-            csv += SqlString(value).toString();
+            csv += Qx::SqlString(value).toString();
             if(n-- != 1)
                 csv += u"','"_s;
         }
