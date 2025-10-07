@@ -89,6 +89,10 @@ public:
         _QxPrivate::appendKeyword(mStr, word.view(), std::forward<First>(first), std::forward<Rest>(rest)...);
     }
 
+    // Doc here cause doxygen sucks
+    /*!
+     *  Constructor for the keyword with @a first through @a rest surrounded by parenthenses as parameters.
+     */
     template<Qx::sql_stringable First, Qx::sql_stringable ...Rest>
     inline explicit ConcreteInline(First&& first, Rest&&... rest) requires (enabled(Cs, Constructor::MultiStringableParen))
     {

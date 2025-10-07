@@ -67,7 +67,7 @@ namespace QxSql
  *  from any compatible types) surrounded by parentheses as an operand being inserted
  *  into the statement.
  *
- *  @var Inline::Constructor Inline::StringableRange
+ *  @var Inline::Constructor Inline::StringableRangeParen
  *  A constructor that results in the keyword along with all values in the provided
  *  ranged (of compatible types) surrounded by parentheses as an operand being inserted
  *  into the statement.
@@ -122,13 +122,7 @@ namespace QxSql
  */
 
 /*!
- *  @fn inline explicit ConcreteInline::ConcreteInline(First&& first, Rest&&... rest) requires (enabled(Cs, Constructor::MultiStringableParen))
- *
- *  Constructor for the keyword with @a first through @a rest surrounded by parenthenses as parameters.
- */
-
-/*!
- *  @fn inline explicit ConcreteInline(const R& range)
+ *  @fn inline explicit ConcreteInline::ConcreteInline(const R& range)
  *
  *  Constructor for the keyword with the values from @a range surrounded by parenthenses as parameters.
  */
