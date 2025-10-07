@@ -14,6 +14,8 @@ namespace QxSql
 
 class Inline
 {
+    friend Qx::SqlString operator|=(const Inline& a, const Inline& b);
+    friend Qx::SqlString operator&=(const Inline& a, const Inline& b);
 //-Class Enums-------------------------------------------------------------
 public:
     enum Constructor
@@ -165,6 +167,13 @@ using ESCAPE = ConcreteInline<"ESCAPE", Inline::Constructor(
     Inline::Constructor::Default |
     Inline::Constructor::SingleString
 )>;
+
+//-Operators------------------------------------------------------------------------------------------------------
+// Special (see operator notes in qx-sqlstring.h)
+// Concat (with space):
+inline Qx::SqlString operator|=(const Inline& a, const Inline& b) { return Qx::SqlString(a.mStr + u" "_s + b.mStr); }
+// Concat: Chosen cause + is taken
+inline Qx::SqlString operator&=(const Inline& a, const Inline& b) { return Qx::SqlString(a.mStr + b.mStr); }
 
 }
 
