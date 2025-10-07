@@ -9,6 +9,9 @@
 #include "qx/sql/qx-sqlstring.h"
 #include "qx/sql/__private/qx-sqlstring_helpers.h"
 
+// Extra-component Includes
+#include "qx/utility/qx-typetraits.h"
+
 namespace QxSql
 {
 
@@ -27,7 +30,8 @@ public:
         SingleStringable = 0x04,
         MultiStringable = 0x08,
         MultiStringableParen = 0x10,
-        Query = 0x20
+        StringableRangeParen = 0x20,
+        Query = 0x40
     };
 
 /*! @cond */
@@ -89,6 +93,25 @@ public:
     inline explicit ConcreteInline(First&& first, Rest&&... rest) requires (enabled(Cs, Constructor::MultiStringableParen))
     {
         _QxPrivate::appendKeyword(mStr, word.view(), u"("_s, std::forward<First>(first), std::forward<Rest>(rest)..., u")"_s);
+    }
+
+    template <std::ranges::input_range R>
+        requires Qx::sql_stringable<Qx::unwrap_t<R>>
+    inline explicit ConcreteInline(const R& range) requires (enabled(Cs, Constructor::StringableRangeParen))
+    {
+        /* The boxing here is inefficient, but I'm not sure how to improve the situation since
+         * we rely on the SqlString ctor to reliably get a string from value_type.
+         */
+        QString csv = u"'"_s;
+        for(auto n = std::size(range); const auto& value : range)
+        {
+            csv += SqlString(value).toString();
+            if(n-- != 1)
+                csv += u"','"_s;
+        }
+        csv += u"'"_s;
+
+        _QxPrivate::appendKeyword(mStr, word.view(), u"("_s, csv, u")");
     }
 
     inline explicit ConcreteInline(const Qx::SqlQuery& q) requires (enabled(Cs, Constructor::Query)) :
@@ -177,7 +200,8 @@ using ESCAPE = ConcreteInline<"ESCAPE", Inline::Constructor(
 )>;
 
 using IN = ConcreteInline<"IN", Inline::Constructor(
-    Inline::Constructor::MultiStringableParen
+    Inline::Constructor::MultiStringableParen |
+    Inline::Constructor::StringableRangeParen
 )>;
 
 // TODO: If many operators end up here, make a separate implementation and these and the ones in qx-sqlstring.h can use

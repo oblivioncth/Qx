@@ -348,13 +348,14 @@ public:
         /* The boxing here is inefficient, but I'm not sure how to improve the situation since
          * we rely on the SqlString ctor to reliably get a string from value_type.
          */
-        QString in;
+        QString in = u"'"_s;
         for(auto n = std::size(range); const auto& value : range)
         {
             in += SqlString(value).toString();
             if(n-- != 1)
-                in += u',';
+                in += u"','"_s;
         }
+        in += u"'"_s;
 
         appendKeyword(u"IN"_s, u"("_s, in, u")");
         return *this_d;
