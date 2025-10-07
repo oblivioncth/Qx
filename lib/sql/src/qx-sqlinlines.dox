@@ -62,6 +62,11 @@ namespace QxSql
  *  A constructor that results in the keyword along with one or more strings (formed
  *  from any compatible types) as an operand being inserted into the statement.
  *
+ *  @var Inline::Constructor Inline::MultiStringableParen
+ *  A constructor that results in the keyword along with one or more strings (formed
+ *  from any compatible types) surrounded by parentheses as an operand being inserted
+ *  into the statement.
+ *
  *  @var Inline::Constructor Inline::Query
  *  A constructor that results in the keyword along with an entire sub-query being
  *  inserted into the statement.

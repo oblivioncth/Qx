@@ -25,7 +25,8 @@ public:
         SingleString = 0x02,
         SingleStringable = 0x04,
         MultiStringable = 0x08,
-        Query = 0x10
+        MultiStringableParen = 0x10,
+        Query = 0x20
     };
 
 /*! @cond */
@@ -81,6 +82,12 @@ public:
     inline explicit ConcreteInline(First&& first, Rest&&... rest) requires (enabled(Cs, Constructor::MultiStringable))
     {
         _QxPrivate::appendKeyword(mStr, word.view(), std::forward<First>(first), std::forward<Rest>(rest)...);
+    }
+
+    template<Qx::sql_stringable First, Qx::sql_stringable ...Rest>
+    inline explicit ConcreteInline(First&& first, Rest&&... rest) requires (enabled(Cs, Constructor::MultiStringableParen))
+    {
+        _QxPrivate::appendKeyword(mStr, word.view(), u"("_s, std::forward<First>(first), std::forward<Rest>(rest)..., u")"_s);
     }
 
     inline explicit ConcreteInline(const Qx::SqlQuery& q) requires (enabled(Cs, Constructor::Query)) :
@@ -166,6 +173,10 @@ using ILIKE = ConcreteInline<"ILIKE", Inline::Constructor(
 using ESCAPE = ConcreteInline<"ESCAPE", Inline::Constructor(
     Inline::Constructor::Default |
     Inline::Constructor::SingleString
+)>;
+
+using IN = ConcreteInline<"IN", Inline::Constructor(
+    Inline::Constructor::MultiStringableParen
 )>;
 
 //-Operators------------------------------------------------------------------------------------------------------
