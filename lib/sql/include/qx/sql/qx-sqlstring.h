@@ -10,6 +10,7 @@
 using namespace Qt::StringLiterals;
 
 // Forwards
+class QUuid;
 namespace Qx
 {
 class SqlQuery;
@@ -72,6 +73,7 @@ public:
     explicit SqlString(const QString& str); // Could possibly be implicit instead
 
     SqlString(bool b);
+    SqlString(const QUuid& id);
 
     template<Qx::arithmetic N>
     SqlString(N n) : mStr(QString::number(n)) {}

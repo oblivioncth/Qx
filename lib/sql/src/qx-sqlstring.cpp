@@ -96,6 +96,13 @@ SqlString::SqlString(const QString& str) : mStr(str) {}
 SqlString::SqlString(bool b) : mStr(b ? u"TRUE"_s : u"FALSE"_s ) {}
 
 /*!
+ *  Constructs an SQL string from @a id (without braces).
+ *
+ *  The id is treated as a string literal.
+ */
+SqlString::SqlString(const QUuid& id) : mStr(u"'"_s + id.toString(QUuid::WithoutBraces) + u"'"_s) {}
+
+/*!
  *  @fn SqlString::SqlString(N n)
  *
  *  Constructs an SQL string from the arithmetic value @a n.
