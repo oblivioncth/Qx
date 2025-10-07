@@ -140,6 +140,11 @@ SqlString SqlString::makeLiteral(const char16_t* str) noexcept
  */
 QString SqlString::toString() const { return mStr; }
 
+/*!
+ *  Returns the SQL string as a regular string.
+ */
+bool SqlString::isEmpty() const { return mStr.isEmpty(); }
+
 //-Operators------------------------------------------------------------------------------------------------------
 //Public:
 /*!

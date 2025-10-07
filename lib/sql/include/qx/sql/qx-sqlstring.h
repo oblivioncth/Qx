@@ -68,8 +68,8 @@ private:
 
 public:
     explicit SqlString();
-    explicit SqlString(QString&& str);
-    explicit SqlString(const QString& str);
+    explicit SqlString(QString&& str); // Could possibly be implicit instead
+    explicit SqlString(const QString& str); // Could possibly be implicit instead
 
     SqlString(bool b);
 
@@ -91,6 +91,7 @@ public:
 //-Instance Functions------------------------------------------------------------------------------------------------------
 public:
     QString toString() const;
+    bool isEmpty() const;
 
 //-Operators------------------------------------------------------------------------------------------------------
 public:
