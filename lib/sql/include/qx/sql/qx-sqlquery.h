@@ -185,13 +185,14 @@ private:
 
 //-Instance Variables-----------------------------------------------------------------------------------------------
 private:
-    SqlDatabase& mDb; // Must remain valid through lifetime
+    SqlDatabase* mDb; // Must remain valid through lifetime
     QString mQueryStr;
     QList<Binding> mBindings;
 
 //-Constructor-------------------------------------------------------------------------------------------------
 /*! @cond */
 protected:
+    SqlQuery();
     SqlQuery(SqlDatabase& db);
 /*! @endcond */
 
@@ -220,6 +221,7 @@ protected:
 
 public:
     QString string() const;
+    bool hasDatabase() const;
     SqlDatabase* database();
     const SqlDatabase* database() const;
 
@@ -239,6 +241,7 @@ protected:
 //-Constructor-------------------------------------------------------------------------------------------------
 protected:
 /*! @cond */
+    AbstractSqlQuery() {}
     AbstractSqlQuery(SqlDatabase& db) : SqlQuery(db) {}
 /*! @endcond */
 
@@ -407,9 +410,7 @@ class QX_SQL_EXPORT SqlDqlQuery : public AbstractSqlQuery<SqlDqlQuery>
 {
 //-Constructor-------------------------------------------------------------------------------------------------
 public:
-    /* Generally should use the methods attached to SqlDatabase, but a standalone query object is useful for
-     * make a subquery to add to the main query, so this is public.
-     */
+    SqlDqlQuery();
     SqlDqlQuery(SqlDatabase& db);
 
 //-Instance Functions------------------------------------------------------------------------------------------------------
@@ -520,6 +521,7 @@ class QX_SQL_EXPORT SqlDmlQuery : public AbstractSqlQuery<SqlDmlQuery>
 {
 //-Constructor-------------------------------------------------------------------------------------------------
 public:
+    SqlDmlQuery();
     SqlDmlQuery(SqlDatabase& db);
 
 //-Instance Functions------------------------------------------------------------------------------------------------------

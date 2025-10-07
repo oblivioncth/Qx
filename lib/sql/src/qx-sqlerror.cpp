@@ -112,7 +112,9 @@ QString SqlError::databaseInfo() const { return mDatabase; }
 SqlError& SqlError::withQuery(const SqlQuery& q)
 {
     mQuery = q.string();
-    return withDatabase(*q.database());
+    if(auto db = q.database())
+        withDatabase(*db);
+    return *this;
 }
 
 /*!
@@ -131,7 +133,7 @@ SqlError& SqlError::withDatabase(const SqlDatabase& db)
 {
     mDatabase = DATABASE_INFO_TEMPLATE.arg(db.isConnected() ? u"true"_s : u"false"_s,
                                            db.databaseName(),
-                                           db.databaseName());
+                                           db.driver());
     return *this;
 }
 

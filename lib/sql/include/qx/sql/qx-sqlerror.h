@@ -26,6 +26,7 @@ public:
     enum Form
     {
         NoError,
+        MissingDb,
         EngineError,
         TypeMismatch,
         MissingField
@@ -35,6 +36,7 @@ public:
 private:
     static inline const QHash<Form, QString> ERR_STRINGS{
         {NoError, u"No error occurred."_s},
+        {MissingDb, u"The query could not be executed because it has no associated database."_s},
         {EngineError, u"Engine error."_s},
         {TypeMismatch, u"A field value did not match the expected type."_s},
         {MissingField, u"An expected field is missing."_s},

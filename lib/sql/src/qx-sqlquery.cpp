@@ -158,8 +158,12 @@ namespace Qx
 //-Constructor--------------------------------------------------------------------------------------------------
 //Protected:
 /*! @cond */
+SqlQuery::SqlQuery() :
+    mDb(nullptr)
+{}
+
 SqlQuery::SqlQuery(SqlDatabase& db) :
-    mDb(db)
+    mDb(&db)
 {}
 /*! @endcond */
 
@@ -199,8 +203,11 @@ QString SqlQuery::autoBindValue(QVariant&& d)
 SqlError SqlQuery::executeQuery(QSqlQuery& result, bool forwardOnly)
 {
     // Get DB
+    if(!mDb)
+        return SqlError(SqlError::MissingDb, u"Null DB pointer."_s).withQuery(*this);
+
     QSqlDatabase db;
-    if(auto err = mDb.database(db); err.isValid())
+    if(auto err = mDb->database(db); err.isValid())
         return err;
 
     // Prepare
@@ -236,14 +243,20 @@ SqlError SqlQuery::executeQuery(QSqlQuery& result, bool forwardOnly)
 QString SqlQuery::string() const { return mQueryStr; }
 
 /*!
+ *  Returns @c true if the query has an associated database, and therefore can be executed;
+ *  otherwise, returns @c false.
+ */
+bool SqlQuery::hasDatabase() const { return mDb; }
+
+/*!
  *  Returns the database associated with the string.
  */
-SqlDatabase* SqlQuery::database() { return &mDb; }
+SqlDatabase* SqlQuery::database() { return mDb; }
 
 /*!
  *  @overload
  */
-const SqlDatabase* SqlQuery::database() const { return &mDb; }
+const SqlDatabase* SqlQuery::database() const { return mDb; }
 
 /*!
  *  Binds the value @a val to placeholder @a placeholder in the query.
@@ -337,6 +350,13 @@ void SqlQuery::bindValue(const QString& placeholder, const QVariant& val) { mBin
 //-Constructor--------------------------------------------------------------------------------------------------
 //Public:
 /*!
+ *  Creates a DQL query without an associated database.
+ *
+ *  A query without an associated database cannot be execute, but can be used as a sub-query.
+ */
+SqlDqlQuery::SqlDqlQuery() {}
+
+/*!
  *  Creates a DQL query associated with database @a db.
  *
  *  @note The database must stay valid for the lifetime of the query.
@@ -371,6 +391,8 @@ SqlError SqlDqlQuery::selectSizeWorkaround(int& size)
      * for when a DB that does not support returning the size of a query naturally
      * (why is this s thing???) is in use.
      */
+    Q_ASSERT(hasDatabase());
+
     // Get DB
     QSqlDatabase db;
     if(auto err = database()->database(db); err.isValid())
@@ -445,6 +467,13 @@ SqlError SqlDqlQuery::selectSizeWorkaround(int& size)
 
 //-Constructor--------------------------------------------------------------------------------------------------
 //Public:
+/*!
+ *  Creates a DML query without an associated database.
+ *
+ *  A query without an associated database cannot be execute, but can be used as a sub-query.
+ */
+SqlDmlQuery::SqlDmlQuery() {}
+
 /*!
  *  Creates a DML query associated with database @a db.
  *
