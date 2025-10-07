@@ -115,7 +115,7 @@ public:
         }
         csv += u"'"_s;
 
-        _QxPrivate::appendKeyword(mStr, word.view(), u"("_s, csv, u")");
+        _QxPrivate::appendKeyword(mStr, word.view(), u"("_s, csv, u")"_s);
     }
 
     inline explicit ConcreteInline(const Qx::SqlQuery& q) requires (enabled(Cs, Constructor::Query)) :
