@@ -360,7 +360,7 @@ public:
         }
         in += u"'"_s;
 
-        appendKeyword(u"IN"_s, u"("_s, in, u")");
+        appendKeyword(u"IN"_s, u"("_s, in, u")"_s);
         return *this_d;
     }
 
