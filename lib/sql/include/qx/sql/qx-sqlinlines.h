@@ -205,7 +205,8 @@ using ESCAPE = ConcreteInline<"ESCAPE", Inline::Constructor(
 
 using IN = ConcreteInline<"IN", Inline::Constructor(
     Inline::Constructor::MultiStringableParen |
-    Inline::Constructor::StringableRangeParen
+    Inline::Constructor::StringableRangeParen |
+    Inline::Constructor::Query
 )>;
 
 // TODO: If many operators end up here, make a separate implementation and these and the ones in qx-sqlstring.h can use
