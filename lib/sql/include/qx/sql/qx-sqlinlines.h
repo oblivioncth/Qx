@@ -151,6 +151,21 @@ using DESC = ConcreteInline<"DESC", Inline::Constructor(
     Inline::Constructor::Default
 )>;
 
+using LIKE = ConcreteInline<"LIKE", Inline::Constructor(
+    Inline::Constructor::Default |
+    Inline::Constructor::SingleString
+)>;
+
+using ILIKE = ConcreteInline<"ILIKE", Inline::Constructor(
+    Inline::Constructor::Default |
+    Inline::Constructor::SingleString
+)>;
+
+using ESCAPE = ConcreteInline<"ESCAPE", Inline::Constructor(
+    Inline::Constructor::Default |
+    Inline::Constructor::SingleString
+)>;
+
 }
 
 #endif // QX_SQLINLINES_H

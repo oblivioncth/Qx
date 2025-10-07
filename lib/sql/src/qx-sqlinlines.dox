@@ -164,6 +164,15 @@ namespace QxSql
  *
  *  @typedef DESC
  *  The keyword DESC
+ *
+ *  @typedef LIKE
+ *  The keyword LIKE
+ *
+ *  @typedef ILIKE
+ *  The keyword ILIKE
+ *
+ *  @typedef ESCAPE
+ *  The keyword ESCAPE
  */
 
 }

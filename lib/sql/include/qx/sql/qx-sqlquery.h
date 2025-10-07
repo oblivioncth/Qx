@@ -429,7 +429,7 @@ public:
     // [HAVING]
     __QX_SQL_QUERY_ADD_KEYWORD_SINGLE_ARG(HAVING);
 
-    // [LIKE]
+    // [ILIKE]
     __QX_SQL_QUERY_ADD_KEYWORD_SINGLE_ARG(ILIKE);
 
     // [JOIN]
