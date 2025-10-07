@@ -29,7 +29,7 @@ template<typename T>
 concept sql_string = std::same_as<T, SqlString>;
 
 template<typename T>
-concept sql_stringable = std::convertible_to<T, SqlString>;
+concept sql_stringable = std::convertible_to<T, SqlString> || std::constructible_from<SqlString, T>;
 
 class QX_SQL_EXPORT SqlString
 {

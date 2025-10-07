@@ -16,7 +16,7 @@ namespace Qx
 
 /*!
  *  @concept sql_stringable
- *  @brief Specifies that a type can be converted to SqlString.
+ *  @brief Specifies that a type can be converted to SqlString, or used to construct a SqlString.
  *
  *  Satisfied if @a T is convertible to SqlString.
  */
