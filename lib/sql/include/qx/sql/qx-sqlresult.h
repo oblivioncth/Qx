@@ -15,7 +15,7 @@ namespace Qx
 template<QxSql::sql_struct T>
 class SqlResult
 {
-    friend class SqlQuery;
+    friend class SqlDqlQuery;
 //-Instance Variables-----------------------------------------------------------------------------------------------
 private:
     QSqlQuery mResult;
