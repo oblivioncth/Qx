@@ -220,8 +220,6 @@ SqlString operator>=(const SqlString& s, const Qx::SqlQuery& q) { return SqlStri
  *  @fn SqlString operator|=(const SqlString& a, const SqlString& b)
  *  Returns the concatenation of @a a and @a b with a space between.
  *
- *  Useful for specifying aliases without the `AS` keyword.
- *
  *  @fn SqlString operator&=(const SqlString& a, const SqlString& b)
  *  Returns the concatenation of @a and @a b.
  *

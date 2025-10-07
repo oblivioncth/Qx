@@ -200,4 +200,17 @@ namespace QxSql
  *  The keyword IN
  */
 
+/*!
+ *  @fn SqlString operator!(const Inline& i)
+ *  Returns a string of "NOT i".
+ *
+ *  @fn SqlString operator|=(const Inline& a, const Inline& b)
+ *  Returns the concatenation of @a a and @a b with a space between.
+ *
+ *  @fn SqlString operator&=(const Inline& a, const Inline& b)
+ *  Returns the concatenation of @a and @a b.
+ *
+ *  This is the same as operator+() for normal strings.
+ */
+
 }
