@@ -171,13 +171,20 @@ SqlError SqlDatabase::database(QSqlDatabase& db, bool connect)
 
     if(db.open())
     {
-        QObject::connect(thread, &QThread::destroyed, [id = mId](QObject* tObj){ // clazy:exclude=connect-3arg-lambda
+        /* NOTE: If the signal is ever changed to QObject::deleted instead, then we need to change the functions
+         * involved with this to take QObject* instead of QThread* as once a QObject emits the destroyed signal any
+         * derived destructors have already run, and so the qobject_cast<> would fail at that point. OR if capturing
+         * the pointer like we do now, note that it would no longer be valid to use it for anything (besides its address)
+         * without upcasting it to a QObject.
+         *
+         * We only need the pointer address anyway, so dropping down to just QObject when passing the thread pointer is fine,
+         * it's just an interface change.
+         */
+        QObject::connect(thread, &QThread::finished, [id = mId, t = thread]{ // clazy:exclude=connect-3arg-lambda
             /* It's safe if the sender calls this after the instance is deleted due to closeConnection()'s
              * implementation and capture by value
              */
-            QThread* thread = qobject_cast<QThread*>(tObj);
-            Q_ASSERT(thread);
-            closeConnection(id, thread); // Static version so we don't potentially use a deleted instance
+            closeConnection(id, t); // Static version so we don't potentially use a deleted instance
         });
         return QSqlError();
     }
