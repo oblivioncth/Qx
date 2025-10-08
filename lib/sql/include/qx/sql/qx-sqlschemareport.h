@@ -143,7 +143,7 @@ private:
                         const QSqlField field = tableRecord.field(memName);
 
                         // Examine field
-                        if(!field.isNull())
+                        if(field.isValid())
                         {
                             // Account for field
                             allFields.removeAll(memName.toString());
