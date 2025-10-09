@@ -4,6 +4,8 @@
 // Qt Includes
 #include <QStringView>
 #include <QString>
+#include <QSqlField>
+#include <QSqlRecord>
 
 // Intra-component Includes
 #include "qx/sql/qx-sqlconcepts.h"
@@ -125,38 +127,53 @@ Qx::SqlError standardParse(T& value, const QVariant& sv)
 }
 
 //-Helpers-----------------------------------------------------------------
-template<typename T>
-struct FieldMatchChecker;
-
 // Like for the default Converter<T>, gate this to valid types once the constraint is made
 template<typename T>
-struct FieldMatchChecker
+struct FieldChecker
 {
-    static Qx::SqlError check(const QVariant& v, const QString& field = {})
+    static Qx::SqlError check(const QSqlField& field, const QString& fieldName = {})
     {
-        Q_ASSERT(v.isValid());
-        return v.canConvert<T>() ? Qx::SqlError() :
-                                   Qx::SqlError(v.typeName(), QMetaType::fromType<T>().name(), field);
+        Q_ASSERT(field.isValid());
+        QMetaType fType = field.metaType();
+        QMetaType mType = QMetaType::fromType<T>();
+        return QMetaType::canConvert(fType, mType) ?
+                    Qx::SqlError() :
+                    Qx::SqlError(fType.name(), mType.name(), fieldName);
     }
 };
 
 template<typename T>
     requires QxSql::sql_optional<T>
-struct FieldMatchChecker<T>
+struct FieldChecker<T>
 {
-    static Qx::SqlError check(const QVariant& v, const QString& field = {})
+    static Qx::SqlError check(const QSqlField& field, const QString& fieldName = {})
     {
-        Q_ASSERT(v.isValid());
-        return FieldMatchChecker<typename T::value_type>::check(v, field);
+        Q_ASSERT(field.isValid());
+        return FieldChecker<typename T::value_type>::check(field, fieldName);
+    }
+};
+
+// This is used as the first step for checking a row, and FieldChecker is for each field,
+// same note about concept gate, if created
+template<typename T>
+struct RowChecker
+{
+    // Default just checks the first value
+    static Qx::SqlError check(const QSqlRecord& record)
+    {
+        Q_ASSERT(!record.isEmpty());
+        return FieldChecker<T>::check(record.field(0));
     }
 };
 
 template<typename T>
     requires QxSql::sql_struct<T>
-struct FieldMatchChecker<T>
+struct RowChecker<T>
 {
-    static Qx::SqlError check(const QSqlQuery& result)
+    static Qx::SqlError check(const QSqlRecord& record)
     {
+        Q_ASSERT(!record.isEmpty());
+
         // Error tracker
         Qx::SqlError chkError;
 
@@ -175,15 +192,15 @@ struct FieldMatchChecker<T>
                 constexpr QLatin1StringView mField(mName);
                 using mType = typename std::remove_reference_t<decltype(memberMeta)>::M_TYPE;
 
-                // Get variant, and check it
-                QVariant vField = result.value(mField);
-                if(!vField.isValid())
+                // Get field, and check it
+                QSqlField sqlField = record.field(mField);
+                if(!sqlField.isValid())
                 {
                     if constexpr(!QxSql::sql_optional<mType>)
                         chkError = Qx::SqlError(Qx::SqlError::MissingField, mField);
                 }
-                else if constexpr(!QxSql::sql_override_convertible<T, mType, mName>)
-                    chkError = FieldMatchChecker<mType>::check(vField);
+                else if constexpr(!QxSql::sql_override_convertible<T, mType, mName>) // If there is an override conversion, assume it works
+                    chkError = FieldChecker<mType>::check(sqlField, mField);
 
                 return !chkError.isValid();
             }() && ...);
@@ -290,7 +307,7 @@ struct RowConverter<T>
         if constexpr(QxSql::sql_struct<E>)
         {
             // Ensure types match
-            if(auto err = QxSqlPrivate::FieldMatchChecker<E>::check(queryResult); err.isValid())
+            if(auto err = QxSqlPrivate::RowChecker<E>::check(queryResult.record()); err.isValid())
                 return err;
         }
 
@@ -337,7 +354,7 @@ struct RowConverter<T>
         if constexpr(QxSql::sql_struct<V>)
         {
             // Ensure types match
-            if(auto err = QxSqlPrivate::FieldMatchChecker<V>::check(queryResult); err.isValid())
+            if(auto err = QxSqlPrivate::RowChecker<V>::check(queryResult.record()); err.isValid())
                 return err;
         }
 

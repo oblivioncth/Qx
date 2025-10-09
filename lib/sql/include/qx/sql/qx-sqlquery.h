@@ -456,6 +456,7 @@ public:
     // [SIMILIAR]
     __QX_SQL_QUERY_ADD_KEYWORD_SINGLE_ARG_X(SIMILAR TO, SIMILAR_TO);    
 
+    // All rows
     template<QxSql::sql_containing Container>
     SqlError execute(Container& result)
     {
@@ -478,7 +479,8 @@ public:
         return SqlError();
     }
 
-    template<QxSql::sql_struct T>
+    // Iterable result of all rows
+    template<typename T>
     SqlError execute(SqlResult<T>& result)
     {
         // Ensure result is reset
@@ -495,7 +497,7 @@ public:
             return SqlError();
 
         // Check types
-        if(auto err = QxSqlPrivate::FieldMatchChecker<T>::check(queryResult); err.isValid())
+        if(auto err = QxSqlPrivate::RowChecker<T>::check(queryResult.record()); err.isValid())
             return err;
 
         // Prepare result object
@@ -506,7 +508,6 @@ public:
 
     // Single row TODO: constrain this to only SQL types if that concept is ever created
     template<std::default_initializable T>
-        requires (!QxSql::sql_struct<T> && !QxSql::sql_containing<T>)
     SqlError execute(T& result)
     {
         // TODO: Implement this idependently of the list version

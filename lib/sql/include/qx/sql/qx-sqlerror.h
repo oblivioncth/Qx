@@ -9,7 +9,7 @@
 
 class QSqlError;
 
-namespace QxSqlPrivate {template<typename T> struct FieldMatchChecker; }
+namespace QxSqlPrivate {template<typename T> struct FieldChecker; }
 
 namespace Qx
 {
@@ -20,7 +20,7 @@ class SqlDatabase;
 class QX_SQL_EXPORT SqlError final : public AbstractError<"Qx::SqlError", 7>
 {
     template<typename T>
-    friend struct QxSqlPrivate::FieldMatchChecker;
+    friend struct QxSqlPrivate::FieldChecker;
 //-Class Enums-------------------------------------------------------------
 public:
     enum Form
