@@ -34,10 +34,6 @@ namespace Qx
 
 class QX_SQL_EXPORT SqlDatabase
 {
-//-Class Variables-----------------------------------------------------------------------------------------------
-private:
-    static inline const QString ID_NAMESPACE = u"Qx::SqlDatabase"_s;
-
 //-Instance Variables-----------------------------------------------------------------------------------------------
 private:
     // NOTE: These are not const to allow move semantics, but DO NOT write to them after construction, or else this
