@@ -69,22 +69,23 @@ class ConcreteInline : public Inline
 {
 //-Constructor---------------------------------------------------------------------
 public:
-    inline explicit ConcreteInline() requires (enabled(Cs, Constructor::Default)) :
+    // The extra qualification of the base class here for "enabled" is to workaround an ICE with GCC
+    inline explicit ConcreteInline() requires (Inline::enabled(Cs, Constructor::Default)) :
         Inline(word.view())
     {}
 
-    inline explicit ConcreteInline(const Qx::SqlString& s) requires (enabled(Cs, Constructor::SingleString)) :
+    inline explicit ConcreteInline(const Qx::SqlString& s) requires (Inline::enabled(Cs, Constructor::SingleString)) :
         Inline(word.view() + u" "_s + s.toString())
     {}
 
     template<Qx::sql_stringable First>
-    inline explicit ConcreteInline(First&& first) requires (enabled(Cs, Constructor::SingleStringable))
+    inline explicit ConcreteInline(First&& first) requires (Inline::enabled(Cs, Constructor::SingleStringable))
     {
         _QxPrivate::appendKeyword(mStr, word.view(), std::forward<First>(first));
     }
 
     template<Qx::sql_stringable First, Qx::sql_stringable ...Rest>
-    inline explicit ConcreteInline(First&& first, Rest&&... rest) requires (enabled(Cs, Constructor::MultiStringable))
+    inline explicit ConcreteInline(First&& first, Rest&&... rest) requires (Inline::enabled(Cs, Constructor::MultiStringable))
     {
         _QxPrivate::appendKeyword(mStr, word.view(), std::forward<First>(first), std::forward<Rest>(rest)...);
     }
@@ -94,14 +95,14 @@ public:
      *  Constructor for the keyword with @a first through @a rest surrounded by parenthenses as parameters.
      */
     template<Qx::sql_stringable First, Qx::sql_stringable ...Rest>
-    inline explicit ConcreteInline(First&& first, Rest&&... rest) requires (enabled(Cs, Constructor::MultiStringableParen))
+    inline explicit ConcreteInline(First&& first, Rest&&... rest) requires (Inline::enabled(Cs, Constructor::MultiStringableParen))
     {
         _QxPrivate::appendKeyword(mStr, word.view(), u"("_s, std::forward<First>(first), std::forward<Rest>(rest)..., u")"_s);
     }
 
     template <std::ranges::input_range R>
         requires Qx::sql_stringable<Qx::unwrap_t<R>>
-    inline explicit ConcreteInline(const R& range) requires (enabled(Cs, Constructor::StringableRangeParen))
+    inline explicit ConcreteInline(const R& range) requires (Inline::enabled(Cs, Constructor::StringableRangeParen))
     {
         /* The boxing here is inefficient, but I'm not sure how to improve the situation since
          * we rely on the SqlString ctor to reliably get a string from value_type.
@@ -118,7 +119,7 @@ public:
         _QxPrivate::appendKeyword(mStr, word.view(), u"("_s, csv, u")"_s);
     }
 
-    inline explicit ConcreteInline(const Qx::SqlQuery& q) requires (enabled(Cs, Constructor::Query)) :
+    inline explicit ConcreteInline(const Qx::SqlQuery& q) requires (Inline::enabled(Cs, Constructor::Query)) :
         Inline(word.view() + u" ("_s + q.string() + u")"_s)
     {}
 
