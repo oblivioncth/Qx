@@ -229,9 +229,6 @@ SqlError SqlQuery::executeQuery(QSqlQuery& result, bool forwardOnly)
     if(!result.exec())
         return SqlError(result.lastError()).withQuery(*this);
 
-    // Advance to first record (assuming there is one)
-    result.next();
-
     return SqlError();
 }
 /*! @endcond */

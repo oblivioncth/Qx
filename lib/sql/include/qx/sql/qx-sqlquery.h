@@ -468,6 +468,9 @@ public:
         if(auto err = executeQuery(queryResult, true); err.isValid())
             return err.withQuery(*this);
 
+        // Advance to first record since we're going to consume the result right now
+        queryResult.next();
+
         // Check for empty result
         if(!queryResult.isValid())
             return SqlError();
@@ -493,7 +496,7 @@ public:
             return err.withQuery(*this);
 
         // Check for empty result
-        if(!queryResult.isValid())
+        if(queryResultSize < 1)
             return SqlError();
 
         // Check types
@@ -507,10 +510,11 @@ public:
     }
 
     // Single row TODO: constrain this to only SQL types if that concept is ever created
-    template<std::default_initializable T>
+    template<typename T>
     SqlError execute(T& result)
     {
-        // TODO: Implement this idependently of the list version
+        static_assert(std::default_initializable<T>, "T must be default constructable to use this overload!");
+        // TODO: Implement this independently of the list version
         QList<T> res;
         auto err = execute(res);
         result = (!err && !res.isEmpty()) ? res.first() : T{};

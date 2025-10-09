@@ -29,7 +29,8 @@ public:
         MissingDb,
         EngineError,
         TypeMismatch,
-        MissingField
+        MissingField,
+        InvalidResult
     };
 
 //-Class Variables-------------------------------------------------------------
@@ -40,6 +41,7 @@ private:
         {EngineError, u"Engine error."_s},
         {TypeMismatch, u"A field value did not match the expected type."_s},
         {MissingField, u"An expected field is missing."_s},
+        {InvalidResult, u"Data retrieval from an invalid result was attempted."_s}
     };
     static inline const QString DATABASE_INFO_TEMPLATE =
         u"Connected: %1\n"_s
@@ -59,7 +61,7 @@ private:
 
 public:
     SqlError();
-    SqlError(Form f, const QString& c);
+    SqlError(Form f, const QString& c = {});
     SqlError(const QSqlError& engineError);
 
 //-Instance Functions-------------------------------------------------------------

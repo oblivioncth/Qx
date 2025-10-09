@@ -8,6 +8,18 @@
 #include "qx/sql/__private/qx-sqlquery_p.h"
 #include "qx/sql/qx-sqlconcepts.h"
 
+namespace QxSql
+{
+
+//-Namespace Enums----------------------------------------------------------------------------------------------------
+enum Location
+{
+    BeforeFirstRow = -1,
+    AfterLastRow = -2
+};
+
+}
+
 namespace Qx
 {
 
@@ -27,7 +39,7 @@ private:
         mResult(std::move(validQuery)),
         mSize(size)
     {
-        Q_ASSERT(mResult.isValid());
+        Q_ASSERT(mResult.isActive());
     }
 
 public:
@@ -35,9 +47,19 @@ public:
 
 //-Instance Functions------------------------------------------------------------------------------------------------------
 public:
+    int at() const { return mResult.at(); }
     int size() const { return mSize; }
     bool isValid() const { return mResult.isValid(); }
-    SqlError value(T& value) const { return QxSqlPrivate::RowConverter<T>::fromSql(value, mResult); }
+    bool isEmpty() const { return mSize < 1; }
+
+    SqlError value(T& value) const
+    {
+        if(isValid())
+            return QxSqlPrivate::RowConverter<T>::fromSql(value, mResult);
+        else
+            return SqlError(SqlError::InvalidResult).withQuery(mResult.lastQuery());
+    }
+
     bool next() { return mResult.next(); }
 };
 

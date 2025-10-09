@@ -1,3 +1,17 @@
+namespace QxSql
+{
+/*!
+ *  @enum Location
+ *  This enum type describes special locations of an SqlResult
+ *
+ *  @var Location Location::BeforeFirstRow
+ *  Before the first record.
+ *
+ *  @var Location Location::AfterLastRow
+ *  After the last record.
+ */
+}
+
 namespace Qx
 {
 //===============================================================================================================
@@ -14,7 +28,9 @@ namespace Qx
  *  methods that simply return a container. Similar to a plain QSqlQuery, rows are navigated one at a time and
  *  the value(s) from them are constructed on-demand via value() instead of all at once.
  *
- *  A valid result obtained via executing a query will begin on the first row (if any), unlike QSqlQuery.
+ *  A valid result obtained via executing a query will begin before the first row (if any), like QSqlQuery.
+ *
+ *  @sa isEmpty(), at(), size().
  */
 
 //-Constructor--------------------------------------------------------------------------------------------------
@@ -28,6 +44,15 @@ namespace Qx
 //-Instance Functions-------------------------------------------------------------------------------------------
 //Public:
 /*!
+ *  @fn int SqlResult::at() const
+ *
+ *  Returns the current position of the query. The first record is at position zero. If the position is invalid,
+ *  the function returns QxSql::BeforeFirstRow or QxSql::AfterLastRow, which are special negative values.
+ *
+ *  @sa next().
+ */
+
+/*!
  *  @fn int SqlResult::size() const
  *
  *  Returns the size of the result.
@@ -37,6 +62,12 @@ namespace Qx
  *  @fn bool SqlResult::isValid() const
  *
  *  Returns @c true if the result is currently positioned on a row of a successful; otherwise, returns @c false.
+ */
+
+/*!
+ *  @fn bool SqlResult::isEmpty() const
+ *
+ *  Returns @c true if the result returned no rows; otherwise, returns @c false.
  */
 
 /*!
@@ -53,6 +84,8 @@ namespace Qx
  *  Advances the result to the next row.
  *
  *  Returns @c true if there was another row, or @c false if the end of the result was reached.
+ *
+ *  @sa at().
  */
 
 }
