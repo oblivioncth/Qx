@@ -415,6 +415,15 @@ SqlError SqlDqlQuery::selectSizeWorkaround(int& size)
 
 //Public:
 /*!
+ *  @fn SqlError SqlDqlQuery::appendExecute(Container& result)
+ *
+ *  Same as execute(Container&), except that the result buffer is not cleared and so the results are
+ *  appended to the existing container, instead of replacing them.
+ *
+ *  @sa execute(Container&).
+ */
+
+/*!
  *  @fn SqlError SqlDqlQuery::execute(Container& result)
  *
  *  Executes the query, placing the result into the container @a result. Each element of the result container
@@ -426,6 +435,8 @@ SqlError SqlDqlQuery::selectSizeWorkaround(int& size)
  *  execute(SqlResult<T>& result).
  *
  *  A valid error is returned if there was an issue executing the query.
+ *
+ *  @sa appendExecute().
  */
 
 /*!

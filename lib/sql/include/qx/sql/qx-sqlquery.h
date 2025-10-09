@@ -456,13 +456,10 @@ public:
     // [SIMILIAR]
     __QX_SQL_QUERY_ADD_KEYWORD_SINGLE_ARG_X(SIMILAR TO, SIMILAR_TO);    
 
-    // All rows
+    // All rows - Does not clear buffer
     template<QxSql::sql_containing Container>
-    SqlError execute(Container& result)
+    SqlError appendExecute(Container& result)
     {
-        // Ensure result is empty
-        result.clear();
-
         // Execute underlying
         QSqlQuery queryResult;
         if(auto err = executeQuery(queryResult, true); err.isValid())
@@ -480,6 +477,14 @@ public:
             return err.withQuery(*this);
 
         return SqlError();
+    }
+
+    // All rows - Clears buffer
+    template<QxSql::sql_containing Container>
+    SqlError execute(Container& result)
+    {
+        result.clear();
+        return appendExecute(result);
     }
 
     // Iterable result of all rows
