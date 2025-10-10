@@ -270,7 +270,7 @@ struct RowConverter<T>
                         return true; // Go to next "iteration"
                     }
                     else
-                        qCritical("SQL struct is missing expected field %s despite passing pre-check!", mField);
+                        qCritical("SQL struct is missing expected field %s despite passing pre-check!", mField.data());
                 }
 
                 // Convert
