@@ -92,31 +92,19 @@ public:
 
     // Doc here cause doxygen sucks
     /*!
-     *  Constructor for the keyword with @a first through @a rest surrounded by parenthenses as parameters.
+     *  Constructor for the keyword with @a first through @a rest surrounded by parentheses as parameters.
      */
     template<Qx::sql_stringable First, Qx::sql_stringable ...Rest>
     inline explicit ConcreteInline(First&& first, Rest&&... rest) requires (Inline::enabled(Cs, Constructor::MultiStringableParen))
     {
-        _QxPrivate::appendKeyword(mStr, word.view(), u"("_s, std::forward<First>(first), std::forward<Rest>(rest)..., u")"_s);
+        _QxPrivate::appendKeywordParen(mStr, word.view(), std::forward<First>(first), std::forward<Rest>(rest)...);
     }
 
     template <std::ranges::input_range R>
         requires Qx::sql_stringable<Qx::unwrap_t<R>>
     inline explicit ConcreteInline(const R& range) requires (Inline::enabled(Cs, Constructor::StringableRangeParen))
     {
-        /* The boxing here is inefficient, but I'm not sure how to improve the situation since
-         * we rely on the SqlString ctor to reliably get a string from value_type.
-         */
-        QString csv = u"'"_s;
-        for(auto n = std::size(range); const auto& value : range)
-        {
-            csv += Qx::SqlString(value).toString();
-            if(n-- != 1)
-                csv += u"','"_s;
-        }
-        csv += u"'"_s;
-
-        _QxPrivate::appendKeyword(mStr, word.view(), u"("_s, csv, u")"_s);
+        _QxPrivate::appendKeywordParen(mStr, word.view(), range);
     }
 
     inline explicit ConcreteInline(const Qx::SqlQuery& q) requires (Inline::enabled(Cs, Constructor::Query)) :

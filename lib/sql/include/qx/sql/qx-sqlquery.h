@@ -120,7 +120,7 @@ namespace QxSql \
     auto& method(First&& fs) \
     { \
         using namespace QxSql; \
-        appendKeyword(u ## #keyword ## _s, u"("_sq, std::forward<First>(fs), u")"_sq); \
+        appendKeywordParen(u ## #keyword ## _s, std::forward<First>(fs)); \
         return *this_d; \
     }
 
@@ -140,7 +140,7 @@ namespace QxSql \
     auto& method(First&& fs, Rest&&... s) \
     { \
         using namespace QxSql; \
-        appendKeyword(u ## #keyword ## _s, u"("_sq, std::forward<First>(fs), std::forward<Rest>(s)..., u")"_sq); \
+        appendKeywordParen(u ## #keyword ## _s, std::forward<First>(fs), std::forward<Rest>(s)...); \
         return *this_d; \
     }
 
@@ -151,7 +151,7 @@ namespace QxSql \
 #define __QX_SQL_QUERY_ADD_KEYWORD_SUB_QUERY_X(keyword, method) \
     auto& method(const SqlQuery& q) \
     { \
-        appendKeyword(u ## #keyword ## _s, u"("_s, q.string(), u")"_s); \
+        appendKeywordParen(u ## #keyword ## _s, q.string()); \
         return *this_d; \
     }
 
@@ -206,6 +206,18 @@ protected:
     void appendKeyword(const QString& word, FirstArg&& firstArg, RestArgs&&... restArgs)
     {
         _QxPrivate::appendKeyword(mQueryStr, word, std::forward<FirstArg>(firstArg), std::forward<RestArgs>(restArgs)...);
+    }
+
+    template<typename FirstArg, typename ...RestArgs>
+    void appendKeywordParen(const QString& word, FirstArg&& firstArg, RestArgs&&... restArgs)
+    {
+        _QxPrivate::appendKeywordParen(mQueryStr, word, std::forward<FirstArg>(firstArg), std::forward<RestArgs>(restArgs)...);
+    }
+
+    template <std::ranges::input_range R>
+    void appendKeywordParen(const QString& word, const R& range)
+    {
+        _QxPrivate::appendKeywordParen(mQueryStr, word, range);
     }
 
     void appendKeyword(const QString& word);
@@ -348,19 +360,7 @@ public:
         requires sql_stringable<unwrap_t<R>>
     Derived& IN(const R& range)
     {
-        /* The boxing here is inefficient, but I'm not sure how to improve the situation since
-         * we rely on the SqlString ctor to reliably get a string from value_type.
-         */
-        QString in = u"'"_s;
-        for(auto n = std::size(range); const auto& value : range)
-        {
-            in += SqlString(value).toString();
-            if(n-- != 1)
-                in += u"','"_s;
-        }
-        in += u"'"_s;
-
-        appendKeyword(u"IN"_s, u"("_s, in, u")"_s);
+        appendKeywordParen(u"IN"_s, range);
         return *this_d;
     }
 
