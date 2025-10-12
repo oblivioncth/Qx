@@ -92,7 +92,11 @@ SqlDatabase::SqlDatabase(SqlDatabase&& other) = default;
  *  Destroys the accessor, closing and removing any underlying connections across all threads in which it
  *  was used.
  */
-SqlDatabase::~SqlDatabase() { closeAllConnections(); }
+SqlDatabase::~SqlDatabase()
+{
+    closeAllConnections();
+    QObject::disconnect(mThreadCloseConnection);
+}
 
 //-Class Functions--------------------------------------------------------------------------------------------
 //Private:
@@ -180,7 +184,7 @@ SqlError SqlDatabase::database(QSqlDatabase& db, bool connect)
          * We only need the pointer address anyway, so dropping down to just QObject when passing the thread pointer is fine,
          * it's just an interface change.
          */
-        QObject::connect(thread, &QThread::finished, [id = mId, t = thread]{ // clazy:exclude=connect-3arg-lambda
+        mThreadCloseConnection = QObject::connect(thread, &QThread::finished, [id = mId, t = thread]{ // clazy:exclude=connect-3arg-lambda
             /* It's safe if the sender calls this after the instance is deleted due to closeConnection()'s
              * implementation and capture by value
              */

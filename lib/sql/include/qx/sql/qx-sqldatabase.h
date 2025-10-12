@@ -48,6 +48,7 @@ private:
                             */
     QString mDriver;
     QString mId;
+    QMetaObject::Connection mThreadCloseConnection; // This is only modified in the destructor.
 
 //-Constructor-------------------------------------------------------------------------------------------------
 public:
