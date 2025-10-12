@@ -118,16 +118,11 @@ public:
 
 //-Namespace Concepts-------------------------------------------------------------------------------------------------------
 
-/* TODO: Clang 12 doesn't support the C++20 feature "Lambdas in unevaluated contexts",
- * so this helper function needs to be used instead. Once moving on to at least Clang 13
- * as the minimum supported version instead the lambda commented out below can be used
- * instead.
- */
-//template<class E>
-//concept error_type = requires(E type) {
-//    // IIFE that ensures E is a specialization of AbstractError
-//    []<CStringLiteral Y, quint16 Z>(AbstractError<Y, Z>&){}(type);
-//};
+template<class E>
+concept error_type = requires(E type) {
+   // IIFE that ensures E is a specialization of AbstractError
+   []<CStringLiteral Y, quint16 Z>(AbstractError<Y, Z>&){}(type);
+};
 
 /* Define error type registrar variable. This must be done out of line to ensure that only
  * one instance of the variable exists per-error-type across an entire program. If the variable
@@ -138,18 +133,7 @@ public:
 /*! @cond */
 template<CStringLiteral EName, quint16 ECode>
 const bool AbstractError<EName, ECode>::REGISTER = registerType(TYPE_CODE, TYPE_NAME);
-
-namespace AbstractErrorPrivate
-{
-    template<Qx::CStringLiteral Y, quint16 Z>
-    void aeDerived(Qx::AbstractError<Y, Z>&);
-}
 /*! @endcond */
-
-template<class E>
-concept error_type = requires(E type) {
-    AbstractErrorPrivate::aeDerived(type);
-};
 
 template<class A>
 concept error_adapter =
