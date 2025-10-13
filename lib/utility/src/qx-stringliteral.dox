@@ -5,27 +5,232 @@ namespace Qx
 //===============================================================================================================
 
 /*!
- *  @struct StringLiteral qx/utility/qx-stringliteral.h
+ *  @class StringLiteral qx/utility/qx-stringliteral.h
  *  @ingroup qx-utility
  *
- *  @brief The StringLiteral template struct acts as a literal class type wrapper around a C-style string
+ *  @brief The StringLiteral template class acts as a literal class type wrapper around a raw string
  *  that effectively allows the string to be used as a non-type template parameter.
  *
+ *  The template parameters of this class allow the underlying character type to be auto-detected by
+ *  the nature of the literal string used to construct it, so a template that takes Qx::StringLiteral
+ *  can accept multiple string types, as shown in the following example.
+ *
  *  @snippet qx-stringliteral.cpp 0
+ *
+ *  If you want to use compile-time literals of a fixed size, use the type-specific derivatives of this
+ *  class (i.e CStringLiteral, WStringLiteral, U8StringLiteral, etc.)
  */
 
-//-Instance Fields---------------------------------------------------------------------------------------------
+//-Aliases---------------------------------------------------------------------------------------------------
+//Public:
 /*!
- *  @var StringLiteral::value
+ * @typedef StringLiteral::data_t
  *
- *  The wrapped C-Style string.
+ *  The storage type for the string.
+ */
+
+/*!
+ * @typedef StringLiteral::view_t
+ *
+ *  The type of view used by the view() method, if any.
+ */
+
+//-Class Variables----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ * @typedef StringLiteral::size_v
+ *
+ *  The size of the string.
+ *
+ *  This variable is easy to use at compile-time given it's a static member.
  */
 
 //-Constructor-------------------------------------------------------------------------------------------------
 //Public:
 /*!
- * @fn StringLiteral<N>::StringLiteral(const char (&str)[N])
+ * @fn StringLiteral::StringLiteral(const C (&str)[N])
  *
- *  Wraps the C-Style string @a str of length @a N.
+ *  Wraps the raw string @a str of length @a N.
+ *
+ *  @warning If preparing a character array manually, be sure to included a null-terminator as its presence
+ *  is assumed! If none is provided, the "size" members will report incorrect values and concatenation will
+ *  result in UB.
+ */
+
+//-Instance Functions----------------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn const C* StringLiteral::data() const
+ *
+ *  Returns a pointer to the raw string.
+ */
+
+/*!
+ *  @fn size_t StringLiteral::size() const
+ *
+ *  Returns the size of the string.
+ */
+
+/*!
+ *  @fn view_t StringLiteral::view() const
+ *
+ *  Returns a Qt type view of the string.
+ *
+ *  Requires C to be @c char or @c char16_t
+ */
+
+/*!
+ *  @fn std::basic_string_view<C> StringLiteral::std_view() const
+ *
+ *  Returns a std style view of the string.
+ */
+
+//-Operators-------------------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn std::strong_ordering StringLiteral::operator<=>(const StringLiteral& other) const
+ *
+ *  Returns the ordering of @a other relative to @c this.
+ */
+
+/*!
+ *  @fn bool StringLiteral::operator==(const StringLiteral& other) const
+ *
+ *  Returns @c true if the StringLiteral is equal to @a other; otherwise, returns @c false.
+ */
+
+/*!
+ *  @fn StringLiteral::operator QLatin1StringView() const
+ *
+ *  Allows the StringLiteral to be converted to a QLatin1StringView.
+ *
+ *  Requires C to be @c char.
+ */
+
+/*!
+ *  @fn StringLiteral::operator QStringView() const
+ *
+ *  Allows the StringLiteral to be converted to a QLatin1StringView.
+ *
+ *  Requires C to be @c char16_t.
+ */
+
+/*!
+ *  @fn StringLiteral::operator std::basic_string_view<C>() const
+ *
+ *  Allows the StringLiteral to be converted to a std::basic_string_view of the appropriate type.
+ */
+
+//===============================================================================================================
+// <file>
+//===============================================================================================================
+
+/*!
+ *  @concept string_literal
+ *  @brief Specifies that a type is a specialization or derivation of StringLiteral
+ *
+ *  Satisfied if @c T specializes or derives from StringLiteral.
+ */
+
+/*!
+ *  @concept compatible_string_literals
+ *  @brief Specifies that two types are StringLiterals that use the same storage type.
+ *
+ *  Satisfied if @c T and @c U satisfy string_literal and have the same data type (data_t).
+ */
+
+//===============================================================================================================
+// CStringLiteral
+//===============================================================================================================
+
+/*!
+ *  @class CStringLiteral qx/utility/qx-stringliteral.h
+ *  @ingroup qx-utility
+ *
+ *  @brief CStringLiteral acts like a typedef/alias for a StringLiteral that uses @c char as its storage type.
+ */
+
+//-Constructor-------------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn CStringLiteral::CStringLiteral(const char (&str)[N])
+ *
+ *  @copydoc StringLiteral::StringLiteral(const C (&str)[N])
+ */
+
+//===============================================================================================================
+// WStringLiteral
+//===============================================================================================================
+
+/*!
+ *  @class WStringLiteral qx/utility/qx-stringliteral.h
+ *  @ingroup qx-utility
+ *
+ *  @brief WStringLiteral acts like a typedef/alias for a StringLiteral that uses @c wchar_t as its storage type.
+ */
+
+//-Constructor-------------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn WStringLiteral::WStringLiteral(const wchar_t (&str)[N])
+ *
+ *  @copydoc StringLiteral::StringLiteral(const C (&str)[N])
+ */
+
+//===============================================================================================================
+// U8StringLiteral
+//===============================================================================================================
+
+/*!
+ *  @class U8StringLiteral qx/utility/qx-stringliteral.h
+ *  @ingroup qx-utility
+ *
+ *  @brief U8StringLiteral acts like a typedef/alias for a StringLiteral that uses @c char8_t as its storage type.
+ */
+
+//-Constructor-------------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn U8StringLiteral::U8StringLiteral(const char8_t (&str)[N])
+ *
+ *  @copydoc StringLiteral::StringLiteral(const C (&str)[N])
+ */
+
+//===============================================================================================================
+// U16StringLiteral
+//===============================================================================================================
+
+/*!
+ *  @class U16StringLiteral qx/utility/qx-stringliteral.h
+ *  @ingroup qx-utility
+ *
+ *  @brief U16StringLiteral acts like a typedef/alias for a StringLiteral that uses @c char16_t as its storage type.
+ */
+
+//-Constructor-------------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn U16StringLiteral::U16StringLiteral(const char16_t (&str)[N])
+ *
+ *  @copydoc StringLiteral::StringLiteral(const C (&str)[N])
+ */
+
+//===============================================================================================================
+// U32StringLiteral
+//===============================================================================================================
+
+/*!
+ *  @class U32StringLiteral qx/utility/qx-stringliteral.h
+ *  @ingroup qx-utility
+ *
+ *  @brief U32StringLiteral acts like a typedef/alias for a StringLiteral that uses @c char32_t as its storage type.
+ */
+
+//-Constructor-------------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn U32StringLiteral::U32StringLiteral(const char32_t (&str)[N])
+ *
+ *  @copydoc StringLiteral::StringLiteral(const C (&str)[N])
  */
 }

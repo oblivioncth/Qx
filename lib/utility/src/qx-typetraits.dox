@@ -18,6 +18,25 @@ namespace Qx
  *  @brief See is_specialization_of.
  */
 
+// Containers
+/*!
+ *  @struct unwrap
+ *  @brief Provides the inner type of T if T wraps or contains another type; otherwise, provides T itself.
+ *
+ *  Provides types based on the following alias availability:
+ *  - T::value_type -> T::value_type
+ *  - T::mapped_type -> T::mapped_type
+ *  - else -> T
+ *
+ *  @sa unwrap_t
+ *
+ *  @var unwrap::type
+ *  The unwrapped type.
+ *
+ *  @typedef unwrap_t
+ *  @brief See unwrap.
+ */
+
 // Qualifiers
 /*!
  *  @typedef target_type
@@ -34,5 +53,17 @@ namespace Qx
  *
  *  Does not influence constness or other qualifiers.
  */
+
+// Misc
+/*!
+ *  @var always_false
+ *
+ *  Evaluates to false no matter what type parameters are used.
+ *
+ *  This is useful for static assertions, disabling code, and other metaprogramming techniques
+ *  where the compiler would try to immediately evaluate a statement as-is, but you want to delay
+ *  the evaluation so that it only occurs when the surrounding template is actually instantiated.
+ */
+
 
 }

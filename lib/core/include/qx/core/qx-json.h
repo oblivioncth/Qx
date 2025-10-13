@@ -98,8 +98,11 @@ public:
 
 class QX_CORE_EXPORT Data
 {
+private:
+    QString mDataError;
+
 public:
-    Data();
+    Data(const QString& dataError = {});
 
     QString string() const;
 };
@@ -227,7 +230,7 @@ namespace QxJson
 template<typename T>
 struct Converter;
 
-template<class Struct, Qx::StringLiteral member>
+template<class Struct, Qx::CStringLiteral member>
 struct MemberOverrideCoverter;
 
 template<typename SelfType, typename DelayedSelfType>
@@ -258,7 +261,7 @@ concept json_convertible = requires(T& tValue) {
     { Converter<T>::toJson(tValue) } -> qjson_type;
 };
 
-template<class K, typename T, Qx::StringLiteral N>
+template<class K, typename T, Qx::CStringLiteral N>
 concept json_override_convertible = requires(T& tValue) {
     { MemberOverrideCoverter<K, N>::fromJson(tValue, QJsonValue()) } -> std::same_as<Qx::JsonError>;
     { MemberOverrideCoverter<K, N>::toJson(tValue) } -> qjson_type;
@@ -303,16 +306,16 @@ static inline const QString ERR_READ_DATA = u"JSON Error: Could not read JSON da
 static inline const QString ERR_WRITE_FILE = u"JSON Error: Could not write JSON file."_s;
 
 //-Structs---------------------------------------------------------------
-template<Qx::StringLiteral MemberN, typename MemberT, class Struct>
+template<Qx::CStringLiteral MemberN, typename MemberT, class Struct>
 struct MemberMetadata
 {
-    constexpr static Qx::StringLiteral M_NAME = MemberN;
+    constexpr static Qx::CStringLiteral M_NAME = MemberN;
     typedef MemberT M_TYPE;
     MemberT Struct::* mPtr;
 };
 
 //-Functions-------------------------------------------------------------
-template <Qx::StringLiteral N, typename T, class S>
+template <Qx::CStringLiteral N, typename T, class S>
 constexpr MemberMetadata<N, T, S> makeMemberMetadata(T S::*memberPtr)
 {
     return {memberPtr};
@@ -374,14 +377,14 @@ constexpr auto getMemberMeta()
     return QxJson::QxJsonMetaStructOutside<K, K>::memberMetadata();
 }
 
-template<class K, typename T, Qx::StringLiteral N>
+template<class K, typename T, Qx::CStringLiteral N>
     requires QxJson::json_override_convertible<K, T, N>
 Qx::JsonError overrideParse(T& value, const QJsonValue& jv)
 {
     return QxJson::MemberOverrideCoverter<K, N>::fromJson(value, jv);
 }
 
-template<class K, typename T, Qx::StringLiteral N>
+template<class K, typename T, Qx::CStringLiteral N>
     requires QxJson::json_override_convertible<K, T, N>
 auto overrideSerialize(const T& value)
 {
@@ -462,7 +465,7 @@ struct Converter<T>
             ([&]{
                 // Meta
                 static constexpr auto mName = std::remove_reference<decltype(memberMeta)>::type::M_NAME;
-                constexpr QLatin1StringView mKey(mName.value);
+                constexpr QLatin1StringView mKey(mName);
                 using mType = typename std::remove_reference<decltype(memberMeta)>::type::M_TYPE;
                 auto& mRef = value.*(memberMeta.mPtr);
 
@@ -511,7 +514,7 @@ struct Converter<T>
             ([&]{
                 // Meta
                 static constexpr auto mName = std::remove_reference<decltype(memberMeta)>::type::M_NAME;
-                constexpr QLatin1StringView mKey(mName.value);
+                constexpr QLatin1StringView mKey(mName);
                 using mType = typename std::remove_reference<decltype(memberMeta)>::type::M_TYPE;
                 auto& mRef = value.*(memberMeta.mPtr);
 
@@ -812,7 +815,7 @@ JsonError parseJson(T& parsed, const QByteArray& data)
     QJsonDocument jd = QJsonDocument::fromJson(data, &jpe);
 
     if(jpe.error != jpe.NoError)
-        return JsonError(QxJsonPrivate::ERR_READ_DATA, JsonError::InvalidData).withContext(QxJson::Data());
+        return JsonError(QxJsonPrivate::ERR_READ_DATA, JsonError::InvalidData).withContext(QxJson::Data(jpe.errorString()));
 
     // True parse
     return parseJson(parsed, jd).withContext(QxJson::Data());

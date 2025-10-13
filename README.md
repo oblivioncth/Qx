@@ -15,6 +15,7 @@ Detailed documentation of this library, facilitated by Doxygen, is available at:
 
 - [Bindable Properties](https://oblivioncth.github.io/Qx/properties.html)
 - [Declarative JSON](https://oblivioncth.github.io/Qx/declarativejson.html)
+- [Declarative SQL](https://oblivioncth.github.io/Qx/declarativesql.html)
 - [Qx::ApplicationLogger](https://oblivioncth.github.io/Qx/classQx_1_1ApplicationLogger.html)
 - [Qx::AsyncDownloadManager](https://oblivioncth.github.io/Qx/classQx_1_1AsyncDownloadManager.html)/[Qx::SyncDownloadManager](https://oblivioncth.github.io/Qx/classQx_1_1SyncDownloadManager.html)
 - [Qx::Base85](https://oblivioncth.github.io/Qx/classQx_1_1Base85.html)

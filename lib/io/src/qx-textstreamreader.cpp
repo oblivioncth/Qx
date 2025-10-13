@@ -61,7 +61,7 @@ IoOpReport TextStreamReader::preReadErrorCheck()
         return mStatus;
     else if(!mFile)
     {
-        mStatus = NULL_FILE_REPORT;
+        mStatus = IoOpReport(IO_OP_READ, IO_ERR_NULL, mFile);
         return mStatus;
     }
     else if(!mFile->isOpen())

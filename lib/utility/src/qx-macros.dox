@@ -50,3 +50,21 @@
  *  QX_FOR_EACH_DELIM(F, 1, 4, 10) // -> F(1), F(4), F(10)
  *  @endcode
  */
+
+ /*!
+ *  @def QX_EVAL_EACH(arg, ...)
+ *
+ *  This function-like macro acts like a fold expression for its variadic arguments.
+ *  It produces the result of calling all trailing macro functions with the argument
+ *  @a arg.
+ *
+ *  For example:
+ *  @code{.cpp}
+ *  #define F(x) //...
+ *  #define G(x) //...
+ *  #define H(x) //...
+ *  QX_EVAL_EACH(10, F, G, H) // -> F(10) G(10) H(10)
+ *  @endcode
+ *
+ *  @sa QX_FOR_EACH()
+ */

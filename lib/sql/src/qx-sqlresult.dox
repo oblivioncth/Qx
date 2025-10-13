@@ -1,0 +1,91 @@
+namespace QxSql
+{
+/*!
+ *  @enum Location
+ *  This enum type describes special locations of an SqlResult
+ *
+ *  @var Location Location::BeforeFirstRow
+ *  Before the first record.
+ *
+ *  @var Location Location::AfterLastRow
+ *  After the last record.
+ */
+}
+
+namespace Qx
+{
+//===============================================================================================================
+// SqlResult
+//===============================================================================================================
+
+/*!
+ *  @class SqlResult qx/sql/qx-sqlresult.h
+ *  @ingroup qx-sql
+ *
+ *  @brief The SqlResult class provides sequential, efficient access to a SELECT/DQL query result.
+ *
+ *  This class acts as an alternative way to process query results that is more efficient than the execution
+ *  methods that simply return a container. Similar to a plain QSqlQuery, rows are navigated one at a time and
+ *  the value(s) from them are constructed on-demand via value() instead of all at once.
+ *
+ *  A valid result obtained via executing a query will begin before the first row (if any), like QSqlQuery.
+ *
+ *  @sa isEmpty(), at(), size().
+ */
+
+//-Constructor--------------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn SqlResult::SqlResult()
+ *
+ *  Constructs an invalid SqlResult.
+ */
+
+//-Instance Functions-------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn int SqlResult::at() const
+ *
+ *  Returns the current position of the query. The first record is at position zero. If the position is invalid,
+ *  the function returns QxSql::BeforeFirstRow or QxSql::AfterLastRow, which are special negative values.
+ *
+ *  @sa next().
+ */
+
+/*!
+ *  @fn int SqlResult::size() const
+ *
+ *  Returns the size of the result.
+ */
+
+/*!
+ *  @fn bool SqlResult::isValid() const
+ *
+ *  Returns @c true if the result is currently positioned on a row of a successful; otherwise, returns @c false.
+ */
+
+/*!
+ *  @fn bool SqlResult::isEmpty() const
+ *
+ *  Returns @c true if the result returned no rows; otherwise, returns @c false.
+ */
+
+/*!
+ *  @fn SqlError SqlResult::value(T& value) const
+ *
+ *  Sets @a value to contain the data from the current row.
+ *
+ *  Returns a valid error object with error info if the data could not be retrieved.
+ */
+
+/*!
+ *  @fn bool SqlResult::next()
+ *
+ *  Advances the result to the next row.
+ *
+ *  Returns @c true if there was another row, or @c false if the end of the result was reached.
+ *
+ *  @sa at().
+ */
+
+}

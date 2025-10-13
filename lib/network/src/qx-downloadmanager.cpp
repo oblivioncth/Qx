@@ -505,9 +505,9 @@ void AsyncDownloadManager::clearTasks()
 void AsyncDownloadManager::sslErrorHandler(QNetworkReply* reply, const QList<QSslError>& errors)
 {
     // Create error message
-    quint16 errValue = QxPrivate::InternalError::VAL_SSL_ERR;
+    quint16 errValue = _QxPrivate::InternalError::VAL_SSL_ERR;
     QString errDetails = String::join(errors, [](const QSslError& err){ return err.errorString(); }, ENDL, LIST_ITEM_PREFIX);
-    QxPrivate::InternalError errMsg(Warning, errValue, SSL_ERR.arg(reply->url().toString()), CONTINUE_QUES, errDetails);
+    _QxPrivate::InternalError errMsg(Warning, errValue, SSL_ERR.arg(reply->url().toString()), CONTINUE_QUES, errDetails);
 
     // Signal result
     bool ignoreErrors = false;

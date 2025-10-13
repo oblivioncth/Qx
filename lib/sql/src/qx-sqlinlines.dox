@@ -1,0 +1,210 @@
+/*!
+ *  @file qx-sqlinlines.h
+ *  @ingroup qx-sql
+ *
+ *  @brief The qx-sqlinlines header file provides several types for conveniently adding
+ *  SQL keywords that are used in the middle of an SQL clause.
+ *
+ *  These types allow one to insert mid-clause keywords without having to manually specify
+ *  them as a string. Such words that can be followed by parentheses containing values have
+ *  a constructor with arguments for those values.
+ *
+ *  Some of these keywords overlap with the SqlQuery keyword methods, so you may use whichever
+ *  is more appropriate in the given context.
+ *
+ *  Simply using:
+ *  @code{.cpp}
+ *  using namespace QxSql;
+ *  @endcode
+ *
+ *  allows you to write these inline keywords plainly.
+ */
+
+namespace QxSql
+{
+
+//===============================================================================================================
+// Inline
+//===============================================================================================================
+
+/*!
+ *  @class Inline
+ *
+ *  @brief The Inline class is the base class from which all SQL inline keywords derive from
+ *
+ *  Each inline keyword is implemented as a specialization of ConcreteInline, each having different constructors
+ *  available as indicated by their use of the Constructor enum.
+ */
+
+//-Class Enums-------------------------------------------------------------
+//Public:
+/*!
+ *  @enum Inline::Constructor
+ *
+ *  This enum specifies what constructors are available for an inline keyword.
+ *
+ *  @var Inline::Constructor Inline::None
+ *  None (never used).
+ *
+ *  @var Inline::Constructor Inline::Default
+ *  A default constructor. This results in just the word itself being inserted
+ *  into the statement.
+ *
+ *  @var Inline::Constructor Inline::SingleString
+ *  A constructor that results in the keyword along with a single string as an
+ *  operand being inserted into the statement.
+ *
+ *  @var Inline::Constructor Inline::SingleStringable
+ *  A constructor that results in the keyword along with a single string (formed
+ *  from any compatible type) as an operand being inserted into the statement.
+ *
+ *  @var Inline::Constructor Inline::MultiStringable
+ *  A constructor that results in the keyword along with one or more strings (formed
+ *  from any compatible types) as an operand being inserted into the statement.
+ *
+ *  @var Inline::Constructor Inline::MultiStringableParen
+ *  A constructor that results in the keyword along with one or more strings (formed
+ *  from any compatible types) surrounded by parentheses as an operand being inserted
+ *  into the statement.
+ *
+ *  @var Inline::Constructor Inline::StringableRangeParen
+ *  A constructor that results in the keyword along with all values in the provided
+ *  ranged (of compatible types) surrounded by parentheses as an operand being inserted
+ *  into the statement.
+ *
+ *  @var Inline::Constructor Inline::Query
+ *  A constructor that results in the keyword along with an entire sub-query being
+ *  inserted into the statement.
+ */
+
+//-Operators----------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn Inline::operator Qx::SqlString() const noexcept
+ *
+ *  Converts the inline word to an SQL string.
+ */
+
+//===============================================================================================================
+// ConcreteInline
+//===============================================================================================================
+
+/*!
+ *  @class ConcreteInline
+ *
+ *  @brief The ConcreteInline class is used to implement each specific inline keyword
+ */
+
+//-Constructor----------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn inline explicit ConcreteInline::ConcreteInline()
+ *
+ *  Constructor for the keyword by itself.
+ */
+
+/*!
+ *  @fn inline explicit ConcreteInline::ConcreteInline(const Qx::SqlString& s)
+ *
+ *  Constructor for the keyword by itself.
+ */
+
+/*!
+ *  @fn inline explicit ConcreteInline::ConcreteInline(First&& first)
+ *
+ *  Constructor for the keyword with @a first as a parameter.
+ */
+
+/*!
+ *  @fn inline explicit ConcreteInline::ConcreteInline(First&& first, Rest&&... rest) requires (enabled(Cs, Constructor::MultiStringable))
+ *
+ *  Constructor for the keyword with @a first through @a rest as parameters.
+ */
+
+/*!
+ *  @fn inline explicit ConcreteInline::ConcreteInline(const R& range)
+ *
+ *  Constructor for the keyword with the values from @a range surrounded by parenthenses as parameters.
+ */
+
+/*!
+ *  @fn inline explicit ConcreteInline::ConcreteInline(const Qx::SqlQuery& q)
+ *
+ *  Constructor for the keyword with @a q as a sub-query parameter.
+ */
+
+//===============================================================================================================
+// <namespace>
+//===============================================================================================================
+
+//-Inline Words-------------------------------------------------------------------
+/*!
+ *  @typedef ANY
+ *  The keyword ANY
+ *
+ *  @typedef SOME
+ *  The keyword SOME
+ *
+ *  @typedef ALL
+ *  The keyword ALL
+ *
+ *  @typedef AS
+ *  The keyword AS
+ *
+ *  @typedef NUL
+ *  The keyword NUL
+ *
+ *  @typedef UNKNOWN
+ *  The keyword UNKNOWN
+ *
+ *  @typedef COUNT
+ *  The keyword COUNT
+ *
+ *  @typedef SUM
+ *  The keyword SUM
+ *
+ *  @typedef MIN
+ *  The keyword MIN
+ *
+ *  @typedef MAX
+ *  The keyword MAX
+ *
+ *  @typedef AVG
+ *  The keyword AVG
+ *
+ *  @typedef DEFAULT
+ *  The keyword DEFAULT
+ *
+ *  @typedef ASC
+ *  The keyword ASC
+ *
+ *  @typedef DESC
+ *  The keyword DESC
+ *
+ *  @typedef LIKE
+ *  The keyword LIKE
+ *
+ *  @typedef ILIKE
+ *  The keyword ILIKE
+ *
+ *  @typedef ESCAPE
+ *  The keyword ESCAPE
+ *
+ *  @typedef IN
+ *  The keyword IN
+ */
+
+/*!
+ *  @fn SqlString operator!(const Inline& i)
+ *  Returns a string of "NOT i".
+ *
+ *  @fn SqlString operator|=(const Inline& a, const Inline& b)
+ *  Returns the concatenation of @a a and @a b with a space between.
+ *
+ *  @fn SqlString operator&=(const Inline& a, const Inline& b)
+ *  Returns the concatenation of @a and @a b.
+ *
+ *  This is the same as operator+() for normal strings.
+ */
+
+}

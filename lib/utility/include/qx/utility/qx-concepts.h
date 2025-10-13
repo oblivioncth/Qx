@@ -12,6 +12,13 @@
 // Inter-component Includes
 #include "qx/utility/qx-typetraits.h"
 
+namespace _QxPrivate
+{
+    // Helpers
+    template <template <class...> class Template, class... Args>
+    void derived_from_specialization_impl(const Template<Args...>&);
+}
+
 namespace Qx
 {
 
@@ -504,6 +511,9 @@ concept any_of = (std::same_as<K, L> || ...);
 // Template
 template<typename K, template <typename...> class L>
 concept specializes = is_specialization_of_v<K, L>;
+
+ template <class K, template <class...> class L>
+concept derived_from_specialization_of = requires(const K& k) { _QxPrivate::derived_from_specialization_impl<L>(k); };
 
 // Similar interface types
 template<typename T>

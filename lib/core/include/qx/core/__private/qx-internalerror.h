@@ -5,7 +5,7 @@
 #include "qx/core/qx-abstracterror.h"
 
 /*! @cond */
-namespace QxPrivate
+namespace _QxPrivate
 {
 
 // Basically a copy of GenericError for internal use only

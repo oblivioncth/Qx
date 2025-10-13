@@ -33,7 +33,7 @@ private:
     static inline const QString T_NAME_DUPE = u"Error type name %1 is already claimed!"_s;
     static inline const QString T_CODE_RESERVED = u"Error type code %1 is reserved!"_s;
     static inline constinit QHash<quint16, const QString*> codeRegistry;
-    static constexpr std::array<QStringView, 8> RESERVED_NAMES{
+    static constexpr std::array<QStringView, 10> RESERVED_NAMES{
         u"Qx::InternalError",
         u"Qx::GenericError",
         u"Qx::IoOpReport",
@@ -41,7 +41,9 @@ private:
         u"Qx::DownloadManagerReport",
         u"Qx::DownloadOpReport",
         u"Qx::JsonError",
-        u"QJsonParseError"
+        u"QJsonParseError",
+        u"Qx::SqlError",
+        u"Qx::SqlSchemaReport",
     };
     // TODO: If this becomes sufficiently large, move to a constexpr set (hopefully available in std by that time)
 
@@ -81,14 +83,14 @@ public:
     bool operator!=(const IError& other) const = default;
 };
 
-template<StringLiteral EName, quint16 ECode>
+template<CStringLiteral EName, quint16 ECode>
 class AbstractError : protected IError
 {
 friend class Error;
 //-Class Variables----------------------------------------------------------------------------------------------------------
 public:
     static constexpr quint16 TYPE_CODE = ECode;
-    static constexpr QLatin1StringView TYPE_NAME{EName.value};
+    static constexpr QLatin1StringView TYPE_NAME{EName};
 
 private:
     static const bool REGISTER;
@@ -116,38 +118,22 @@ public:
 
 //-Namespace Concepts-------------------------------------------------------------------------------------------------------
 
-/* TODO: Clang 12 doesn't support the C++20 feature "Lambdas in unevaluated contexts",
- * so this helper function needs to be used instead. Once moving on to at least Clang 13
- * as the minimum supported version instead the lambda commented out below can be used
- * instead.
- */
-//template<class E>
-//concept error_type = requires(E type) {
-//    // IIFE that ensures E is a specialization of AbstractError
-//    []<StringLiteral Y, quint16 Z>(AbstractError<Y, Z>&){}(type);
-//};
+template<class E>
+concept error_type = requires(E type) {
+   // IIFE that ensures E is a specialization of AbstractError
+   []<CStringLiteral Y, quint16 Z>(AbstractError<Y, Z>&){}(type);
+};
 
 /* Define error type registrar variable. This must be done out of line to ensure that only
  * one instance of the variable exists per-error-type across an entire program. If the variable
- * is defined inline, multiple versiosn of it can exist in parallel when linking via shared-libraries,
+ * is defined inline, multiple versions of it can exist in parallel when linking via shared-libraries,
  * if those libraries are used by multiple targets in the same project. This would cause an error type
  * to call registerType() multiple times.
  */
-template<StringLiteral EName, quint16 ECode>
-const bool AbstractError<EName, ECode>::REGISTER = registerType(TYPE_CODE, TYPE_NAME);
-
 /*! @cond */
-namespace AbstractErrorPrivate
-{
-    template<Qx::StringLiteral Y, quint16 Z>
-    void aeDerived(Qx::AbstractError<Y, Z>&);
-}
+template<CStringLiteral EName, quint16 ECode>
+const bool AbstractError<EName, ECode>::REGISTER = registerType(TYPE_CODE, TYPE_NAME);
 /*! @endcond */
-
-template<class E>
-concept error_type = requires(E type) {
-    AbstractErrorPrivate::aeDerived(type);
-};
 
 template<class A>
 concept error_adapter =

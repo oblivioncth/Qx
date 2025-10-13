@@ -1,0 +1,93 @@
+/*!
+ *  @file qx-sqlconcepts.h
+ *  @ingroup qx-sql
+ *
+ *  @brief The qx-sqlconcepts header file provides a set of concepts that are specific to the
+ *  Qx SQL module.
+ */
+
+namespace QxSql
+{
+/*!
+ *  @concept sql_struct_inside
+ *  @brief Specifies that a type is a SQL-tied struct registered with QX_SQL_STRUCT().
+ *
+ *  Satisfied if @a T has been properly registered with the above macro.
+ */
+
+/*!
+ *  @concept sql_struct_outside
+ *  @brief Specifies that a type is a SQL-tied struct registered with QX_SQL_STRUCT_OUTSIDE().
+ *
+ *  Satisfied if @a T has been properly registered with the above macro.
+ */
+
+/*!
+ *  @concept sql_struct
+ *  @brief Specifies that a type is a SQL-tied struct.
+ *
+ *  Satisfied if @a T has been properly registered with QX_SQL_STRUCT() or QX_SQL_STRUCT_OUTSIDE().
+ */
+
+/*!
+ *  @concept sql_convertible
+ *  @brief Specifies that a type is generally convertible to/from SQL.
+ *
+ *  Satisfied if a Converter specialization exists for @a T that includes functions with the signatures:
+ *  - `static Qx::SqlError fromSql(T& value, const QVariant vValue)`
+ *  - `static QVariant toSql(const T& value)`
+ */
+
+/*!
+ *  @concept sql_override_convertible
+ *  @brief Specifies that a type has override conversions for changing to/from SQL.
+ *
+ *  Satisfied if QX_SQL_MEMBER_OVERRIDE() has been used to add functions to a SQL-tied struct with the
+ *  signatures:
+ *  - `static Qx::SqlError fromSql(T& member, const QVariant& vValue)`
+ *  - `static QVaroamt toSql(const T& member)`
+ */
+
+/*!
+ *  @concept sql_keyable
+ *  @brief Specifies that a type has a known method for creating a corresponding key.
+ *
+ *  Satisfied if a keygen() specialization exists for @a Key and @a Value that creates a key from
+ *  an instance of Value.
+ */
+
+/*!
+ *  @concept sql_collective
+ *  @brief Specifies that a type is a non-associative container, the value type of which is convertible
+ *  to/from SQL.
+ *
+ *  Satisfied if @a T satisfies Qx::qcollective and T::value_type satisfies sql_convertible.
+ */
+
+/*!
+ *  @concept sql_associative
+ *  @brief Specifies that a type is an associative container, the value type of which is convertible,
+ *  to/from SQL, and for which a key/value type specializaton of keygen() exists.
+ *
+ *  Satisfied if @a T satisfies Qx::qassociative, T::mapped_type satisfies sql_convertible, and
+ *  T::key_type + T::mapped_type satisfy sql_keyable.
+ */
+
+ /*!
+ *  @concept sql_containing
+ *  @brief Specifies that a type is a container, and abides by the other corresponding restrictions
+ *  for that kind of a container.
+ *
+ *  Satisfied if @a T satisfies sql_collective or sql_associative.
+ */
+
+/*!
+ *  @concept sql_optional
+ *  @brief Specifies that a type is a specialization of std::optional that manages values of a SQL
+ *  convertible type.
+ *
+ *  Satisfied if @a T satisfies Qx::specialize (for std::optional) and T::value_type satisfies
+ *  sql_convertible.
+ */
+
+}

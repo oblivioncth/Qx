@@ -17,10 +17,6 @@ namespace Qx
 
 class QX_IO_EXPORT TextStreamWriter
 {
-//-Class Variables------------------------------------------------------------------------------------------------
-private:
-    static inline const IoOpReport NULL_FILE_REPORT = IoOpReport(IO_OP_WRITE, IO_ERR_NULL, static_cast<QFile*>(nullptr));
-
 //-Instance Variables------------------------------------------------------------------------------------------------
 private:
     QFile* mFile;
