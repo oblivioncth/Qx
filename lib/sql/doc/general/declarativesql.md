@@ -54,6 +54,10 @@ int main()
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This system is accessed through the Qx SQL module, predominantly with QX_SQL_STRUCT() et al.
+This system is accessed through the Qx SQL module, predominantly with QX_SQL_STRUCT() et al from qx-sqlquery.h, along with qx-sqlstring.h and qx-sqlinlines.h.
+
+Database access in general is also simplified thanks to Qx::SqlDatabase.
+
+The system still has a ways to go, but is already quite useful for a variety of basic-to-intermediate tasks.
 
 TODO: Make this more complete.
