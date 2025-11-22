@@ -56,14 +56,18 @@ void appendKeywordParen(QString& str, const QString& word, const R& range)
     /* The boxing here is inefficient, but I'm not sure how to improve the situation since
      * we rely on the SqlString ctor to reliably get a string from value_type.
      */
-    QString rStr = u"'"_s;
+
+    /* NOTE: With current implementation it is up to the caller to ensure that the elements
+     * in 'range' end up quoted as required (or of a type that automatically quotes them
+     * during construction).
+     */
+    QString rStr;
     for(auto n = std::size(range); const auto& value : range)
     {
         rStr += __private::qstring_compat(value);
         if(n-- != 1)
-            rStr += u"','"_s;
+            rStr += u","_s;
     }
-    rStr += u"'"_s;
 
     appendKeywordParen(str, word, rStr);
 }
