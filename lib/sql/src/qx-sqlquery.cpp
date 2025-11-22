@@ -131,7 +131,7 @@
 /*!
  *  @def QX_SQL_MEMBER_OVERRIDE()
  *
- *  Used to define a member/field specific value parsing/serialzing override for a
+ *  Used to define a member/field specific value parsing/serializing override for a
  *  SQL-tried struct. The specified member will be processed using the provided
  *  functions instead of potentially available generic ones for that type.
  *
@@ -289,7 +289,7 @@ void SqlQuery::bindValue(const QString& placeholder, const QVariant& val) { mBin
 /*!
  *  @fn Derived& AbstractSqlQuery::IN(const R& range)
  *
- *  Adds an `IN` clause to the query using all of the elments from @a range.
+ *  Adds an `IN` clause to the query using all of the elements from @a range.
  *
  *  If @a range is empty, the SQL statement will be ill-formed.
  */

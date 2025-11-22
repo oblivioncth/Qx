@@ -56,14 +56,29 @@ void appendKeywordParen(QString& str, const QString& word, const R& range)
     /* The boxing here is inefficient, but I'm not sure how to improve the situation since
      * we rely on the SqlString ctor to reliably get a string from value_type.
      */
-    QString rStr = u"'"_s;
+
+    /* TODO: This is a bit of a hack. We manually quote when the contained type of R is QString
+     * based. This works, but there is an arugment to be made that the caller should be responsible
+     * for ensuring that everything is quoted as required (or is a type that auto quotes) ahead of
+     * time, and this may on occasion cause accidental double quoting.
+     */
+    constexpr bool quote = std::constructible_from<QString, Qx::unwrap<R>>;
+    QString rStr;
+    if constexpr(quote)
+        rStr += u"'"_s;
     for(auto n = std::size(range); const auto& value : range)
     {
         rStr += __private::qstring_compat(value);
         if(n-- != 1)
-            rStr += u"','"_s;
+        {
+            if constexpr(quote)
+                rStr += u"','"_s;
+            else
+                rStr += u","_s;
+        }
     }
-    rStr += u"'"_s;
+    if constexpr(quote)
+        rStr += u"'"_s;
 
     appendKeywordParen(str, word, rStr);
 }
