@@ -62,7 +62,7 @@ void appendKeywordParen(QString& str, const QString& word, const R& range)
      * for ensuring that everything is quoted as required (or is a type that auto quotes) ahead of
      * time, and this may on occasion cause accidental double quoting.
      */
-    constexpr bool quote = std::constructible_from<QString, Qx::unwrap<R>>;
+    constexpr bool quote = std::constructible_from<QString, Qx::unwrap_t<R>>;
     QString rStr;
     if constexpr(quote)
         rStr += u"'"_s;
