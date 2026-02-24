@@ -191,6 +191,21 @@ bool SqlString::isEmpty() const { return mStr.isEmpty(); }
  *
  *  @fn SqlString operator>=(const SqlString& a, const SqlString& b)
  *  Returns a string of "a >= b".
+ *
+ *  @fn SqlString operator+(const SqlString& a, const SqlString& b)
+ *  Returns a string of "a + b".
+ *
+ *  @fn SqlString operator-(const SqlString& a, const SqlString& b)
+ *  Returns a string of "a - b".
+ *
+ *  @fn SqlString operator*(const SqlString& a, const SqlString& b)
+ *  Returns a string of "a * b".
+ *
+ *  @fn SqlString operator/(const SqlString& a, const SqlString& b)
+ *  Returns a string of "a / b".
+ *
+ *  @fn SqlString operator^=(const SqlString& a, const SqlString& b)
+ *  Returns a string of "a = b".
  */
 
 /*!
