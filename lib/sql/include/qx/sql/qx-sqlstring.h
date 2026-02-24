@@ -38,14 +38,19 @@ class QX_SQL_EXPORT SqlString
     friend SqlString QxSql::operator""_sqi(const char16_t* str, size_t size) noexcept;
     friend SqlString QxSql::operator""_sqs(const char16_t* str, size_t size) noexcept;
     friend SqlString operator!(const SqlString& s);
-    friend SqlString operator&&(const SqlString& lhs, const SqlString& rhs);
-    friend SqlString operator||(const SqlString& lhs, const SqlString& rhs);
-    friend SqlString operator==(const SqlString& lhs, const SqlString& rhs);
-    friend SqlString operator!=(const SqlString& lhs, const SqlString& rhs);
-    friend SqlString operator<(const SqlString& lhs, const SqlString& rhs);
-    friend SqlString operator<=(const SqlString& lhs, const SqlString& rhs);
-    friend SqlString operator>(const SqlString& lhs, const SqlString& rhs);
-    friend SqlString operator>=(const SqlString& lhs, const SqlString& rhs);
+    friend SqlString operator&&(const SqlString& a, const SqlString& b);
+    friend SqlString operator||(const SqlString& a, const SqlString& b);
+    friend SqlString operator==(const SqlString& a, const SqlString& b);
+    friend SqlString operator!=(const SqlString& a, const SqlString& b);
+    friend SqlString operator<(const SqlString& a, const SqlString& b);
+    friend SqlString operator<=(const SqlString& a, const SqlString& b);
+    friend SqlString operator>(const SqlString& a, const SqlString& b);
+    friend SqlString operator>=(const SqlString& a, const SqlString& b);
+    friend SqlString operator+(const SqlString& a, const SqlString& b);
+    friend SqlString operator-(const SqlString& a, const SqlString& b);
+    friend SqlString operator*(const SqlString& a, const SqlString& b);
+    friend SqlString operator/(const SqlString& a, const SqlString& b);
+    friend SqlString operator^=(const SqlString& a, const SqlString& b);
     friend SqlString operator==(const SqlString& a, const SqlQuery& b);
     friend SqlString operator!=(const SqlString& a, const SqlQuery& b);
     friend SqlString operator<(const SqlString& a, const SqlQuery& b);
@@ -111,6 +116,12 @@ inline SqlString operator<(const SqlString& a, const SqlString& b) { return SqlS
 inline SqlString operator<=(const SqlString& a, const SqlString& b) { return SqlString(a.mStr + u" <= "_s + b.mStr); }
 inline SqlString operator>(const SqlString& a, const SqlString& b) { return SqlString(a.mStr + u" > "_s + b.mStr); }
 inline SqlString operator>=(const SqlString& a, const SqlString& b) { return SqlString(a.mStr + u" >= "_s + b.mStr); }
+inline SqlString operator+(const SqlString& a, const SqlString& b) { return SqlString(a.mStr + u" + "_s + b.mStr); }
+inline SqlString operator-(const SqlString& a, const SqlString& b) { return SqlString(a.mStr + u" - "_s + b.mStr); }
+inline SqlString operator*(const SqlString& a, const SqlString& b) { return SqlString(a.mStr + u" * "_s + b.mStr); }
+inline SqlString operator/(const SqlString& a, const SqlString& b) { return SqlString(a.mStr + u" / "_s + b.mStr); }
+// Sub for = since we cannot override operator=() sensibly
+inline SqlString operator^=(const SqlString& a, const SqlString& b) { return SqlString(a.mStr + u" = "_s + b.mStr); }
 
 // Sub-query
 SqlString operator==(const SqlString& s, const SqlQuery& q);
@@ -120,6 +131,7 @@ SqlString operator<=(const SqlString& s, const SqlQuery& q);
 SqlString operator>(const SqlString& s, const SqlQuery& q);
 SqlString operator>=(const SqlString& s, const SqlQuery& q);
 
+// TODO: To minimize confusion we may want to get rid of these and make them methods, though the user would differ
 // Special (use of assignment operators for non-assignment here is because many operators are already used in SQL)
 // Concat (with space): Chosen cause + is taken and separating words with just a space is generally only use for
 // shorthand aliases and "or equal" kind of matches saying "this is an alias", like "otherwise known as"
