@@ -85,7 +85,8 @@ The `ninja` generator is recommended.
 
  - `QX_DOCS` - Set to `ON` in order to generate the documentation target (OFF)
  - `QX_COMPONENTS` - Set to a semicolon/whitespace delimited list of components to limit configuration to those components only ([all-components])
- - `QX_TESTS` = Set to `ON` in order to generate the test targets (OFF)
+ - `QX_TESTS` - Set to `ON` in order to generate the test targets (OFF)
+ - `QX_INSTALL_MISC` - Set to `ON` to enable installation of misc components (e.g. README.md/LICENSE) (ON)
  - `BUILD_SHARED_LIBS` - Build Qx as a shared libraries instead of a static ones (OFF)
 
 ### CMake Targets:
@@ -97,8 +98,9 @@ The `ninja` generator is recommended.
  - `qx_tst_...` - Builds the various test targets. To actually run tests, just build the general CMake tests target `test`.
 
 ### CMake Install Components:
-- `qx` - Installs top-level files (README.md, CMake package configuration files, etc.)
+- `qx` - Installs top-level files (CMake package configuration files, etc.)
 - `qx_docs` - Installs the Qx documentation
+- `qx_misc` - Installs miscellaneous files (e.g. README.md/LICENSE)
 - `qx_<lowercase_component_name>` - Installs a specific Qx component
 
 If Qx is configured as a sub-project, its install components are automatically removed from the `all` component, as to not pollute the install directory of the top-level project.

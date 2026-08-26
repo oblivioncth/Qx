@@ -15,6 +15,7 @@ if(NOT DEFINED __@PROJECT_NAMESPACE_UC@_@COMPONENT_NAME_UC@)
     # Qt dependencies (inserted when this file was configured)
     set(__@PROJECT_NAMESPACE_UC@_@COMPONENT_NAME_UC@_QT_DEPENDS @COMPONENT_DEPENDS_QT@)
     if(__@PROJECT_NAMESPACE_UC@_@COMPONENT_NAME_UC@_QT_DEPENDS)
+        include(CMakeFindDependencyMacro)
         find_dependency(Qt6 COMPONENTS ${__@PROJECT_NAMESPACE_UC@_@COMPONENT_NAME_UC@_QT_DEPENDS})
     endif()
 
