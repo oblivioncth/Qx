@@ -15,7 +15,7 @@ project(Qx
 
 # Get helper scripts
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FetchOBCMake.cmake)
-fetch_ob_cmake("v0.4.0.2")
+fetch_ob_cmake("dev")
 
 # Initialize project according to standard rules
 include(OB/Project)
@@ -131,6 +131,7 @@ if(QX_TESTS)
 endif()
 
 #================= Top Level Install =======================
+
 if(QX_INSTALL_MISC)
     ob_standard_project_misc_install()
 endif()
