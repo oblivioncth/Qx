@@ -8,14 +8,14 @@ cmake_minimum_required(VERSION 3.23.0...3.31.0)
 # avoided and only used for hotfixes. DON'T USE TRAILING
 # ZEROS IN VERSIONS
 project(Qx
-    VERSION 0.7.0.4
+    VERSION 0.7.1
     LANGUAGES CXX
     DESCRIPTION "Qt Extensions Library"
 )
 
 # Get helper scripts
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FetchOBCMake.cmake)
-fetch_ob_cmake("v0.3.12")
+fetch_ob_cmake("dev")
 
 # Initialize project according to standard rules
 include(OB/Project)
@@ -61,6 +61,7 @@ message(STATUS "Available Qx components: ${AVAILABLE_COMPONENTS}")
 set(QX_COMPONENTS "${AVAILABLE_COMPONENTS}" CACHE STRING "Qx components to configure")
 option(QX_DOCS "Build Qx documentation." OFF)
 option(QX_TESTS "Build the Qx tests." OFF)
+option(QX_INSTALL_MISC "Enable installation of misc components (e.g README.md/LICENSE)" ON)
 option(BUILD_SHARED_LIBS "Build shared libraries." OFF) # Redundant due to OB, but explicit
 
 # Confirm user component choices are valid and normalize casing
@@ -131,7 +132,9 @@ endif()
 
 #================= Top Level Install =======================
 
-ob_standard_project_misc_install()
+if(QX_INSTALL_MISC)
+    ob_standard_project_misc_install()
+endif()
 
 #====================== Package ==============================
 
