@@ -48,12 +48,7 @@ namespace Qx
  */
 size_t qHash(const DownloadTask& key, size_t seed) noexcept
 {
-    QtPrivate::QHashCombine hash;
-    seed = hash(seed, key.target);
-    seed = hash(seed, key.dest);
-    seed = hash(seed, key.checksum);
-
-    return seed;
+    return qHashMulti(seed, key.target, key.dest, key.checksum);
 }
 
 }
