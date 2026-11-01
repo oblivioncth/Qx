@@ -62,7 +62,7 @@ FreeIndexTracker::FreeIndexTracker(quint64 min, quint64 max, QSet<quint64> reser
     mReserved.resize(sz);
 
     // Set initial reservations
-    for(quint64 idx : reserved)
+    for(quint64 idx : std::as_const(reserved))
         mReserved[internalIdx(idx)] = true;
 
     mFree = sz - reserved.size();
