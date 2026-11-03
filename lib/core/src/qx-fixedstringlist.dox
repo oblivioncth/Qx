@@ -1,0 +1,265 @@
+namespace Qx
+{
+//===============================================================================================================
+// FixedStringList
+//===============================================================================================================
+
+/*!
+ *  @class FixedStringList qx/core/qx-fixedstringlist.h
+ *  @ingroup qx-core
+ *
+ *  @brief The FixedStringList template class is a FixedList with a few added convenience functions for
+ *  handling lists of string views (i.e. the FixedList equivalent of QStringList).
+ *
+ *  The element type must be either @c QStringView or @c QLatin1StringView. As with any other view,
+ *  the underlying strings are not owned by the list, so they must outlive it. This is naturally the case
+ *  for string literals, which is the primary use-case for this class.
+ *
+ *  All of FixedList's functionality also applies to FixedStringList. For example you can use functions
+ *  like isEmpty(), at(), and size() to inspect the list.
+ *
+ *  Both the view type and the size can be deduced from the type of literal used to construct the list;
+ *  char16_t literals (and QString or QStringView) will result in a QStringView list, while char literals
+ *  (and QLatin1StringView) will result in a QLatin1StringView list. The StringViewList and
+ *  Latin1StringViewList aliases can be used to make the type explicit while still having the size deduced.
+ *
+ *  @code
+ *  Qx::FixedStringList fsl1{u"one", u"two", u"three"}; // FixedStringList<QStringView, 3>
+ *  Qx::FixedStringList fsl2{"one", "two"}; // FixedStringList<QLatin1StringView, 2>
+ *  Qx::StringViewList fsl3{u"one", u"two"}; // FixedStringList<QStringView, 2>
+ *  Qx::Latin1StringViewList fsl4{"one", "two"}; // FixedStringList<QLatin1StringView, 2>
+ *  Qx::StringViewList<2> fsl5{{u"one", u"two"}};
+ *
+ *  QString str = fsl1.join(u", "); // "one, two, three"
+ *  @endcode
+ *
+ *  @sa FixedList, StringViewList, Latin1StringViewList
+ */
+
+//-Constructor-------------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn FixedStringList::FixedStringList()
+ *
+ *  Constructs an empty FixedStringList.
+ */
+
+/*!
+ *  @fn FixedStringList::FixedStringList(const ViewT (&arr)[M])
+ *
+ *  Constructs a list that contains copies of the views in the C array @a arr.
+ *
+ *  Requires that @c M is equal to @c N.
+ */
+
+/*!
+ *  @fn FixedStringList::FixedStringList(A&& arr)
+ *
+ *  Constructs a list that contains the views in the @c std::array @a arr.
+ *
+ *  Requires that @c A is a (possibly cv-qualified/reference) <tt>std::array<ViewT, N></tt>.
+ */
+
+/*!
+ *  @fn FixedStringList::FixedStringList(B&& base)
+ *
+ *  Constructs a list from the FixedList @a base, which allows the result of a FixedList operation to be
+ *  used as a FixedStringList.
+ *
+ *  Requires that @c B is a (possibly cv-qualified/reference) <tt>FixedList<ViewT, N></tt>.
+ */
+
+/*!
+ *  @fn FixedStringList::FixedStringList(Args&&... args)
+ *
+ *  Constructs a list from @a args, each of which must be usable to construct a @c ViewT, such as a string
+ *  literal.
+ *
+ *  Requires that the number of arguments is equal to @c N, and that @c N is greater than zero.
+ */
+
+//-Instance Functions----------------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn bool FixedStringList::contains(QStringView str, Qt::CaseSensitivity cs) const
+ *
+ *  Returns @c true if the list contains the string @a str; otherwise, returns @c false.
+ *
+ *  The search is case insensitive if @a cs is Qt::CaseInsensitive; the search is case sensitive by default.
+ *
+ *  @sa indexOf(), lastIndexOf()
+ */
+
+/*!
+ *  @fn bool FixedStringList::contains(QLatin1StringView str, Qt::CaseSensitivity cs) const
+ *
+ *  @overload
+ *
+ *  Returns @c true if the list contains the Latin-1 string viewed by @a str; otherwise, returns @c false.
+ */
+
+/*!
+ *  @fn qsizetype FixedStringList::indexOf(QStringView str, qsizetype from, Qt::CaseSensitivity cs) const
+ *
+ *  Returns the index position of the first occurrence of the string @a str in the list, searching forward
+ *  from index position @a from. Returns -1 if no item matched.
+ *
+ *  If @a from is negative, it is interpreted as an offset from the end of the list (i.e. -1 starts the
+ *  search at the last item).
+ *
+ *  The search is case insensitive if @a cs is Qt::CaseInsensitive; the search is case sensitive by default.
+ *
+ *  @sa lastIndexOf(), contains()
+ */
+
+/*!
+ *  @fn qsizetype FixedStringList::indexOf(QLatin1StringView str, qsizetype from, Qt::CaseSensitivity cs) const
+ *
+ *  @overload
+ *
+ *  Returns the index position of the first occurrence of the Latin-1 string viewed by @a str.
+ */
+
+/*!
+ *  @fn qsizetype FixedStringList::lastIndexOf(QStringView str, qsizetype from, Qt::CaseSensitivity cs) const
+ *
+ *  Returns the index position of the last occurrence of the string @a str in the list, searching backward
+ *  from index position @a from. Returns -1 if no item matched.
+ *
+ *  If @a from is negative, it is interpreted as an offset from the end of the list (i.e. -1, the default,
+ *  starts the search at the last item). If @a from is greater than or equal to the size of the list, the
+ *  search starts at the last item.
+ *
+ *  The search is case insensitive if @a cs is Qt::CaseInsensitive; the search is case sensitive by default.
+ *
+ *  @sa indexOf(), contains()
+ */
+
+/*!
+ *  @fn qsizetype FixedStringList::lastIndexOf(QLatin1StringView str, qsizetype from, Qt::CaseSensitivity cs) const
+ *
+ *  @overload
+ *
+ *  Returns the index position of the last occurrence of the Latin-1 string viewed by @a str.
+ */
+
+/*!
+ *  @fn QString FixedStringList::join(QStringView separator) const
+ *
+ *  Joins all the strings in the list into a single string with each element separated by the given
+ *  @a separator (which can be an empty string).
+ *
+ *  If the list is empty, an empty string is returned.
+ *
+ *  @sa toStringList()
+ */
+
+/*!
+ *  @fn QString FixedStringList::join(QLatin1StringView separator) const
+ *
+ *  @overload
+ */
+
+/*!
+ *  @fn QString FixedStringList::join(QChar separator) const
+ *
+ *  @overload
+ */
+
+/*!
+ *  @fn QStringList FixedStringList::toStringList() const
+ *
+ *  Returns a QStringList that contains a QString copy of each of the strings in the list.
+ *
+ *  @sa join(), FixedList::toList()
+ */
+
+/*!
+ *  @fn auto FixedStringList::first() const
+ *
+ *  Returns a FixedStringList<ViewT, K> that contains copies of the first @c K views in this list.
+ *
+ *  @c K must be non-negative and no greater than @c N.
+ *
+ *  @sa FixedList::first()
+ */
+
+/*!
+ *  @fn auto FixedStringList::last() const
+ *
+ *  Returns a FixedStringList<ViewT, K> that contains copies of the last @c K views in this list.
+ *
+ *  @c K must be non-negative and no greater than @c N.
+ *
+ *  @sa FixedList::last()
+ */
+
+/*!
+ *  @fn auto FixedStringList::chopped() const
+ *
+ *  Returns a FixedStringList<ViewT, N - K> that contains copies of all but the last @c K views in this list.
+ *
+ *  @c K must be non-negative and no greater than @c N.
+ *
+ *  @sa FixedList::chopped()
+ */
+
+/*!
+ *  @fn auto FixedStringList::mid() const
+ *
+ *  Returns a FixedStringList that contains copies of up to @c Len views in this list, starting at index
+ *  position @c Pos.
+ *
+ *  The size of the result and the requirements of the parameters are the same as FixedList::mid().
+ *
+ *  @sa FixedList::mid()
+ */
+
+/*!
+ *  @fn FixedStringList<ViewT, N + M> FixedStringList::operator+(const FixedStringList<ViewT, M>& other) const
+ *
+ *  Returns a FixedStringList of size @c N + @c M that contains all the views in this list followed by all the
+ *  views in @a other.
+ */
+
+/*!
+ *  @fn FixedStringList<ViewT, N + M> FixedStringList::operator+(const ViewT (&other)[M]) const
+ *
+ *  @overload
+ *
+ *  Returns a FixedStringList of size @c N + @c M that contains all the views in this list followed by all the
+ *  views in the C array @a other.
+ */
+
+/*!
+ *  @fn FixedStringList<ViewT, N + 1> FixedStringList::operator+(L&& other) const
+ *
+ *  @overload
+ *
+ *  Returns a FixedStringList of size @c N + 1 that contains all the views in this list followed by
+ *  a @c ViewT constructed from @a other, which can be anything that a @c ViewT can be constructed from
+ *  (i.e. a string literal).
+ */
+
+//===============================================================================================================
+// <file>
+//===============================================================================================================
+
+/*!
+ *  @typedef StringViewList
+ *  @ingroup qx-core
+ *
+ *  Alias for a FixedStringList that uses @c QStringView as its view type, with a size of @c N.
+ *
+ *  The size can be deduced when constructing from char16_t literals.
+ */
+
+/*!
+ *  @typedef Latin1StringViewList
+ *  @ingroup qx-core
+ *
+ *  Alias for a FixedStringList that uses @c QLatin1StringView as its view type, with a size of @c N.
+ *
+ *  The size can be deduced when constructing from char literals.
+ */
+}

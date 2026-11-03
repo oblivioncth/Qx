@@ -15,6 +15,7 @@ qx_add_component("Core"
         qx-error.h
         qx-exclusiveaccess.h
         qx-fixedlist.h
+        qx-fixedstringlist.h
         qx-flatmultiset.h
         qx-freeindextracker.h
         qx-genericerror.h
@@ -96,6 +97,7 @@ qx_add_component("Core"
         qx-bytearray.dox
         qx-exclusiveaccess.dox
         qx-fixedlist.dox
+        qx-fixedstringlist.dox
         qx-flatmultiset.dox
         qx-index.dox
         qx-iostream.dox
