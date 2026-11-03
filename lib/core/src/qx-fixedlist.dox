@@ -1,0 +1,723 @@
+namespace Qx
+{
+//===============================================================================================================
+// FixedList
+//===============================================================================================================
+
+/*!
+ *  @class FixedList qx/core/qx-fixedlist.h
+ *  @ingroup qx-core
+ *
+ *  @brief The FixedList template class is a compile-time friendly fixed size container that wraps
+ *  @c std::array, but provides an API that better matches Qt's sequential containers (e.g. QList).
+ *
+ *  The underlying iterators are those of @c std::array, so a FixedList can be used with all of the standard
+ *  algorithms (i.e. @c std::sort(), @c std::ranges::reverse(), etc.), many of which are usable in constant
+ *  expressions.
+ *
+ *  Both the element type and size can be deduced when constructing from a C array or from a series of
+ *  elements:.
+ *
+ *  @code
+ *  Qx::FixedList fl1{{3, 6, 10}}; // FixedList<int, 3>
+ *  Qx::FixedList fl2{3, 6, 10}; // FixedList<int, 3>
+ *  Qx::FixedList<int, 3> fl3{{3, 6, 10}};
+ *  auto fl4 = Qx::makeFixedList<double>({3, 6, 10}); // FixedList<double, 3>
+ *
+ *  auto fl5 = fl1 + fl3.sliced<1, 2>(); // FixedList<int, 5>
+ *  @endcode
+ *
+ *  @note It isn't possible to specify only the element type and have the size be deduced when constructing
+ *  with CTAD (i.e. @c FixedList<int>{{1,2,3}}). Use makeFixedList() if you wish to explicitly specify the
+ *  element type but still have the size deduced.
+ *
+ *  A FixedList can also be used with structured bindings.
+ *
+ *  @code
+ *  Qx::FixedList fl{3, 6, 10};
+ *  auto [a, b, c] = fl;
+ *  @endcode
+ *
+ *  @sa makeFixedList()
+ */
+
+//-Aliases---------------------------------------------------------------------------------------------------
+//Public:
+/*!
+ * @typedef FixedList::value_type
+ *
+ *  The type of the items stored in the list (@c T).
+ */
+
+/*!
+ * @typedef FixedList::pointer
+ *
+ *  A pointer to an item in the list (@c T*).
+ */
+
+/*!
+ * @typedef FixedList::const_pointer
+ *
+ *  A pointer to a constant item in the list (<tt>const T*</tt>).
+ */
+
+/*!
+ * @typedef FixedList::reference
+ *
+ *  A reference to an item in the list (@c T&).
+ */
+
+/*!
+ * @typedef FixedList::const_reference
+ *
+ *  A reference to a constant item in the list (<tt>const T&</tt>).
+ */
+
+/*!
+ * @typedef FixedList::size_type
+ *
+ *  The type used for sizes and counts (@c qsizetype).
+ */
+
+/*!
+ * @typedef FixedList::difference_type
+ *
+ *  The type used for the difference between positions in the list (@c qsizetype).
+ */
+
+/*!
+ * @typedef FixedList::parameter_type
+ *
+ *  The type used when passing an item to a function (<tt>const T&</tt>).
+ */
+
+/*!
+ * @typedef FixedList::iterator
+ *
+ *  The type of the non-const STL-style iterators. This is the same as the iterator type of the
+ *  underlying @c std::array.
+ *
+ *  @sa begin(), end()
+ */
+
+/*!
+ * @typedef FixedList::const_iterator
+ *
+ *  The type of the const STL-style iterators. This is the same as the const iterator type of the
+ *  underlying @c std::array.
+ *
+ *  @sa cbegin(), cend()
+ */
+
+/*!
+ * @typedef FixedList::reverse_iterator
+ *
+ *  The type of the non-const STL-style reverse iterators.
+ *
+ *  @sa rbegin(), rend()
+ */
+
+/*!
+ * @typedef FixedList::const_reverse_iterator
+ *
+ *  The type of the const STL-style reverse iterators.
+ *
+ *  @sa crbegin(), crend()
+ */
+
+/*!
+ * @typedef FixedList::Iterator
+ *
+ *  Qt-style synonym for FixedList::iterator.
+ */
+
+/*!
+ * @typedef FixedList::ConstIterator
+ *
+ *  Qt-style synonym for FixedList::const_iterator.
+ */
+
+//-Class Variables----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ * @typedef FixedList::size_v
+ *
+ *  The number of items in the list.
+ *
+ *  For ease of use in some contexts at compile-time.
+ */
+
+//-Constructor-------------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn FixedList::FixedList()
+ *
+ *  Constructs an empty list.
+ */
+
+/*!
+ *  @fn FixedList::FixedList(const T (&arr)[M])
+ *
+ *  Constructs a list that contains copies of the items in the C array @a arr.
+ *
+ *  Requires that @c M is equal to @c N.
+ */
+
+/*!
+ *  @fn FixedList::FixedList(A&& arr)
+ *
+ *  Constructs a list that contains the items in the @c std::array @a arr, which are copied or moved
+ *  depending on the value category of @a arr.
+ *
+ *  Requires that @c A is a (possibly cv-qualified/reference) <tt>std::array<T, N></tt>.
+ */
+
+/*!
+ *  @fn template<typename... Args> FixedList::FixedList(Args&&... args)
+ *
+ *  Constructs a list from the items in @a args, each of which must be convertible to @c T.
+ *
+ *  Requires that the number of arguments is equal to @c N, and that @c N is greater than zero. This
+ *  constructor is @c explicit if @c N is 1.
+ */
+
+//-Instance Functions----------------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn qsizetype FixedList::size()
+ *
+ *  Returns the number of items in the list.
+ *
+ *  This is the same as size_v, count() and length().
+ *
+ *  @sa isEmpty()
+ */
+
+/*!
+ *  @fn qsizetype FixedList::count()
+ *
+ *  @copydoc FixedList::size()
+ *
+ *  @sa count(const AT&)
+ */
+
+/*!
+ *  @fn qsizetype FixedList::length()
+ *
+ *  @copydoc FixedList::size()
+ */
+
+/*!
+ *  @fn bool FixedList::isEmpty()
+ *
+ *  Returns @c true if the list has a size of 0; otherwise, returns @c false.
+ *
+ *  @sa size()
+ */
+
+/*!
+ *  @fn bool FixedList::empty()
+ *
+ *  This function is provided for STL compatibility. It is equivalent to isEmpty().
+ */
+
+/*!
+ *  @fn pointer FixedList::data()
+ *
+ *  Returns a pointer to the data stored in the list. The pointer can be used to access and modify the
+ *  items in the list.
+ *
+ *  The pointer remains valid for as long as the list exists.
+ *
+ *  @sa constData(), operator[]()
+ */
+
+/*!
+ *  @fn const_pointer FixedList::data() const
+ *
+ *  @overload
+ */
+
+/*!
+ *  @fn const_pointer FixedList::constData() const
+ *
+ *  Returns a const pointer to the data stored in the list.
+ *
+ *  @sa data()
+ */
+
+/*!
+ *  @fn std::array<T, N>& FixedList::stdArray()
+ *
+ *  Returns a reference to the underlying @c std::array.
+ *
+ *  @sa toStdArray()
+ */
+
+/*!
+ *  @fn const std::array<T, N>& FixedList::stdArray() const
+ *
+ *  @overload
+ */
+
+/*!
+ *  @fn std::array<T, N> FixedList::toStdArray() const
+ *
+ *  Returns a copy of the underlying @c std::array.
+ *
+ *  @sa stdArray()
+ */
+
+/*!
+ *  @fn QList<T> FixedList::toList() const
+ *
+ *  Returns a QList that contains copies of the items in this list.
+ */
+
+/*!
+ *  @fn reference FixedList::operator[](qsizetype i)
+ *
+ *  Returns the item at index position @a i as a modifiable reference.
+ *
+ *  @a i must be a valid index position in the list (i.e., 0 <= @a i < size()).
+ *
+ *  @sa at(), value()
+ */
+
+/*!
+ *  @fn const_reference FixedList::operator[](qsizetype i) const
+ *
+ *  @overload
+ */
+
+/*!
+ *  @fn reference FixedList::at(qsizetype i)
+ *
+ *  Returns the item at index position @a i as a modifiable reference.
+ *
+ *  @a i must be a valid index position in the list (i.e., 0 <= @a i < size()).
+ *
+ *  @sa value(), operator[]()
+ */
+
+/*!
+ *  @fn const_reference FixedList::at(qsizetype i) const
+ *
+ *  @overload
+ */
+
+/*!
+ *  @fn T FixedList::value(qsizetype i) const
+ *
+ *  Returns the item at index position @a i in the list. If @a i is out of bounds, the function returns
+ *  a default-constructed value.
+ *
+ *  Requires @c T to be default-initializable.
+ *
+ *  @sa at(), operator[]()
+ */
+
+/*!
+ *  @fn T FixedList::value(qsizetype i, const AT& defaultValue) const
+ *
+ *  @overload
+ *
+ *  If @a i is out of bounds, the function returns @a defaultValue converted to @c T.
+ */
+
+/*!
+ *  @fn reference FixedList::first()
+ *
+ *  Returns a reference to the first item in the list.
+ *
+ *  Requires the list to not be empty.
+ *
+ *  @sa constFirst(), last(), isEmpty()
+ */
+
+/*!
+ *  @fn const_reference FixedList::first() const
+ *
+ *  @overload
+ */
+
+/*!
+ *  @fn const_reference FixedList::constFirst() const
+ *
+ *  Returns a const reference to the first item in the list.
+ *
+ *  Requires the list to not be empty.
+ *
+ *  @sa first(), constLast(), isEmpty()
+ */
+
+/*!
+ *  @fn reference FixedList::front()
+ *
+ *  This function is provided for STL compatibility. It is equivalent to first().
+ */
+
+/*!
+ *  @fn const_reference FixedList::front() const
+ *
+ *  @overload
+ */
+
+/*!
+ *  @fn reference FixedList::last()
+ *
+ *  Returns a reference to the last item in the list.
+ *
+ *  Requires the list to not be empty.
+ *
+ *  @sa constLast(), first(), isEmpty()
+ */
+
+/*!
+ *  @fn const_reference FixedList::last() const
+ *
+ *  @overload
+ */
+
+/*!
+ *  @fn const_reference FixedList::constLast() const
+ *
+ *  Returns a const reference to the last item in the list.
+ *
+ *  Requires the list to not be empty.
+ *
+ *  @sa last(), constFirst(), isEmpty()
+ */
+
+/*!
+ *  @fn reference FixedList::back()
+ *
+ *  This function is provided for STL compatibility. It is equivalent to last().
+ */
+
+/*!
+ *  @fn const_reference FixedList::back() const
+ *
+ *  @overload
+ */
+
+/*!
+ *  @fn iterator FixedList::begin()
+ *
+ *  Returns an STL-style iterator pointing to the first item in the list.
+ *
+ *  @sa constBegin(), end()
+ */
+
+/*!
+ *  @fn const_iterator FixedList::begin() const
+ *
+ *  @overload
+ */
+
+/*!
+ *  @fn const_iterator FixedList::cbegin() const
+ *
+ *  Returns a const STL-style iterator pointing to the first item in the list.
+ *
+ *  @sa begin(), cend()
+ */
+
+/*!
+ *  @fn const_iterator FixedList::constBegin() const
+ *
+ *  Returns a const STL-style iterator pointing to the first item in the list.
+ *
+ *  @sa begin(), constEnd()
+ */
+
+/*!
+ *  @fn iterator FixedList::end()
+ *
+ *  Returns an STL-style iterator pointing to the imaginary item after the last item in the list.
+ *
+ *  @sa constEnd(), begin()
+ */
+
+/*!
+ *  @fn const_iterator FixedList::end() const
+ *
+ *  @overload
+ */
+
+/*!
+ *  @fn const_iterator FixedList::cend() const
+ *
+ *  Returns a const STL-style iterator pointing to the imaginary item after the last item in the list.
+ *
+ *  @sa end(), cbegin()
+ */
+
+/*!
+ *  @fn const_iterator FixedList::constEnd() const
+ *
+ *  Returns a const STL-style iterator pointing to the imaginary item after the last item in the list.
+ *
+ *  @sa end(), constBegin()
+ */
+
+/*!
+ *  @fn reverse_iterator FixedList::rbegin()
+ *
+ *  Returns an STL-style reverse iterator pointing to the first item in the reversed list (i.e., the last
+ *  item in the list).
+ *
+ *  @sa crbegin(), rend()
+ */
+
+/*!
+ *  @fn const_reverse_iterator FixedList::rbegin() const
+ *
+ *  @overload
+ */
+
+/*!
+ *  @fn const_reverse_iterator FixedList::crbegin() const
+ *
+ *  Returns a const STL-style reverse iterator pointing to the first item in the reversed list (i.e., the
+ *  last item in the list).
+ *
+ *  @sa rbegin(), crend()
+ */
+
+/*!
+ *  @fn reverse_iterator FixedList::rend()
+ *
+ *  Returns an STL-style reverse iterator pointing to the imaginary item after the last item in the
+ *  reversed list (i.e., the imaginary item before the first item in the list).
+ *
+ *  @sa crend(), rbegin()
+ */
+
+/*!
+ *  @fn const_reverse_iterator FixedList::rend() const
+ *
+ *  @overload
+ */
+
+/*!
+ *  @fn const_reverse_iterator FixedList::crend() const
+ *
+ *  Returns a const STL-style reverse iterator pointing to the imaginary item after the last item in the
+ *  reversed list (i.e., the imaginary item before the first item in the list).
+ *
+ *  @sa rend(), crbegin()
+ */
+
+/*!
+ *  @fn bool FixedList::contains(const AT& t) const
+ *
+ *  Returns @c true if the list contains an item equal to @a t; otherwise, returns @c false.
+ *
+ *  This function requires @c AT to be comparable with @c T via @c operator==().
+ *
+ *  @sa indexOf(), count(const AT&)
+ */
+
+/*!
+ *  @fn qsizetype FixedList::count(const AT& t) const
+ *
+ *  Returns the number of items in the list that are equal to @a t.
+ *
+ *  This function requires @c AT to be comparable with @c T via @c operator==().
+ *
+ *  @sa contains(), indexOf()
+ */
+
+/*!
+ *  @fn qsizetype FixedList::indexOf(const AT& t, qsizetype from) const
+ *
+ *  Returns the index position of the first occurrence of @a t in the list, searching forward from index
+ *  position @a from. Returns -1 if no item matched.
+ *
+ *  If @a from is negative, it is interpreted as an offset from the end of the list (i.e. -1 starts the
+ *  search at the last item).
+ *
+ *  This function requires @c AT to be comparable with @c T via @c operator==().
+ *
+ *  @sa lastIndexOf(), contains()
+ */
+
+/*!
+ *  @fn qsizetype FixedList::lastIndexOf(const AT& t, qsizetype from) const
+ *
+ *  Returns the index position of the last occurrence of @a t in the list, searching backward from index
+ *  position @a from. Returns -1 if no item matched.
+ *
+ *  If @a from is negative, it is interpreted as an offset from the end of the list (i.e. -1, the default,
+ *  starts the search at the last item). If @a from is greater than or equal to the size of the list, the
+ *  search starts at the last item.
+ *
+ *  This function requires @c AT to be comparable with @c T via @c operator==().
+ *
+ *  @sa indexOf(), contains()
+ */
+
+/*!
+ *  @fn bool FixedList::startsWith(const AT& t) const
+ *
+ *  Returns @c true if the list is not empty and its first item is equal to @a t; otherwise, returns
+ *  @c false.
+ *
+ *  This function requires @c AT to be comparable with @c T via @c operator==().
+ *
+ *  @sa endsWith(), first()
+ */
+
+/*!
+ *  @fn bool FixedList::endsWith(const AT& t) const
+ *
+ *  Returns @c true if the list is not empty and its last item is equal to @a t; otherwise, returns
+ *  @c false.
+ *
+ *  This function requires @c AT to be comparable with @c T via @c operator==().
+ *
+ *  @sa startsWith(), last()
+ */
+
+/*!
+ *  @fn FixedList& FixedList::fill(const AT& t)
+ *
+ *  Assigns @a t to all items in the list. Returns a reference to the list.
+ *
+ *  This function requires @c T to be assignable from @c AT.
+ */
+
+/*!
+ *  @fn void FixedList::replace(qsizetype i, const AT& t)
+ *
+ *  Replaces the item at index position @a i with @a t.
+ *
+ *  @a i must be a valid index position in the list (i.e., 0 <= @a i < size()).
+ *
+ *  This function requires @c T to be assignable from @c AT.
+ *
+ *  @sa operator[](), at()
+ */
+
+/*!
+ *  @fn void FixedList::swapItemsAt(qsizetype i, qsizetype j)
+ *
+ *  Exchanges the item at index position @a i with the item at index position @a j.
+ *
+ *  Both @a i and @a j must be valid index positions in the list (i.e., 0 <= @a i, @a j < size()).
+ *
+ *  @sa swap()
+ */
+
+/*!
+ *  @fn void FixedList::move(qsizetype from, qsizetype to)
+ *
+ *  Moves the item at index position @a from to index position @a to, shifting the items in between
+ *  accordingly.
+ *
+ *  Both @a from and @a to must be valid index positions in the list (i.e., 0 <= @a from, @a to < size()).
+ *
+ *  @sa swapItemsAt()
+ */
+
+/*!
+ *  @fn void FixedList::swap(FixedList& other)
+ *
+ *  Swaps the contents of this list with @a other.
+ *
+ *  @sa swapItemsAt()
+ */
+
+/*!
+ *  @fn auto FixedList::chopped() const
+ *
+ *  Returns a FixedList<T, N - K> that contains copies of all but the last @c K items in this list.
+ *
+ *  @c K must be non-negative and no greater than @c N.
+ *
+ *  @sa first(), sliced(), mid()
+ */
+
+/*!
+ *  @fn auto FixedList::mid() const
+ *
+ *  Returns a FixedList that contains copies of up to @c Len items in this list, starting at index
+ *  position @c Pos.
+ *
+ *  If @c Len is negative (the default) or would extend past the end of the list, all items from
+ *  @c Pos to the end are returned. The size of the result is therefore
+ *  <tt>min(Len, N - Pos)</tt>, or <tt>N - Pos</tt> if @c Len is negative.
+ *
+ *  Unlike QList::mid(), @c Pos must be non-negative and no greater than @c N, as an out-of-range position
+ *  would otherwise need to produce a differently sized list at run-time.
+ *
+ *  @sa first(), last(), sliced(), chopped()
+ */
+
+/*!
+ *  @fn FixedList<T, N + M> FixedList::operator+(const FixedList<T, M>& other) const
+ *
+ *  Returns a FixedList of size @c N + @c M that contains all the items in this list followed by all the
+ *  items in @a other.
+ *
+ *  @sa operator+(const T (&other)[M]) const, operator+(const T& other) const
+ */
+
+/*!
+ *  @fn FixedList<T, N + M> FixedList::operator+(const T (&other)[M]) const
+ *
+ *  @overload
+ *
+ *  Returns a FixedList of size @c N + @c M that contains all the items in this list followed by all the
+ *  items in the C array @a other.
+ */
+
+/*!
+ *  @fn FixedList<T, N + 1> FixedList::operator+(const T& other) const
+ *
+ *  @overload
+ *
+ *  Returns a FixedList of size @c N + 1 that contains all the items in this list followed by @a other.
+ */
+
+//-Operators-------------------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn bool FixedList::operator==(const FixedList& other) const
+ *
+ *  Returns @c true if the FixedList is equal to @a other; otherwise, returns @c false.
+ *
+ *  Two lists are equal if each of their items compare equal, in order. Lists of different sizes or
+ *  different element types are different types and cannot be compared.
+ *
+ *  @c operator!=() is synthesized from this operator.
+ */
+
+/*!
+ *  @fn auto FixedList::operator<=>(const FixedList& other) const
+ *
+ *  Returns the ordering of @a other relative to @c this.
+ *
+ *  Items are compared lexicographically. This operator is only available if @c T supports three-way
+ *  comparison or @c operator<(); otherwise it is deleted.
+ */
+
+//-Friends-----------------------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @fn void FixedList::swap(FixedList& a, FixedList& b)
+ *
+ *  Swaps the contents of @a a and @a b.
+ *
+ *  @sa FixedList::swap()
+ */
+
+/*!
+ *  @fn size_t FixedList::qHash(const FixedList& key, size_t seed)
+ *
+ *  Returns the hash value for @a key, using @a seed to seed the calculation.
+ *
+ *  This function requires @c T to be hashable via @c qHash().
+ */
+}
