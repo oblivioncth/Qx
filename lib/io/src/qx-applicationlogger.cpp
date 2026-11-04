@@ -1,6 +1,9 @@
 // Unit Includes
 #include "qx/io/qx-applicationlogger.h"
 
+// Core Includes
+#include "qx/core/qx-string.h"
+
 // Qt Includes
 #include <QCoreApplication>
 
@@ -153,11 +156,18 @@ void ApplicationLogger::setApplicationArguments(const QString& args) { mAppArgum
 /*!
  *  @overload
  *
- *  @a args are joined together into a single string using spaces as a separator.
+ *  @a args are joined together into a single string using spaces as a separator. Any elemnts that
+ *  contain whitespace will be surrounded in double quotes.
  *
  *  @sa applicationArguments().
  */
-void ApplicationLogger::setApplicationArguments(const QStringList& args) { mAppArguments = args.join(' '); }
+void ApplicationLogger::setApplicationArguments(const QStringList& args)
+{
+    mAppArguments = String::join(args, [](const QString& arg){
+        bool ws = std::any_of(arg.cbegin(), arg.cend(), [](QChar c) { return c.isSpace(); });
+        return ws ? u'"' + arg + u'"' : arg;
+    }, u" "_s);
+}
 
 /*!
  *  Sets the maximum number of entries to be kept in the log before the oldest one is purged.

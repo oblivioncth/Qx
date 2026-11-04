@@ -93,11 +93,7 @@ bool operator==(const FileDetails::Translation& lhs, const FileDetails::Translat
  */
 size_t qHash(const FileDetails::Translation& key, size_t seed) noexcept
 {
-    QtPrivate::QHashCombine hash;
-    seed = hash(seed, key.language);
-    seed = hash(seed, key.codePage);
-
-    return seed;
+    return qHashMulti(seed, key.language, key.codePage);
 }
 
 //===============================================================================================================

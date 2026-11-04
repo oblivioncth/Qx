@@ -58,7 +58,7 @@ public:
 
 //-Signals & Slots------------------------------------------------------------------------------------------------
 signals:
-    void signaled(Signal s, bool* handled);
+    void signaled(Qx::SystemSignalWatcher::Signal s, bool* handled);
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(SystemSignalWatcher::Signals);
 

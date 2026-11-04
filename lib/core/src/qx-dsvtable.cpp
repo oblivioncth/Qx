@@ -286,7 +286,7 @@ QByteArray DsvTable::toDsv(QChar delim, QChar esc)
     QTextStream serializer(dsv);
 
     // Print all values
-    for(const QList<QVariant>& row : mTable)
+    for(const QList<QVariant>& row : std::as_const(mTable))
     {
         for(auto itr = row.constBegin(); itr != row.constEnd(); itr++)
         {

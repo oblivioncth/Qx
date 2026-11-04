@@ -84,7 +84,7 @@ signals:
     void processStopped();
     void processCloseFailed();
     void graceStarted();
-    void complete(Outcome outcome);
+    void complete(Qx::ProcessBiderWorker::Outcome outcome);
 };
 
 class ProcessBider;

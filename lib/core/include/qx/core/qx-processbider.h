@@ -99,7 +99,7 @@ public:
 
 //-Slots------------------------------------------------------------------------------------------------------------
 private slots:
-    void handleResultReady(ResultType result);
+    void handleResultReady(Qx::ProcessBider::ResultType result);
     void handleCloseFailure();
 
 public slots:
@@ -115,8 +115,8 @@ signals:
     void processStopped();
     void processClosing();
     void stopped();
-    void errorOccurred(ProcessBiderError error);
-    void finished(ResultType result);
+    void errorOccurred(Qx::ProcessBiderError error);
+    void finished(Qx::ProcessBider::ResultType result);
 
 /*! @cond */
     // Temporary until using PIMPL or changing implementation otherwise
