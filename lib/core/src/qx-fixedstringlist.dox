@@ -252,6 +252,10 @@ namespace Qx
  *  Alias for a FixedStringList that uses @c QStringView as its view type, with a size of @c N.
  *
  *  The size can be deduced when constructing from char16_t literals.
+ *
+ *  @note This aliases is only available when using a compiler that supports P1814R0 (CTAD for alias templates),
+ *  as it's use otherwise is outright worse than just using FixedStringLiteral since that can deduce types
+ *  regardless. This alias only serves as a formality for the purposes of intent expression anyway.
  */
 
 /*!
@@ -261,5 +265,9 @@ namespace Qx
  *  Alias for a FixedStringList that uses @c QLatin1StringView as its view type, with a size of @c N.
  *
  *  The size can be deduced when constructing from char literals.
+ *
+ *  @note This aliases is only available when using a compiler that supports P1814R0 (CTAD for alias templates),
+ *  as it's use otherwise is outright worse than just using FixedStringLiteral since that can deduce types
+ *  regardless. This alias only serves as a formality for the purposes of intent expression anyway.
  */
 }

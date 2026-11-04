@@ -221,11 +221,22 @@ FixedStringList(First&&, Rest&&...) -> FixedStringList<_QxPrivate::string_view_f
 /*! @endcond */
 
 //-Aliases----------------------------------------------------------------------------------------------------------
+/* TODO: These have the same problem as the would-be aliases in StringLiteral, which is that Clang didn't introduce
+ * CTAD for template aliases until Clang 19, which is not yet common place. This makes using these aliases straight-up
+ * worse than just sing FixedStringList since that can deduce the types anyway. Unlike with StringLiteral, temporarily
+ * implementing these as derived classes would be even more involved so I've deemed it not worth it.
+ *
+ * Instead we just gate these behind compilers that support them an note that in the documentation. This check is
+ * technically overly coarse in that it also requires CTAD for aggregates, P1816R0 (which we don't need here), but every
+ * compiler that matters has implemented that before P1814R0 so this check works anyway.
+ */
+#if defined(__cpp_deduction_guides) && __cpp_deduction_guides >= 201907L || defined(DOXYGEN)
 template<size_t N>
 using StringViewList = FixedStringList<QStringView, N>;
 
 template<size_t N>
 using Latin1StringViewList = FixedStringList<QLatin1StringView, N>;
+#endif
 
 //-Operators--------------------------------------------------------------------------------------------------------
 /*!
