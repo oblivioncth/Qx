@@ -74,7 +74,7 @@ private:
 
 //-Slots------------------------------------------------------------------------------------------------------------
 public slots:
-    void handlePollRequest(QPointer<ProcessWaiter> waiter) { mWaiters[startTimer(waiter->pollRate())] = waiter; }
+    void handlePollRequest(QPointer<Qx::ProcessWaiter> waiter) { mWaiters[startTimer(waiter->pollRate())] = waiter; }
 
 //-Signals----------------------------------------------------------------------------------------------------------
 signals:
@@ -152,7 +152,7 @@ private slots:
 
 //-Signals----------------------------------------------------------------------------------------------------------
 signals:
-    void pollRequested(QPointer<ProcessWaiter> waiter);
+    void pollRequested(QPointer<Qx::ProcessWaiter> waiter);
 };
 
 //===============================================================================================================
