@@ -35,6 +35,7 @@ qx_add_component("Core"
         qx-versionnumber.h
         qx-regularexpression.h
         qx-setonce.h
+        qx-settings.h
         qx-string.h
         qx-system.h
         qx-systemerror.h
@@ -68,6 +69,7 @@ qx_add_component("Core"
         qx-property.cpp
         qx-versionnumber.cpp
         qx-string.cpp
+        qx-settings.cpp
         qx-system.cpp
         qx-system_linux.cpp
         qx-system_win.cpp
